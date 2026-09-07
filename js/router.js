@@ -24,6 +24,7 @@ class PulseRouter {
     this.listeners = [];
 
     window.addEventListener('hashchange', () => this.handleHashChange());
+    window.addEventListener('popstate', () => this.handleHashChange());
     window.addEventListener('DOMContentLoaded', () => this.handleHashChange());
   }
 
@@ -50,6 +51,16 @@ class PulseRouter {
   handleHashChange() {
     let rawHash = window.location.hash.replace(/^#\/?/, '').trim();
     if (!rawHash) {
+      // Fallback to pathname segment if accessed via direct URL on Vercel
+      const pathSegment = window.location.pathname.replace(/\/$/, '').split('/').pop().replace(/\.html$/, '').toLowerCase();
+      if (pathSegment === 'homepage') {
+        rawHash = 'landing';
+      } else if (pathSegment && this.routes[pathSegment]) {
+        rawHash = pathSegment;
+      } else {
+        rawHash = 'landing';
+      }
+    } else if (rawHash.toLowerCase() === 'homepage') {
       rawHash = 'landing';
     }
 
