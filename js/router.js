@@ -24,7 +24,11 @@ class PulseRouter {
     this.listeners = [];
 
     window.addEventListener('hashchange', () => this.handleHashChange());
-    window.addEventListener('DOMContentLoaded', () => this.handleHashChange());
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', () => this.handleHashChange());
+    } else {
+      setTimeout(() => this.handleHashChange(), 0);
+    }
   }
 
   onRouteChange(callback) {

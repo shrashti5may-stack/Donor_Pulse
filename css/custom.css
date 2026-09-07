@@ -2,16 +2,20 @@
 
 /* Smooth view transitions */
 .view-section {
-  display: none;
+  display: none !important;
   opacity: 0;
   transform: translateY(6px);
   transition: opacity 0.25s ease-out, transform 0.25s ease-out;
 }
 
 .view-section.active {
-  display: block;
+  display: block !important;
   opacity: 1;
   transform: translateY(0);
+}
+
+.view-section.active.flex {
+  display: flex !important;
 }
 
 /* Custom scrollbars where needed */

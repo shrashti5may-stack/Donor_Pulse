@@ -19,6 +19,20 @@
       main > :first-child { margin-top: 0 !important; }
       main > :last-child { margin-bottom: 0 !important; }
     }
+
+    /* Strict view display control */
+    .view-section {
+      display: none !important;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+    }
+
+    .view-section.active {
+      display: block !important;
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 
   <!-- Tailwind CDN & Authentic Stitch Theme Configuration -->
@@ -117,7 +131,7 @@
       }
     };
   </script>
-  <link rel="stylesheet" href="css/custom.css"/>
+  <link rel="stylesheet" href="css/custom.css?v=2"/>
 </head>
 <body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col">
 
@@ -192,7 +206,7 @@
     <!-- ------------------------------------------------------------------- -->
     <!-- VIEW 1: LANDING PAGE (#/landing)                                     -->
     <!-- ------------------------------------------------------------------- -->
-    <div id="view-landing" class="view-section active flex flex-col w-full">
+    <div id="view-landing" class="view-section active w-full">
       <!-- Top Notification Ticker / System Status -->
       <section class="w-full bg-surface-container-low border-b border-surface-container-high py-2.5">
         <div class="max-w-[1280px] mx-auto px-gutter-desktop flex flex-wrap items-center justify-between gap-space-sm text-on-surface-variant font-label-md text-label-md">
