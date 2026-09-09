@@ -1,0 +1,17 @@
+{
+  "name": "donor-pulse",
+  "version": "1.0.0",
+  "description": "DonorPulse — National Real-Time Hemovigilance & Blood Donation Grid",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "blood-donation",
+    "healthcare",
+    "hemovigilance"
+  ],
+  "author": "",
+  "license": "ISC"
+}
