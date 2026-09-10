@@ -314,7 +314,156 @@ function initInteractiveWidgets() {
     });
   }
 
-  // Interactive Blood Compatibility Matrix highlighting
+  // Interactive Blood Compatibility Widget & Matrix Controller
+  initBloodCompatibilityWidget();
+}
+
+function initBloodCompatibilityWidget() {
+  const bloodData = {
+    'O-': {
+      name: 'Type O Negative',
+      tag: 'Universal Red Cell Donor',
+      tagClass: 'bg-primary-fixed text-primary',
+      stats: '7% of population • Critical Emergency Need',
+      summary: "Type O- is the universal donor for red blood cells. In trauma situations where the patient's blood type is unknown, O- is the emergency choice.",
+      donate: ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'],
+      receive: ['O- Only']
+    },
+    'O+': {
+      name: 'Type O Positive',
+      tag: 'Most Common Blood Type',
+      tagClass: 'bg-surface-container-highest text-on-surface',
+      stats: '38% of population • Constant High Demand',
+      summary: 'Type O+ is the most widely transfused red blood cell type, heavily utilized in emergency rooms and elective surgeries worldwide.',
+      donate: ['O+', 'A+', 'B+', 'AB+'],
+      receive: ['O-', 'O+']
+    },
+    'A-': {
+      name: 'Type A Negative',
+      tag: 'Universal Platelet Component',
+      tagClass: 'bg-surface-container-highest text-on-surface',
+      stats: '6% of population • High Clinical Value',
+      summary: 'Type A- donors can provide whole blood to 4 different types and are prized for specialized apheresis platelet donations.',
+      donate: ['A-', 'A+', 'AB-', 'AB+'],
+      receive: ['O-', 'A-']
+    },
+    'A+': {
+      name: 'Type A Positive',
+      tag: 'Second Most Common Type',
+      tagClass: 'bg-surface-container-highest text-on-surface',
+      stats: '34% of population • High Surgical Demand',
+      summary: 'Type A+ blood is critical in cancer therapies and trauma care, being compatible with A+ and AB+ recipients.',
+      donate: ['A+', 'AB+'],
+      receive: ['O-', 'O+', 'A-', 'A+']
+    },
+    'B-': {
+      name: 'Type B Negative',
+      tag: 'Rare Blood Type',
+      tagClass: 'bg-primary-fixed/40 text-primary',
+      stats: '2% of population • Priority Acute Need',
+      summary: 'With only 2% prevalence, regional reserves of B- are frequently in critical short supply when emergency surgeries occur.',
+      donate: ['B-', 'B+', 'AB-', 'AB+'],
+      receive: ['O-', 'B-']
+    },
+    'B+': {
+      name: 'Type B Positive',
+      tag: 'Vital Clinical Match',
+      tagClass: 'bg-surface-container-highest text-on-surface',
+      stats: '9% of population • Ongoing Need',
+      summary: 'Type B+ is especially common in diverse patient populations and essential in thalassemia and sickle cell care.',
+      donate: ['B+', 'AB+'],
+      receive: ['O-', 'O+', 'B-', 'B+']
+    },
+    'AB-': {
+      name: 'Type AB Negative',
+      tag: 'Rarest Blood Type',
+      tagClass: 'bg-secondary-container text-secondary',
+      stats: '1% of population • Specialized Transfusion',
+      summary: 'The rarest blood type on earth. While red blood cell usage is specific, AB- individuals make universal plasma donors.',
+      donate: ['AB-', 'AB+'],
+      receive: ['O-', 'A-', 'B-', 'AB-']
+    },
+    'AB+': {
+      name: 'Type AB Positive',
+      tag: 'Universal Red Cell Recipient',
+      tagClass: 'bg-tertiary-fixed text-on-tertiary-fixed',
+      stats: '3% of population • Universal Plasma Donor',
+      summary: 'Type AB+ patients are universal recipients of red blood cells (can receive from all 8 groups). In addition, AB+ donors are universal plasma donors!',
+      donate: ['AB+'],
+      receive: ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+']
+    }
+  };
+
+  const pills = document.querySelectorAll('#blood-pills-container button[data-blood]');
+  const badgeEl = document.getElementById('widget-group-badge');
+  const titleEl = document.getElementById('widget-group-title');
+  const tagEl = document.getElementById('widget-tag');
+  const statsEl = document.getElementById('widget-stats');
+  const summaryEl = document.getElementById('widget-summary');
+  const donateListEl = document.getElementById('widget-can-donate-list');
+  const receiveListEl = document.getElementById('widget-can-receive-list');
+
+  function selectBlood(type) {
+    const data = bloodData[type];
+    if (!data) return;
+
+    pills.forEach(p => {
+      if (p.getAttribute('data-blood') === type) {
+        p.classList.add('active');
+        p.classList.remove('bg-surface-container-low');
+      } else {
+        p.classList.remove('active');
+        p.classList.add('bg-surface-container-low');
+      }
+    });
+
+    if (badgeEl) badgeEl.textContent = type;
+    if (titleEl) titleEl.textContent = data.name;
+    if (tagEl) {
+      tagEl.textContent = data.tag;
+      tagEl.className = `px-2.5 py-0.5 rounded-full font-label-badge text-[11px] font-bold ${data.tagClass}`;
+    }
+    if (statsEl) statsEl.textContent = data.stats;
+    if (summaryEl) summaryEl.textContent = data.summary;
+
+    if (donateListEl) {
+      donateListEl.innerHTML = data.donate.map(item =>
+        `<span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold transition-all">${item}</span>`
+      ).join('');
+    }
+
+    if (receiveListEl) {
+      receiveListEl.innerHTML = data.receive.map(item =>
+        `<span class="px-2.5 py-1 rounded-lg bg-primary-fixed/40 text-primary font-label-badge text-xs font-bold transition-all">${item}</span>`
+      ).join('');
+    }
+  }
+
+  pills.forEach(p => {
+    p.addEventListener('click', () => {
+      const type = p.getAttribute('data-blood');
+      selectBlood(type);
+    });
+  });
+
+  // Toggle full clinical matrix table
+  const btnToggle = document.getElementById('btn-toggle-matrix');
+  const matrixContainer = document.getElementById('matrix-full-container');
+  const toggleIcon = document.getElementById('matrix-toggle-icon');
+  if (btnToggle && matrixContainer) {
+    btnToggle.addEventListener('click', () => {
+      const isHidden = matrixContainer.classList.contains('hidden');
+      if (isHidden) {
+        matrixContainer.classList.remove('hidden');
+        if (toggleIcon) toggleIcon.textContent = 'expand_less';
+      } else {
+        matrixContainer.classList.add('hidden');
+        if (toggleIcon) toggleIcon.textContent = 'expand_more';
+      }
+    });
+  }
+
+  // Hover highlighting on matrix rows
   const matrixRows = document.querySelectorAll('#matrixTable tbody tr');
   matrixRows.forEach(row => {
     row.addEventListener('mouseenter', () => {

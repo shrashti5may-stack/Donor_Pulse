@@ -87,3 +87,35 @@
 .step-line-active {
   background-color: #00583c !important;
 }
+
+/* Card subtle hover elevation */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+}
+
+/* Radar Sweep Animation for Telemetry */
+@keyframes radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.radar-sweep-anim {
+  animation: radar-sweep 4s linear infinite;
+  transform-origin: center center;
+}
+
+/* Blood matcher pill active state */
+.blood-pill {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.blood-pill.active {
+  background-color: #c8102e !important;
+  color: #ffffff !important;
+  border-color: #c8102e !important;
+  box-shadow: 0 4px 14px rgba(200, 16, 46, 0.3);
+  transform: scale(1.04);
+}
