@@ -111,11 +111,63 @@
 /* Blood matcher pill active state */
 .blood-pill {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
 }
 .blood-pill.active {
   background-color: #c8102e !important;
   color: #ffffff !important;
   border-color: #c8102e !important;
-  box-shadow: 0 4px 14px rgba(200, 16, 46, 0.3);
+  box-shadow: 0 4px 14px rgba(200, 16, 46, 0.35);
   transform: scale(1.04);
 }
+
+/* Interactive Blood Badges in Cards */
+.clickable-blood-pill {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+.clickable-blood-pill:hover {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.clickable-blood-pill:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Matrix Table Interactive Styling */
+.matrix-row-selected {
+  background-color: rgba(200, 16, 46, 0.08) !important;
+  font-weight: 700;
+}
+.matrix-row-selected td:first-child {
+  border-left: 3px solid #c8102e;
+}
+
+.matrix-col-selected {
+  background-color: rgba(200, 16, 46, 0.05) !important;
+}
+
+.matrix-cell-interactive {
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  border-radius: 8px;
+}
+.matrix-cell-interactive:hover {
+  transform: scale(1.22);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.matrix-cell-active-match {
+  outline: 2px solid #c8102e;
+  outline-offset: 2px;
+  transform: scale(1.18);
+  z-index: 12;
+  box-shadow: 0 4px 14px rgba(200, 16, 46, 0.35);
+}
+

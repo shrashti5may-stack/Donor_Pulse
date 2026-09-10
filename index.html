@@ -577,6 +577,7 @@
           </div>
 
           <!-- The Widget Container -->
+          <!-- The Widget Container -->
           <div class="bg-surface-container-lowest rounded-3xl border border-surface-container-high shadow-sm p-6 sm:p-8">
             
             <!-- Blood Group Pills Row -->
@@ -585,14 +586,14 @@
                 Select Blood Type:
               </label>
               <div class="grid grid-cols-4 sm:grid-cols-8 gap-2.5" id="blood-pills-container">
-                <button type="button" data-blood="O-" class="blood-pill active py-2.5 px-2 rounded-xl border border-outline-variant font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">O-</button>
-                <button type="button" data-blood="O+" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">O+</button>
-                <button type="button" data-blood="A-" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">A-</button>
-                <button type="button" data-blood="A+" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">A+</button>
-                <button type="button" data-blood="B-" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">B-</button>
-                <button type="button" data-blood="B+" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">B+</button>
-                <button type="button" data-blood="AB-" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">AB-</button>
-                <button type="button" data-blood="AB+" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">AB+</button>
+                <button type="button" data-blood="O-" onclick="window.selectBloodType('O-')" class="blood-pill active py-2.5 px-2 rounded-xl border border-outline-variant font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">O-</button>
+                <button type="button" data-blood="O+" onclick="window.selectBloodType('O+')" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">O+</button>
+                <button type="button" data-blood="A-" onclick="window.selectBloodType('A-')" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">A-</button>
+                <button type="button" data-blood="A+" onclick="window.selectBloodType('A+')" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">A+</button>
+                <button type="button" data-blood="B-" onclick="window.selectBloodType('B-')" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">B-</button>
+                <button type="button" data-blood="B+" onclick="window.selectBloodType('B+')" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">B+</button>
+                <button type="button" data-blood="AB-" onclick="window.selectBloodType('AB-')" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">AB-</button>
+                <button type="button" data-blood="AB+" onclick="window.selectBloodType('AB+')" class="blood-pill py-2.5 px-2 rounded-xl border border-outline-variant bg-surface-container-low font-headline-sm text-sm sm:text-base font-extrabold text-center hover:bg-surface-container transition-all">AB+</button>
               </div>
             </div>
 
@@ -601,7 +602,7 @@
               <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-5 border-b border-surface-container-high">
                 <!-- Group Identity & Badges -->
                 <div class="flex items-center gap-4">
-                  <div id="widget-group-badge" class="w-14 h-14 rounded-2xl bg-primary-container text-on-primary font-numeric-metric text-2xl font-extrabold flex items-center justify-center shadow-sm">
+                  <div id="widget-group-badge" class="w-14 h-14 rounded-2xl bg-primary-container text-on-primary font-numeric-metric text-2xl font-extrabold flex items-center justify-center shadow-sm transition-all duration-300">
                     O-
                   </div>
                   <div>
@@ -625,30 +626,36 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5">
                 <!-- Can Donate To -->
                 <div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container-high">
-                  <div class="flex items-center gap-2 mb-3">
-                    <span class="w-6 h-6 rounded-full bg-tertiary-fixed text-tertiary flex items-center justify-center font-bold text-xs">✓</span>
-                    <h4 class="font-title-md text-sm font-bold text-on-surface">Can Donate Red Blood Cells To:</h4>
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="w-6 h-6 rounded-full bg-tertiary-fixed text-tertiary flex items-center justify-center font-bold text-xs">✓</span>
+                      <h4 class="font-title-md text-sm font-bold text-on-surface">Can Donate Red Blood Cells To:</h4>
+                    </div>
+                    <span class="font-body-sm text-[11px] text-on-surface-variant">Click type to explore</span>
                   </div>
                   <div id="widget-can-donate-list" class="flex flex-wrap gap-2">
-                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold">O-</span>
-                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold">O+</span>
-                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold">A-</span>
-                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold">A+</span>
-                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold">B-</span>
-                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold">B+</span>
-                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold">AB-</span>
-                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold">AB+</span>
+                    <button type="button" onclick="window.selectBloodType('O-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view O- profile">O-</button>
+                    <button type="button" onclick="window.selectBloodType('O+')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view O+ profile">O+</button>
+                    <button type="button" onclick="window.selectBloodType('A-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view A- profile">A-</button>
+                    <button type="button" onclick="window.selectBloodType('A+')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view A+ profile">A+</button>
+                    <button type="button" onclick="window.selectBloodType('B-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view B- profile">B-</button>
+                    <button type="button" onclick="window.selectBloodType('B+')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view B+ profile">B+</button>
+                    <button type="button" onclick="window.selectBloodType('AB-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view AB- profile">AB-</button>
+                    <button type="button" onclick="window.selectBloodType('AB+')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view AB+ profile">AB+</button>
                   </div>
                 </div>
 
                 <!-- Can Receive From -->
                 <div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container-high">
-                  <div class="flex items-center gap-2 mb-3">
-                    <span class="w-6 h-6 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-xs">↓</span>
-                    <h4 class="font-title-md text-sm font-bold text-on-surface">Can Receive Red Blood Cells From:</h4>
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="w-6 h-6 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-xs">↓</span>
+                      <h4 class="font-title-md text-sm font-bold text-on-surface">Can Receive Red Blood Cells From:</h4>
+                    </div>
+                    <span class="font-body-sm text-[11px] text-on-surface-variant">Click type to explore</span>
                   </div>
                   <div id="widget-can-receive-list" class="flex flex-wrap gap-2">
-                    <span class="px-2.5 py-1 rounded-lg bg-primary-fixed/40 text-primary font-label-badge text-xs font-bold">O- Only</span>
+                    <button type="button" onclick="window.selectBloodType('O-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-primary-fixed/40 hover:bg-primary text-primary hover:text-on-primary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view O- profile">O- Only</button>
                   </div>
                 </div>
               </div>
@@ -656,95 +663,190 @@
 
             <!-- Expandable Clinical Matrix Table Toggle -->
             <div class="border-t border-surface-container-high/80 pt-4">
-              <button type="button" id="btn-toggle-matrix" class="inline-flex items-center gap-2 text-primary font-label-md text-xs sm:text-sm font-bold hover:underline">
-                <span class="material-symbols-outlined text-[18px]">table_chart</span>
-                <span>View Full 8×8 Clinical Compatibility Matrix Table</span>
-                <span class="material-symbols-outlined text-[18px]" id="matrix-toggle-icon">expand_more</span>
+              <button type="button" id="btn-toggle-matrix" onclick="window.toggleMatrixTable()" class="inline-flex items-center gap-2 text-primary font-label-md text-xs sm:text-sm font-bold hover:underline transition-all group">
+                <span class="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110">table_chart</span>
+                <span id="matrix-toggle-text">View Full 8×8 Clinical Compatibility Matrix Table</span>
+                <span class="material-symbols-outlined text-[20px] transition-transform" id="matrix-toggle-icon">expand_more</span>
               </button>
 
               <!-- Collapsible Full Matrix Table -->
-              <div id="matrix-full-container" class="hidden mt-4 overflow-x-auto">
+              <div id="matrix-full-container" class="hidden mt-4 overflow-x-auto space-y-4">
+                
+                <!-- Clinical Matrix Context Bar -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-surface-container-low rounded-xl border border-surface-container-high text-xs text-on-surface-variant">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[18px]">info</span>
+                    <span><strong>Interactive Matrix:</strong> Click any cell, recipient row, or donor column to test real-time cross-match compatibility.</span>
+                  </div>
+                  <div class="flex items-center gap-4 shrink-0 font-bold">
+                    <span class="inline-flex items-center gap-1"><span class="w-4 h-4 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 inline-flex items-center justify-center text-[10px]">✓</span> Compatible</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-4 h-4 rounded text-outline inline-flex items-center justify-center text-[10px] font-bold">—</span> Incompatible</span>
+                  </div>
+                </div>
+
                 <table class="w-full text-center border-collapse min-w-[620px]" id="matrixTable">
                   <thead>
                     <tr>
-                      <th class="p-3 text-left font-label-lg text-xs text-on-surface-variant uppercase tracking-wider bg-surface-container-low rounded-tl-xl">Recipient (Can Receive From) ↓</th>
-                      <th class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low">O-</th>
-                      <th class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low">O+</th>
-                      <th class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low">A-</th>
-                      <th class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low">A+</th>
-                      <th class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low">B-</th>
-                      <th class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low">B+</th>
-                      <th class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low">AB-</th>
-                      <th class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low rounded-tr-xl">AB+</th>
+                      <th class="p-3 text-left font-label-lg text-xs text-on-surface-variant uppercase tracking-wider bg-surface-container-low rounded-tl-xl">
+                        Recipient (Can Receive From) ↓ / Donor →
+                      </th>
+                      <th data-donor-col="O-" onclick="window.selectBloodType('O-')" class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low hover:bg-primary-fixed/30 cursor-pointer transition-colors" title="Donor O-: Click to select">O-</th>
+                      <th data-donor-col="O+" onclick="window.selectBloodType('O+')" class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low hover:bg-primary-fixed/30 cursor-pointer transition-colors" title="Donor O+: Click to select">O+</th>
+                      <th data-donor-col="A-" onclick="window.selectBloodType('A-')" class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low hover:bg-primary-fixed/30 cursor-pointer transition-colors" title="Donor A-: Click to select">A-</th>
+                      <th data-donor-col="A+" onclick="window.selectBloodType('A+')" class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low hover:bg-primary-fixed/30 cursor-pointer transition-colors" title="Donor A+: Click to select">A+</th>
+                      <th data-donor-col="B-" onclick="window.selectBloodType('B-')" class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low hover:bg-primary-fixed/30 cursor-pointer transition-colors" title="Donor B-: Click to select">B-</th>
+                      <th data-donor-col="B+" onclick="window.selectBloodType('B+')" class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low hover:bg-primary-fixed/30 cursor-pointer transition-colors" title="Donor B+: Click to select">B+</th>
+                      <th data-donor-col="AB-" onclick="window.selectBloodType('AB-')" class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low hover:bg-primary-fixed/30 cursor-pointer transition-colors" title="Donor AB-: Click to select">AB-</th>
+                      <th data-donor-col="AB+" onclick="window.selectBloodType('AB+')" class="p-3 font-title-md text-xs font-bold text-on-surface bg-surface-container-low hover:bg-primary-fixed/30 cursor-pointer transition-colors rounded-tr-xl" title="Donor AB+: Click to select">AB+</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-surface-container-high font-body-sm text-xs text-on-surface">
-                    <tr class="hover:bg-surface-container-low/50 transition-colors">
-                      <td class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-primary-container text-on-primary font-bold text-[10px] flex items-center justify-center">O-</span> Type O-</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td>
+                    <!-- Row O- -->
+                    <tr id="matrix-row-O-" data-recipient-row="O-" class="matrix-row-selected hover:bg-surface-container-low/60 transition-colors">
+                      <td onclick="window.selectBloodType('O-')" class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-primary-container text-on-primary font-bold text-[10px] flex items-center justify-center">O-</span>
+                        <span>Type O-</span>
+                      </td>
+                      <td data-cell-recipient="O-" data-cell-donor="O-" data-compatible="true" onclick="window.inspectCrossMatch('O-', 'O-')" class="matrix-cell-interactive p-2.5" title="Recipient O- can receive from Donor O- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="O-" data-cell-donor="O+" data-compatible="false" onclick="window.inspectCrossMatch('O-', 'O+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O- cannot receive from Donor O+ (Incompatible)">—</td>
+                      <td data-cell-recipient="O-" data-cell-donor="A-" data-compatible="false" onclick="window.inspectCrossMatch('O-', 'A-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O- cannot receive from Donor A- (Incompatible)">—</td>
+                      <td data-cell-recipient="O-" data-cell-donor="A+" data-compatible="false" onclick="window.inspectCrossMatch('O-', 'A+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O- cannot receive from Donor A+ (Incompatible)">—</td>
+                      <td data-cell-recipient="O-" data-cell-donor="B-" data-compatible="false" onclick="window.inspectCrossMatch('O-', 'B-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O- cannot receive from Donor B- (Incompatible)">—</td>
+                      <td data-cell-recipient="O-" data-cell-donor="B+" data-compatible="false" onclick="window.inspectCrossMatch('O-', 'B+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O- cannot receive from Donor B+ (Incompatible)">—</td>
+                      <td data-cell-recipient="O-" data-cell-donor="AB-" data-compatible="false" onclick="window.inspectCrossMatch('O-', 'AB-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O- cannot receive from Donor AB- (Incompatible)">—</td>
+                      <td data-cell-recipient="O-" data-cell-donor="AB+" data-compatible="false" onclick="window.inspectCrossMatch('O-', 'AB+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O- cannot receive from Donor AB+ (Incompatible)">—</td>
                     </tr>
-                    <tr class="hover:bg-surface-container-low/50 transition-colors">
-                      <td class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">O+</span> Type O+</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td>
+                    <!-- Row O+ -->
+                    <tr id="matrix-row-O+" data-recipient-row="O+" class="hover:bg-surface-container-low/60 transition-colors">
+                      <td onclick="window.selectBloodType('O+')" class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">O+</span>
+                        <span>Type O+</span>
+                      </td>
+                      <td data-cell-recipient="O+" data-cell-donor="O-" data-compatible="true" onclick="window.inspectCrossMatch('O+', 'O-')" class="matrix-cell-interactive p-2.5" title="Recipient O+ can receive from Donor O- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="O+" data-cell-donor="O+" data-compatible="true" onclick="window.inspectCrossMatch('O+', 'O+')" class="matrix-cell-interactive p-2.5" title="Recipient O+ can receive from Donor O+ (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="O+" data-cell-donor="A-" data-compatible="false" onclick="window.inspectCrossMatch('O+', 'A-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O+ cannot receive from Donor A- (Incompatible)">—</td>
+                      <td data-cell-recipient="O+" data-cell-donor="A+" data-compatible="false" onclick="window.inspectCrossMatch('O+', 'A+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O+ cannot receive from Donor A+ (Incompatible)">—</td>
+                      <td data-cell-recipient="O+" data-cell-donor="B-" data-compatible="false" onclick="window.inspectCrossMatch('O+', 'B-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O+ cannot receive from Donor B- (Incompatible)">—</td>
+                      <td data-cell-recipient="O+" data-cell-donor="B+" data-compatible="false" onclick="window.inspectCrossMatch('O+', 'B+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O+ cannot receive from Donor B+ (Incompatible)">—</td>
+                      <td data-cell-recipient="O+" data-cell-donor="AB-" data-compatible="false" onclick="window.inspectCrossMatch('O+', 'AB-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O+ cannot receive from Donor AB- (Incompatible)">—</td>
+                      <td data-cell-recipient="O+" data-cell-donor="AB+" data-compatible="false" onclick="window.inspectCrossMatch('O+', 'AB+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient O+ cannot receive from Donor AB+ (Incompatible)">—</td>
                     </tr>
-                    <tr class="hover:bg-surface-container-low/50 transition-colors">
-                      <td class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">A-</span> Type A-</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td>
+                    <!-- Row A- -->
+                    <tr id="matrix-row-A-" data-recipient-row="A-" class="hover:bg-surface-container-low/60 transition-colors">
+                      <td onclick="window.selectBloodType('A-')" class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">A-</span>
+                        <span>Type A-</span>
+                      </td>
+                      <td data-cell-recipient="A-" data-cell-donor="O-" data-compatible="true" onclick="window.inspectCrossMatch('A-', 'O-')" class="matrix-cell-interactive p-2.5" title="Recipient A- can receive from Donor O- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="A-" data-cell-donor="O+" data-compatible="false" onclick="window.inspectCrossMatch('A-', 'O+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A- cannot receive from Donor O+ (Incompatible)">—</td>
+                      <td data-cell-recipient="A-" data-cell-donor="A-" data-compatible="true" onclick="window.inspectCrossMatch('A-', 'A-')" class="matrix-cell-interactive p-2.5" title="Recipient A- can receive from Donor A- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="A-" data-cell-donor="A+" data-compatible="false" onclick="window.inspectCrossMatch('A-', 'A+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A- cannot receive from Donor A+ (Incompatible)">—</td>
+                      <td data-cell-recipient="A-" data-cell-donor="B-" data-compatible="false" onclick="window.inspectCrossMatch('A-', 'B-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A- cannot receive from Donor B- (Incompatible)">—</td>
+                      <td data-cell-recipient="A-" data-cell-donor="B+" data-compatible="false" onclick="window.inspectCrossMatch('A-', 'B+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A- cannot receive from Donor B+ (Incompatible)">—</td>
+                      <td data-cell-recipient="A-" data-cell-donor="AB-" data-compatible="false" onclick="window.inspectCrossMatch('A-', 'AB-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A- cannot receive from Donor AB- (Incompatible)">—</td>
+                      <td data-cell-recipient="A-" data-cell-donor="AB+" data-compatible="false" onclick="window.inspectCrossMatch('A-', 'AB+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A- cannot receive from Donor AB+ (Incompatible)">—</td>
                     </tr>
-                    <tr class="hover:bg-surface-container-low/50 transition-colors">
-                      <td class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">A+</span> Type A+</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td>
+                    <!-- Row A+ -->
+                    <tr id="matrix-row-A+" data-recipient-row="A+" class="hover:bg-surface-container-low/60 transition-colors">
+                      <td onclick="window.selectBloodType('A+')" class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">A+</span>
+                        <span>Type A+</span>
+                      </td>
+                      <td data-cell-recipient="A+" data-cell-donor="O-" data-compatible="true" onclick="window.inspectCrossMatch('A+', 'O-')" class="matrix-cell-interactive p-2.5" title="Recipient A+ can receive from Donor O- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="A+" data-cell-donor="O+" data-compatible="true" onclick="window.inspectCrossMatch('A+', 'O+')" class="matrix-cell-interactive p-2.5" title="Recipient A+ can receive from Donor O+ (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="A+" data-cell-donor="A-" data-compatible="true" onclick="window.inspectCrossMatch('A+', 'A-')" class="matrix-cell-interactive p-2.5" title="Recipient A+ can receive from Donor A- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="A+" data-cell-donor="A+" data-compatible="true" onclick="window.inspectCrossMatch('A+', 'A+')" class="matrix-cell-interactive p-2.5" title="Recipient A+ can receive from Donor A+ (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="A+" data-cell-donor="B-" data-compatible="false" onclick="window.inspectCrossMatch('A+', 'B-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A+ cannot receive from Donor B- (Incompatible)">—</td>
+                      <td data-cell-recipient="A+" data-cell-donor="B+" data-compatible="false" onclick="window.inspectCrossMatch('A+', 'B+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A+ cannot receive from Donor B+ (Incompatible)">—</td>
+                      <td data-cell-recipient="A+" data-cell-donor="AB-" data-compatible="false" onclick="window.inspectCrossMatch('A+', 'AB-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A+ cannot receive from Donor AB- (Incompatible)">—</td>
+                      <td data-cell-recipient="A+" data-cell-donor="AB+" data-compatible="false" onclick="window.inspectCrossMatch('A+', 'AB+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient A+ cannot receive from Donor AB+ (Incompatible)">—</td>
                     </tr>
-                    <tr class="hover:bg-surface-container-low/50 transition-colors">
-                      <td class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">B-</span> Type B-</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td>
+                    <!-- Row B- -->
+                    <tr id="matrix-row-B-" data-recipient-row="B-" class="hover:bg-surface-container-low/60 transition-colors">
+                      <td onclick="window.selectBloodType('B-')" class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">B-</span>
+                        <span>Type B-</span>
+                      </td>
+                      <td data-cell-recipient="B-" data-cell-donor="O-" data-compatible="true" onclick="window.inspectCrossMatch('B-', 'O-')" class="matrix-cell-interactive p-2.5" title="Recipient B- can receive from Donor O- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="B-" data-cell-donor="O+" data-compatible="false" onclick="window.inspectCrossMatch('B-', 'O+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B- cannot receive from Donor O+ (Incompatible)">—</td>
+                      <td data-cell-recipient="B-" data-cell-donor="A-" data-compatible="false" onclick="window.inspectCrossMatch('B-', 'A-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B- cannot receive from Donor A- (Incompatible)">—</td>
+                      <td data-cell-recipient="B-" data-cell-donor="A+" data-compatible="false" onclick="window.inspectCrossMatch('B-', 'A+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B- cannot receive from Donor A+ (Incompatible)">—</td>
+                      <td data-cell-recipient="B-" data-cell-donor="B-" data-compatible="true" onclick="window.inspectCrossMatch('B-', 'B-')" class="matrix-cell-interactive p-2.5" title="Recipient B- can receive from Donor B- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="B-" data-cell-donor="B+" data-compatible="false" onclick="window.inspectCrossMatch('B-', 'B+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B- cannot receive from Donor B+ (Incompatible)">—</td>
+                      <td data-cell-recipient="B-" data-cell-donor="AB-" data-compatible="false" onclick="window.inspectCrossMatch('B-', 'AB-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B- cannot receive from Donor AB- (Incompatible)">—</td>
+                      <td data-cell-recipient="B-" data-cell-donor="AB+" data-compatible="false" onclick="window.inspectCrossMatch('B-', 'AB+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B- cannot receive from Donor AB+ (Incompatible)">—</td>
                     </tr>
-                    <tr class="hover:bg-surface-container-low/50 transition-colors">
-                      <td class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">B+</span> Type B+</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td><td class="p-2.5 text-outline">—</td>
+                    <!-- Row B+ -->
+                    <tr id="matrix-row-B+" data-recipient-row="B+" class="hover:bg-surface-container-low/60 transition-colors">
+                      <td onclick="window.selectBloodType('B+')" class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">B+</span>
+                        <span>Type B+</span>
+                      </td>
+                      <td data-cell-recipient="B+" data-cell-donor="O-" data-compatible="true" onclick="window.inspectCrossMatch('B+', 'O-')" class="matrix-cell-interactive p-2.5" title="Recipient B+ can receive from Donor O- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="B+" data-cell-donor="O+" data-compatible="true" onclick="window.inspectCrossMatch('B+', 'O+')" class="matrix-cell-interactive p-2.5" title="Recipient B+ can receive from Donor O+ (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="B+" data-cell-donor="A-" data-compatible="false" onclick="window.inspectCrossMatch('B+', 'A-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B+ cannot receive from Donor A- (Incompatible)">—</td>
+                      <td data-cell-recipient="B+" data-cell-donor="A+" data-compatible="false" onclick="window.inspectCrossMatch('B+', 'A+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B+ cannot receive from Donor A+ (Incompatible)">—</td>
+                      <td data-cell-recipient="B+" data-cell-donor="B-" data-compatible="true" onclick="window.inspectCrossMatch('B+', 'B-')" class="matrix-cell-interactive p-2.5" title="Recipient B+ can receive from Donor B- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="B+" data-cell-donor="B+" data-compatible="true" onclick="window.inspectCrossMatch('B+', 'B+')" class="matrix-cell-interactive p-2.5" title="Recipient B+ can receive from Donor B+ (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="B+" data-cell-donor="AB-" data-compatible="false" onclick="window.inspectCrossMatch('B+', 'AB-')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B+ cannot receive from Donor AB- (Incompatible)">—</td>
+                      <td data-cell-recipient="B+" data-cell-donor="AB+" data-compatible="false" onclick="window.inspectCrossMatch('B+', 'AB+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient B+ cannot receive from Donor AB+ (Incompatible)">—</td>
                     </tr>
-                    <tr class="hover:bg-surface-container-low/50 transition-colors">
-                      <td class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">AB-</span> Type AB-</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5 text-outline">—</td>
+                    <!-- Row AB- -->
+                    <tr id="matrix-row-AB-" data-recipient-row="AB-" class="hover:bg-surface-container-low/60 transition-colors">
+                      <td onclick="window.selectBloodType('AB-')" class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[10px] flex items-center justify-center">AB-</span>
+                        <span>Type AB-</span>
+                      </td>
+                      <td data-cell-recipient="AB-" data-cell-donor="O-" data-compatible="true" onclick="window.inspectCrossMatch('AB-', 'O-')" class="matrix-cell-interactive p-2.5" title="Recipient AB- can receive from Donor O- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB-" data-cell-donor="O+" data-compatible="false" onclick="window.inspectCrossMatch('AB-', 'O+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient AB- cannot receive from Donor O+ (Incompatible)">—</td>
+                      <td data-cell-recipient="AB-" data-cell-donor="A-" data-compatible="true" onclick="window.inspectCrossMatch('AB-', 'A-')" class="matrix-cell-interactive p-2.5" title="Recipient AB- can receive from Donor A- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB-" data-cell-donor="A+" data-compatible="false" onclick="window.inspectCrossMatch('AB-', 'A+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient AB- cannot receive from Donor A+ (Incompatible)">—</td>
+                      <td data-cell-recipient="AB-" data-cell-donor="B-" data-compatible="true" onclick="window.inspectCrossMatch('AB-', 'B-')" class="matrix-cell-interactive p-2.5" title="Recipient AB- can receive from Donor B- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB-" data-cell-donor="B+" data-compatible="false" onclick="window.inspectCrossMatch('AB-', 'B+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient AB- cannot receive from Donor B+ (Incompatible)">—</td>
+                      <td data-cell-recipient="AB-" data-cell-donor="AB-" data-compatible="true" onclick="window.inspectCrossMatch('AB-', 'AB-')" class="matrix-cell-interactive p-2.5" title="Recipient AB- can receive from Donor AB- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB-" data-cell-donor="AB+" data-compatible="false" onclick="window.inspectCrossMatch('AB-', 'AB+')" class="matrix-cell-interactive p-2.5 text-outline" title="Recipient AB- cannot receive from Donor AB+ (Incompatible)">—</td>
                     </tr>
-                    <tr class="hover:bg-surface-container-low/50 transition-colors bg-surface-container-low/30">
-                      <td class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-tint text-on-primary font-bold text-[10px] flex items-center justify-center">AB+</span> Type AB+ (Universal)</td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
-                      <td class="p-2.5"><span class="inline-flex w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold items-center justify-center text-[10px]">✓</span></td>
+                    <!-- Row AB+ (Universal Recipient) -->
+                    <tr id="matrix-row-AB+" data-recipient-row="AB+" class="hover:bg-surface-container-low/60 transition-colors">
+                      <td onclick="window.selectBloodType('AB+')" class="p-2.5 text-left font-bold text-on-surface flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-surface-tint text-on-primary font-bold text-[10px] flex items-center justify-center">AB+</span>
+                        <span>Type AB+ (Universal)</span>
+                      </td>
+                      <td data-cell-recipient="AB+" data-cell-donor="O-" data-compatible="true" onclick="window.inspectCrossMatch('AB+', 'O-')" class="matrix-cell-interactive p-2.5" title="Recipient AB+ can receive from Donor O- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB+" data-cell-donor="O+" data-compatible="true" onclick="window.inspectCrossMatch('AB+', 'O+')" class="matrix-cell-interactive p-2.5" title="Recipient AB+ can receive from Donor O+ (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB+" data-cell-donor="A-" data-compatible="true" onclick="window.inspectCrossMatch('AB+', 'A-')" class="matrix-cell-interactive p-2.5" title="Recipient AB+ can receive from Donor A- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB+" data-cell-donor="A+" data-compatible="true" onclick="window.inspectCrossMatch('AB+', 'A+')" class="matrix-cell-interactive p-2.5" title="Recipient AB+ can receive from Donor A+ (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB+" data-cell-donor="B-" data-compatible="true" onclick="window.inspectCrossMatch('AB+', 'B-')" class="matrix-cell-interactive p-2.5" title="Recipient AB+ can receive from Donor B- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB+" data-cell-donor="B+" data-compatible="true" onclick="window.inspectCrossMatch('AB+', 'B+')" class="matrix-cell-interactive p-2.5" title="Recipient AB+ can receive from Donor B+ (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB+" data-cell-donor="AB-" data-compatible="true" onclick="window.inspectCrossMatch('AB+', 'AB-')" class="matrix-cell-interactive p-2.5" title="Recipient AB+ can receive from Donor AB- (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
+                      <td data-cell-recipient="AB+" data-cell-donor="AB+" data-compatible="true" onclick="window.inspectCrossMatch('AB+', 'AB+')" class="matrix-cell-interactive p-2.5" title="Recipient AB+ can receive from Donor AB+ (Safe)"><span class="inline-flex w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold items-center justify-center text-xs shadow-xs">✓</span></td>
                     </tr>
                   </tbody>
                 </table>
+
+                <!-- Interactive Clinical Match Inspector Panel -->
+                <div id="matrix-inspector-panel" class="p-4 sm:p-5 rounded-2xl bg-surface-container-low border border-surface-container-high transition-all">
+                  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center font-bold">
+                        <span class="material-symbols-outlined text-[20px]">science</span>
+                      </div>
+                      <div>
+                        <div class="flex items-center gap-2">
+                          <span class="font-headline-sm text-sm font-bold text-on-surface">Active Match Profile: Type O Negative</span>
+                          <span class="px-2 py-0.5 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-[10px] font-bold">Universal Donor</span>
+                        </div>
+                        <p class="font-body-sm text-xs text-on-surface-variant mt-0.5">
+                          Type O- red cells carry no A, B, or Rh antigens and can be safely transfused to all 8 blood groups.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <span class="font-body-sm text-xs text-on-surface-variant">Click any cell above to test direct pairing</span>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
 
@@ -2552,8 +2654,8 @@
   </footer>
 
   <!-- Core Scripts -->
-  <script src="js/store.js"></script>
-  <script src="js/router.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/store.js?v=3"></script>
+  <script src="js/router.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>

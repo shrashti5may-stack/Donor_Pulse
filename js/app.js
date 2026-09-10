@@ -3,7 +3,7 @@
  * Integrates all screens, state management, interactive controls, and UI updates.
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+function startApp() {
   initToasts();
   initRouterHooks();
   initFormControllers();
@@ -14,10 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAllViews();
   
   // Listen for state changes
-  window.PulseStore.subscribe(() => {
-    renderAllViews();
-  });
-});
+  if (window.PulseStore) {
+    window.PulseStore.subscribe(() => {
+      renderAllViews();
+    });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startApp);
+} else {
+  startApp();
+}
 
 // ============================================================================
 // 1. TOAST NOTIFICATION SYSTEM
@@ -327,7 +335,7 @@ function initBloodCompatibilityWidget() {
       stats: '7% of population • Critical Emergency Need',
       summary: "Type O- is the universal donor for red blood cells. In trauma situations where the patient's blood type is unknown, O- is the emergency choice.",
       donate: ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'],
-      receive: ['O- Only']
+      receive: ['O-']
     },
     'O+': {
       name: 'Type O Positive',
@@ -394,30 +402,44 @@ function initBloodCompatibilityWidget() {
     }
   };
 
-  const pills = document.querySelectorAll('#blood-pills-container button[data-blood]');
-  const badgeEl = document.getElementById('widget-group-badge');
-  const titleEl = document.getElementById('widget-group-title');
-  const tagEl = document.getElementById('widget-tag');
-  const statsEl = document.getElementById('widget-stats');
-  const summaryEl = document.getElementById('widget-summary');
-  const donateListEl = document.getElementById('widget-can-donate-list');
-  const receiveListEl = document.getElementById('widget-can-receive-list');
+  let currentSelectedBlood = 'O-';
 
   function selectBlood(type) {
+    if (!type) return;
+    type = type.trim();
     const data = bloodData[type];
     if (!data) return;
+    currentSelectedBlood = type;
 
+    // 1. Update Blood Pills
+    const pills = document.querySelectorAll('#blood-pills-container button[data-blood]');
     pills.forEach(p => {
-      if (p.getAttribute('data-blood') === type) {
+      const pType = p.getAttribute('data-blood');
+      if (pType === type) {
         p.classList.add('active');
         p.classList.remove('bg-surface-container-low');
+        p.setAttribute('aria-selected', 'true');
       } else {
         p.classList.remove('active');
         p.classList.add('bg-surface-container-low');
+        p.setAttribute('aria-selected', 'false');
       }
     });
 
-    if (badgeEl) badgeEl.textContent = type;
+    // 2. Update Details Card
+    const badgeEl = document.getElementById('widget-group-badge');
+    const titleEl = document.getElementById('widget-group-title');
+    const tagEl = document.getElementById('widget-tag');
+    const statsEl = document.getElementById('widget-stats');
+    const summaryEl = document.getElementById('widget-summary');
+    const donateListEl = document.getElementById('widget-can-donate-list');
+    const receiveListEl = document.getElementById('widget-can-receive-list');
+
+    if (badgeEl) {
+      badgeEl.textContent = type;
+      badgeEl.classList.add('scale-105');
+      setTimeout(() => badgeEl.classList.remove('scale-105'), 200);
+    }
     if (titleEl) titleEl.textContent = data.name;
     if (tagEl) {
       tagEl.textContent = data.tag;
@@ -426,54 +448,283 @@ function initBloodCompatibilityWidget() {
     if (statsEl) statsEl.textContent = data.stats;
     if (summaryEl) summaryEl.textContent = data.summary;
 
+    // Render clickable donate badges
     if (donateListEl) {
       donateListEl.innerHTML = data.donate.map(item =>
-        `<span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold transition-all">${item}</span>`
+        `<button type="button" onclick="window.selectBloodType('${item}')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view ${item} profile">${item}</button>`
       ).join('');
     }
 
+    // Render clickable receive badges
     if (receiveListEl) {
       receiveListEl.innerHTML = data.receive.map(item =>
-        `<span class="px-2.5 py-1 rounded-lg bg-primary-fixed/40 text-primary font-label-badge text-xs font-bold transition-all">${item}</span>`
+        `<button type="button" onclick="window.selectBloodType('${item}')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-primary-fixed/40 hover:bg-primary text-primary hover:text-on-primary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view ${item} profile">${item}${data.receive.length === 1 && item === 'O-' ? ' Only' : ''}</button>`
       ).join('');
     }
+
+    // 3. Highlight Matrix Table Rows and Columns
+    highlightMatrixSelection(type);
+
+    // 4. Update Inspector Panel to selected group overview
+    updateInspectorForGroup(type, data);
   }
 
-  pills.forEach(p => {
-    p.addEventListener('click', () => {
-      const type = p.getAttribute('data-blood');
-      selectBlood(type);
-    });
-  });
-
-  // Toggle full clinical matrix table
-  const btnToggle = document.getElementById('btn-toggle-matrix');
-  const matrixContainer = document.getElementById('matrix-full-container');
-  const toggleIcon = document.getElementById('matrix-toggle-icon');
-  if (btnToggle && matrixContainer) {
-    btnToggle.addEventListener('click', () => {
-      const isHidden = matrixContainer.classList.contains('hidden');
-      if (isHidden) {
-        matrixContainer.classList.remove('hidden');
-        if (toggleIcon) toggleIcon.textContent = 'expand_less';
+  function highlightMatrixSelection(type) {
+    // Highlight matching recipient row
+    const matrixRows = document.querySelectorAll('#matrixTable tbody tr');
+    matrixRows.forEach(row => {
+      const rType = row.getAttribute('data-recipient-row');
+      if (rType === type) {
+        row.classList.add('matrix-row-selected');
       } else {
-        matrixContainer.classList.add('hidden');
-        if (toggleIcon) toggleIcon.textContent = 'expand_more';
+        row.classList.remove('matrix-row-selected');
+      }
+    });
+
+    // Highlight matching donor column headers and cells
+    const colHeaders = document.querySelectorAll('#matrixTable thead th[data-donor-col]');
+    colHeaders.forEach(th => {
+      const dType = th.getAttribute('data-donor-col');
+      if (dType === type) {
+        th.classList.add('matrix-col-selected', 'text-primary');
+      } else {
+        th.classList.remove('matrix-col-selected', 'text-primary');
+      }
+    });
+
+    const cells = document.querySelectorAll('#matrixTable tbody td[data-cell-donor]');
+    cells.forEach(td => {
+      const dType = td.getAttribute('data-cell-donor');
+      if (dType === type) {
+        td.classList.add('matrix-col-selected');
+      } else {
+        td.classList.remove('matrix-col-selected');
       }
     });
   }
 
-  // Hover highlighting on matrix rows
+  function inspectCrossMatch(recipient, donor) {
+    if (!recipient || !donor) return;
+    recipient = recipient.trim();
+    donor = donor.trim();
+
+    const rData = bloodData[recipient];
+    const isCompatible = rData && rData.receive.includes(donor);
+
+    // Spotlight clicked cell
+    const allCells = document.querySelectorAll('#matrixTable tbody td[data-cell-recipient]');
+    allCells.forEach(td => {
+      td.classList.remove('matrix-cell-active-match');
+    });
+
+    const targetCell = document.querySelector(`#matrixTable tbody td[data-cell-recipient="${recipient}"][data-cell-donor="${donor}"]`);
+    if (targetCell) {
+      targetCell.classList.add('matrix-cell-active-match');
+    }
+
+    // Highlight row and column
+    const matrixRows = document.querySelectorAll('#matrixTable tbody tr');
+    matrixRows.forEach(row => {
+      const rType = row.getAttribute('data-recipient-row');
+      if (rType === recipient) {
+        row.classList.add('matrix-row-selected');
+      } else {
+        row.classList.remove('matrix-row-selected');
+      }
+    });
+
+    const colHeaders = document.querySelectorAll('#matrixTable thead th[data-donor-col]');
+    colHeaders.forEach(th => {
+      const dType = th.getAttribute('data-donor-col');
+      if (dType === donor) {
+        th.classList.add('matrix-col-selected', 'text-primary');
+      } else {
+        th.classList.remove('matrix-col-selected', 'text-primary');
+      }
+    });
+
+    // Generate clinical explanation
+    let explanation = '';
+    if (isCompatible) {
+      if (recipient === donor) {
+        explanation = `Identical ABO & Rh match. Donor ${donor} red blood cells share the exact antigenic structure of Recipient ${recipient}. Completely safe for transfusion.`;
+      } else if (donor === 'O-') {
+        explanation = `Universal donor compatibility. Donor O- red blood cells lack A, B, and Rh(D) surface antigens. Recipient ${recipient}'s plasma antibodies will not attack them. Safe for emergency transfusion.`;
+      } else if (recipient === 'AB+') {
+        explanation = `Universal recipient compatibility. Recipient AB+ plasma lacks anti-A, anti-B, and anti-Rh antibodies, safely accepting Donor ${donor} red blood cells without agglutination.`;
+      } else {
+        explanation = `Clinically compatible. Donor ${donor} red blood cells carry no antigens foreign to Recipient ${recipient}'s immune system. Safe for clinical transfusion.`;
+      }
+    } else {
+      if (donor.includes('+') && recipient.includes('-')) {
+        explanation = `Contraindicated: Rh Incompatibility! Donor ${donor} carries Rh(D) surface antigens. Infusion into Rh-negative Recipient ${recipient} triggers anti-D immunization and acute or delayed hemolytic destruction.`;
+      } else if ((donor.includes('A') || donor.includes('AB')) && (recipient.startsWith('B') || recipient.startsWith('O'))) {
+        explanation = `Contraindicated: Severe ABO Incompatibility! Donor ${donor} red cells have type A antigens. Recipient ${recipient} plasma contains natural IgM anti-A antibodies that provoke immediate catastrophic intravascular hemolysis.`;
+      } else if ((donor.includes('B') || donor.includes('AB')) && (recipient.startsWith('A') || recipient.startsWith('O'))) {
+        explanation = `Contraindicated: Severe ABO Incompatibility! Donor ${donor} red cells have type B antigens. Recipient ${recipient} plasma contains natural IgM anti-B antibodies that provoke immediate catastrophic intravascular hemolysis.`;
+      } else {
+        explanation = `Contraindicated: Incompatible blood grouping. Recipient ${recipient} circulating antibodies will agglutinate and destroy transfused Donor ${donor} red blood cells.`;
+      }
+    }
+
+    // Render in inspector panel
+    const panel = document.getElementById('matrix-inspector-panel');
+    if (panel) {
+      panel.innerHTML = `
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-start sm:items-center gap-3">
+            <div class="w-11 h-11 rounded-xl ${isCompatible ? 'bg-emerald-600 text-white' : 'bg-error text-on-error'} flex items-center justify-center font-bold shrink-0 shadow-md">
+              <span class="material-symbols-outlined text-[24px]">${isCompatible ? 'check_circle' : 'gpp_bad'}</span>
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-headline-sm text-sm sm:text-base font-bold text-on-surface">
+                  Recipient ${recipient} &larr; Donor ${donor}
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full font-label-badge text-xs font-bold ${
+                  isCompatible 
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' 
+                    : 'bg-error/20 text-error font-extrabold'
+                }">
+                  ${isCompatible ? '✓ COMPATIBLE (Safe Transfusion)' : '✕ INCOMPATIBLE (Adverse Reaction)'}
+                </span>
+              </div>
+              <p class="font-body-sm text-xs sm:text-sm text-on-surface-variant mt-1 max-w-2xl leading-relaxed">
+                ${explanation}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <button type="button" onclick="window.selectBloodType('${recipient}')" class="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-xs font-bold transition-all shadow-xs" title="Select ${recipient} as active profile">
+              View ${recipient}
+            </button>
+            <button type="button" onclick="window.selectBloodType('${donor}')" class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs font-bold transition-all shadow-xs" title="Select ${donor} as active profile">
+              View ${donor}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (window.showToast) {
+      window.showToast(
+        `${recipient} + ${donor}: ${isCompatible ? 'Compatible' : 'Incompatible'}`,
+        isCompatible ? `Recipient ${recipient} can safely receive red cells from Donor ${donor}.` : `Transfusion unsafe: Recipient ${recipient} antibodies will attack ${donor} cells.`,
+        isCompatible ? 'success' : 'error'
+      );
+    }
+  }
+
+  function updateInspectorForGroup(type, data) {
+    const panel = document.getElementById('matrix-inspector-panel');
+    if (!panel) return;
+    panel.innerHTML = `
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[20px]">science</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-headline-sm text-sm font-bold text-on-surface">Active Match Profile: ${data.name} (${type})</span>
+              <span class="px-2 py-0.5 rounded-md ${data.tagClass} font-label-badge text-[10px] font-bold">${data.tag}</span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant mt-0.5 max-w-2xl">
+              Can donate to: <strong>${data.donate.join(', ')}</strong> &bull; Can receive from: <strong>${data.receive.join(', ')}</strong>. Click any cell in the table to test direct pairings.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="font-body-sm text-xs text-on-surface-variant">Click any cell above to test direct pairing</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function toggleMatrixTable() {
+    const matrixContainer = document.getElementById('matrix-full-container');
+    const toggleIcon = document.getElementById('matrix-toggle-icon');
+    const toggleText = document.getElementById('matrix-toggle-text');
+    if (!matrixContainer) return;
+
+    const isHidden = matrixContainer.classList.contains('hidden');
+    if (isHidden) {
+      matrixContainer.classList.remove('hidden');
+      if (toggleIcon) toggleIcon.textContent = 'expand_less';
+      if (toggleText) toggleText.textContent = 'Hide 8×8 Clinical Compatibility Matrix Table';
+      // Ensure active selection is highlighted
+      highlightMatrixSelection(currentSelectedBlood);
+    } else {
+      matrixContainer.classList.add('hidden');
+      if (toggleIcon) toggleIcon.textContent = 'expand_more';
+      if (toggleText) toggleText.textContent = 'View Full 8×8 Clinical Compatibility Matrix Table';
+    }
+  }
+
+  // Expose global methods
+  window.selectBloodType = selectBlood;
+  window.toggleMatrixTable = toggleMatrixTable;
+  window.inspectCrossMatch = inspectCrossMatch;
+  window.initBloodCompatibilityWidget = initBloodCompatibilityWidget;
+
+  // Bind event listeners to blood pills
+  const pills = document.querySelectorAll('#blood-pills-container button[data-blood]');
+  pills.forEach(p => {
+    p.onclick = (e) => {
+      e.preventDefault();
+      const type = p.getAttribute('data-blood');
+      selectBlood(type);
+    };
+  });
+
+  // Bind toggle button
+  const btnToggle = document.getElementById('btn-toggle-matrix');
+  if (btnToggle) {
+    btnToggle.onclick = (e) => {
+      e.preventDefault();
+      toggleMatrixTable();
+    };
+  }
+
+  // Bind matrix table recipient rows
   const matrixRows = document.querySelectorAll('#matrixTable tbody tr');
   matrixRows.forEach(row => {
-    row.addEventListener('mouseenter', () => {
-      row.classList.add('bg-surface-container-high/60');
-    });
-    row.addEventListener('mouseleave', () => {
-      row.classList.remove('bg-surface-container-high/60');
-    });
+    const rType = row.getAttribute('data-recipient-row');
+    const labelTd = row.querySelector('td:first-child');
+    if (labelTd && rType) {
+      labelTd.addEventListener('click', () => {
+        selectBlood(rType);
+      });
+    }
   });
+
+  // Bind matrix table donor columns
+  const colHeaders = document.querySelectorAll('#matrixTable thead th[data-donor-col]');
+  colHeaders.forEach(th => {
+    const dType = th.getAttribute('data-donor-col');
+    if (dType) {
+      th.addEventListener('click', () => {
+        selectBlood(dType);
+      });
+    }
+  });
+
+  // Bind matrix cells
+  const cells = document.querySelectorAll('#matrixTable tbody td[data-cell-donor]');
+  cells.forEach(td => {
+    const r = td.getAttribute('data-cell-recipient');
+    const d = td.getAttribute('data-cell-donor');
+    if (r && d) {
+      td.addEventListener('click', () => {
+        inspectCrossMatch(r, d);
+      });
+    }
+  });
+
+  // Default initialize to O-
+  selectBlood('O-');
 }
+
 
 function openRequestModal() {
   if (!window.PulseStore.isHospitalVerified()) {
