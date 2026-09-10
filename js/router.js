@@ -126,6 +126,23 @@ class PulseRouter {
       target.classList.add('active');
     }
 
+    // Taskbar should ONLY be visible on the 1st page (view-landing) and not on other pages
+    const mainHeader = document.getElementById('main-app-header');
+    const mainElement = document.querySelector('main');
+    if (viewId === 'view-landing') {
+      if (mainHeader) mainHeader.classList.remove('hidden');
+      if (mainElement) {
+        mainElement.classList.add('pt-20');
+        mainElement.classList.remove('pt-4');
+      }
+    } else {
+      if (mainHeader) mainHeader.classList.add('hidden');
+      if (mainElement) {
+        mainElement.classList.remove('pt-20');
+        mainElement.classList.add('pt-4');
+      }
+    }
+
     // Handle smooth in-page positioning for sub-dashboard routes
     if (['nearby-requests', 'dashboard/requests', 'donor-dashboard/requests', 'donor-requests', 'donor-requests-section'].includes(path)) {
       setTimeout(() => {
