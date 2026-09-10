@@ -860,7 +860,7 @@
         <div class="w-full flex justify-start mb-4 relative z-10">
           <button type="button" onclick="window.PulseRouter.navigate('landing')" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container-high/80 hover:bg-surface-container text-on-surface font-label-md text-xs sm:text-sm font-semibold transition-all shadow-xs group cursor-pointer">
             <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
-            <span>Back to Landing Page</span>
+            <span>Back to Home Page</span>
           </button>
         </div>
 
@@ -1245,22 +1245,14 @@
               </div>
             </div>
 
-            <!-- Header Action Controls & Blood Type Badge -->
-            <div class="flex items-center gap-3 shrink-0">
-              <button type="button" onclick="window.logoutUser('donor')" class="px-3.5 py-2.5 rounded-xl border border-outline-variant/60 hover:bg-error/10 hover:border-error text-on-surface-variant hover:text-error text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 shadow-xs shrink-0" title="Log out from donor session">
-                <span class="material-symbols-outlined text-[18px]">logout</span>
-                <span>Log Out</span>
-              </button>
-
-              <!-- Blood Type Badge -->
-              <div class="bg-primary-container text-on-primary rounded-xl p-space-md shadow-md flex items-center gap-space-md shrink-0">
-                <div class="donor-blood-display w-12 h-12 rounded-xl bg-on-primary/15 flex items-center justify-center font-display-hero text-headline-md font-black text-on-primary tracking-tight">
-                  O-
-                </div>
-                <div class="flex flex-col">
-                  <span class="font-headline-sm text-headline-sm font-extrabold tracking-tight">Type <span class="donor-blood-display">O-</span></span>
-                  <span class="font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed font-semibold">Universal Red Cell Donor</span>
-                </div>
+            <!-- Blood Type Badge -->
+            <div class="bg-primary-container text-on-primary rounded-xl p-space-md shadow-md flex items-center gap-space-md shrink-0">
+              <div class="donor-blood-display w-12 h-12 rounded-xl bg-on-primary/15 flex items-center justify-center font-display-hero text-headline-md font-black text-on-primary tracking-tight">
+                O-
+              </div>
+              <div class="flex flex-col">
+                <span class="font-headline-sm text-headline-sm font-extrabold tracking-tight">Type <span class="donor-blood-display">O-</span></span>
+                <span class="font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed font-semibold">Universal Red Cell Donor</span>
               </div>
             </div>
           </section>
@@ -1887,10 +1879,6 @@
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-space-sm shrink-0">
-              <button type="button" onclick="window.logoutUser('hospital')" class="px-3.5 py-3 rounded-xl border border-outline-variant/60 hover:bg-error/10 hover:border-error text-on-surface-variant hover:text-error text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer" title="Log out from hospital session">
-                <span class="material-symbols-outlined text-[18px]">logout</span>
-                <span>Log Out</span>
-              </button>
               <a href="#/hospital-verification" class="px-space-md py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg transition-colors flex items-center gap-space-xs">
                 <span class="material-symbols-outlined text-[18px]">verified</span>
                 <span>Verification Desk</span>

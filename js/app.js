@@ -1377,9 +1377,9 @@ window.logoutUser = function(role) {
     window.showToast('Logged Out', `Successfully signed out of the ${roleName}.`, 'info');
   }
   if (window.PulseRouter) {
-    window.PulseRouter.navigate('landing');
+    window.PulseRouter.navigate('role-selection');
   } else {
-    window.location.hash = '#/landing';
+    window.location.hash = '#/role-selection';
   }
 };
 
