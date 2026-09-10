@@ -70,6 +70,16 @@ class PulseRouter {
       });
     }
 
+    // Registration feature disabled: redirect directly to dashboards
+    if (path === 'donor-register') {
+      this.navigate('donor-dashboard');
+      return;
+    }
+    if (path === 'hospital-register') {
+      this.navigate('hospital-dashboard');
+      return;
+    }
+
     const viewId = this.routes[path];
     if (viewId && document.getElementById(viewId)) {
       this.currentRoute = path;
