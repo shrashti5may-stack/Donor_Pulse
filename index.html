@@ -153,7 +153,6 @@
         <!-- Main Navigation Links -->
         <nav class="hidden lg:flex items-center gap-space-lg ml-space-md">
           <a class="font-label-lg text-label-lg text-primary font-bold transition-colors" data-nav-path="landing" href="#/landing">Landing Page</a>
-          <a class="font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" data-nav-path="role-selection" href="#/role-selection">Role Selection</a>
         </nav>
       </div>
 
@@ -862,6 +861,14 @@
     <!-- ------------------------------------------------------------------- -->
     <div id="view-role-selection" class="view-section w-full">
       <div class="relative w-full max-w-[1280px] mx-auto px-4 md:px-8 py-8 md:py-14 flex flex-col items-center">
+        <!-- Back Navigation -->
+        <div class="w-full flex justify-start mb-4 relative z-10">
+          <button type="button" onclick="window.PulseRouter.navigate('landing')" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container-high/80 hover:bg-surface-container text-on-surface font-label-md text-xs sm:text-sm font-semibold transition-all shadow-xs group cursor-pointer">
+            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+            <span>Back to Landing Page</span>
+          </button>
+        </div>
+
         <!-- Ambient Glow -->
         <div class="absolute top-12 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-gradient-to-b from-primary-fixed/30 via-secondary-container/20 to-transparent blur-3xl pointer-events-none rounded-full"></div>
         
@@ -1195,6 +1202,11 @@
                 <span>Switch Portal</span>
               </div>
             </a>
+            <div class="my-1 h-px bg-surface-container"></div>
+            <button type="button" onclick="window.logoutUser('donor')" class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-error hover:bg-error-container/20 font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left" title="Sign out of Donor Portal">
+              <span class="material-symbols-outlined text-[20px]">logout</span>
+              <span>Log Out</span>
+            </button>
           </nav>
 
           <!-- Live Transit Grid Widget -->
@@ -1238,14 +1250,22 @@
               </div>
             </div>
 
-            <!-- Blood Type Badge -->
-            <div class="bg-primary-container text-on-primary rounded-xl p-space-md shadow-md flex items-center gap-space-md shrink-0">
-              <div class="donor-blood-display w-12 h-12 rounded-xl bg-on-primary/15 flex items-center justify-center font-display-hero text-headline-md font-black text-on-primary tracking-tight">
-                O-
-              </div>
-              <div class="flex flex-col">
-                <span class="font-headline-sm text-headline-sm font-extrabold tracking-tight">Type <span class="donor-blood-display">O-</span></span>
-                <span class="font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed font-semibold">Universal Red Cell Donor</span>
+            <!-- Header Action Controls & Blood Type Badge -->
+            <div class="flex items-center gap-3 shrink-0">
+              <button type="button" onclick="window.logoutUser('donor')" class="px-3.5 py-2.5 rounded-xl border border-outline-variant/60 hover:bg-error/10 hover:border-error text-on-surface-variant hover:text-error text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 shadow-xs shrink-0" title="Log out from donor session">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                <span>Log Out</span>
+              </button>
+
+              <!-- Blood Type Badge -->
+              <div class="bg-primary-container text-on-primary rounded-xl p-space-md shadow-md flex items-center gap-space-md shrink-0">
+                <div class="donor-blood-display w-12 h-12 rounded-xl bg-on-primary/15 flex items-center justify-center font-display-hero text-headline-md font-black text-on-primary tracking-tight">
+                  O-
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-headline-sm text-headline-sm font-extrabold tracking-tight">Type <span class="donor-blood-display">O-</span></span>
+                  <span class="font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed font-semibold">Universal Red Cell Donor</span>
+                </div>
               </div>
             </div>
           </section>
@@ -1354,6 +1374,10 @@
                 <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Nearby Blood Requests</h2>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">Validated clinical demands prioritized by proximity and blood compatibility</p>
               </div>
+              <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); window.PulseRouter.navigate('donor-dashboard');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group w-fit self-start sm:self-center">
+                <span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
+                <span>Back to Overview</span>
+              </button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
               <!-- Card 1 -->
@@ -1458,10 +1482,16 @@
                 <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Donation History &amp; Records</h2>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">Digitally attested clinical verification log per national haemovigilance standards</p>
               </div>
-              <button onclick="window.showToast('Exporting Log', 'Full clinical PDF transcript downloaded with cryptographic hash.', 'info')" class="self-start sm:self-auto px-space-sm py-2 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[18px]">file_download</span>
-                <span>Export Complete Log</span>
-              </button>
+              <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+                <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); window.PulseRouter.navigate('donor-dashboard');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group">
+                  <span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
+                  <span>Back to Overview</span>
+                </button>
+                <button onclick="window.showToast('Exporting Log', 'Full clinical PDF transcript downloaded with cryptographic hash.', 'info')" class="px-space-sm py-2 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[18px]">file_download</span>
+                  <span>Export Complete Log</span>
+                </button>
+              </div>
             </div>
             <div class="overflow-x-auto w-full">
               <table class="w-full text-left font-body-sm text-body-sm border-collapse">
@@ -1660,6 +1690,14 @@
     <div id="view-hospital-verification" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
       <div class="max-w-3xl mx-auto flex flex-col gap-space-lg">
         
+        <!-- Back Navigation Button -->
+        <div class="flex items-center justify-start">
+          <button type="button" onclick="window.PulseRouter.navigate('hospital-dashboard')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-all shadow-xs group cursor-pointer">
+            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+            <span>Back to Hospital Dashboard</span>
+          </button>
+        </div>
+
         <!-- Header -->
         <div class="text-center max-w-xl mx-auto">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high text-secondary font-label-badge text-label-badge uppercase tracking-wider mb-2">
@@ -1809,6 +1847,11 @@
                 <span>Role Selection</span>
               </div>
             </a>
+            <div class="my-1 h-px bg-surface-container"></div>
+            <button type="button" onclick="window.logoutUser('hospital')" class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-error hover:bg-error-container/20 font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left" title="Sign out of Hospital Portal">
+              <span class="material-symbols-outlined text-[20px]">logout</span>
+              <span>Log Out</span>
+            </button>
           </nav>
 
           <!-- Facility Mini Contact Card -->
@@ -1849,6 +1892,10 @@
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-space-sm shrink-0">
+              <button type="button" onclick="window.logoutUser('hospital')" class="px-3.5 py-3 rounded-xl border border-outline-variant/60 hover:bg-error/10 hover:border-error text-on-surface-variant hover:text-error text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer" title="Log out from hospital session">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                <span>Log Out</span>
+              </button>
               <a href="#/hospital-verification" class="px-space-md py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg transition-colors flex items-center gap-space-xs">
                 <span class="material-symbols-outlined text-[18px]">verified</span>
                 <span>Verification Desk</span>
@@ -2147,6 +2194,12 @@
     <!-- VIEW 8: RAISE BLOOD REQUEST (#/raise-request)                        -->
     <!-- ------------------------------------------------------------------- -->
     <div id="view-raise-request" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
+      <div class="max-w-2xl mx-auto mb-4">
+        <button type="button" onclick="window.PulseRouter.navigate('hospital-dashboard')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-all shadow-xs group cursor-pointer">
+          <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+          <span>Back to Hospital Dashboard</span>
+        </button>
+      </div>
       <div class="max-w-2xl mx-auto bg-surface-container-lowest p-space-xl rounded-2xl shadow-sm border border-surface-container-high">
         <div class="flex items-start gap-space-sm pb-space-lg border-b border-surface-container">
           <div class="w-12 h-12 rounded-xl bg-error-container/40 flex items-center justify-center text-primary font-bold shrink-0">
@@ -2256,6 +2309,12 @@
     <!-- VIEW 9: REQUEST CONFIRMATION CARD (#/request-confirmation)           -->
     <!-- ------------------------------------------------------------------- -->
     <div id="view-request-confirmation" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
+      <div class="max-w-2xl mx-auto mb-4">
+        <button type="button" onclick="window.PulseRouter.navigate('hospital-dashboard')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-all shadow-xs group cursor-pointer">
+          <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+          <span>Back to Hospital Dashboard</span>
+        </button>
+      </div>
       <div class="max-w-2xl mx-auto bg-surface-container-lowest p-space-xl rounded-2xl shadow-lg border border-surface-container-high flex flex-col gap-space-lg">
         
         <!-- Header / Success Ring -->
@@ -2308,14 +2367,20 @@
 
         <!-- Action Navigation Buttons -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-space-xs">
-          <button id="btn-confirm-view-matches" class="w-full sm:w-auto px-space-lg py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-98">
-            <span class="material-symbols-outlined text-[20px]">group</span>
-            <span>View Matched Donors</span>
+          <button type="button" onclick="window.PulseRouter.navigate('hospital-dashboard')" class="w-full sm:w-auto px-space-md py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg font-semibold transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span>Dashboard</span>
           </button>
-          <button id="btn-confirm-track" class="w-full sm:w-auto px-space-lg py-3 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-lg text-label-lg font-semibold transition-all flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-[20px] text-primary">vital_signs</span>
-            <span>Track Request Progress</span>
-          </button>
+          <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            <button id="btn-confirm-view-matches" class="w-full sm:w-auto px-space-lg py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-98">
+              <span class="material-symbols-outlined text-[20px]">group</span>
+              <span>View Matched Donors</span>
+            </button>
+            <button id="btn-confirm-track" class="w-full sm:w-auto px-space-lg py-3 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-lg text-label-lg font-semibold transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[20px] text-primary">vital_signs</span>
+              <span>Track Request Progress</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2326,6 +2391,14 @@
     <div id="view-matched-donors" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
       <div class="flex flex-col gap-space-lg">
         
+        <!-- Back Navigation Button -->
+        <div class="flex items-center justify-start">
+          <button type="button" onclick="window.PulseRouter.navigate('hospital-dashboard')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-all shadow-xs group cursor-pointer">
+            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+            <span>Back to Hospital Dashboard</span>
+          </button>
+        </div>
+
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm border border-surface-container-high">
           <div>
@@ -2368,6 +2441,14 @@
     <div id="view-request-tracking" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
       <div class="flex flex-col gap-space-lg">
         
+        <!-- Back Navigation Button -->
+        <div class="flex items-center justify-start">
+          <button type="button" onclick="window.PulseRouter.navigate('hospital-dashboard')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-all shadow-xs group cursor-pointer">
+            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+            <span>Back to Hospital Dashboard</span>
+          </button>
+        </div>
+
         <!-- Header -->
         <div class="bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm border border-surface-container-high flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>

@@ -1367,3 +1367,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+/**
+ * Global User Logout Handler
+ */
+window.logoutUser = function(role) {
+  const roleName = role === 'hospital' ? 'Hospital Portal' : 'Donor Portal';
+  if (window.showToast) {
+    window.showToast('Logged Out', `Successfully signed out of the ${roleName}.`, 'info');
+  }
+  if (window.PulseRouter) {
+    window.PulseRouter.navigate('landing');
+  } else {
+    window.location.hash = '#/landing';
+  }
+};
+
