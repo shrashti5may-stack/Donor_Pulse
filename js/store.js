@@ -273,6 +273,42 @@ class Store {
     this.saveState();
   }
 
+  registerNewDonor(donorData) {
+    const rawBlood = (donorData.bloodGroup || 'O-').trim();
+    const cleanBloodCode = rawBlood.replace(/[^a-zA-Z0-9]/g, '');
+    const randomId = Math.floor(1000 + Math.random() * 9000);
+    const newId = `DP-${randomId}-${cleanBloodCode}`;
+
+    this.state.donor = {
+      id: newId,
+      fullName: donorData.fullName || 'Registered Donor',
+      age: parseInt(donorData.age || 25, 10),
+      bloodGroup: rawBlood,
+      phone: donorData.phone || '+1 (555) 000-0000',
+      email: donorData.email || 'donor@pulse.org',
+      address: donorData.address || 'Metro District',
+      city: donorData.city || 'Metro Central',
+      medicalHistory: donorData.medicalHistory || 'Pre-screened verified donor. Clinical vitals within healthy standard range.',
+      lastDonationDate: donorData.lastDonationDate || 'First-time Donor',
+      nextEligibleDate: 'Eligible Now',
+      availability: donorData.availability !== undefined ? donorData.availability : true,
+      radiusMiles: parseInt(donorData.radiusMiles || 10, 10),
+      totalDonations: 0,
+      livesSaved: 0,
+      rewardPoints: 100,
+      rewardTier: 'Active Registered Donor',
+      nextTierPointsLeft: 400,
+      vitals: {
+        hemoglobin: '14.2 g/dL',
+        bp: '120/80 mmHg',
+        pulse: '72 bpm',
+        weight: '68 kg'
+      }
+    };
+    this.saveState();
+    return this.state.donor;
+  }
+
   toggleDonorAvailability() {
     this.state.donor.availability = !this.state.donor.availability;
     this.saveState();

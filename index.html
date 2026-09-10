@@ -1039,6 +1039,12 @@
     <!-- VIEW 3: DONOR REGISTRATION (#/donor-register)                        -->
     <!-- ------------------------------------------------------------------- -->
     <div id="view-donor-register" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
+      <div class="max-w-2xl mx-auto mb-4 flex items-center justify-between">
+        <a href="#/role-selection" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group w-fit">
+          <span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-x-0.5">arrow_back</span>
+          <span>Back to Portal Selection</span>
+        </a>
+      </div>
       <div class="max-w-2xl mx-auto bg-surface-container-lowest p-space-xl rounded-2xl shadow-sm border border-surface-container-high">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-space-lg border-b border-surface-container">
           <div>
@@ -1058,11 +1064,11 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Full Name *</label>
-              <input required name="fullName" type="text" placeholder="e.g. Sarah Jenkins" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input required name="fullName" type="text" placeholder="e.g. Alex Morgan" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Age *</label>
-              <input required name="age" type="number" min="18" max="75" placeholder="e.g. 28" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input required name="age" type="number" min="18" max="75" placeholder="e.g. 29" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
           </div>
 
@@ -1070,26 +1076,26 @@
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Blood Group *</label>
               <select required name="bloodGroup" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md font-bold focus:ring-2 focus:ring-primary focus:outline-none">
-                <option value="O-">O Negative (Universal Donor)</option>
-                <option value="O+">O Positive</option>
-                <option value="A-">A Negative</option>
-                <option value="A+">A Positive</option>
-                <option value="B-">B Negative</option>
-                <option value="B+">B Positive</option>
-                <option value="AB-">AB Negative</option>
-                <option value="AB+">AB Positive (Universal Recipient)</option>
+                <option value="A+">A Positive (A+)</option>
+                <option value="A-">A Negative (A-)</option>
+                <option value="B+">B Positive (B+)</option>
+                <option value="B-">B Negative (B-)</option>
+                <option value="AB+">AB Positive (AB+ Universal Recipient)</option>
+                <option value="AB-">AB Negative (AB- Universal Plasma)</option>
+                <option value="O+">O Positive (O+)</option>
+                <option value="O-">O Negative (O- Universal Red Cell)</option>
               </select>
             </div>
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Phone Number *</label>
-              <input required name="phone" type="tel" placeholder="+1 (555) 234-5678" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input required name="phone" type="tel" placeholder="+1 (555) 342-8891" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Email Address *</label>
-              <input required name="email" type="email" placeholder="sarah.jenkins@medvolunteer.org" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input required name="email" type="email" placeholder="donor@healthgrid.org" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">City / Metro District *</label>
@@ -1098,14 +1104,14 @@
           </div>
 
           <div class="flex flex-col gap-space-xs">
-            <label class="font-label-md text-label-md text-on-surface font-semibold">Residential Address</label>
-            <input name="address" type="text" placeholder="482 Lexington Ave, Apt 4B" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            <label class="font-label-md text-label-md text-on-surface font-semibold">Residential / Clinic Address *</label>
+            <input required name="address" type="text" placeholder="e.g. 742 Evergreen Terrace, Apt 4B" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Last Donation Date</label>
-              <input name="lastDonationDate" type="date" value="2024-10-14" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input name="lastDonationDate" type="date" value="2024-11-05" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Notification Travel Radius</label>
@@ -1139,7 +1145,7 @@
             </a>
             <button type="submit" class="px-space-xl py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold shadow-md transition-all active:scale-98 flex items-center gap-2">
               <span class="material-symbols-outlined text-[20px]">how_to_reg</span>
-              <span>Complete Registration</span>
+              <span>Complete Registration &amp; Launch Dashboard</span>
             </button>
           </div>
         </form>
@@ -1163,7 +1169,11 @@
             </div>
             <div class="flex flex-col min-w-0">
               <span class="donor-name-display font-title-md text-title-md text-on-surface truncate">Sarah Jenkins</span>
-              <span class="donor-id-display font-label-badge text-label-badge uppercase tracking-wider text-secondary">ID #DP-8924-O</span>
+              <div class="flex items-center gap-1.5 text-xs text-on-surface-variant mt-0.5">
+                <span class="donor-age-display font-medium text-on-surface">28 yrs</span> • <span class="donor-blood-display font-bold text-primary">O-</span>
+              </div>
+              <span class="donor-id-display font-label-badge text-label-badge uppercase tracking-wider text-secondary mt-0.5">ID #DP-8924-O</span>
+              <div class="text-[11px] text-secondary truncate donor-address-display mt-0.5">482 Lexington Ave</div>
             </div>
           </div>
 
@@ -1227,7 +1237,7 @@
           <section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col xl:flex-row xl:items-center justify-between gap-space-md">
             <div class="flex flex-col gap-space-2xs min-w-0">
               <div class="flex flex-wrap items-center gap-space-xs">
-                <h1 class="font-headline-md text-headline-md text-on-surface font-bold">Welcome back, <span class="donor-name-display">Sarah Jenkins</span></h1>
+                <h1 class="font-headline-md text-headline-md text-on-surface font-bold">Welcome back, <span class="donor-name-display">Sarah Jenkins</span> (<span class="donor-age-display">28 yrs</span>)</h1>
                 <span id="donor-avail-badge" class="inline-flex items-center gap-1.5 px-space-xs py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge uppercase tracking-wide">
                   <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Available to Donate
                 </span>
@@ -1252,7 +1262,7 @@
               </div>
               <div class="flex flex-col">
                 <span class="font-headline-sm text-headline-sm font-extrabold tracking-tight">Type <span class="donor-blood-display">O-</span></span>
-                <span class="font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed font-semibold">Universal Red Cell Donor</span>
+                <span class="donor-blood-subtitle font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed font-semibold">Universal Red Cell Donor</span>
               </div>
             </div>
           </section>
@@ -1267,9 +1277,9 @@
               </div>
               <div>
                 <div class="donor-blood-display font-numeric-metric text-numeric-metric text-on-surface leading-none">O-</div>
-                <p class="font-body-sm text-body-sm text-primary font-medium mt-1">Universal Donor Reserve</p>
+                <p class="donor-blood-reserve-tag font-body-sm text-body-sm text-primary font-medium mt-1">Universal Donor Reserve</p>
               </div>
-              <div class="bg-surface-container-low px-space-xs py-1 rounded text-[11px] font-label-badge text-on-surface-variant uppercase">
+              <div class="donor-blood-receive-note bg-surface-container-low px-space-xs py-1 rounded text-[11px] font-label-badge text-on-surface-variant uppercase">
                 Can receive only O-
               </div>
             </div>
@@ -1338,8 +1348,8 @@
                     </span>
                     <span class="font-body-sm text-body-sm text-primary-fixed">12 minutes ago</span>
                   </div>
-                  <h2 class="font-headline-sm text-headline-sm font-bold text-on-primary">
-                    CRITICAL: Urgent O- platelets needed at St. Mary's Trauma Center
+                  <h2 id="donor-code-red-title" class="font-headline-sm text-headline-sm font-bold text-on-primary">
+                    CRITICAL: Urgent <span class="donor-blood-display">O-</span> units needed at St. Mary's Trauma Center
                   </h2>
                   <p class="font-body-md text-body-md text-on-primary-container max-w-2xl">
                     Immediate blood inventory shortage following a multi-vehicle highway collision. St. Mary's Trauma Center is located 1.8 miles away from your Downtown location.

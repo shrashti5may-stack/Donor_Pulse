@@ -8,7 +8,7 @@ class PulseRouter {
     this.routes = {
       'landing': 'view-landing',
       'role-selection': 'view-role-selection',
-      'donor-register': 'view-donor-dashboard',
+      'donor-register': 'view-donor-register',
       'donor-dashboard': 'view-donor-dashboard',
       'nearby-requests': 'view-donor-dashboard',
       'dashboard/requests': 'view-donor-dashboard',
@@ -78,11 +78,6 @@ class PulseRouter {
       });
     }
 
-    // Registration feature disabled: redirect directly to dashboards
-    if (path === 'donor-register') {
-      this.navigate('donor-dashboard');
-      return;
-    }
     if (path === 'hospital-register') {
       this.navigate('hospital-dashboard');
       return;

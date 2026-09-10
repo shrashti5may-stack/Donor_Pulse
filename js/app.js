@@ -118,21 +118,22 @@ function initFormControllers() {
       e.preventDefault();
       const formData = new FormData(donorForm);
       const donorData = {
-        fullName: formData.get('fullName') || 'Sarah Jenkins',
-        age: parseInt(formData.get('age') || 28, 10),
-        bloodGroup: formData.get('bloodGroup') || 'O-',
-        phone: formData.get('phone') || '+1 (555) 234-5678',
-        email: formData.get('email') || 'donor@pulse.org',
-        address: formData.get('address') || '482 Lexington Ave',
-        city: formData.get('city') || 'Downtown Metro Center',
-        medicalHistory: formData.get('medicalHistory') || 'No pre-existing conditions reported. Verified vitals standard.',
-        lastDonationDate: formData.get('lastDonationDate') || '2024-10-14',
+        fullName: formData.get('fullName')?.toString().trim() || 'New Registered Donor',
+        age: parseInt(formData.get('age') || 25, 10),
+        bloodGroup: formData.get('bloodGroup')?.toString().trim() || 'O-',
+        phone: formData.get('phone')?.toString().trim() || '+1 (555) 000-0000',
+        email: formData.get('email')?.toString().trim() || 'donor@pulse.org',
+        address: formData.get('address')?.toString().trim() || 'Metro District',
+        city: formData.get('city')?.toString().trim() || 'Downtown Metro Center',
+        medicalHistory: formData.get('medicalHistory')?.toString().trim() || 'Pre-screened verified donor. Clinical vitals within healthy standard range.',
+        lastDonationDate: formData.get('lastDonationDate') || 'First-time Donor',
         availability: formData.get('availability') === 'on' || formData.get('availability') === 'true',
         radiusMiles: parseInt(formData.get('radiusMiles') || 10, 10)
       };
 
-      window.PulseStore.setDonor(donorData);
-      showToast('Registration Successful', `Welcome, ${donorData.fullName}! Your donor profile is active.`, 'success');
+      window.PulseStore.registerNewDonor(donorData);
+      renderDonorDashboard();
+      showToast('Registration Successful', `Welcome, ${donorData.fullName}! Your ${donorData.bloodGroup} donor dashboard is ready.`, 'success');
       window.PulseRouter.navigate('donor-dashboard');
     });
 
@@ -140,7 +141,7 @@ function initFormControllers() {
     if (btnDemoDonor) {
       btnDemoDonor.addEventListener('click', () => {
         fillDonorFormDemo();
-        showToast('Demo Donor Data Loaded', 'Sarah Jenkins (O- Universal Donor) profile loaded.', 'info');
+        showToast('Demo Donor Data Loaded', 'Alex Morgan (A+ Donor) profile pre-filled for testing.', 'info');
       });
     }
   }
@@ -220,16 +221,16 @@ function initFormControllers() {
 function fillDonorFormDemo() {
   const form = document.getElementById('form-donor-register');
   if (!form) return;
-  setInputValue(form, 'fullName', 'Sarah Jenkins');
-  setInputValue(form, 'age', '28');
-  setInputValue(form, 'bloodGroup', 'O-');
-  setInputValue(form, 'phone', '+1 (555) 234-5678');
-  setInputValue(form, 'email', 'sarah.jenkins@medvolunteer.org');
-  setInputValue(form, 'address', '482 Lexington Ave, Apt 4B');
-  setInputValue(form, 'city', 'Downtown Metro Center');
-  setInputValue(form, 'lastDonationDate', '2024-10-14');
+  setInputValue(form, 'fullName', 'Alex Morgan');
+  setInputValue(form, 'age', '29');
+  setInputValue(form, 'bloodGroup', 'A+');
+  setInputValue(form, 'phone', '+1 (555) 342-8891');
+  setInputValue(form, 'email', 'alex.morgan@healthgrid.org');
+  setInputValue(form, 'address', '742 Evergreen Terrace');
+  setInputValue(form, 'city', 'Metro West District');
+  setInputValue(form, 'lastDonationDate', '2024-11-05');
   setInputValue(form, 'radiusMiles', '10');
-  setInputValue(form, 'medicalHistory', 'Hemoglobin 14.8 g/dL (Normal). Regular whole blood donor. No travel abroad in past 6 months. Blood pressure 118/76.');
+  setInputValue(form, 'medicalHistory', 'Pre-screened whole blood donor. Optimal hemoglobin 15.2 g/dL. No restrictions.');
   const avail = form.querySelector('[name="availability"]');
   if (avail) avail.checked = true;
 }
@@ -792,17 +793,46 @@ function renderDonorDashboard() {
   const donor = window.PulseStore.getDonor();
   if (!donor) return;
 
-  // Name & ID
+  // Name, ID, Age, Address, Blood Group
   setTextContentAll('.donor-name-display', donor.fullName);
   setTextContentAll('.donor-id-display', `ID #${donor.id}`);
   setTextContentAll('.donor-blood-display', donor.bloodGroup);
-  setTextContentAll('.donor-location-display', `${donor.city} • Within ${donor.radiusMiles} miles`);
-  setTextContentAll('.donor-last-date-display', donor.lastDonationDate);
+  setTextContentAll('.donor-age-display', `${donor.age} yrs`);
+  setTextContentAll('.donor-address-display', donor.address || donor.city);
+  setTextContentAll('.donor-location-display', `${donor.address ? donor.address + ', ' : ''}${donor.city} • Within ${donor.radiusMiles} miles`);
+  setTextContentAll('.donor-last-date-display', donor.lastDonationDate || 'First-time Donor');
   setTextContentAll('.donor-donations-display', `${donor.totalDonations} Units`);
   setTextContentAll('.donor-lives-display', `${donor.livesSaved} Lives Saved to Date`);
-  setTextContentAll('.donor-points-display', donor.rewardPoints.toLocaleString());
-  setTextContentAll('.donor-tier-display', donor.rewardTier);
-  setTextContentAll('.donor-next-tier-display', `Next: Platinum (${donor.nextTierPointsLeft} pts left)`);
+  setTextContentAll('.donor-points-display', (donor.rewardPoints || 0).toLocaleString());
+  setTextContentAll('.donor-tier-display', donor.rewardTier || 'Active Registered Donor');
+  setTextContentAll('.donor-next-tier-display', `Next: Platinum (${donor.nextTierPointsLeft || 400} pts left)`);
+
+  // Blood Group Compatibility & Clinical Notes
+  const bloodTraits = {
+    'O-': { subtitle: 'Universal Red Cell Donor', note: 'Can receive only O-', reserve: 'Universal Donor Reserve' },
+    'O+': { subtitle: 'Universal Red Cells for Positive', note: 'Can receive O+, O-', reserve: 'High Demand Blood Type' },
+    'A-': { subtitle: 'Universal Platelet & A/AB Donor', note: 'Can receive A-, O-', reserve: 'Emergency Whole Blood Reserve' },
+    'A+': { subtitle: 'Compatible with A+ and AB+', note: 'Can receive A+, A-, O+, O-', reserve: 'Vital Clinical Reserve' },
+    'B-': { subtitle: 'Rare Blood Donor Group', note: 'Can receive B-, O-', reserve: 'Critical Emergency Reserve' },
+    'B+': { subtitle: 'Compatible with B+ and AB+', note: 'Can receive B+, B-, O+, O-', reserve: 'High Demand Red Cells' },
+    'AB-': { subtitle: 'Universal Plasma Donor', note: 'Can receive AB-, A-, B-, O-', reserve: 'Specialized Plasma Unit' },
+    'AB+': { subtitle: 'Universal Red Cell Recipient', note: 'Can receive all blood types', reserve: 'Universal Plasma Donor' }
+  };
+  const traits = bloodTraits[donor.bloodGroup] || {
+    subtitle: `Compatible with ${donor.bloodGroup}`,
+    note: `Verified clinical matches only`,
+    reserve: `${donor.bloodGroup} Donor Reserve`
+  };
+
+  setTextContentAll('.donor-blood-subtitle', traits.subtitle);
+  setTextContentAll('.donor-blood-receive-note', traits.note);
+  setTextContentAll('.donor-blood-reserve-tag', traits.reserve);
+
+  // Dynamic Urgent Notification Banner on Donor Dashboard
+  const codeRedTitle = document.getElementById('donor-code-red-title');
+  if (codeRedTitle) {
+    codeRedTitle.innerHTML = `CRITICAL: Urgent ${donor.bloodGroup} units needed at St. Mary's Trauma Center`;
+  }
 
   // Availability Toggle & Badge
   const toggle = document.getElementById('toggleAvailability');
