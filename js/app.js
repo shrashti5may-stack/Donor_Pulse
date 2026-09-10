@@ -999,3 +999,120 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+// ============================================================================
+// CERTIFICATE VIEWER MODAL SYSTEM
+// ============================================================================
+let currentCertificateData = null;
+
+window.openCertificateModal = function(data) {
+  currentCertificateData = data || {
+    id: 'CERT-88391',
+    date: 'October 14, 2024',
+    hospital: 'City Central Blood Bank',
+    type: 'Whole Blood (1 Unit - 450 mL)',
+    bay: 'Donation Bay #04',
+    doctor: 'Dr. R. Adams',
+    hash: 'e92f8b1c4a0d92e5f67a8b9c0d1e2f3a4b5c6d7e',
+    image: 'images/certificate-sarah-jenkins.jpg'
+  };
+
+  const modal = document.getElementById('modal-certificate');
+  if (!modal) return;
+
+  const subtitleEl = document.getElementById('cert-modal-subtitle');
+  if (subtitleEl) {
+    subtitleEl.textContent = `Donation Attestation #${currentCertificateData.id} • Clinical ID #DP-8924-O`;
+  }
+
+  const centerEl = document.getElementById('cert-modal-center');
+  if (centerEl) centerEl.textContent = currentCertificateData.hospital;
+
+  const typeEl = document.getElementById('cert-modal-type');
+  if (typeEl) typeEl.textContent = currentCertificateData.type;
+
+  const dateEl = document.getElementById('cert-modal-date');
+  if (dateEl) dateEl.textContent = currentCertificateData.date;
+
+  const hashEl = document.getElementById('cert-modal-hash');
+  if (hashEl) hashEl.textContent = currentCertificateData.hash ? (currentCertificateData.hash.slice(0, 24) + '...') : 'e92f8b1c4a0d92e5f67a...';
+
+  const imgEl = document.getElementById('cert-modal-img');
+  if (imgEl) {
+    imgEl.src = currentCertificateData.image || 'images/certificate-sarah-jenkins.jpg';
+  }
+
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeCertificateModal = function() {
+  const modal = document.getElementById('modal-certificate');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+};
+
+window.downloadCertificate = function(certId, imageSrc = 'images/certificate-sarah-jenkins.jpg') {
+  const a = document.createElement('a');
+  a.href = imageSrc;
+  a.download = `DonorPulse-Certificate-${certId || 'CERT-88391'}.jpg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  if (window.showToast) {
+    window.showToast('Certificate Downloaded', `Impact Certificate #${certId || 'CERT-88391'} saved to your device.`, 'success');
+  }
+};
+
+window.downloadCertificateFromModal = function() {
+  const certId = currentCertificateData ? currentCertificateData.id : 'CERT-88391';
+  const img = currentCertificateData ? currentCertificateData.image : 'images/certificate-sarah-jenkins.jpg';
+  window.downloadCertificate(certId, img);
+};
+
+window.printCertificate = function() {
+  const imgUrl = (currentCertificateData && currentCertificateData.image) ? currentCertificateData.image : 'images/certificate-sarah-jenkins.jpg';
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>DonorPulse - Certificate of Life-Saving Impact</title>
+          <style>
+            @page { size: landscape; margin: 0; }
+            body { margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #fff; }
+            img { max-width: 100vw; max-height: 100vh; object-fit: contain; }
+          </style>
+        </head>
+        <body>
+          <img src="${imgUrl}" onload="window.print();window.close();" />
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  } else {
+    window.print();
+  }
+};
+
+// Global modal backdrop and key listeners for Certificate Viewer
+document.addEventListener('DOMContentLoaded', () => {
+  const certModal = document.getElementById('modal-certificate');
+  if (certModal) {
+    certModal.addEventListener('click', (e) => {
+      if (e.target.id === 'modal-certificate') {
+        window.closeCertificateModal();
+      }
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      window.closeCertificateModal();
+    }
+  });
+});
