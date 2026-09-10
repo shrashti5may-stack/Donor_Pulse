@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>DonorPulse — National Real-Time Hemovigilance & Blood Donation Grid</title>
+  <title>DonorPulse — National Real-Time Haemovigilance & Blood Donation Grid</title>
   <meta name="description" content="DonorPulse bridges verified hospital critical care units with pre-screened, eligible blood donors in real-time. Seamless blood requisition, donor matching, and cold-chain tracking."/>
 
   <!-- Fonts & Material Symbols -->
@@ -216,7 +216,7 @@
               <!-- Pill Badge -->
               <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-error-container/30 text-on-error-container border border-outline-variant/40 mb-5 shadow-sm">
                 <span class="material-symbols-outlined text-[17px] text-primary" style="font-variation-settings: 'FILL' 1;">water_drop</span>
-                <span class="font-label-badge text-label-badge tracking-widest uppercase text-primary font-bold">Autonomous Hemovigilance Grid</span>
+                <span class="font-label-badge text-label-badge tracking-widest uppercase text-primary font-bold">Autonomous Haemovigilance Grid</span>
               </div>
 
               <!-- Main Heading -->
@@ -232,15 +232,11 @@
                 DonorPulse connects verified hospital critical care units with pre-screened, proximate blood donors in under 4 minutes. Seamless, audited, and clinically certified.
               </p>
 
-              <!-- CTA Button Group -->
+              <!-- Combined CTA: Get Started -->
               <div class="flex flex-wrap items-center gap-3.5 w-full sm:w-auto mb-8">
-                <a class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg font-bold shadow-lg hover:bg-primary transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" href="#/role-selection">
-                  <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">water_drop</span>
-                  <span>Become a Donor</span>
-                </a>
-                <a class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-surface-container-lowest text-on-surface font-label-lg text-label-lg font-semibold border border-outline-variant/60 shadow-sm hover:bg-surface-container-low transition-all duration-200" href="#/role-selection">
-                  <span class="material-symbols-outlined text-[20px] text-secondary">local_hospital</span>
-                  <span>Hospital Portal</span>
+                <a class="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-base font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] tracking-wide group" href="#/role-selection">
+                  <span>GET STARTED</span>
+                  <span class="material-symbols-outlined text-[20px] transition-transform duration-200 group-hover:translate-x-1">arrow_forward</span>
                 </a>
               </div>
 
@@ -553,7 +549,7 @@
                 </li>
                 <li class="flex items-start gap-2.5">
                   <span class="material-symbols-outlined text-secondary text-[18px] shrink-0 mt-0.5">check_circle</span>
-                  <span><strong>Full Regulatory Audit:</strong> Automated logging meeting FDA, ISO 15189, and AABB hemovigilance standards.</span>
+                  <span><strong>Full Regulatory Audit:</strong> Automated logging meeting FDA, ISO 15189, and AABB haemovigilance standards.</span>
                 </li>
               </ul>
             </div>
@@ -779,7 +775,7 @@
             Welcome to <span class="text-primary tracking-tight">DonorPulse</span>
           </h1>
           <p class="font-body-lg text-body-lg text-secondary max-w-xl mx-auto">
-            Choose your account type to access personalized blood coordination tools and clinical triage systems.
+            Select your portal to log in or register for donor access and hospital clinical triage.
           </p>
         </div>
 
@@ -836,10 +832,14 @@
                 </div>
               </div>
             </div>
-            <div class="flex flex-col gap-3 pt-2">
+            <div class="flex flex-col gap-2.5 pt-2">
               <a href="#/donor-dashboard" class="w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
-                <span>Continue to Donor Dashboard</span>
+                <span>Donor Login / Dashboard</span>
                 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </a>
+              <a href="#/donor-register" class="w-full h-11 bg-surface-container-low hover:bg-surface-container text-primary border border-outline-variant/60 rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+                <span>Register as New Donor</span>
               </a>
             </div>
           </div>
@@ -894,10 +894,14 @@
                 </div>
               </div>
             </div>
-            <div class="flex flex-col gap-3 pt-2">
+            <div class="flex flex-col gap-2.5 pt-2">
               <a href="#/hospital-dashboard" class="w-full h-12 bg-on-surface hover:bg-secondary text-surface rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
-                <span>Continue to Hospital Portal</span>
+                <span>Hospital Login / Portal</span>
                 <span class="material-symbols-outlined text-[18px]">domain</span>
+              </a>
+              <a href="#/hospital-register" class="w-full h-11 bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/60 rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[18px]">app_registration</span>
+                <span>Register Healthcare Facility</span>
               </a>
             </div>
           </div>
@@ -1103,7 +1107,7 @@
             <p class="font-body-sm text-body-sm text-on-surface-variant">Metro trauma blood couriers operating with 11-min median response.</p>
             <div class="bg-surface-container-low p-space-xs rounded-lg flex items-center gap-space-xs">
               <span class="material-symbols-outlined text-primary text-[18px]">local_hospital</span>
-              <span class="font-label-md text-label-md text-on-surface font-medium">9 Hemovigilance Centers</span>
+              <span class="font-label-md text-label-md text-on-surface font-medium">9 Haemovigilance Centers</span>
             </div>
           </div>
         </aside>
@@ -1350,7 +1354,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
               <div>
                 <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Donation History &amp; Records</h2>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">Digitally attested clinical verification log per national hemovigilance standards</p>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">Digitally attested clinical verification log per national haemovigilance standards</p>
               </div>
               <button onclick="window.showToast('Exporting Log', 'Full clinical PDF transcript downloaded with cryptographic hash.', 'info')" class="self-start sm:self-auto px-space-sm py-2 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[18px]">file_download</span>
@@ -1448,7 +1452,7 @@
                 <span class="material-symbols-outlined text-primary text-[26px]">qr_code_2</span>
               </div>
               <div>
-                <h3 class="font-title-md text-title-md font-bold text-on-surface">Universal Hemovigilance Digital Pass</h3>
+                <h3 class="font-title-md text-title-md font-bold text-on-surface">Universal Haemovigilance Digital Pass</h3>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">Instant clinical check-in QR code active. Verified vitals: Hemoglobin 14.8 g/dL (Normal).</p>
               </div>
             </div>
@@ -1531,7 +1535,7 @@
           <div class="p-space-sm rounded-xl bg-surface-container-low flex items-center gap-3">
             <span class="material-symbols-outlined text-primary text-[24px]">verified_user</span>
             <p class="font-body-sm text-[12px] text-on-surface-variant">
-              By submitting, you certify authorization under federal hemovigilance guidelines. Registration requires state verification before blood requisitions can be raised.
+              By submitting, you certify authorization under federal haemovigilance guidelines. Registration requires state verification before blood requisitions can be raised.
             </p>
           </div>
 
@@ -1558,7 +1562,7 @@
         <div class="text-center max-w-xl mx-auto">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high text-secondary font-label-badge text-label-badge uppercase tracking-wider mb-2">
             <span class="material-symbols-outlined text-[16px] text-primary">policy</span>
-            National Hemovigilance Accreditation Desk
+            National Haemovigilance Accreditation Desk
           </div>
           <h1 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">Hospital Verification Status</h1>
           <p class="font-body-md text-body-md text-on-surface-variant mt-1">
@@ -2453,7 +2457,7 @@
         <div class="flex items-center gap-space-xs">
           <span class="material-symbols-outlined text-primary text-[24px]">vital_signs</span>
           <span class="font-headline-sm text-headline-sm font-bold text-on-surface">DonorPulse</span>
-          <span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Hemovigilance Infrastructure</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span>
         </div>
         <div class="flex flex-wrap items-center gap-space-lg">
           <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#/landing">Clinical Protocols</a>

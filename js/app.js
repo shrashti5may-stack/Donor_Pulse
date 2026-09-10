@@ -156,7 +156,7 @@ function initFormControllers() {
       };
 
       window.PulseStore.setHospital(hospitalData);
-      showToast('Hospital Registered', 'Facility submitted for National Hemovigilance verification.', 'info');
+      showToast('Hospital Registered', 'Facility submitted for National Haemovigilance verification.', 'info');
       window.PulseRouter.navigate('hospital-verification');
     });
 
@@ -679,7 +679,7 @@ function renderHospitalVerification() {
         <span class="w-3 h-3 rounded-full bg-tertiary animate-ping"></span>
       </div>
       <p class="font-body-md text-body-md text-on-surface-variant">
-        <strong>${hospital.name}</strong> is fully accredited and authenticated on the National Hemovigilance Network. All emergency requisition tools, cold-chain telemetry, and direct donor dispatch systems are active.
+        <strong>${hospital.name}</strong> is fully accredited and authenticated on the National Haemovigilance Network. All emergency requisition tools, cold-chain telemetry, and direct donor dispatch systems are active.
       </p>
       <div class="flex flex-wrap items-center gap-3 pt-2">
         <a href="#/hospital-dashboard" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg font-semibold shadow-md hover:bg-primary-container transition-all flex items-center gap-2">
@@ -713,7 +713,7 @@ function renderHospitalVerification() {
         <span class="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></span>
       </div>
       <p class="font-body-md text-body-md text-on-surface-variant">
-        Credentials for <strong>${hospital.name}</strong> were received. The National Hemovigilance Authority is authenticating the medical operating license (#${hospital.licenseNumber}) and medical directorship with state health registers.
+        Credentials for <strong>${hospital.name}</strong> were received. The National Haemovigilance Authority is authenticating the medical operating license (#${hospital.licenseNumber}) and medical directorship with state health registers.
       </p>
       <div class="bg-surface-container-lowest p-4 rounded-xl border border-surface-container-high space-y-2 text-body-sm">
         <div class="flex items-center gap-2 text-on-surface font-semibold">
