@@ -1065,29 +1065,29 @@
 
           <!-- Navigation Links -->
           <nav class="bg-surface-container-lowest p-space-xs rounded-xl shadow-sm flex flex-col gap-space-2xs">
-            <a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg bg-surface-container text-primary font-label-lg text-label-lg transition-colors" href="#/donor-dashboard">
+            <a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg bg-surface-container text-primary font-label-lg text-label-lg transition-colors cursor-pointer" href="#/donor-dashboard" data-donor-nav="dashboard" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">
               <div class="flex items-center gap-space-xs">
                 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
                 <span>Dashboard</span>
               </div>
-              <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-primary dot-active"></span>
             </a>
-            <a class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors" href="#/donor-register">
+            <a class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#/donor-dashboard" onclick="window.showToast('Profile & Vitals', 'Your clinical profile and vitals are up to date.', 'info')" data-donor-nav="profile">
               <span class="material-symbols-outlined text-[20px]">badge</span>
               <span>Edit Profile &amp; Vitals</span>
             </a>
-            <a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors" href="#donor-requests-section">
+            <a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#/nearby-requests" data-donor-nav="requests" onclick="document.getElementById('donor-requests-section')?.scrollIntoView({ behavior: 'smooth' });">
               <div class="flex items-center gap-space-xs">
                 <span class="material-symbols-outlined text-[20px]">bloodtype</span>
                 <span>Nearby Requests</span>
               </div>
               <span class="px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-badge text-label-badge">3 Urgent</span>
             </a>
-            <a class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors" href="#donor-history-section">
+            <a class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#/donation-history" data-donor-nav="history" onclick="document.getElementById('donor-history-section')?.scrollIntoView({ behavior: 'smooth' });">
               <span class="material-symbols-outlined text-[20px]">history</span>
               <span>Donation History</span>
             </a>
-            <a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors" href="#/role-selection">
+            <a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#/role-selection">
               <div class="flex items-center gap-space-xs">
                 <span class="material-symbols-outlined text-[20px]">switch_account</span>
                 <span>Switch Portal</span>

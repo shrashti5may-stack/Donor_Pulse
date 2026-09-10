@@ -8,9 +8,17 @@ class PulseRouter {
     this.routes = {
       'landing': 'view-landing',
       'role-selection': 'view-role-selection',
-      'donor-register': 'view-donor-register',
+      'donor-register': 'view-donor-dashboard',
       'donor-dashboard': 'view-donor-dashboard',
-      'hospital-register': 'view-hospital-register',
+      'nearby-requests': 'view-donor-dashboard',
+      'dashboard/requests': 'view-donor-dashboard',
+      'donor-dashboard/requests': 'view-donor-dashboard',
+      'donor-requests': 'view-donor-dashboard',
+      'donor-requests-section': 'view-donor-dashboard',
+      'donation-history': 'view-donor-dashboard',
+      'donor-history': 'view-donor-dashboard',
+      'donor-history-section': 'view-donor-dashboard',
+      'hospital-register': 'view-hospital-dashboard',
       'hospital-verification': 'view-hospital-verification',
       'hospital-dashboard': 'view-hospital-dashboard',
       'raise-request': 'view-raise-request',
@@ -80,6 +88,21 @@ class PulseRouter {
       return;
     }
 
+    // Direct in-page anchor check (e.g. #donor-requests-section)
+    const directTarget = document.getElementById(pathPart);
+    if (directTarget) {
+      const parentView = directTarget.closest('.view-section');
+      if (parentView) {
+        this.currentRoute = path;
+        this.routeParams = params;
+        this.activateView(parentView.id, path, params);
+        setTimeout(() => {
+          directTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 60);
+        return;
+      }
+    }
+
     const viewId = this.routes[path];
     if (viewId && document.getElementById(viewId)) {
       this.currentRoute = path;
@@ -103,10 +126,31 @@ class PulseRouter {
       target.classList.add('active');
     }
 
-    // Scroll smoothly to top
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Handle smooth in-page positioning for sub-dashboard routes
+    if (['nearby-requests', 'dashboard/requests', 'donor-dashboard/requests', 'donor-requests', 'donor-requests-section'].includes(path)) {
+      setTimeout(() => {
+        const sec = document.getElementById('donor-requests-section');
+        if (sec) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
+          setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
+        }
+      }, 70);
+    } else if (['donation-history', 'donor-history', 'donor-history-section'].includes(path)) {
+      setTimeout(() => {
+        const sec = document.getElementById('donor-history-section');
+        if (sec) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
+          setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
+        }
+      }, 70);
+    } else {
+      // Scroll smoothly to top for standard full page views
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
 
-    // Update global nav link active classes
+    // Update global top nav link active classes
     document.querySelectorAll('[data-nav-path]').forEach(link => {
       const navPath = link.getAttribute('data-nav-path');
       if (navPath === path) {
@@ -117,6 +161,32 @@ class PulseRouter {
         link.classList.add('text-on-surface-variant');
       }
     });
+
+    // Update donor dashboard sidebar item active states
+    const donorNavItems = document.querySelectorAll('[data-donor-nav]');
+    if (donorNavItems.length > 0) {
+      donorNavItems.forEach(item => {
+        const navKey = item.getAttribute('data-donor-nav');
+        const isMatch = (navKey === 'requests' && ['nearby-requests', 'dashboard/requests', 'donor-dashboard/requests', 'donor-requests', 'donor-requests-section'].includes(path)) ||
+                        (navKey === 'history' && ['donation-history', 'donor-history', 'donor-history-section'].includes(path)) ||
+                        (navKey === 'dashboard' && path === 'donor-dashboard');
+        
+        if (isMatch) {
+          item.classList.add('bg-surface-container', 'text-primary');
+          item.classList.remove('text-on-surface-variant');
+          if (!item.querySelector('.dot-active')) {
+            const dot = document.createElement('span');
+            dot.className = 'w-1.5 h-1.5 rounded-full bg-primary dot-active';
+            item.appendChild(dot);
+          }
+        } else {
+          item.classList.remove('bg-surface-container', 'text-primary');
+          item.classList.add('text-on-surface-variant');
+          const dot = item.querySelector('.dot-active');
+          if (dot) dot.remove();
+        }
+      });
+    }
 
     // Update header Quick Switcher select value if it exists
     const quickSwitcher = document.getElementById('prototype-quick-select');

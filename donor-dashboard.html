@@ -31,7 +31,7 @@
 <span class="material-symbols-outlined text-[20px]">badge</span>
 <span>My Profile &amp; Health Pass</span>
 </a>
-<a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors" href="#">
+<a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#donor-requests-section" onclick="document.getElementById('donor-requests-section')?.scrollIntoView({ behavior: 'smooth' });">
 <div class="flex items-center gap-space-xs">
 <span class="material-symbols-outlined text-[20px]">bloodtype</span>
 <span>Find Blood Requests</span>
@@ -209,7 +209,7 @@
 </div>
 </section>
 <!-- NEARBY BLOOD REQUESTS INTERACTIVE GRID -->
-<section class="flex flex-col gap-space-md">
+<section id="donor-requests-section" class="flex flex-col gap-space-md">
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
 <div>
 <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Nearby Blood Requests</h2>
