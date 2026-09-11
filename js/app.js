@@ -146,34 +146,131 @@ function initFormControllers() {
     }
   }
 
-  // B. Hospital Registration Form
+  // B. Hospital Registration Form & Verification Proof
   const hospitalForm = document.getElementById('form-hospital-register');
+  const proofFileInput = document.getElementById('hospital-proof-file');
+  const proofDropzone = document.getElementById('hospital-upload-dropzone');
+  const proofPreview = document.getElementById('hospital-proof-preview');
+  const proofFilenameEl = document.getElementById('hospital-proof-filename');
+  const proofFilesizeEl = document.getElementById('hospital-proof-filesize');
+  const btnRemoveProof = document.getElementById('btn-remove-proof');
+  const btnAttachSampleProof = document.getElementById('btn-attach-sample-proof');
+
+  let currentProofAttachment = {
+    fileName: 'state_accreditation_certificate_2024.pdf',
+    fileSize: '2.4 MB',
+    attached: true
+  };
+
+  function updateProofUI(name, size) {
+    if (proofFilenameEl) proofFilenameEl.textContent = name;
+    if (proofFilesizeEl) proofFilesizeEl.textContent = `${size} • Uploaded & Verified Valid`;
+    if (proofPreview) proofPreview.classList.remove('hidden');
+    if (proofDropzone) proofDropzone.classList.add('hidden');
+    currentProofAttachment = { fileName: name, fileSize: size, attached: true };
+  }
+
+  function clearProofUI() {
+    if (proofFileInput) proofFileInput.value = '';
+    if (proofPreview) proofPreview.classList.add('hidden');
+    if (proofDropzone) proofDropzone.classList.remove('hidden');
+    currentProofAttachment = { fileName: '', fileSize: '', attached: false };
+  }
+
+  if (proofDropzone && proofFileInput) {
+    proofDropzone.addEventListener('click', () => proofFileInput.click());
+    
+    proofDropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      proofDropzone.classList.add('border-primary', 'bg-primary/5');
+    });
+
+    proofDropzone.addEventListener('dragleave', () => {
+      proofDropzone.classList.remove('border-primary', 'bg-primary/5');
+    });
+
+    proofDropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      proofDropzone.classList.remove('border-primary', 'bg-primary/5');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+        updateProofUI(file.name, `${sizeMb} MB`);
+      }
+    });
+
+    proofFileInput.addEventListener('change', () => {
+      if (proofFileInput.files && proofFileInput.files.length > 0) {
+        const file = proofFileInput.files[0];
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+        updateProofUI(file.name, `${sizeMb} MB`);
+      }
+    });
+  }
+
+  if (btnRemoveProof) {
+    btnRemoveProof.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clearProofUI();
+    });
+  }
+
+  if (btnAttachSampleProof) {
+    btnAttachSampleProof.addEventListener('click', () => {
+      updateProofUI('state_accreditation_certificate_2024.pdf', '2.4 MB');
+      showToast('Sample Certificate Attached', 'Accredited State Health Board certificate loaded.', 'info');
+    });
+  }
+
   if (hospitalForm) {
     hospitalForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const formData = new FormData(hospitalForm);
+
+      const autoVerify = formData.get('autoVerify') === 'on' || formData.get('autoVerify') === 'true' || document.getElementById('check-auto-verify')?.checked;
+
       const hospitalData = {
-        name: formData.get('hospitalName') || 'Metro General Hospital & Trauma Center',
-        location: formData.get('hospitalLocation') || 'Ward 4B, Emergency Wing',
-        address: formData.get('address') || '1200 Healthcare Blvd',
-        city: formData.get('city') || 'New York, NY',
-        phone: formData.get('phone') || '+1 (800) 555-8821',
-        email: formData.get('email') || 'triage@metrogeneral.org',
-        licenseNumber: formData.get('licenseNumber') || 'HSP-88219-NY',
-        authorizedPerson: formData.get('authorizedPerson') || 'Dr. Aris Thorne, MD',
-        verificationStatus: formData.get('initialStatus') || 'pending'
+        name: formData.get('hospitalName')?.toString().trim() || 'New Healthcare Facility',
+        category: formData.get('hospitalCategory')?.toString().trim() || 'Apex Multi-Specialty & Trauma Center',
+        location: formData.get('hospitalLocation')?.toString().trim() || 'Emergency Wing',
+        bedCapacity: parseInt(formData.get('bedCapacity') || 450, 10),
+        traumaLevel: formData.get('traumaLevel')?.toString().trim() || 'Trauma Level 1',
+        address: formData.get('address')?.toString().trim() || '742 Healthcare Expressway',
+        city: formData.get('city')?.toString().trim() || 'Chicago',
+        state: formData.get('state')?.toString().trim() || 'IL',
+        zip: formData.get('zip')?.toString().trim() || '60611',
+        phone: formData.get('phone')?.toString().trim() || '+1 (800) 555-8821',
+        email: formData.get('email')?.toString().trim() || 'triage@hospitaldomain.org',
+        licenseNumber: formData.get('licenseNumber')?.toString().trim() || 'HSP-90412-IL',
+        authorizedPerson: formData.get('authorizedPerson')?.toString().trim() || 'Dr. Evelyn Vance, MD',
+        roleTitle: formData.get('roleTitle')?.toString().trim() || 'Chief Medical Officer & Triage Director',
+        documentType: formData.get('documentType')?.toString().trim() || 'State Department Health Operating License',
+        documentNumber: formData.get('documentNumber')?.toString().trim() || 'CERT-IL-2024-89240',
+        fileName: currentProofAttachment.attached ? currentProofAttachment.fileName : 'clinical_establishment_license.pdf',
+        fileSize: currentProofAttachment.attached ? currentProofAttachment.fileSize : '2.1 MB',
+        verificationStatus: autoVerify ? 'verified' : 'pending'
       };
 
-      window.PulseStore.setHospital(hospitalData);
-      showToast('Hospital Registered', 'Facility submitted for National Haemovigilance verification.', 'info');
-      window.PulseRouter.navigate('hospital-verification');
+      const newHospital = window.PulseStore.registerNewHospital(hospitalData);
+
+      if (autoVerify) {
+        window.PulseStore.setHospitalVerification('verified');
+        renderHospitalDashboard();
+        showToast('Facility Verified & Dashboard Generated', `${newHospital.name} successfully registered. Dedicated dashboard active!`, 'success');
+        window.PulseRouter.navigate('hospital-dashboard');
+      } else {
+        renderHospitalVerification();
+        showToast('Hospital Registered', 'Facility submitted for National Haemovigilance verification desk review.', 'info');
+        window.PulseRouter.navigate('hospital-verification');
+      }
     });
 
     const btnDemoHospital = document.getElementById('btn-fill-demo-hospital');
     if (btnDemoHospital) {
       btnDemoHospital.addEventListener('click', () => {
         fillHospitalFormDemo();
-        showToast('Demo Hospital Data Loaded', 'Metro General Hospital & Trauma Center details loaded.', 'info');
+        updateProofUI('state_accreditation_certificate_2024.pdf', '2.4 MB');
+        showToast('Sample Facility Loaded', 'St. Jude Memorial Hospital details & verification proof loaded.', 'info');
       });
     }
   }
@@ -238,14 +335,22 @@ function fillDonorFormDemo() {
 function fillHospitalFormDemo() {
   const form = document.getElementById('form-hospital-register');
   if (!form) return;
-  setInputValue(form, 'hospitalName', 'Metro General Hospital & Trauma Center');
-  setInputValue(form, 'hospitalLocation', 'Ward 4B, Emergency Wing');
-  setInputValue(form, 'address', '1200 Healthcare Blvd, Suite 100');
-  setInputValue(form, 'city', 'New York, NY');
-  setInputValue(form, 'phone', '+1 (800) 555-8821');
-  setInputValue(form, 'email', 'triage@metrogeneral.org');
-  setInputValue(form, 'licenseNumber', 'HSP-88219-NY');
-  setInputValue(form, 'authorizedPerson', 'Dr. Aris Thorne, MD');
+  setInputValue(form, 'hospitalName', 'St. Jude Memorial Hospital & Trauma Center');
+  setInputValue(form, 'hospitalCategory', 'Apex Multi-Specialty & Trauma Center');
+  setInputValue(form, 'hospitalLocation', 'Trauma Resuscitation Wing, Floor 1');
+  setInputValue(form, 'bedCapacity', '450');
+  setInputValue(form, 'traumaLevel', 'Trauma Level 1');
+  setInputValue(form, 'address', '742 Healthcare Expressway, Medical District');
+  setInputValue(form, 'city', 'Chicago');
+  setInputValue(form, 'state', 'IL');
+  setInputValue(form, 'zip', '60611');
+  setInputValue(form, 'phone', '+1 (312) 555-0199');
+  setInputValue(form, 'email', 'emergency.triage@stjudememorial.org');
+  setInputValue(form, 'licenseNumber', 'HSP-99214-IL');
+  setInputValue(form, 'authorizedPerson', 'Dr. Evelyn Vance, MD');
+  setInputValue(form, 'roleTitle', 'Chief Medical Officer & Triage Director');
+  setInputValue(form, 'documentType', 'State Department Health Operating License');
+  setInputValue(form, 'documentNumber', 'CERT-IL-2024-89240');
 }
 
 function setInputValue(form, name, value) {
@@ -863,11 +968,38 @@ function renderHospitalDashboard() {
   const isPending = hospital.verificationStatus === 'pending';
   const isRejected = hospital.verificationStatus === 'rejected';
 
-  // Hospital Name & Location
+  // Hospital Name & Attributes
   setTextContentAll('.hospital-name-display', hospital.name);
-  setTextContentAll('.hospital-location-display', `${hospital.location}, ${hospital.city}`);
-  setTextContentAll('.hospital-license-display', `License #${hospital.licenseNumber}`);
+  setTextContentAll('.hospital-location-display', `${hospital.location}, ${hospital.city}${hospital.state ? ', ' + hospital.state : ''}`);
+  setTextContentAll('.hospital-license-display', `Verified Hospital (License #${hospital.licenseNumber})`);
   setTextContentAll('.hospital-triage-officer', hospital.authorizedPerson);
+  setTextContentAll('.hospital-phone-display', hospital.phone);
+  setTextContentAll('.hospital-beds-display', `${hospital.bedCapacity || 450} Beds Capacity`);
+  setTextContentAll('.hospital-trauma-display', hospital.traumaLevel || 'Accredited Trauma I');
+  setTextContentAll('.hospital-category-badge', hospital.category || 'Apex Multi-Specialty');
+  setTextContentAll('.hospital-node-id', `Node: ${hospital.id}`);
+
+  // Populate facility switcher dropdown
+  const switcher = document.getElementById('hospital-facility-switcher');
+  if (switcher) {
+    const list = window.PulseStore.getHospitalList();
+    switcher.innerHTML = list.map(h => `
+      <option value="${escapeHtml(h.id)}" ${h.id === hospital.id ? 'selected' : ''}>
+        ${escapeHtml(h.name)} (${escapeHtml(h.id)})
+      </option>
+    `).join('');
+
+    if (!switcher.dataset.hasListener) {
+      switcher.dataset.hasListener = 'true';
+      switcher.addEventListener('change', (e) => {
+        const newActive = window.PulseStore.switchHospital(e.target.value);
+        if (newActive) {
+          showToast('Facility Active', `Switched dashboard to ${newActive.name}`, 'info');
+          renderHospitalDashboard();
+        }
+      });
+    }
+  }
 
   // Status Banner on Hospital Dashboard
   const statusBanner = document.getElementById('hospital-dashboard-status-banner');
@@ -885,7 +1017,7 @@ function renderHospitalDashboard() {
           </div>
         </div>
         <a href="#/hospital-verification" class="px-3 py-1.5 rounded-lg bg-amber-600 text-white font-label-md text-label-md font-semibold hover:bg-amber-700 transition-colors">
-          View Status
+          View Status / Approve
         </a>
       `;
     } else if (isRejected) {
@@ -934,6 +1066,7 @@ function renderHospitalDashboard() {
 function renderHospitalVerification() {
   const hospital = window.PulseStore.getHospital();
   const status = hospital.verificationStatus;
+  const proof = hospital.verificationProof || {};
 
   // Active status highlight
   const container = document.getElementById('verification-status-card');
@@ -952,19 +1085,43 @@ function renderHospitalVerification() {
               <span class="px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge font-bold uppercase tracking-wider">
                 Accreditation Approved
               </span>
-              <span class="font-label-badge text-label-badge text-secondary font-mono">${hospital.licenseNumber}</span>
+              <span class="font-label-badge text-label-badge text-secondary font-mono">${escapeHtml(hospital.licenseNumber)}</span>
             </div>
-            <h2 class="font-headline-md text-headline-md text-on-surface font-bold mt-1">Verified Clinical Facility</h2>
+            <h2 class="font-headline-md text-headline-md text-on-surface font-bold mt-1">${escapeHtml(hospital.name)}</h2>
           </div>
         </div>
         <span class="w-3 h-3 rounded-full bg-tertiary animate-ping"></span>
       </div>
       <p class="font-body-md text-body-md text-on-surface-variant">
-        <strong>${hospital.name}</strong> is fully accredited and authenticated on the National Haemovigilance Network. All emergency requisition tools, cold-chain telemetry, and direct donor dispatch systems are active.
+        <strong>${escapeHtml(hospital.name)}</strong> is officially authenticated on the National Haemovigilance Network. All emergency requisition dispatch tools, cold-chain telemetry, and direct donor notification keys are active.
       </p>
+
+      <!-- Accreditation Proof Summary Box -->
+      <div class="bg-surface-container-lowest p-4 rounded-xl border border-tertiary/30 grid grid-cols-1 sm:grid-cols-2 gap-3 text-body-sm">
+        <div>
+          <span class="text-xs text-on-surface-variant block">Accredited Document:</span>
+          <span class="font-semibold text-on-surface">${escapeHtml(proof.documentType || 'State Health Operating License')}</span>
+        </div>
+        <div>
+          <span class="text-xs text-on-surface-variant block">Registry Certificate ID:</span>
+          <span class="font-semibold font-mono text-on-surface">${escapeHtml(proof.documentNumber || hospital.licenseNumber)}</span>
+        </div>
+        <div>
+          <span class="text-xs text-on-surface-variant block">Submitted Proof File:</span>
+          <span class="font-semibold text-primary flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">description</span>
+            ${escapeHtml(proof.fileName || 'accreditation_certificate.pdf')} (${escapeHtml(proof.fileSize || '2.4 MB')})
+          </span>
+        </div>
+        <div>
+          <span class="text-xs text-on-surface-variant block">Authorized Officer:</span>
+          <span class="font-semibold text-on-surface">${escapeHtml(hospital.authorizedPerson)}</span>
+        </div>
+      </div>
+
       <div class="flex flex-wrap items-center gap-3 pt-2">
         <a href="#/hospital-dashboard" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg font-semibold shadow-md hover:bg-primary-container transition-all flex items-center gap-2">
-          <span>Go to Hospital Dashboard</span>
+          <span>Go to Dedicated Hospital Dashboard</span>
           <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
         </a>
         <button data-open-modal-request class="px-5 py-2.5 rounded-xl bg-surface-container-lowest text-on-surface font-label-lg text-label-lg font-semibold hover:bg-surface-container-low transition-all border border-surface-container-high flex items-center gap-2">
@@ -986,36 +1143,50 @@ function renderHospitalVerification() {
               <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-label-badge text-label-badge font-bold uppercase tracking-wider">
                 Review in Progress
               </span>
-              <span class="font-label-badge text-label-badge text-secondary font-mono">${hospital.licenseNumber}</span>
+              <span class="font-label-badge text-label-badge text-secondary font-mono">${escapeHtml(hospital.licenseNumber)}</span>
             </div>
-            <h2 class="font-headline-md text-headline-md text-on-surface font-bold mt-1">Pending Institutional Verification</h2>
+            <h2 class="font-headline-md text-headline-md text-on-surface font-bold mt-1">${escapeHtml(hospital.name)}</h2>
           </div>
         </div>
         <span class="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></span>
       </div>
       <p class="font-body-md text-body-md text-on-surface-variant">
-        Credentials for <strong>${hospital.name}</strong> were received. The National Haemovigilance Authority is authenticating the medical operating license (#${hospital.licenseNumber}) and medical directorship with state health registers.
+        Credentials for <strong>${escapeHtml(hospital.name)}</strong> were received with proof document <code>${escapeHtml(proof.fileName || 'document.pdf')}</code>. You can perform an instant accreditation validation below to generate your dashboard immediately.
       </p>
       <div class="bg-surface-container-lowest p-4 rounded-xl border border-surface-container-high space-y-2 text-body-sm">
         <div class="flex items-center gap-2 text-on-surface font-semibold">
           <span class="material-symbols-outlined text-tertiary text-[18px]">check_circle</span>
-          <span>Hospital Registration Submitted</span>
+          <span>Hospital Registration &amp; Proof Document Uploaded</span>
+        </div>
+        <div class="flex items-center gap-2 text-on-surface">
+          <span class="material-symbols-outlined text-tertiary text-[18px]">check_circle</span>
+          <span>Proof: ${escapeHtml(proof.documentType || 'Operating License')} (Ref #${escapeHtml(proof.documentNumber || hospital.licenseNumber)})</span>
         </div>
         <div class="flex items-center gap-2 text-on-surface-variant">
           <span class="material-symbols-outlined text-amber-600 text-[18px]">pending</span>
-          <span>State License Certification Cross-Check (Est. 12-24 hrs)</span>
-        </div>
-        <div class="flex items-center gap-2 text-on-surface-variant opacity-60">
-          <span class="material-symbols-outlined text-[18px]">lock</span>
-          <span>Requisition Dispatch Key Issued Upon Approval</span>
+          <span>State Health Registry Digital Verification Ready</span>
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-3 pt-2">
+        <button type="button" id="btn-approve-and-launch" class="px-5 py-2.5 rounded-xl bg-tertiary hover:bg-tertiary-container text-on-tertiary font-label-lg text-label-lg font-bold shadow hover:shadow-md transition-all flex items-center gap-2 cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">verified</span>
+          <span>Approve Accreditation &amp; Launch Dashboard</span>
+        </button>
         <a href="#/hospital-dashboard" class="px-5 py-2.5 rounded-xl bg-surface-container-highest text-on-surface font-label-lg text-label-lg font-semibold hover:bg-surface-container transition-all">
           Preview Hospital Dashboard (Read-Only)
         </a>
       </div>
     `;
+
+    const btnApprove = document.getElementById('btn-approve-and-launch');
+    if (btnApprove) {
+      btnApprove.addEventListener('click', () => {
+        window.PulseStore.setHospitalVerification('verified');
+        showToast('Accreditation Approved', `Credentials verified for ${hospital.name}. Launching dashboard.`, 'success');
+        renderHospitalDashboard();
+        window.PulseRouter.navigate('hospital-dashboard');
+      });
+    }
   } else if (status === 'rejected') {
     container.className = 'p-6 md:p-8 rounded-2xl bg-error-container/30 border-2 border-error/50 shadow-sm flex flex-col gap-4';
     container.innerHTML = `
@@ -1029,14 +1200,14 @@ function renderHospitalVerification() {
               <span class="px-2.5 py-0.5 rounded-full bg-error text-white font-label-badge text-label-badge font-bold uppercase tracking-wider">
                 Verification Rejected
               </span>
-              <span class="font-label-badge text-label-badge text-secondary font-mono">${hospital.licenseNumber}</span>
+              <span class="font-label-badge text-label-badge text-secondary font-mono">${escapeHtml(hospital.licenseNumber)}</span>
             </div>
             <h2 class="font-headline-md text-headline-md text-on-surface font-bold mt-1">Accreditation Not Approved</h2>
           </div>
         </div>
       </div>
       <p class="font-body-md text-body-md text-on-surface-variant">
-        Verification could not be granted for <strong>${hospital.name}</strong>.
+        Verification could not be granted for <strong>${escapeHtml(hospital.name)}</strong>.
       </p>
       <div class="p-4 rounded-xl bg-error-container/40 border border-error/20 text-body-sm text-on-error-container">
         <strong>Reason for rejection:</strong> ${escapeHtml(hospital.rejectionReason)}

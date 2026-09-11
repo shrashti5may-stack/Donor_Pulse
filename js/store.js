@@ -41,9 +41,12 @@ const DEFAULT_STATE = {
   hospital: {
     id: 'HSP-88219-NY',
     name: 'Metro General Hospital & Trauma Center',
+    category: 'Apex Multi-Specialty & Trauma Care',
     location: 'Ward 4B, Emergency Wing',
     address: '1200 Healthcare Blvd, Suite 100',
     city: 'New York, NY',
+    state: 'NY',
+    zip: '10001',
     phone: '+1 (800) 555-8821',
     email: 'triage@metrogeneral.org',
     licenseNumber: 'HSP-88219-NY',
@@ -51,10 +54,47 @@ const DEFAULT_STATE = {
     roleTitle: 'Chief Triage Officer',
     bedCapacity: 650,
     traumaLevel: 'Trauma Level 1',
+    verificationProof: {
+      documentType: 'State Department Health Operating License',
+      documentNumber: 'ACC-NY-90428-2024',
+      fileName: 'metro_general_accreditation_2024.pdf',
+      fileSize: '2.4 MB',
+      uploadedAt: 'Oct 12, 2024'
+    },
     // Verification state: 'verified' | 'pending' | 'rejected'
     verificationStatus: 'verified',
     rejectionReason: 'State department documentation mismatch on primary accreditation license certificate.'
   },
+
+  // Registered Hospital Registry
+  registeredHospitals: [
+    {
+      id: 'HSP-88219-NY',
+      name: 'Metro General Hospital & Trauma Center',
+      category: 'Apex Multi-Specialty & Trauma Care',
+      location: 'Ward 4B, Emergency Wing',
+      address: '1200 Healthcare Blvd, Suite 100',
+      city: 'New York, NY',
+      state: 'NY',
+      zip: '10001',
+      phone: '+1 (800) 555-8821',
+      email: 'triage@metrogeneral.org',
+      licenseNumber: 'HSP-88219-NY',
+      authorizedPerson: 'Dr. Aris Thorne, MD',
+      roleTitle: 'Chief Triage Officer',
+      bedCapacity: 650,
+      traumaLevel: 'Trauma Level 1',
+      verificationProof: {
+        documentType: 'State Department Health Operating License',
+        documentNumber: 'ACC-NY-90428-2024',
+        fileName: 'metro_general_accreditation_2024.pdf',
+        fileSize: '2.4 MB',
+        uploadedAt: 'Oct 12, 2024'
+      },
+      verificationStatus: 'verified',
+      rejectionReason: ''
+    }
+  ],
 
   // Active Requests
   requests: [
@@ -233,7 +273,12 @@ class Store {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return { ...DEFAULT_STATE, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        const merged = { ...DEFAULT_STATE, ...parsed };
+        if (!Array.isArray(merged.registeredHospitals) || merged.registeredHospitals.length === 0) {
+          merged.registeredHospitals = [merged.hospital || DEFAULT_STATE.hospital];
+        }
+        return merged;
       }
     } catch (e) {
       console.warn('Failed to load state from localStorage:', e);
@@ -320,15 +365,95 @@ class Store {
     return this.state.hospital;
   }
 
+  getHospitalList() {
+    if (!Array.isArray(this.state.registeredHospitals)) {
+      this.state.registeredHospitals = [this.state.hospital];
+    }
+    return this.state.registeredHospitals;
+  }
+
   setHospital(hospitalData) {
     this.state.hospital = { ...this.state.hospital, ...hospitalData };
+    if (!Array.isArray(this.state.registeredHospitals)) {
+      this.state.registeredHospitals = [this.state.hospital];
+    } else {
+      const idx = this.state.registeredHospitals.findIndex(h => h.id === this.state.hospital.id);
+      if (idx >= 0) {
+        this.state.registeredHospitals[idx] = { ...this.state.registeredHospitals[idx], ...hospitalData };
+      }
+    }
     this.saveState();
+  }
+
+  registerNewHospital(data) {
+    const randomId = Math.floor(10000 + Math.random() * 90000);
+    const stateRaw = data.state || data.city || 'GEN';
+    const stateCode = stateRaw.substring(0, 2).toUpperCase().replace(/[^A-Z]/g, 'X');
+    const newId = `HSP-${randomId}-${stateCode}`;
+
+    const newHospital = {
+      id: newId,
+      name: (data.name || 'New Healthcare Facility').trim(),
+      category: data.category || 'Multi-Specialty Hospital',
+      location: data.location || 'Emergency Wing',
+      address: data.address || 'Medical District',
+      city: data.city || 'Metropolitan Core',
+      state: data.state || '',
+      zip: data.zip || '',
+      phone: data.phone || '+1 (800) 555-0199',
+      email: data.email || 'emergency@hospital.org',
+      licenseNumber: data.licenseNumber || `LIC-${randomId}`,
+      authorizedPerson: data.authorizedPerson || 'Medical Superintendent',
+      roleTitle: data.roleTitle || 'Chief Medical Officer',
+      bedCapacity: parseInt(data.bedCapacity || 250, 10),
+      traumaLevel: data.traumaLevel || 'Trauma Level 1',
+      verificationProof: {
+        documentType: data.documentType || 'State Health Department Operating License',
+        documentNumber: data.documentNumber || `CERT-${randomId}`,
+        fileName: data.fileName || 'hospital_accreditation_proof.pdf',
+        fileSize: data.fileSize || '1.8 MB',
+        uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      },
+      verificationStatus: data.verificationStatus || 'verified',
+      rejectionReason: ''
+    };
+
+    if (!Array.isArray(this.state.registeredHospitals)) {
+      this.state.registeredHospitals = [this.state.hospital];
+    }
+
+    // Add to registry (newest first)
+    this.state.registeredHospitals.unshift(newHospital);
+    // Switch active hospital to the newly registered one
+    this.state.hospital = newHospital;
+    this.saveState();
+    return newHospital;
+  }
+
+  switchHospital(hospitalId) {
+    if (!Array.isArray(this.state.registeredHospitals)) {
+      this.state.registeredHospitals = [this.state.hospital];
+    }
+    const target = this.state.registeredHospitals.find(h => h.id === hospitalId);
+    if (target) {
+      this.state.hospital = target;
+      this.saveState();
+      return target;
+    }
+    return this.state.hospital;
   }
 
   setHospitalVerification(status, rejectionReason = '') {
     this.state.hospital.verificationStatus = status;
     if (rejectionReason) {
       this.state.hospital.rejectionReason = rejectionReason;
+    }
+    if (Array.isArray(this.state.registeredHospitals)) {
+      const idx = this.state.registeredHospitals.findIndex(h => h.id === this.state.hospital.id);
+      if (idx >= 0) {
+        this.state.registeredHospitals[idx].verificationStatus = status;
+        if (rejectionReason) this.state.registeredHospitals[idx].rejectionReason = rejectionReason;
+      }
     }
     this.saveState();
   }

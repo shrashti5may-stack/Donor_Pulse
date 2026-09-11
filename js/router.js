@@ -17,8 +17,7 @@ class PulseRouter {
       'donor-requests-section': 'view-donor-dashboard',
       'donation-history': 'view-donor-dashboard',
       'donor-history': 'view-donor-dashboard',
-      'donor-history-section': 'view-donor-dashboard',
-      'hospital-register': 'view-hospital-dashboard',
+      'hospital-register': 'view-hospital-register',
       'hospital-verification': 'view-hospital-verification',
       'hospital-dashboard': 'view-hospital-dashboard',
       'raise-request': 'view-raise-request',
@@ -76,11 +75,6 @@ class PulseRouter {
         const [k, v] = pair.split('=');
         if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || '');
       });
-    }
-
-    if (path === 'hospital-register') {
-      this.navigate('hospital-dashboard');
-      return;
     }
 
     // Direct in-page anchor check (e.g. #donor-requests-section)

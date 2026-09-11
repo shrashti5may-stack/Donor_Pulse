@@ -1602,80 +1602,224 @@
     <!-- VIEW 5: HOSPITAL REGISTRATION (#/hospital-register)                  -->
     <!-- ------------------------------------------------------------------- -->
     <div id="view-hospital-register" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
-      <div class="max-w-2xl mx-auto bg-surface-container-lowest p-space-xl rounded-2xl shadow-sm border border-surface-container-high">
+      <div class="max-w-3xl mx-auto bg-surface-container-lowest p-6 md:p-10 rounded-2xl shadow-sm border border-surface-container-high">
+        <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-space-lg border-b border-surface-container">
           <div>
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-badge text-label-badge font-bold uppercase mb-2">
               <span class="material-symbols-outlined text-[14px]">domain</span> Institutional Onboarding
             </div>
-            <h1 class="font-headline-md text-headline-md text-on-surface font-extrabold">Hospital &amp; Healthcare Registration</h1>
-            <p class="font-body-sm text-body-sm text-on-surface-variant">Register clinical facilities for accredited emergency blood requisition access.</p>
+            <h1 class="font-headline-md text-headline-md text-on-surface font-extrabold">Register Healthcare Facility</h1>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Official clinical onboarding gateway under the National Haemovigilance &amp; Emergency Blood Grid.</p>
           </div>
-          <button id="btn-fill-demo-hospital" type="button" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1.5 shrink-0">
+          <button id="btn-fill-demo-hospital" type="button" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold transition-colors flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer">
             <span class="material-symbols-outlined text-[16px] text-primary">auto_fix_high</span>
-            <span>Fill Demo Data</span>
+            <span>Fill Sample Facility</span>
           </button>
         </div>
 
-        <form id="form-hospital-register" class="flex flex-col gap-space-md pt-space-lg">
-          <div class="flex flex-col gap-space-xs">
-            <label class="font-label-md text-label-md text-on-surface font-semibold">Hospital / Healthcare Facility Name *</label>
-            <input required name="hospitalName" type="text" placeholder="Metro General Hospital & Trauma Center" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+        <form id="form-hospital-register" class="flex flex-col gap-6 pt-space-lg">
+          <!-- SECTION 1: Facility Identity & Specialization -->
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-2 text-primary font-bold text-sm tracking-wide uppercase">
+              <span class="material-symbols-outlined text-[18px]">local_hospital</span>
+              <span>1. Facility Identity &amp; Specialization</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="md:col-span-2 flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Hospital / Facility Full Legal Name *</label>
+                <input required name="hospitalName" type="text" placeholder="e.g., St. Jude Memorial Hospital &amp; Trauma Center" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Facility Category *</label>
+                <select required name="hospitalCategory" class="h-11 px-3 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all">
+                  <option value="Apex Multi-Specialty &amp; Trauma Center">Apex Multi-Specialty &amp; Trauma</option>
+                  <option value="Regional Critical Care Hospital">Regional Critical Care Hospital</option>
+                  <option value="Blood Bank &amp; Transfusion Institute">Blood Bank &amp; Research Center</option>
+                  <option value="District General Hospital">District General Hospital</option>
+                  <option value="Pediatric &amp; Neonatal Center">Pediatric &amp; Neonatal Center</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="sm:col-span-2 flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Emergency Wing / Critical Care Department *</label>
+                <input required name="hospitalLocation" type="text" placeholder="e.g., Emergency Triage Wing, Trauma Resuscitation Bay" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Operational Bed Capacity *</label>
+                <input required name="bedCapacity" type="number" min="20" max="5000" placeholder="450" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Trauma Care Accreditation Level *</label>
+                <select required name="traumaLevel" class="h-11 px-3 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all">
+                  <option value="Trauma Level 1">Trauma Level 1 (24/7 Comprehensive Surgical SLA)</option>
+                  <option value="Trauma Level 2">Trauma Level 2 (Major Resuscitation Wing)</option>
+                  <option value="Trauma Level 3">Trauma Level 3 (Emergency Stabilization)</option>
+                  <option value="Critical Transfusion Center">Critical Transfusion Center</option>
+                </select>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Cold-Chain Storage Unit Capacity</label>
+                <input name="coldChainCapacity" type="text" placeholder="500 Whole Blood / Platelet Units" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-            <div class="flex flex-col gap-space-xs">
-              <label class="font-label-md text-label-md text-on-surface font-semibold">Ward / Emergency Wing Location *</label>
-              <input required name="hospitalLocation" type="text" placeholder="Ward 4B, Emergency Wing" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+          <!-- SECTION 2: Physical Location & Address -->
+          <div class="flex flex-col gap-3 pt-2 border-t border-surface-container">
+            <div class="flex items-center gap-2 text-primary font-bold text-sm tracking-wide uppercase">
+              <span class="material-symbols-outlined text-[18px]">location_on</span>
+              <span>2. Physical Location &amp; Address</span>
             </div>
-            <div class="flex flex-col gap-space-xs">
-              <label class="font-label-md text-label-md text-on-surface font-semibold">City &amp; State *</label>
-              <input required name="city" type="text" placeholder="New York, NY" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Street Address *</label>
+              <input required name="address" type="text" placeholder="e.g., 742 Healthcare Expressway, Medical District" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
             </div>
-          </div>
-
-          <div class="flex flex-col gap-space-xs">
-            <label class="font-label-md text-label-md text-on-surface font-semibold">Physical Facility Street Address *</label>
-            <input required name="address" type="text" placeholder="1200 Healthcare Blvd, Suite 100" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-            <div class="flex flex-col gap-space-xs">
-              <label class="font-label-md text-label-md text-on-surface font-semibold">Emergency Desk Phone *</label>
-              <input required name="phone" type="tel" placeholder="+1 (800) 555-8821" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
-            </div>
-            <div class="flex flex-col gap-space-xs">
-              <label class="font-label-md text-label-md text-on-surface font-semibold">Official Clinical Email *</label>
-              <input required name="email" type="email" placeholder="triage@metrogeneral.org" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-            <div class="flex flex-col gap-space-xs">
-              <label class="font-label-md text-label-md text-on-surface font-semibold">Hospital License / NPI Number *</label>
-              <input required name="licenseNumber" type="text" placeholder="HSP-88219-NY" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md font-mono focus:ring-2 focus:ring-primary focus:outline-none"/>
-            </div>
-            <div class="flex flex-col gap-space-xs">
-              <label class="font-label-md text-label-md text-on-surface font-semibold">Authorized Person Name (MD / Officer) *</label>
-              <input required name="authorizedPerson" type="text" placeholder="Dr. Aris Thorne, MD" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">City *</label>
+                <input required name="city" type="text" placeholder="e.g., Chicago" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">State / Province *</label>
+                <input required name="state" type="text" placeholder="e.g., IL" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">ZIP / Postal Code *</label>
+                <input required name="zip" type="text" placeholder="e.g., 60611" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
             </div>
           </div>
 
-          <div class="p-space-sm rounded-xl bg-surface-container-low flex items-center gap-3">
-            <span class="material-symbols-outlined text-primary text-[24px]">verified_user</span>
-            <p class="font-body-sm text-[12px] text-on-surface-variant">
-              By submitting, you certify authorization under federal haemovigilance guidelines. Registration requires state verification before blood requisitions can be raised.
-            </p>
+          <!-- SECTION 3: Emergency Communications & Officers -->
+          <div class="flex flex-col gap-3 pt-2 border-t border-surface-container">
+            <div class="flex items-center gap-2 text-primary font-bold text-sm tracking-wide uppercase">
+              <span class="material-symbols-outlined text-[18px]">contact_phone</span>
+              <span>3. Clinical Communications &amp; Authorized Personnel</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">24/7 Emergency Triage Hotline *</label>
+                <input required name="phone" type="tel" placeholder="+1 (800) 555-8821" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Official Clinical Email *</label>
+                <input required name="email" type="email" placeholder="triage@hospitaldomain.org" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Authorized Medical Officer / Superintendent *</label>
+                <input required name="authorizedPerson" type="text" placeholder="Dr. Evelyn Vance, MD" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Officer Designation / Department *</label>
+                <input required name="roleTitle" type="text" placeholder="Chief Medical Officer &amp; Triage Director" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+            </div>
           </div>
 
-          <div class="flex items-center justify-between pt-space-md border-t border-surface-container">
-            <a href="#/role-selection" class="px-space-md py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors">
+          <!-- SECTION 4: Regulatory Verification Proof & Document Upload -->
+          <div class="flex flex-col gap-3 pt-2 border-t border-surface-container">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-primary font-bold text-sm tracking-wide uppercase">
+                <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                <span>4. Regulatory License &amp; Verification Proof</span>
+              </div>
+              <button id="btn-attach-sample-proof" type="button" class="text-xs text-primary font-semibold hover:underline flex items-center gap-1 cursor-pointer">
+                <span class="material-symbols-outlined text-[14px]">attachment</span>
+                <span>Load Sample Certificate</span>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Hospital Accreditation / License Number *</label>
+                <input required name="licenseNumber" type="text" placeholder="e.g., HSP-90412-IL" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-mono font-bold border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Verification Proof Document Type *</label>
+                <select required name="documentType" id="hospital-doc-type" class="h-11 px-3 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all">
+                  <option value="State Department Health Operating License">State Department Health Operating License</option>
+                  <option value="NABH / JCI Hospital Accreditation Certificate">NABH / JCI Hospital Accreditation Certificate</option>
+                  <option value="Clinical Establishment Act Registration Certificate">Clinical Establishment Act Registration Certificate</option>
+                  <option value="National Blood Transfusion Council Regulatory License">National Blood Bank Council Approval</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Document Certificate / Registry Number *</label>
+              <input required name="documentNumber" id="hospital-doc-number" type="text" placeholder="e.g., CERT-IL-2024-89240" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+
+            <!-- Drag & Drop / File Upload Box -->
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Upload Verification Proof Document (PDF, JPG, PNG up to 10MB) *</label>
+              
+              <!-- Hidden File Input -->
+              <input type="file" id="hospital-proof-file" class="hidden" accept=".pdf,.png,.jpg,.jpeg"/>
+              
+              <!-- Dropzone Container -->
+              <div id="hospital-upload-dropzone" class="border-2 border-dashed border-outline-variant/70 hover:border-primary bg-surface-container-low/60 hover:bg-surface-container-low rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-2">
+                <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[28px]">cloud_upload</span>
+                </div>
+                <div>
+                  <span class="text-sm font-semibold text-on-surface">Click to select verification document</span>
+                  <span class="text-xs text-on-surface-variant block mt-0.5">or drag and drop your clinical certificate here</span>
+                </div>
+                <span class="text-[11px] text-secondary font-medium">Supported formats: PDF, JPG, PNG (Max 10 MB)</span>
+              </div>
+
+              <!-- Uploaded File Preview Card (Hidden by default, shown on select) -->
+              <div id="hospital-proof-preview" class="hidden p-4 rounded-xl bg-tertiary-fixed/30 border border-tertiary/40 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-lg bg-tertiary text-on-tertiary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">description</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span id="hospital-proof-filename" class="font-semibold text-sm text-on-surface truncate">hospital_accreditation_proof.pdf</span>
+                    <span id="hospital-proof-filesize" class="text-xs text-on-surface-variant">2.4 MB • Uploaded &amp; Verified Valid</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="px-2.5 py-1 rounded-full bg-tertiary text-on-tertiary text-[11px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">check</span> Proof Attached
+                  </span>
+                  <button type="button" id="btn-remove-proof" class="text-error hover:text-on-error-container p-1 rounded-lg hover:bg-error/10 cursor-pointer" title="Remove attachment">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Instant Verification Toggle -->
+            <div class="p-3.5 rounded-xl bg-surface-container flex items-start gap-3 mt-1">
+              <input type="checkbox" name="autoVerify" id="check-auto-verify" checked class="mt-1 w-4 h-4 text-primary rounded focus:ring-primary cursor-pointer"/>
+              <label for="check-auto-verify" class="text-xs text-on-surface cursor-pointer select-none">
+                <strong class="font-semibold text-on-surface">Enable Direct Automated Clearance:</strong>
+                <span class="text-on-surface-variant block mt-0.5">Validate accreditation credentials immediately against state digital registry and launch your dedicated facility dashboard.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-surface-container">
+            <a href="#/role-selection" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold transition-colors text-center cursor-pointer">
               Cancel
             </a>
-            <button type="submit" class="px-space-xl py-3 rounded-xl bg-on-surface hover:bg-secondary text-surface font-label-lg text-label-lg font-bold shadow-md transition-all active:scale-98 flex items-center gap-2">
-              <span class="material-symbols-outlined text-[20px]">domain_verification</span>
-              <span>Submit for Verification</span>
-            </button>
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+              <button type="submit" id="btn-submit-hospital" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold shadow-md hover:shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
+                <span class="material-symbols-outlined text-[20px]">domain_verification</span>
+                <span>Register &amp; Launch Hospital Dashboard</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -1865,6 +2009,24 @@
         <!-- MAIN DASHBOARD CONTENT AREA -->
         <section class="flex-1 flex flex-col gap-space-xl min-w-0 w-full">
           
+          <!-- Facility Switcher & Active Node Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-container-lowest px-4 py-3 rounded-xl border border-surface-container-high shadow-xs">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="material-symbols-outlined text-primary text-[20px] shrink-0">apartment</span>
+              <span class="text-xs font-semibold text-on-surface-variant shrink-0">Active Facility Node:</span>
+              <select id="hospital-facility-switcher" class="text-xs font-bold bg-surface-container-low text-on-surface py-1.5 px-3 rounded-lg border border-outline-variant/50 focus:ring-2 focus:ring-primary focus:outline-none cursor-pointer">
+                <!-- Dynamically populated by renderHospitalDashboard -->
+              </select>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="hospital-node-id font-mono text-[11px] px-2 py-0.5 rounded bg-surface-container text-secondary font-semibold">Node: HSP-88219-NY</span>
+              <a href="#/hospital-register" class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-on-primary hover:bg-primary px-3 py-1.5 rounded-lg bg-primary/10 transition-all">
+                <span class="material-symbols-outlined text-[16px]">add_business</span>
+                <span>Register New Facility</span>
+              </a>
+            </div>
+          </div>
+
           <!-- Hospital Verification Alert Banner (Toggled via JS) -->
           <div id="hospital-dashboard-status-banner" class="hidden"></div>
 
@@ -1877,15 +2039,16 @@
                   <span class="material-symbols-outlined text-[14px]">verified</span>
                   <span class="hospital-license-display">Verified Hospital (License #HSP-88219-NY)</span>
                 </div>
-                <span class="px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-label-badge">Accredited Trauma I</span>
+                <span class="hospital-trauma-display px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-label-badge">Accredited Trauma I</span>
+                <span class="hospital-category-badge px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed font-label-badge text-label-badge hidden sm:inline">Apex Multi-Specialty</span>
               </div>
               <h1 class="hospital-name-display font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">Metro General Hospital &amp; Trauma Center</h1>
               <div class="flex flex-wrap items-center gap-space-md text-body-sm text-on-surface-variant">
                 <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-primary">location_on</span> <span class="hospital-location-display">Ward 4B, Emergency Wing, New York, NY</span></span>
                 <span>•</span>
-                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">domain</span> 650 Beds Capacity</span>
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">domain</span> <span class="hospital-beds-display">650 Beds Capacity</span></span>
                 <span>•</span>
-                <span class="text-tertiary font-medium">Auto-dispatch Sync: Operational</span>
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">call</span> <span class="hospital-phone-display">+1 (800) 555-8821</span></span>
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-space-sm shrink-0">

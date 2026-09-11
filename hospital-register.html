@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>DonorPulse — Register Healthcare Facility</title>
+  <meta name="description" content="Register accredited hospitals, emergency trauma wings, and clinical centers to the National Haemovigilance & Emergency Blood Grid."/>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      "darkMode": "class",
+      "theme": {
+        "extend": {
+          "colors": {
+            "surface-container-high": "#e6e8ea",
+            "primary-fixed": "#ffdad8",
+            "inverse-primary": "#ffb3b1",
+            "tertiary-fixed": "#85f8c4",
+            "outline": "#906f6e",
+            "surface-variant": "#e0e3e5",
+            "on-primary": "#ffffff",
+            "surface-dim": "#d8dadc",
+            "inverse-on-surface": "#eff1f3",
+            "on-tertiary-container": "#85f8c3",
+            "outline-variant": "#e5bdbb",
+            "surface-container-highest": "#e0e3e5",
+            "on-secondary-fixed-variant": "#3f465c",
+            "on-tertiary-fixed-variant": "#005137",
+            "on-tertiary-fixed": "#002114",
+            "on-surface-variant": "#5c403f",
+            "secondary": "#565e74",
+            "on-primary-container": "#ffdad8",
+            "on-error-container": "#93000a",
+            "tertiary-container": "#00734f",
+            "on-secondary-fixed": "#131b2e",
+            "primary-fixed-dim": "#ffb3b1",
+            "on-secondary": "#ffffff",
+            "secondary-fixed-dim": "#bec6e0",
+            "on-secondary-container": "#5c647a",
+            "surface-container-low": "#f2f4f6",
+            "on-primary-fixed": "#410007",
+            "tertiary-fixed-dim": "#68dba9",
+            "on-primary-fixed-variant": "#92001c",
+            "on-surface": "#191c1e",
+            "on-tertiary": "#ffffff",
+            "error": "#ba1a1a",
+            "on-background": "#191c1e",
+            "secondary-container": "#dae2fd",
+            "surface-container-lowest": "#ffffff",
+            "surface": "#f7f9fb",
+            "on-error": "#ffffff",
+            "inverse-surface": "#2d3133",
+            "primary": "#9e001f",
+            "error-container": "#ffdad6",
+            "surface-container": "#eceef0",
+            "surface-bright": "#f7f9fb",
+            "background": "#f7f9fb",
+            "surface-tint": "#bf0229",
+            "tertiary": "#00583c",
+            "primary-container": "#c8102e",
+            "secondary-fixed": "#dae2fd"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "label-badge": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "numeric-metric": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "display-hero": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "title-md": ["Inter"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col justify-start">
+  <!-- Top Bar -->
+  <div class="w-full max-w-[1280px] mx-auto px-4 md:px-8 pt-6 flex items-center justify-between">
+    <a href="role-selection.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-all shadow-xs group cursor-pointer">
+      <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+      <span>Back to Role Selection</span>
+    </a>
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+      <span class="font-label-badge text-label-badge text-secondary uppercase font-semibold">National Haemovigilance Gateway</span>
+    </div>
+  </div>
+
+  <main class="w-full bg-surface flex-1 py-8 px-4 md:px-8">
+    <div class="max-w-3xl mx-auto bg-surface-container-lowest p-6 md:p-10 rounded-2xl shadow-sm border border-surface-container-high">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-surface-container">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-badge text-label-badge font-bold uppercase mb-2">
+            <span class="material-symbols-outlined text-[14px]">domain</span> Institutional Onboarding
+          </div>
+          <h1 class="font-headline-md text-headline-md text-on-surface font-extrabold text-2xl md:text-3xl">Register Healthcare Facility</h1>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Official clinical onboarding gateway under the National Haemovigilance &amp; Emergency Blood Grid.</p>
+        </div>
+        <button id="btn-fill-demo-standalone" type="button" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold transition-colors flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer">
+          <span class="material-symbols-outlined text-[16px] text-primary">auto_fix_high</span>
+          <span>Fill Sample Facility</span>
+        </button>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="form-standalone-register" class="flex flex-col gap-6 pt-6">
+        <!-- SECTION 1: Facility Identity & Specialization -->
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-2 text-primary font-bold text-sm tracking-wide uppercase">
+            <span class="material-symbols-outlined text-[18px]">local_hospital</span>
+            <span>1. Facility Identity &amp; Specialization</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2 flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Hospital / Facility Full Legal Name *</label>
+              <input required name="hospitalName" type="text" placeholder="e.g., St. Jude Memorial Hospital &amp; Trauma Center" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Facility Category *</label>
+              <select required name="hospitalCategory" class="h-11 px-3 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all">
+                <option value="Apex Multi-Specialty &amp; Trauma Center">Apex Multi-Specialty &amp; Trauma</option>
+                <option value="Regional Critical Care Hospital">Regional Critical Care Hospital</option>
+                <option value="Blood Bank &amp; Transfusion Institute">Blood Bank &amp; Research Center</option>
+                <option value="District General Hospital">District General Hospital</option>
+                <option value="Pediatric &amp; Neonatal Center">Pediatric &amp; Neonatal Center</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="sm:col-span-2 flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Emergency Wing / Critical Care Department *</label>
+              <input required name="hospitalLocation" type="text" placeholder="e.g., Emergency Triage Wing, Trauma Resuscitation Bay" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Operational Bed Capacity *</label>
+              <input required name="bedCapacity" type="number" min="20" max="5000" placeholder="450" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Trauma Care Accreditation Level *</label>
+              <select required name="traumaLevel" class="h-11 px-3 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all">
+                <option value="Trauma Level 1">Trauma Level 1 (24/7 Comprehensive Surgical SLA)</option>
+                <option value="Trauma Level 2">Trauma Level 2 (Major Resuscitation Wing)</option>
+                <option value="Trauma Level 3">Trauma Level 3 (Emergency Stabilization)</option>
+                <option value="Critical Transfusion Center">Critical Transfusion Center</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Cold-Chain Storage Unit Capacity</label>
+              <input name="coldChainCapacity" type="text" placeholder="500 Whole Blood / Platelet Units" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Physical Location & Address -->
+        <div class="flex flex-col gap-3 pt-2 border-t border-surface-container">
+          <div class="flex items-center gap-2 text-primary font-bold text-sm tracking-wide uppercase">
+            <span class="material-symbols-outlined text-[18px]">location_on</span>
+            <span>2. Physical Location &amp; Address</span>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-md text-label-md text-on-surface font-semibold">Street Address *</label>
+            <input required name="address" type="text" placeholder="e.g., 742 Healthcare Expressway, Medical District" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">City *</label>
+              <input required name="city" type="text" placeholder="e.g., Chicago" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">State / Province *</label>
+              <input required name="state" type="text" placeholder="e.g., IL" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">ZIP / Postal Code *</label>
+              <input required name="zip" type="text" placeholder="e.g., 60611" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Emergency Communications & Officers -->
+        <div class="flex flex-col gap-3 pt-2 border-t border-surface-container">
+          <div class="flex items-center gap-2 text-primary font-bold text-sm tracking-wide uppercase">
+            <span class="material-symbols-outlined text-[18px]">contact_phone</span>
+            <span>3. Clinical Communications &amp; Authorized Personnel</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">24/7 Emergency Triage Hotline *</label>
+              <input required name="phone" type="tel" placeholder="+1 (800) 555-8821" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Official Clinical Email *</label>
+              <input required name="email" type="email" placeholder="triage@hospitaldomain.org" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Authorized Medical Officer / Superintendent *</label>
+              <input required name="authorizedPerson" type="text" placeholder="Dr. Evelyn Vance, MD" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Officer Designation / Department *</label>
+              <input required name="roleTitle" type="text" placeholder="Chief Medical Officer &amp; Triage Director" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: Regulatory Verification Proof & Document Upload -->
+        <div class="flex flex-col gap-3 pt-2 border-t border-surface-container">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-primary font-bold text-sm tracking-wide uppercase">
+              <span class="material-symbols-outlined text-[18px]">verified_user</span>
+              <span>4. Regulatory License &amp; Verification Proof</span>
+            </div>
+            <button id="btn-attach-sample-standalone" type="button" class="text-xs text-primary font-semibold hover:underline flex items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-[14px]">attachment</span>
+              <span>Load Sample Certificate</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Hospital Accreditation / License Number *</label>
+              <input required name="licenseNumber" type="text" placeholder="e.g., HSP-90412-IL" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-mono font-bold border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Verification Proof Document Type *</label>
+              <select required name="documentType" id="standalone-doc-type" class="h-11 px-3 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all">
+                <option value="State Department Health Operating License">State Department Health Operating License</option>
+                <option value="NABH / JCI Hospital Accreditation Certificate">NABH / JCI Hospital Accreditation Certificate</option>
+                <option value="Clinical Establishment Act Registration Certificate">Clinical Establishment Act Registration Certificate</option>
+                <option value="National Blood Transfusion Council Regulatory License">National Blood Bank Council Approval</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-md text-label-md text-on-surface font-semibold">Document Certificate / Registry Number *</label>
+            <input required name="documentNumber" id="standalone-doc-number" type="text" placeholder="e.g., CERT-IL-2024-89240" class="h-11 px-3.5 rounded-xl bg-surface-container-low text-on-surface font-body-md border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:outline-none transition-all"/>
+          </div>
+
+          <!-- Drag & Drop / File Upload Box -->
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-md text-label-md text-on-surface font-semibold">Upload Verification Proof Document (PDF, JPG, PNG up to 10MB) *</label>
+            
+            <input type="file" id="standalone-proof-file" class="hidden" accept=".pdf,.png,.jpg,.jpeg"/>
+            
+            <!-- Dropzone Container -->
+            <div id="standalone-upload-dropzone" class="border-2 border-dashed border-outline-variant/70 hover:border-primary bg-surface-container-low/60 hover:bg-surface-container-low rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-2">
+              <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-[28px]">cloud_upload</span>
+              </div>
+              <div>
+                <span class="text-sm font-semibold text-on-surface">Click to select verification document</span>
+                <span class="text-xs text-on-surface-variant block mt-0.5">or drag and drop your clinical certificate here</span>
+              </div>
+              <span class="text-[11px] text-secondary font-medium">Supported formats: PDF, JPG, PNG (Max 10 MB)</span>
+            </div>
+
+            <!-- Uploaded File Preview Card -->
+            <div id="standalone-proof-preview" class="hidden p-4 rounded-xl bg-tertiary-fixed/30 border border-tertiary/40 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-lg bg-tertiary text-on-tertiary flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[22px]">description</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span id="standalone-proof-filename" class="font-semibold text-sm text-on-surface truncate">hospital_accreditation_proof.pdf</span>
+                  <span id="standalone-proof-filesize" class="text-xs text-on-surface-variant">2.4 MB • Uploaded &amp; Verified Valid</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="px-2.5 py-1 rounded-full bg-tertiary text-on-tertiary text-[11px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">check</span> Proof Attached
+                </span>
+                <button type="button" id="standalone-btn-remove-proof" class="text-error hover:text-on-error-container p-1 rounded-lg hover:bg-error/10 cursor-pointer" title="Remove attachment">
+                  <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instant Verification Checkbox -->
+          <div class="p-3.5 rounded-xl bg-surface-container flex items-start gap-3 mt-1">
+            <input type="checkbox" name="autoVerify" id="standalone-auto-verify" checked class="mt-1 w-4 h-4 text-primary rounded focus:ring-primary cursor-pointer"/>
+            <label for="standalone-auto-verify" class="text-xs text-on-surface cursor-pointer select-none">
+              <strong class="font-semibold text-on-surface">Enable Direct Automated Clearance:</strong>
+              <span class="text-on-surface-variant block mt-0.5">Validate accreditation credentials immediately against state digital registry and launch your dedicated facility dashboard.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Bottom Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-surface-container">
+          <a href="role-selection.html" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold transition-colors text-center cursor-pointer">
+            Cancel
+          </a>
+          <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold shadow-md hover:shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[20px]">domain_verification</span>
+            <span>Register &amp; Launch Hospital Dashboard</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="js/store.js?v=4"></script>
+  <script>
+    const form = document.getElementById('form-standalone-register');
+    const fileInput = document.getElementById('standalone-proof-file');
+    const dropzone = document.getElementById('standalone-upload-dropzone');
+    const preview = document.getElementById('standalone-proof-preview');
+    const filenameEl = document.getElementById('standalone-proof-filename');
+    const filesizeEl = document.getElementById('standalone-proof-filesize');
+    const btnRemove = document.getElementById('standalone-btn-remove-proof');
+    const btnSampleProof = document.getElementById('btn-attach-sample-standalone');
+    const btnSampleFacility = document.getElementById('btn-fill-demo-standalone');
+
+    let currentProof = { fileName: 'state_accreditation_certificate_2024.pdf', fileSize: '2.4 MB', attached: true };
+
+    function setProofUI(name, size) {
+      filenameEl.textContent = name;
+      filesizeEl.textContent = size + ' • Uploaded & Verified Valid';
+      preview.classList.remove('hidden');
+      dropzone.classList.add('hidden');
+      currentProof = { fileName: name, fileSize: size, attached: true };
+    }
+
+    function resetProofUI() {
+      fileInput.value = '';
+      preview.classList.add('hidden');
+      dropzone.classList.remove('hidden');
+      currentProof = { fileName: '', fileSize: '', attached: false };
+    }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-primary'); });
+    dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('border-primary'); });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-primary');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        setProofUI(file.name, (file.size / (1024*1024)).toFixed(1) + ' MB');
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        setProofUI(file.name, (file.size / (1024*1024)).toFixed(1) + ' MB');
+      }
+    });
+
+    btnRemove.addEventListener('click', (e) => { e.stopPropagation(); resetProofUI(); });
+
+    btnSampleProof.addEventListener('click', () => {
+      setProofUI('state_accreditation_certificate_2024.pdf', '2.4 MB');
+    });
+
+    btnSampleFacility.addEventListener('click', () => {
+      form.hospitalName.value = 'St. Jude Memorial Hospital & Trauma Center';
+      form.hospitalCategory.value = 'Apex Multi-Specialty & Trauma Center';
+      form.hospitalLocation.value = 'Trauma Resuscitation Wing, Floor 1';
+      form.bedCapacity.value = '450';
+      form.traumaLevel.value = 'Trauma Level 1';
+      form.address.value = '742 Healthcare Expressway, Medical District';
+      form.city.value = 'Chicago';
+      form.state.value = 'IL';
+      form.zip.value = '60611';
+      form.phone.value = '+1 (312) 555-0199';
+      form.email.value = 'emergency.triage@stjudememorial.org';
+      form.licenseNumber.value = 'HSP-99214-IL';
+      form.authorizedPerson.value = 'Dr. Evelyn Vance, MD';
+      form.roleTitle.value = 'Chief Medical Officer & Triage Director';
+      form.documentType.value = 'State Department Health Operating License';
+      form.documentNumber.value = 'CERT-IL-2024-89240';
+      setProofUI('state_accreditation_certificate_2024.pdf', '2.4 MB');
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const autoVerify = document.getElementById('standalone-auto-verify').checked;
+
+      const hospitalData = {
+        name: formData.get('hospitalName')?.toString().trim() || 'New Healthcare Facility',
+        category: formData.get('hospitalCategory')?.toString().trim() || 'Apex Multi-Specialty & Trauma Center',
+        location: formData.get('hospitalLocation')?.toString().trim() || 'Emergency Wing',
+        bedCapacity: parseInt(formData.get('bedCapacity') || 450, 10),
+        traumaLevel: formData.get('traumaLevel')?.toString().trim() || 'Trauma Level 1',
+        address: formData.get('address')?.toString().trim() || '742 Healthcare Expressway',
+        city: formData.get('city')?.toString().trim() || 'Chicago',
+        state: formData.get('state')?.toString().trim() || 'IL',
+        zip: formData.get('zip')?.toString().trim() || '60611',
+        phone: formData.get('phone')?.toString().trim() || '+1 (800) 555-8821',
+        email: formData.get('email')?.toString().trim() || 'triage@hospitaldomain.org',
+        licenseNumber: formData.get('licenseNumber')?.toString().trim() || 'HSP-90412-IL',
+        authorizedPerson: formData.get('authorizedPerson')?.toString().trim() || 'Dr. Evelyn Vance, MD',
+        roleTitle: formData.get('roleTitle')?.toString().trim() || 'Chief Medical Officer & Triage Director',
+        documentType: formData.get('documentType')?.toString().trim() || 'State Department Health Operating License',
+        documentNumber: formData.get('documentNumber')?.toString().trim() || 'CERT-IL-2024-89240',
+        fileName: currentProof.attached ? currentProof.fileName : 'clinical_establishment_license.pdf',
+        fileSize: currentProof.attached ? currentProof.fileSize : '2.1 MB',
+        verificationStatus: autoVerify ? 'verified' : 'pending'
+      };
+
+      if (window.PulseStore) {
+        window.PulseStore.registerNewHospital(hospitalData);
+        if (autoVerify) {
+          window.PulseStore.setHospitalVerification('verified');
+        }
+      }
+
+      window.location.href = 'hospital-dashboard.html';
+    });
+  </script>
+</body>
+</html>
