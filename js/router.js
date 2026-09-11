@@ -180,7 +180,7 @@ class PulseRouter {
         if (isMatch) {
           item.classList.add('bg-surface-container', 'text-primary');
           item.classList.remove('text-on-surface-variant');
-          if (!item.querySelector('.dot-active')) {
+          if (navKey !== 'requests' && !item.querySelector('.dot-active')) {
             const dot = document.createElement('span');
             dot.className = 'w-1.5 h-1.5 rounded-full bg-primary dot-active';
             item.appendChild(dot);
