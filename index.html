@@ -1153,6 +1153,179 @@
     </div>
 
     <!-- ------------------------------------------------------------------- -->
+    <!-- VIEW: DONOR EDIT PROFILE & VITALS (#/donor-profile)                 -->
+    <!-- ------------------------------------------------------------------- -->
+    <div id="view-donor-profile" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
+      <div class="max-w-2xl mx-auto mb-4 flex items-center justify-between">
+        <a href="#/donor-dashboard" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group w-fit">
+          <span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-x-0.5">arrow_back</span>
+          <span>Back to Donor Dashboard</span>
+        </a>
+        <span class="font-label-badge text-label-badge text-secondary font-bold uppercase tracking-wider hidden sm:inline-block">
+          Profile &amp; Vitals Management
+        </span>
+      </div>
+
+      <div class="max-w-2xl mx-auto bg-surface-container-lowest p-space-xl rounded-2xl shadow-sm border border-surface-container-high">
+        <!-- Header -->
+        <div class="pb-space-lg border-b border-surface-container">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-primary font-label-badge text-label-badge font-bold uppercase mb-2">
+            <span class="material-symbols-outlined text-[14px]">clinical_notes</span> Clinical Profile &amp; Vitals
+          </div>
+          <h1 class="font-headline-md text-headline-md text-on-surface font-extrabold">Edit Profile &amp; Vitals</h1>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Update your contact details, emergency response radius, medical notes, and clinical vitals.</p>
+
+          <!-- Haemovigilance Identity Lock Notice Banner -->
+          <div class="mt-4 p-3.5 rounded-xl bg-surface-container border border-surface-container-high flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
+              <span class="material-symbols-outlined text-[18px]">lock</span>
+            </div>
+            <div class="flex-1 text-xs">
+              <div class="font-bold text-on-surface flex items-center gap-1.5">
+                <span>Locked Registration Credentials</span>
+                <span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-[10px] uppercase font-bold text-on-surface-variant">Permanent</span>
+              </div>
+              <p class="text-on-surface-variant mt-0.5 leading-relaxed">
+                In compliance with national haemovigilance protocols and patient transfusion safety standards, your <strong>Full Name</strong> and <strong>Blood Group</strong> are verified at registration and cannot be modified online.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <form id="form-donor-profile" class="flex flex-col gap-space-md pt-space-lg">
+          <!-- Non-Editable Credentials Section -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+            <div class="flex flex-col gap-space-xs">
+              <div class="flex items-center justify-between">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Full Name</label>
+                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-secondary">
+                  <span class="material-symbols-outlined text-[13px]">lock</span> Locked
+                </span>
+              </div>
+              <div class="relative">
+                <input id="edit-donor-fullName" name="fullName" type="text" readonly disabled class="w-full h-11 pl-3 pr-10 rounded-lg bg-surface-container text-on-surface-variant font-body-md font-semibold cursor-not-allowed border border-surface-container-high focus:outline-none select-none" title="Name cannot be changed once registered"/>
+                <span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-secondary">lock</span>
+              </div>
+              <span class="text-[11px] text-secondary">Verified legal identity on file</span>
+            </div>
+
+            <div class="flex flex-col gap-space-xs">
+              <div class="flex items-center justify-between">
+                <label class="font-label-md text-label-md text-on-surface font-semibold">Blood Group</label>
+                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-primary">
+                  <span class="material-symbols-outlined text-[13px]">lock</span> Fixed
+                </span>
+              </div>
+              <div class="relative">
+                <input id="edit-donor-bloodGroup" name="bloodGroup" type="text" readonly disabled class="w-full h-11 pl-3 pr-10 rounded-lg bg-surface-container text-primary font-body-md font-extrabold cursor-not-allowed border border-surface-container-high focus:outline-none select-none" title="Blood group cannot be edited once registered"/>
+                <span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-secondary">lock</span>
+              </div>
+              <span class="text-[11px] text-secondary">Clinically authenticated blood phenotype</span>
+            </div>
+          </div>
+
+          <!-- Editable Profile Details (Matching Registration Fields) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+            <div class="flex flex-col gap-space-xs">
+              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-age">Age *</label>
+              <input required id="edit-donor-age" name="age" type="number" min="18" max="75" placeholder="e.g. 28" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            </div>
+            <div class="flex flex-col gap-space-xs">
+              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-phone">Phone Number *</label>
+              <input required id="edit-donor-phone" name="phone" type="tel" placeholder="+1 (555) 234-5678" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+            <div class="flex flex-col gap-space-xs">
+              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-email">Email Address *</label>
+              <input required id="edit-donor-email" name="email" type="email" placeholder="sarah.jenkins@medvolunteer.org" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            </div>
+            <div class="flex flex-col gap-space-xs">
+              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-city">City / Metro District *</label>
+              <input required id="edit-donor-city" name="city" type="text" placeholder="Downtown Metro Center" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-space-xs">
+            <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-address">Residential / Clinic Address *</label>
+            <input required id="edit-donor-address" name="address" type="text" placeholder="e.g. 482 Lexington Ave, Apt 4B" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+            <div class="flex flex-col gap-space-xs">
+              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-lastDonationDate">Last Donation Date</label>
+              <input id="edit-donor-lastDonationDate" name="lastDonationDate" type="date" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            </div>
+            <div class="flex flex-col gap-space-xs">
+              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-radiusMiles">Notification Travel Radius</label>
+              <select id="edit-donor-radiusMiles" name="radiusMiles" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none">
+                <option value="5">Within 5 miles (Fast response)</option>
+                <option value="10">Within 10 miles (Standard metro)</option>
+                <option value="25">Within 25 miles (Wide emergency)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Clinical Vitals Section -->
+          <div class="p-space-md rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-space-sm">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[20px]">monitor_heart</span>
+                <span class="font-label-md text-label-md text-on-surface font-bold">Clinical Vitals</span>
+              </div>
+              <span class="text-[11px] text-on-surface-variant font-medium">Last Recorded Measurements</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm">
+              <div class="flex flex-col gap-1">
+                <label class="text-[11px] font-semibold text-secondary" for="edit-donor-vitals-hemoglobin">Hemoglobin</label>
+                <input id="edit-donor-vitals-hemoglobin" name="vitals_hemoglobin" type="text" placeholder="14.8 g/dL" class="h-10 px-2.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-sm font-semibold focus:ring-2 focus:ring-primary focus:outline-none"/>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[11px] font-semibold text-secondary" for="edit-donor-vitals-bp">Blood Pressure</label>
+                <input id="edit-donor-vitals-bp" name="vitals_bp" type="text" placeholder="118/76 mmHg" class="h-10 px-2.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-sm font-semibold focus:ring-2 focus:ring-primary focus:outline-none"/>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[11px] font-semibold text-secondary" for="edit-donor-vitals-pulse">Resting Pulse</label>
+                <input id="edit-donor-vitals-pulse" name="vitals_pulse" type="text" placeholder="72 bpm" class="h-10 px-2.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-sm font-semibold focus:ring-2 focus:ring-primary focus:outline-none"/>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[11px] font-semibold text-secondary" for="edit-donor-vitals-weight">Weight</label>
+                <input id="edit-donor-vitals-weight" name="vitals_weight" type="text" placeholder="64 kg" class="h-10 px-2.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-sm font-semibold focus:ring-2 focus:ring-primary focus:outline-none"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-space-xs">
+            <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-medicalHistory">Medical History &amp; Health Notes</label>
+            <textarea id="edit-donor-medicalHistory" name="medicalHistory" rows="3" placeholder="Disclose any chronic conditions, hemoglobin history, recent dental procedures or travel." class="p-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"></textarea>
+          </div>
+
+          <div class="p-space-sm rounded-xl bg-surface-container-low flex items-center justify-between">
+            <div>
+              <span class="font-label-md text-label-md text-on-surface font-bold">Active On Call Availability</span>
+              <p class="font-body-sm text-[12px] text-on-surface-variant">Ready to receive priority emergency notifications</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input id="edit-donor-availability" name="availability" type="checkbox" class="sr-only peer"/>
+              <div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-tertiary"></div>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between pt-space-md border-t border-surface-container">
+            <a href="#/donor-dashboard" class="px-space-md py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold transition-colors">
+              Cancel
+            </a>
+            <button type="submit" class="px-space-xl py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold shadow-md transition-all active:scale-98 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[20px]">save</span>
+              <span>Save Profile &amp; Vitals</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------- -->
     <!-- VIEW 4: DONOR DASHBOARD (#/donor-dashboard)                          -->
     <!-- ------------------------------------------------------------------- -->
     <div id="view-donor-dashboard" class="view-section w-full">
@@ -1186,7 +1359,7 @@
               </div>
               <span class="w-1.5 h-1.5 rounded-full bg-primary dot-active"></span>
             </a>
-            <a class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#/donor-dashboard" onclick="window.showToast('Profile & Vitals', 'Your clinical profile and vitals are up to date.', 'info')" data-donor-nav="profile">
+            <a class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#/donor-profile" data-donor-nav="profile">
               <span class="material-symbols-outlined text-[20px]">badge</span>
               <span>Edit Profile &amp; Vitals</span>
             </a>
@@ -1576,14 +1749,14 @@
               </div>
               <div>
                 <h3 class="font-title-md text-title-md font-bold text-on-surface">Universal Haemovigilance Digital Pass</h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">Instant clinical check-in QR code active. Verified vitals: Hemoglobin 14.8 g/dL (Normal).</p>
+                <p id="donor-vitals-pass-text" class="font-body-sm text-body-sm text-on-surface-variant">Instant clinical check-in QR code active. Verified vitals: Hemoglobin 14.8 g/dL (Normal).</p>
               </div>
             </div>
             <div class="flex items-center gap-space-xs shrink-0 w-full sm:w-auto">
               <button onclick="window.showToast('Digital Health Pass QR', 'Scan pass at hospital triage kiosk for fast-track donor lane.', 'info')" class="flex-1 sm:flex-none px-space-md py-2.5 rounded-xl bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-label-md font-semibold transition-colors shadow-sm">
                 Show Pass QR
               </button>
-              <a href="#/donor-register" class="flex-1 sm:flex-none px-space-md py-2.5 rounded-xl bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors text-center">
+              <a href="#/donor-profile" class="flex-1 sm:flex-none px-space-md py-2.5 rounded-xl bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors text-center">
                 Update Vitals
               </a>
             </div>

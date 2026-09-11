@@ -93,6 +93,8 @@ function initRouterHooks() {
 
     if (route === 'donor-dashboard') {
       renderDonorDashboard();
+    } else if (route === 'donor-profile') {
+      populateDonorProfileForm();
     } else if (route === 'hospital-dashboard') {
       renderHospitalDashboard();
     } else if (route === 'hospital-verification') {
@@ -144,6 +146,42 @@ function initFormControllers() {
         showToast('Demo Donor Data Loaded', 'Alex Morgan (A+ Donor) profile pre-filled for testing.', 'info');
       });
     }
+  }
+
+  // A2. Donor Profile & Vitals Editing Form
+  const editProfileForm = document.getElementById('form-donor-profile');
+  if (editProfileForm) {
+    editProfileForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const currentDonor = window.PulseStore.getDonor();
+      const formData = new FormData(editProfileForm);
+
+      // Name and Blood Group CANNOT be changed once registered - strictly preserved
+      const updatedDonorData = {
+        fullName: currentDonor.fullName,
+        bloodGroup: currentDonor.bloodGroup,
+        age: parseInt(formData.get('age') || currentDonor.age, 10),
+        phone: formData.get('phone')?.toString().trim() || currentDonor.phone,
+        email: formData.get('email')?.toString().trim() || currentDonor.email,
+        city: formData.get('city')?.toString().trim() || currentDonor.city,
+        address: formData.get('address')?.toString().trim() || currentDonor.address,
+        lastDonationDate: formData.get('lastDonationDate')?.toString().trim() || currentDonor.lastDonationDate,
+        radiusMiles: parseInt(formData.get('radiusMiles') || currentDonor.radiusMiles, 10),
+        medicalHistory: formData.get('medicalHistory')?.toString().trim() || currentDonor.medicalHistory,
+        availability: formData.get('availability') === 'on' || formData.get('availability') === 'true' || document.getElementById('edit-donor-availability')?.checked,
+        vitals: {
+          hemoglobin: formData.get('vitals_hemoglobin')?.toString().trim() || (currentDonor.vitals && currentDonor.vitals.hemoglobin) || '14.8 g/dL',
+          bp: formData.get('vitals_bp')?.toString().trim() || (currentDonor.vitals && currentDonor.vitals.bp) || '118/76 mmHg',
+          pulse: formData.get('vitals_pulse')?.toString().trim() || (currentDonor.vitals && currentDonor.vitals.pulse) || '72 bpm',
+          weight: formData.get('vitals_weight')?.toString().trim() || (currentDonor.vitals && currentDonor.vitals.weight) || '64 kg'
+        }
+      };
+
+      window.PulseStore.setDonor(updatedDonorData);
+      renderDonorDashboard();
+      showToast('Profile & Vitals Updated', `Updated details and clinical vitals for ${currentDonor.fullName} saved successfully.`, 'success');
+      window.PulseRouter.navigate('donor-dashboard');
+    });
   }
 
   // B. Hospital Registration Form & Verification Proof
@@ -884,6 +922,7 @@ function initPrototypeToolbar() {
 // ============================================================================
 function renderAllViews() {
   renderDonorDashboard();
+  populateDonorProfileForm();
   renderHospitalDashboard();
   renderHospitalVerification();
   renderRequestConfirmation();
@@ -957,6 +996,70 @@ function renderDonorDashboard() {
       ? '<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Available to Donate'
       : '<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Off Call';
   }
+
+  // Update vitals pass text if present
+  const vitalsPassText = document.getElementById('donor-vitals-pass-text');
+  if (vitalsPassText && donor.vitals) {
+    vitalsPassText.textContent = `Instant clinical check-in QR code active. Verified vitals: Hemoglobin ${donor.vitals.hemoglobin || '14.8 g/dL'} (Normal) • BP ${donor.vitals.bp || '118/76 mmHg'}.`;
+  }
+}
+
+/**
+ * Pre-populates the Edit Profile & Vitals form with current donor data.
+ * Blood Group and Full Name are strictly locked against edits.
+ */
+function populateDonorProfileForm() {
+  const donor = window.PulseStore ? window.PulseStore.getDonor() : null;
+  if (!donor) return;
+
+  // Locked non-editable identity fields (Full Name & Blood Group)
+  const nameInput = document.getElementById('edit-donor-fullName');
+  if (nameInput) nameInput.value = donor.fullName || '';
+
+  const bloodInput = document.getElementById('edit-donor-bloodGroup');
+  if (bloodInput) bloodInput.value = donor.bloodGroup || '';
+
+  // Editable fields (matching registration options)
+  const ageInput = document.getElementById('edit-donor-age');
+  if (ageInput) ageInput.value = donor.age || 28;
+
+  const phoneInput = document.getElementById('edit-donor-phone');
+  if (phoneInput) phoneInput.value = donor.phone || '';
+
+  const emailInput = document.getElementById('edit-donor-email');
+  if (emailInput) emailInput.value = donor.email || '';
+
+  const cityInput = document.getElementById('edit-donor-city');
+  if (cityInput) cityInput.value = donor.city || '';
+
+  const addressInput = document.getElementById('edit-donor-address');
+  if (addressInput) addressInput.value = donor.address || '';
+
+  const lastDonationInput = document.getElementById('edit-donor-lastDonationDate');
+  if (lastDonationInput) lastDonationInput.value = donor.lastDonationDate || '';
+
+  const radiusSelect = document.getElementById('edit-donor-radiusMiles');
+  if (radiusSelect) radiusSelect.value = donor.radiusMiles || 10;
+
+  const medHistoryInput = document.getElementById('edit-donor-medicalHistory');
+  if (medHistoryInput) medHistoryInput.value = donor.medicalHistory || '';
+
+  const availCheckbox = document.getElementById('edit-donor-availability');
+  if (availCheckbox) availCheckbox.checked = donor.availability !== false;
+
+  // Clinical Vitals
+  const vitals = donor.vitals || {};
+  const hemoInput = document.getElementById('edit-donor-vitals-hemoglobin');
+  if (hemoInput) hemoInput.value = vitals.hemoglobin || '14.8 g/dL';
+
+  const bpInput = document.getElementById('edit-donor-vitals-bp');
+  if (bpInput) bpInput.value = vitals.bp || '118/76 mmHg';
+
+  const pulseInput = document.getElementById('edit-donor-vitals-pulse');
+  if (pulseInput) pulseInput.value = vitals.pulse || '72 bpm';
+
+  const weightInput = document.getElementById('edit-donor-vitals-weight');
+  if (weightInput) weightInput.value = vitals.weight || '64 kg';
 }
 
 /**

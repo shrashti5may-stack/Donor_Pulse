@@ -9,6 +9,7 @@ class PulseRouter {
       'landing': 'view-landing',
       'role-selection': 'view-role-selection',
       'donor-register': 'view-donor-register',
+      'donor-profile': 'view-donor-profile',
       'donor-dashboard': 'view-donor-dashboard',
       'nearby-requests': 'view-donor-dashboard',
       'dashboard/requests': 'view-donor-dashboard',
@@ -175,6 +176,7 @@ class PulseRouter {
         const navKey = item.getAttribute('data-donor-nav');
         const isMatch = (navKey === 'requests' && ['nearby-requests', 'dashboard/requests', 'donor-dashboard/requests', 'donor-requests', 'donor-requests-section'].includes(path)) ||
                         (navKey === 'history' && ['donation-history', 'donor-history', 'donor-history-section'].includes(path)) ||
+                        (navKey === 'profile' && path === 'donor-profile') ||
                         (navKey === 'dashboard' && path === 'donor-dashboard');
         
         if (isMatch) {
