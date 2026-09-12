@@ -1892,47 +1892,61 @@
           <div class="grid grid-cols-1 xl:grid-cols-3 gap-space-xl items-start">
             <!-- LIVE MATCHES TABLE -->
             <div class="xl:col-span-2 bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
-              <div class="flex items-center justify-between">
+              <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Live Donor Matches</h2>
                   <p class="font-body-sm text-body-sm text-on-surface-variant">Real-time responders matched to open hospital tickets</p>
                 </div>
-                <a href="#/matched-donors" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md font-semibold transition-colors flex items-center gap-1">
+                <a href="#/matched-donors" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md font-semibold transition-colors flex items-center gap-1 shrink-0">
                   <span>View All Matches</span>
                   <span class="material-symbols-outlined text-[16px]">chevron_right</span>
                 </a>
               </div>
-              <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse font-body-sm text-body-sm">
+              <div class="w-full overflow-hidden table-no-scroll">
+                <table class="w-full text-left border-collapse font-body-sm text-body-sm table-auto">
                   <thead>
-                    <tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
-                      <th class="py-3 px-space-md rounded-l-lg">Donor Name</th>
-                      <th class="py-3 px-space-sm text-center">Group</th>
-                      <th class="py-3 px-space-sm">Distance</th>
-                      <th class="py-3 px-space-sm">Match Score</th>
-                      <th class="py-3 px-space-sm">Status</th>
-                      <th class="py-3 px-space-md text-right rounded-r-lg">Action</th>
+                    <tr class="bg-surface-container-low text-on-surface-variant font-label-md text-xs sm:text-label-md uppercase tracking-wider">
+                      <th class="py-2.5 px-2 sm:px-3 rounded-l-lg">Donor Name</th>
+                      <th class="py-2.5 px-1.5 sm:px-2 text-center">Group</th>
+                      <th class="py-2.5 px-1.5 sm:px-2 hidden sm:table-cell">Distance</th>
+                      <th class="py-2.5 px-1.5 sm:px-2 hidden sm:table-cell">Match Score</th>
+                      <th class="py-2.5 px-1.5 sm:px-2">Status</th>
+                      <th class="py-2.5 px-2 sm:px-3 text-right rounded-r-lg">Action</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-surface-container">
                     <tr class="hover:bg-surface/60 transition-colors">
-                      <td class="py-3.5 px-space-md font-semibold text-on-surface">David K.</td>
-                      <td class="py-3.5 px-space-sm text-center"><span class="w-7 h-7 rounded-full bg-surface-container-high inline-flex items-center justify-center font-bold">B+</span></td>
-                      <td class="py-3.5 px-space-sm">1.4 miles</td>
-                      <td class="py-3.5 px-space-sm text-tertiary font-bold">100%</td>
-                      <td class="py-3.5 px-space-sm"><span class="px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge">Accepted (ETA 25m)</span></td>
-                      <td class="py-3.5 px-space-md text-right">
-                        <button onclick="window.showToast('Secure Channel', 'Connecting encrypted intercom to David K.', 'info')" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md">Contact</button>
+                      <td class="py-3 px-2 sm:px-3 font-semibold text-on-surface text-xs sm:text-sm">
+                        <div>David K.</div>
+                        <div class="text-[11px] text-on-surface-variant font-normal sm:hidden">1.4 mi • 100%</div>
+                      </td>
+                      <td class="py-3 px-1.5 sm:px-2 text-center">
+                        <span class="w-7 h-7 rounded-full bg-surface-container-high inline-flex items-center justify-center font-bold text-xs">B+</span>
+                      </td>
+                      <td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-on-surface hidden sm:table-cell whitespace-nowrap">1.4 miles</td>
+                      <td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-tertiary font-bold hidden sm:table-cell whitespace-nowrap">100%</td>
+                      <td class="py-3 px-1.5 sm:px-2">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-[11px] font-semibold whitespace-nowrap">Accepted (ETA 25m)</span>
+                      </td>
+                      <td class="py-3 px-2 sm:px-3 text-right whitespace-nowrap">
+                        <button onclick="window.showToast('Secure Channel', 'Connecting encrypted intercom to David K.', 'info')" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs sm:text-sm font-semibold transition-colors">Contact</button>
                       </td>
                     </tr>
                     <tr class="hover:bg-surface/60 transition-colors">
-                      <td class="py-3.5 px-space-md font-semibold text-on-surface">Sarah Jenkins</td>
-                      <td class="py-3.5 px-space-sm text-center"><span class="w-7 h-7 rounded-full bg-primary-fixed text-primary inline-flex items-center justify-center font-bold">O-</span></td>
-                      <td class="py-3.5 px-space-sm">1.8 miles</td>
-                      <td class="py-3.5 px-space-sm text-primary font-bold">Universal</td>
-                      <td class="py-3.5 px-space-sm"><span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge">Available On Call</span></td>
-                      <td class="py-3.5 px-space-md text-right">
-                        <button onclick="window.showToast('Broadcast Sent', 'Emergency ping dispatched to Sarah Jenkins.', 'success')" class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md">Ping Donor</button>
+                      <td class="py-3 px-2 sm:px-3 font-semibold text-on-surface text-xs sm:text-sm">
+                        <div>Sarah Jenkins</div>
+                        <div class="text-[11px] text-on-surface-variant font-normal sm:hidden">1.8 mi • Universal</div>
+                      </td>
+                      <td class="py-3 px-1.5 sm:px-2 text-center">
+                        <span class="w-7 h-7 rounded-full bg-primary-fixed text-primary inline-flex items-center justify-center font-bold text-xs">O-</span>
+                      </td>
+                      <td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-on-surface hidden sm:table-cell whitespace-nowrap">1.8 miles</td>
+                      <td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-primary font-bold hidden sm:table-cell whitespace-nowrap">Universal</td>
+                      <td class="py-3 px-1.5 sm:px-2">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-[11px] font-semibold whitespace-nowrap">Available On Call</span>
+                      </td>
+                      <td class="py-3 px-2 sm:px-3 text-right whitespace-nowrap">
+                        <button onclick="window.showToast('Broadcast Sent', 'Emergency ping dispatched to Sarah Jenkins.', 'success')" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs sm:text-sm font-semibold transition-colors">Ping Donor</button>
                       </td>
                     </tr>
                   </tbody>

@@ -312,128 +312,134 @@
 <span class="font-label-badge text-label-badge text-tertiary uppercase">3 Synchronized</span>
 </div>
 </div>
-<!-- Table Container -->
-<div class="overflow-x-auto">
-<table class="w-full text-left border-collapse">
+<!-- Table Container (Non-Scrollable & Fully Responsive) -->
+<div class="w-full overflow-hidden table-no-scroll">
+<table class="w-full text-left border-collapse table-auto">
 <thead>
-<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
-<th class="py-3 px-space-md rounded-l-lg">Donor ID / Name</th>
-<th class="py-3 px-space-sm text-center">Group</th>
-<th class="py-3 px-space-sm">Distance</th>
-<th class="py-3 px-space-sm">Match Score</th>
-<th class="py-3 px-space-sm">Status</th>
-<th class="py-3 px-space-md text-right rounded-r-lg">Action</th>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-xs sm:text-label-md uppercase tracking-wider">
+<th class="py-2.5 px-2 sm:px-3 rounded-l-lg">Donor ID / Name</th>
+<th class="py-2.5 px-1.5 sm:px-2 text-center">Group</th>
+<th class="py-2.5 px-1.5 sm:px-2 hidden sm:table-cell">Distance</th>
+<th class="py-2.5 px-1.5 sm:px-2 hidden sm:table-cell">Match Score</th>
+<th class="py-2.5 px-1.5 sm:px-2">Status</th>
+<th class="py-2.5 px-2 sm:px-3 text-right rounded-r-lg">Action</th>
 </tr>
 </thead>
 <tbody class="divide-y divide-surface-container font-body-sm text-body-sm">
 <!-- Row 1 -->
 <tr class="hover:bg-surface/60 transition-colors">
-<td class="py-3.5 px-space-md">
-<div class="flex items-center gap-space-sm">
-<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md font-bold">
+<td class="py-3 px-2 sm:px-3">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md font-bold shrink-0 text-xs sm:text-sm">
                         DK
                       </div>
-<div class="flex flex-col">
-<span class="font-title-md text-body-md font-bold text-on-surface">David K.</span>
-<span class="font-label-badge text-[10px] text-tertiary flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">verified</span> Verified Donor</span>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-xs sm:text-sm font-bold text-on-surface truncate">David K.</span>
+<span class="font-label-badge text-[10px] text-tertiary hidden sm:flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">verified</span> Verified Donor</span>
+<span class="text-[10px] text-on-surface-variant font-normal sm:hidden">1.4 mi • 100%</span>
 </div>
 </div>
 </td>
-<td class="py-3.5 px-space-sm text-center">
-<span class="inline-flex w-7 h-7 rounded-full bg-surface-container-high items-center justify-center font-bold text-on-surface">B+</span>
+<td class="py-3 px-1.5 sm:px-2 text-center">
+<span class="inline-flex w-7 h-7 rounded-full bg-surface-container-high items-center justify-center font-bold text-xs text-on-surface">B+</span>
 </td>
-<td class="py-3.5 px-space-sm text-on-surface">1.4 miles</td>
-<td class="py-3.5 px-space-sm">
-<div class="flex items-center gap-1.5">
-<div class="w-12 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-on-surface hidden sm:table-cell whitespace-nowrap">1.4 miles</td>
+<td class="py-3 px-1.5 sm:px-2 hidden sm:table-cell">
+<div class="flex items-center gap-1.5 whitespace-nowrap">
+<div class="w-10 sm:w-12 bg-surface-container-high h-2 rounded-full overflow-hidden">
 <div class="bg-tertiary h-full w-full"></div>
 </div>
-<span class="font-label-md text-label-md font-bold text-tertiary">100%</span>
+<span class="font-label-md text-xs sm:text-label-md font-bold text-tertiary">100%</span>
 </div>
 </td>
-<td class="py-3.5 px-space-sm">
-<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-label-badge uppercase">
-<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Accepted (ETA 25m)
+<td class="py-3 px-1.5 sm:px-2">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-[10px] sm:text-label-badge uppercase whitespace-nowrap">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary shrink-0"></span> Accepted (ETA 25m)
                     </span>
 </td>
-<td class="py-3.5 px-space-md text-right">
-<button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-primary hover:text-on-primary text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1 ml-auto">
-<span class="material-symbols-outlined text-[16px]">lock_person</span>
-<span>Contact Securely</span>
+<td class="py-3 px-2 sm:px-3 text-right whitespace-nowrap">
+<button class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-container hover:bg-primary hover:text-on-primary text-on-surface font-label-md text-xs sm:text-label-md transition-colors inline-flex items-center gap-1 ml-auto">
+<span class="material-symbols-outlined text-[14px] sm:text-[16px]">lock_person</span>
+<span class="hidden md:inline">Contact Securely</span>
+<span class="md:hidden">Contact</span>
 </button>
 </td>
 </tr>
 <!-- Row 2 -->
 <tr class="hover:bg-surface/60 transition-colors">
-<td class="py-3.5 px-space-md">
-<div class="flex items-center gap-space-sm">
-<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md font-bold">
+<td class="py-3 px-2 sm:px-3">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md font-bold shrink-0 text-xs sm:text-sm">
                         ER
                       </div>
-<div class="flex flex-col">
-<span class="font-title-md text-body-md font-bold text-on-surface">Elena R.</span>
-<span class="font-label-badge text-[10px] text-tertiary flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">verified</span> Verified Donor</span>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-xs sm:text-sm font-bold text-on-surface truncate">Elena R.</span>
+<span class="font-label-badge text-[10px] text-tertiary hidden sm:flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">verified</span> Verified Donor</span>
+<span class="text-[10px] text-on-surface-variant font-normal sm:hidden">2.8 mi • Universal</span>
 </div>
 </div>
 </td>
-<td class="py-3.5 px-space-sm text-center">
-<span class="inline-flex w-7 h-7 rounded-full bg-primary-fixed text-on-primary-fixed font-bold items-center justify-center">O-</span>
+<td class="py-3 px-1.5 sm:px-2 text-center">
+<span class="inline-flex w-7 h-7 rounded-full bg-primary-fixed text-on-primary-fixed font-bold text-xs items-center justify-center">O-</span>
 </td>
-<td class="py-3.5 px-space-sm text-on-surface">2.8 miles</td>
-<td class="py-3.5 px-space-sm">
-<div class="flex items-center gap-1.5">
-<div class="w-12 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-on-surface hidden sm:table-cell whitespace-nowrap">2.8 miles</td>
+<td class="py-3 px-1.5 sm:px-2 hidden sm:table-cell">
+<div class="flex items-center gap-1.5 whitespace-nowrap">
+<div class="w-10 sm:w-12 bg-surface-container-high h-2 rounded-full overflow-hidden">
 <div class="bg-primary h-full w-[95%]"></div>
 </div>
-<span class="font-label-md text-label-md font-bold text-primary">Universal</span>
+<span class="font-label-md text-xs sm:text-label-md font-bold text-primary">Universal</span>
 </div>
 </td>
-<td class="py-3.5 px-space-sm">
-<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed/50 text-secondary font-label-badge text-label-badge uppercase">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Notified (Awaiting)
+<td class="py-3 px-1.5 sm:px-2">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-fixed/50 text-secondary font-label-badge text-[10px] sm:text-label-badge uppercase whitespace-nowrap">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary shrink-0"></span> Notified (Awaiting)
                     </span>
 </td>
-<td class="py-3.5 px-space-md text-right">
-<button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1 ml-auto">
-<span class="material-symbols-outlined text-[16px]">sensors</span>
-<span>Send Ping</span>
+<td class="py-3 px-2 sm:px-3 text-right whitespace-nowrap">
+<button class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs sm:text-label-md transition-colors inline-flex items-center gap-1 ml-auto">
+<span class="material-symbols-outlined text-[14px] sm:text-[16px]">sensors</span>
+<span class="hidden md:inline">Send Ping</span>
+<span class="md:hidden">Ping</span>
 </button>
 </td>
 </tr>
 <!-- Row 3 -->
 <tr class="hover:bg-surface/60 transition-colors">
-<td class="py-3.5 px-space-md">
-<div class="flex items-center gap-space-sm">
-<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md font-bold">
+<td class="py-3 px-2 sm:px-3">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md font-bold shrink-0 text-xs sm:text-sm">
                         MT
                       </div>
-<div class="flex flex-col">
-<span class="font-title-md text-body-md font-bold text-on-surface">Marcus T.</span>
-<span class="font-label-badge text-[10px] text-tertiary flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">verified</span> Verified Donor</span>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-xs sm:text-sm font-bold text-on-surface truncate">Marcus T.</span>
+<span class="font-label-badge text-[10px] text-tertiary hidden sm:flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">verified</span> Verified Donor</span>
+<span class="text-[10px] text-on-surface-variant font-normal sm:hidden">3.5 mi • 100%</span>
 </div>
 </div>
 </td>
-<td class="py-3.5 px-space-sm text-center">
-<span class="inline-flex w-7 h-7 rounded-full bg-surface-container-high items-center justify-center font-bold text-on-surface">B+</span>
+<td class="py-3 px-1.5 sm:px-2 text-center">
+<span class="inline-flex w-7 h-7 rounded-full bg-surface-container-high items-center justify-center font-bold text-xs text-on-surface">B+</span>
 </td>
-<td class="py-3.5 px-space-sm text-on-surface">3.5 miles</td>
-<td class="py-3.5 px-space-sm">
-<div class="flex items-center gap-1.5">
-<div class="w-12 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-on-surface hidden sm:table-cell whitespace-nowrap">3.5 miles</td>
+<td class="py-3 px-1.5 sm:px-2 hidden sm:table-cell">
+<div class="flex items-center gap-1.5 whitespace-nowrap">
+<div class="w-10 sm:w-12 bg-surface-container-high h-2 rounded-full overflow-hidden">
 <div class="bg-tertiary h-full w-full"></div>
 </div>
-<span class="font-label-md text-label-md font-bold text-tertiary">100%</span>
+<span class="font-label-md text-xs sm:text-label-md font-bold text-tertiary">100%</span>
 </div>
 </td>
-<td class="py-3.5 px-space-sm">
-<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-label-badge uppercase">
-<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Slot: 3:30 PM
+<td class="py-3 px-1.5 sm:px-2">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-[10px] sm:text-label-badge uppercase whitespace-nowrap">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary shrink-0"></span> Slot: 3:30 PM
                     </span>
 </td>
-<td class="py-3.5 px-space-md text-right">
-<button class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md transition-colors flex items-center gap-1 ml-auto">
-<span class="material-symbols-outlined text-[16px]">how_to_reg</span>
-<span>Check In Donor</span>
+<td class="py-3 px-2 sm:px-3 text-right whitespace-nowrap">
+<button class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs sm:text-label-md transition-colors inline-flex items-center gap-1 ml-auto">
+<span class="material-symbols-outlined text-[14px] sm:text-[16px]">how_to_reg</span>
+<span class="hidden md:inline">Check In Donor</span>
+<span class="md:hidden">Check In</span>
 </button>
 </td>
 </tr>

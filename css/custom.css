@@ -119,3 +119,14 @@
   box-shadow: 0 4px 14px rgba(200, 16, 46, 0.3);
   transform: scale(1.04);
 }
+
+/* Prevent unwanted horizontal scrollbars on dashboard card tables */
+.table-no-scroll {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.table-no-scroll table {
+  width: 100% !important;
+}
+
