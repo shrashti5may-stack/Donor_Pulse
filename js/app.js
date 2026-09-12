@@ -2102,3 +2102,107 @@ window.logoutUser = function(role) {
   }
 };
 
+// ============================================================================
+// DONOR BLOOD REQUISITION DETAILS MODAL CONTROLLER
+// ============================================================================
+let activeDonorRequest = null;
+
+window.openDonorRequestModal = function(data) {
+  activeDonorRequest = data || {
+    hospital: "St. Mary's General Hospital",
+    urgency: 'HIGH EMERGENCY',
+    urgencyClass: 'bg-error-container text-on-error-container',
+    blood: 'O-',
+    distance: '1.8 miles away • Trauma Level 1',
+    demand: '3 Units Needed',
+    requiredBy: 'Next 2 Hours',
+    reason: 'Immediate blood inventory shortage following a multi-vehicle highway collision. Emergency surgical transfusion required.',
+    doctor: 'Dr. H. Vance, MD (Chief Trauma Surgeon)',
+    reqId: 'REQ-STMARYS-8921',
+    location: "Trauma Wing, Bay 04, 1200 St. Mary's Blvd",
+    cardId: 'card-request-1'
+  };
+
+  const modal = document.getElementById('modal-donor-request-details');
+  if (!modal) return;
+
+  const setElText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el && text !== undefined) el.textContent = text;
+  };
+
+  setElText('donor-modal-hospital-name', activeDonorRequest.hospital);
+  setElText('donor-modal-demand', activeDonorRequest.demand);
+  setElText('donor-modal-timeframe', activeDonorRequest.requiredBy);
+  setElText('donor-modal-reason', activeDonorRequest.reason);
+  setElText('donor-modal-doctor', activeDonorRequest.doctor);
+  setElText('donor-modal-req-id', activeDonorRequest.reqId);
+  setElText('donor-modal-location', activeDonorRequest.location);
+  setElText('donor-modal-blood-badge', `${activeDonorRequest.blood} Needed`);
+
+  const subEl = document.getElementById('donor-modal-hospital-sub');
+  if (subEl && activeDonorRequest.distance) {
+    subEl.innerHTML = `<span class="material-symbols-outlined text-[16px] text-primary">pin_drop</span><span>${escapeHtml(activeDonorRequest.distance)}</span>`;
+  }
+
+  const badgeEl = document.getElementById('donor-modal-urgency-badge');
+  if (badgeEl) {
+    badgeEl.textContent = activeDonorRequest.urgency || 'HIGH EMERGENCY';
+    badgeEl.className = `px-2.5 py-0.5 rounded-full font-label-badge text-label-badge uppercase font-bold tracking-wider ${activeDonorRequest.urgencyClass || 'bg-error-container text-on-error-container'}`;
+  }
+
+  modal.classList.remove('hidden');
+};
+
+window.closeDonorRequestModal = function() {
+  const modal = document.getElementById('modal-donor-request-details');
+  if (modal) modal.classList.add('hidden');
+};
+
+window.approveDonorRequest = function() {
+  const req = activeDonorRequest || { hospital: "St. Mary's General Hospital" };
+  window.closeDonorRequestModal();
+
+  if (window.showToast) {
+    window.showToast(
+      'Request Approved',
+      `Donation slot confirmed at ${req.hospital}! Emergency transit pass generated.`,
+      'success'
+    );
+  }
+
+  const cardBtn = req.cardId ? document.getElementById(req.cardId + '-btn') : document.getElementById('card-request-1-btn');
+  if (cardBtn) {
+    cardBtn.className = 'w-full py-2.5 px-space-md rounded-xl bg-tertiary text-on-tertiary font-label-lg text-label-lg font-semibold shadow-sm flex items-center justify-center gap-2 cursor-default';
+    cardBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>Approved &amp; Confirmed</span>';
+    cardBtn.onclick = () => window.showToast('Slot Confirmed', `You are already registered for this slot at ${req.hospital}.`, 'info');
+  }
+};
+
+window.declineDonorRequest = function() {
+  const req = activeDonorRequest || { hospital: "St. Mary's General Hospital" };
+  window.closeDonorRequestModal();
+
+  if (window.showToast) {
+    window.showToast(
+      'Request Declined',
+      `You have declined the requisition from ${req.hospital}. Other alerts remain active on your dashboard.`,
+      'info'
+    );
+  }
+};
+
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('modal-donor-request-details');
+  if (modal && !modal.classList.contains('hidden') && e.target === modal) {
+    window.closeDonorRequestModal();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    window.closeDonorRequestModal();
+  }
+});
+
+

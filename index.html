@@ -1027,10 +1027,13 @@
               <p class="font-body-sm text-body-sm text-secondary">Direct emergency dispatcher link active for Trauma Level 1-4 units and neonatal centers.</p>
             </div>
           </div>
-          <a class="px-6 py-3.5 rounded-xl bg-error hover:bg-on-error-container text-on-error font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 shadow-sm transition-colors" href="tel:18007857354">
+          <div class="px-5 py-3 rounded-xl bg-error text-on-error font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 shadow-sm shrink-0 select-all" title="Emergency Contact Number">
             <span class="material-symbols-outlined text-[20px]">call</span>
-            <span>1-800-PULSE-LIFE</span>
-          </a>
+            <span class="tracking-wide select-all">+91 9528033454</span>
+            <button type="button" onclick="navigator.clipboard.writeText('+91 9528033454'); window.showToast('Number Copied', '+91 9528033454 copied to clipboard.', 'success');" class="ml-1 p-1 rounded-md hover:bg-white/20 active:scale-95 transition-colors cursor-pointer" title="Copy Phone Number">
+              <span class="material-symbols-outlined text-[16px]">content_copy</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1368,7 +1371,7 @@
                 <span class="material-symbols-outlined text-[20px]">bloodtype</span>
                 <span>Nearby Requests</span>
               </div>
-              <span class="material-symbols-outlined text-primary text-[18px] animate-pulse shrink-0" style="font-variation-settings: 'FILL' 1;" title="Emergency Alert">warning</span>
+              <span class="material-symbols-outlined text-primary text-[18px] animate-pulse shrink-0" style="font-variation-settings: 'FILL' 1;" title="Emergency Blood Demand">water_drop</span>
             </button>
             <button type="button" data-donor-nav="history" onclick="window.scrollToDonorSection('donor-history-section')" class="donor-nav-btn flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left">
               <div class="flex items-center gap-space-xs">
@@ -1570,7 +1573,7 @@
                     <span class="font-semibold text-error">Next 2 Hours</span>
                   </div>
                 </div>
-                <button onclick="window.showToast('Slot Scheduled', 'Slot reserved at St. Mary\'s General Hospital. Digital pass generated.', 'success')" class="w-full py-2.5 px-space-md rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg font-semibold hover:bg-primary transition-colors shadow-sm active:scale-98 flex items-center justify-center gap-2">
+                <button id="card-request-1-btn" onclick="window.openDonorRequestModal({ hospital: 'St. Mary\'s General Hospital', urgency: 'HIGH EMERGENCY', urgencyClass: 'bg-error-container text-on-error-container', blood: 'O-', distance: '1.8 miles away • Trauma Level 1', demand: '3 Units Needed', requiredBy: 'Next 2 Hours', reason: 'Immediate blood inventory shortage following a multi-vehicle highway collision. Emergency surgical transfusion required.', doctor: 'Dr. H. Vance, MD (Chief Trauma Surgeon)', reqId: 'REQ-STMARYS-8921', location: 'Trauma Wing, Bay 04, 1200 St. Mary\'s Blvd', cardId: 'card-request-1' })" class="w-full py-2.5 px-space-md rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg font-semibold hover:bg-primary transition-colors shadow-sm active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
                   <span>View Request &amp; Schedule</span>
                   <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </button>
@@ -1603,7 +1606,7 @@
                     <span class="font-semibold text-secondary">Today, 18:00</span>
                   </div>
                 </div>
-                <button onclick="window.showToast('Slot Scheduled', 'Slot reserved at Children\'s Specialized Care. Transit QR code active.', 'success')" class="w-full py-2.5 px-space-md rounded-xl bg-surface-container text-on-surface font-label-lg text-label-lg font-semibold hover:bg-surface-container-high transition-colors active:scale-98 flex items-center justify-center gap-2">
+                <button id="card-request-2-btn" onclick="window.openDonorRequestModal({ hospital: 'Children\'s Specialized Care', urgency: 'URGENT', urgencyClass: 'bg-primary-fixed text-on-primary-fixed', blood: 'O- / A-', distance: '3.4 miles away • Pediatric ICU', demand: 'Whole Blood (1 Unit)', requiredBy: 'Today, 18:00', reason: 'Scheduled pediatric critical care surgery. Autologous backup units required.', doctor: 'Dr. Ronald Chen, MD (Pediatric Hematology)', reqId: 'REQ-CHILD-4402', location: 'Pediatric Care Pavilion, Bay 2, 850 West Medical Center', cardId: 'card-request-2' })" class="w-full py-2.5 px-space-md rounded-xl bg-surface-container text-on-surface font-label-lg text-label-lg font-semibold hover:bg-surface-container-high transition-colors active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
                   <span>Schedule Appointment</span>
                   <span class="material-symbols-outlined text-[18px]">calendar_month</span>
                 </button>
@@ -1635,7 +1638,7 @@
                     <span class="font-semibold text-on-surface">Tomorrow Morning</span>
                   </div>
                 </div>
-                <button onclick="window.showToast('Slot Booked', 'Appointment booked at Memorial Heart Institute for tomorrow at 09:30 AM.', 'success')" class="w-full py-2.5 px-space-md rounded-xl bg-surface-container text-on-surface font-label-lg text-label-lg font-semibold hover:bg-surface-container-high transition-colors active:scale-98 flex items-center justify-center gap-2">
+                <button id="card-request-3-btn" onclick="window.openDonorRequestModal({ hospital: 'Memorial Heart Institute', urgency: 'SCHEDULED', urgencyClass: 'bg-surface-container-high text-on-surface', blood: 'O-', distance: '5.1 miles away • Surgical Wing', demand: 'Packed RBC (2 Units)', requiredBy: 'Tomorrow Morning', reason: 'Pre-operative cardiac bypass patient support. Standby transfusion requirement.', doctor: 'Dr. Elena Rostova, MD (Cardiovascular Surgery)', reqId: 'REQ-HEART-1094', location: 'Cardiovascular Surgical Tower, Ward 3A, 400 Grand Ave', cardId: 'card-request-3' })" class="w-full py-2.5 px-space-md rounded-xl bg-surface-container text-on-surface font-label-lg text-label-lg font-semibold hover:bg-surface-container-high transition-colors active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
                   <span>Book Slot</span>
                   <span class="material-symbols-outlined text-[18px]">calendar_month</span>
                 </button>
@@ -2088,8 +2091,8 @@
             <span class="font-label-badge text-label-badge uppercase tracking-wider text-secondary">Triage Officer on Duty</span>
             <span class="hospital-triage-officer font-title-md text-title-md text-on-surface">Dr. Aris Thorne, MD</span>
             <span class="text-on-surface-variant">Ext: 4429 • Trauma Desk</span>
-            <div class="flex items-center gap-space-xs mt-space-xs text-tertiary font-label-md text-label-md">
-              <span class="material-symbols-outlined text-[16px]">call</span> Direct Hotline Connected
+            <div class="flex items-center gap-space-xs mt-space-xs text-tertiary font-label-md text-label-md select-all" title="Direct Hotline">
+              <span class="material-symbols-outlined text-[16px]">call</span> +91 9528033454
             </div>
           </div>
         </aside>
@@ -2127,9 +2130,9 @@
               <div class="absolute right-0 top-0 w-64 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
               <div class="flex flex-col gap-space-xs">
                 <div class="flex flex-wrap items-center gap-space-xs">
-                  <div class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-label-badge uppercase tracking-wider">
-                    <span class="material-symbols-outlined text-[14px]">verified</span>
-                    <span class="hospital-license-display">Verified Hospital (License #HSP-88219-NY)</span>
+                  <div class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-label-badge uppercase tracking-wider whitespace-nowrap shrink-0">
+                    <span class="material-symbols-outlined text-[14px] shrink-0">verified</span>
+                    <span class="hospital-license-display whitespace-nowrap">Verified Hospital (License #HSP-88219-NY)</span>
                   </div>
                   <span class="hospital-trauma-display px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-label-badge">Accredited Trauma I</span>
                   <span class="hospital-category-badge px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed font-label-badge text-label-badge hidden sm:inline">Apex Multi-Specialty</span>
@@ -3020,6 +3023,115 @@
             <span>Download Certificate</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: DONOR BLOOD REQUISITION DETAILS & CONFIRMATION                 -->
+  <!-- ===================================================================== -->
+  <div id="modal-donor-request-details" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container-high w-full max-w-xl max-h-[92vh] overflow-hidden flex flex-col relative">
+      
+      <!-- Modal Header -->
+      <div class="p-5 sm:p-6 border-b border-surface-container bg-surface-container-low/40 flex items-start justify-between gap-4">
+        <div class="flex items-start gap-3">
+          <div class="w-11 h-11 rounded-xl bg-error-container text-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[24px]">local_hospital</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-1 flex-wrap">
+              <span id="donor-modal-urgency-badge" class="px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-badge text-label-badge uppercase font-bold tracking-wider">
+                HIGH EMERGENCY
+              </span>
+              <span id="donor-modal-blood-badge" class="px-2 py-0.5 rounded-md bg-surface-container text-primary font-bold text-xs">
+                O- Needed
+              </span>
+            </div>
+            <h3 id="donor-modal-hospital-name" class="font-headline-sm text-headline-sm font-bold text-on-surface">St. Mary's General Hospital</h3>
+            <p id="donor-modal-hospital-sub" class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+              <span class="material-symbols-outlined text-[16px] text-primary">pin_drop</span>
+              <span>1.8 miles away • Trauma Level 1</span>
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="window.closeDonorRequestModal()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors shrink-0 cursor-pointer" title="Close">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body (All Details) -->
+      <div class="p-5 sm:p-6 overflow-y-auto flex flex-col gap-4 text-on-surface">
+        
+        <!-- Requisition Overview Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container">
+            <span class="text-[11px] font-semibold text-secondary uppercase tracking-wider block">Quantity Demanded</span>
+            <span id="donor-modal-demand" class="font-title-md text-title-md font-extrabold text-on-surface mt-0.5 block">3 Units Needed</span>
+            <span class="text-[11px] text-on-surface-variant">Whole Blood / Red Cells</span>
+          </div>
+          <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container">
+            <span class="text-[11px] font-semibold text-secondary uppercase tracking-wider block">Required Timeframe</span>
+            <span id="donor-modal-timeframe" class="font-title-md text-title-md font-extrabold text-error mt-0.5 block">Next 2 Hours</span>
+            <span class="text-[11px] text-on-surface-variant">Critical surgical window</span>
+          </div>
+        </div>
+
+        <!-- Clinical Reason & Notes -->
+        <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-1.5">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-secondary uppercase tracking-wider">
+            <span class="material-symbols-outlined text-[16px] text-primary">medical_services</span>
+            <span>Clinical Case Summary</span>
+          </div>
+          <p id="donor-modal-reason" class="text-sm text-on-surface leading-relaxed">
+            Immediate blood inventory shortage following a multi-vehicle highway collision. Emergency surgical transfusion required.
+          </p>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 mt-1 border-t border-surface-container text-xs text-on-surface-variant">
+            <span>Requesting Physician: <strong id="donor-modal-doctor" class="text-on-surface">Dr. H. Vance, MD (Chief Trauma Surgeon)</strong></span>
+            <span>Requisition ID: <code id="donor-modal-req-id" class="font-mono text-primary font-bold">REQ-STMARYS-8921</code></span>
+          </div>
+        </div>
+
+        <!-- Reporting Location & Bay Instructions -->
+        <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-1.5">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-secondary uppercase tracking-wider">
+            <span class="material-symbols-outlined text-[16px] text-tertiary">location_on</span>
+            <span>Reporting Destination &amp; Access</span>
+          </div>
+          <div class="text-sm">
+            <span class="font-bold text-on-surface" id="donor-modal-location">Trauma Wing, Bay 04, 1200 St. Mary's Blvd</span>
+            <p class="text-xs text-on-surface-variant mt-0.5">
+              Priority hospital transit pass is active. Fast-track blood donor lane available at main emergency receiving bay.
+            </p>
+          </div>
+        </div>
+
+        <!-- Donor Compatibility Verified Notice -->
+        <div class="p-3.5 rounded-xl bg-tertiary-fixed/30 border border-tertiary/20 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-tertiary text-[22px]">verified</span>
+            <div class="text-xs">
+              <span class="font-bold text-on-surface">100% Blood Compatibility Verified</span>
+              <p class="text-on-surface-variant">Your pre-screened vitals match all criteria for immediate donation.</p>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-tertiary text-on-tertiary font-bold text-[11px] shrink-0">
+            Eligible
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer (The end of the pop up: Approve and Decline buttons) -->
+      <div class="p-4 sm:p-5 bg-surface-container-low border-t border-surface-container flex items-center justify-between gap-3">
+        <button type="button" id="btn-donor-modal-decline" onclick="window.declineDonorRequest()" class="px-5 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-sm font-semibold transition-colors cursor-pointer flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+          <span>Decline</span>
+        </button>
+        <button type="button" id="btn-donor-modal-approve" onclick="window.approveDonorRequest()" class="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-sm font-bold shadow-md transition-all active:scale-98 cursor-pointer flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">check_circle</span>
+          <span>Approve</span>
+        </button>
       </div>
     </div>
   </div>
