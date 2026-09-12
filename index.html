@@ -1177,53 +1177,25 @@
           </div>
           <h1 class="font-headline-md text-headline-md text-on-surface font-extrabold">Edit Profile &amp; Vitals</h1>
           <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Update your contact details, emergency response radius, medical notes, and clinical vitals.</p>
-
-          <!-- Haemovigilance Identity Lock Notice Banner -->
-          <div class="mt-4 p-3.5 rounded-xl bg-surface-container border border-surface-container-high flex items-start gap-3">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
-              <span class="material-symbols-outlined text-[18px]">lock</span>
-            </div>
-            <div class="flex-1 text-xs">
-              <div class="font-bold text-on-surface flex items-center gap-1.5">
-                <span>Locked Registration Credentials</span>
-                <span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-[10px] uppercase font-bold text-on-surface-variant">Permanent</span>
-              </div>
-              <p class="text-on-surface-variant mt-0.5 leading-relaxed">
-                In compliance with national haemovigilance protocols and patient transfusion safety standards, your <strong>Full Name</strong> and <strong>Blood Group</strong> are verified at registration and cannot be modified online.
-              </p>
-            </div>
-          </div>
         </div>
 
         <form id="form-donor-profile" class="flex flex-col gap-space-md pt-space-lg">
-          <!-- Non-Editable Credentials Section -->
+          <!-- Credentials Section -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
             <div class="flex flex-col gap-space-xs">
-              <div class="flex items-center justify-between">
-                <label class="font-label-md text-label-md text-on-surface font-semibold">Full Name</label>
-                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-secondary">
-                  <span class="material-symbols-outlined text-[13px]">lock</span> Locked
-                </span>
-              </div>
+              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-fullName">Full Name</label>
               <div class="relative">
                 <input id="edit-donor-fullName" name="fullName" type="text" readonly disabled class="w-full h-11 pl-3 pr-10 rounded-lg bg-surface-container text-on-surface-variant font-body-md font-semibold cursor-not-allowed border border-surface-container-high focus:outline-none select-none" title="Name cannot be changed once registered"/>
                 <span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-secondary">lock</span>
               </div>
-              <span class="text-[11px] text-secondary">Verified legal identity on file</span>
             </div>
 
             <div class="flex flex-col gap-space-xs">
-              <div class="flex items-center justify-between">
-                <label class="font-label-md text-label-md text-on-surface font-semibold">Blood Group</label>
-                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-primary">
-                  <span class="material-symbols-outlined text-[13px]">lock</span> Fixed
-                </span>
-              </div>
+              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-bloodGroup">Blood Group</label>
               <div class="relative">
                 <input id="edit-donor-bloodGroup" name="bloodGroup" type="text" readonly disabled class="w-full h-11 pl-3 pr-10 rounded-lg bg-surface-container text-primary font-body-md font-extrabold cursor-not-allowed border border-surface-container-high focus:outline-none select-none" title="Blood group cannot be edited once registered"/>
                 <span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-secondary">lock</span>
               </div>
-              <span class="text-[11px] text-secondary">Clinically authenticated blood phenotype</span>
             </div>
           </div>
 
