@@ -1329,9 +1329,9 @@
     <!-- VIEW 4: DONOR DASHBOARD (#/donor-dashboard)                          -->
     <!-- ------------------------------------------------------------------- -->
     <div id="view-donor-dashboard" class="view-section w-full">
-      <div class="max-w-[1280px] w-full mx-auto px-gutter-desktop py-space-lg flex flex-col lg:flex-row gap-space-lg">
-        <!-- LEFT NAVIGATION SIDEBAR -->
-        <aside class="w-full lg:w-64 shrink-0 flex flex-col gap-space-md">
+      <div class="max-w-[1280px] w-full mx-auto px-gutter-desktop py-space-lg flex flex-col lg:flex-row gap-space-lg items-start">
+        <!-- LEFT NAVIGATION SIDEBAR (FIXED/STICKY) -->
+        <aside class="w-full lg:w-64 shrink-0 flex flex-col gap-space-md lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto custom-scrollbar">
           <!-- Donor ID Card Brief -->
           <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center gap-space-sm">
             <div class="relative">
@@ -1351,29 +1351,31 @@
           </div>
 
           <!-- Navigation Links -->
-          <nav class="bg-surface-container-lowest p-space-xs rounded-xl shadow-sm flex flex-col gap-space-2xs">
-            <a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg bg-surface-container text-primary font-label-lg text-label-lg transition-colors cursor-pointer" href="#/donor-dashboard" data-donor-nav="dashboard" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">
+          <nav id="donor-sidebar-nav" class="bg-surface-container-lowest p-space-xs rounded-xl shadow-sm flex flex-col gap-space-2xs">
+            <button type="button" data-donor-nav="dashboard" onclick="window.scrollToDonorSection('donor-overview')" class="donor-nav-btn flex items-center justify-between px-space-sm py-2.5 rounded-lg bg-surface-container text-primary font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left">
               <div class="flex items-center gap-space-xs">
                 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
                 <span>Dashboard</span>
               </div>
               <span class="w-1.5 h-1.5 rounded-full bg-primary dot-active"></span>
-            </a>
+            </button>
             <a class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#/donor-profile" data-donor-nav="profile">
               <span class="material-symbols-outlined text-[20px]">badge</span>
               <span>Edit Profile &amp; Vitals</span>
             </a>
-            <a class="flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#/nearby-requests" data-donor-nav="requests" onclick="document.getElementById('donor-requests-section')?.scrollIntoView({ behavior: 'smooth' });">
+            <button type="button" data-donor-nav="requests" onclick="window.scrollToDonorSection('donor-requests-section')" class="donor-nav-btn flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left">
               <div class="flex items-center gap-space-xs">
                 <span class="material-symbols-outlined text-[20px]">bloodtype</span>
                 <span>Nearby Requests</span>
               </div>
               <span class="material-symbols-outlined text-primary text-[18px] animate-pulse shrink-0" style="font-variation-settings: 'FILL' 1;" title="Emergency Alert">warning</span>
-            </a>
-            <a class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer" href="#/donation-history" data-donor-nav="history" onclick="document.getElementById('donor-history-section')?.scrollIntoView({ behavior: 'smooth' });">
-              <span class="material-symbols-outlined text-[20px]">history</span>
-              <span>Donation History</span>
-            </a>
+            </button>
+            <button type="button" data-donor-nav="history" onclick="window.scrollToDonorSection('donor-history-section')" class="donor-nav-btn flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left">
+              <div class="flex items-center gap-space-xs">
+                <span class="material-symbols-outlined text-[20px]">history</span>
+                <span>Donation History</span>
+              </div>
+            </button>
             <div class="my-1 h-px bg-surface-container"></div>
             <button type="button" onclick="window.logoutUser('donor')" class="flex items-center gap-space-xs px-space-sm py-2.5 rounded-lg text-error hover:bg-error-container/20 font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left" title="Sign out of Donor Portal">
               <span class="material-symbols-outlined text-[20px]">logout</span>
@@ -1401,7 +1403,7 @@
         <!-- MAIN DASHBOARD CONTENT AREA -->
         <div class="flex-1 flex flex-col gap-space-lg min-w-0">
           <!-- TOP GREETING BANNER -->
-          <section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col xl:flex-row xl:items-center justify-between gap-space-md">
+          <section id="donor-overview" class="scroll-mt-section bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col xl:flex-row xl:items-center justify-between gap-space-md">
             <div class="flex flex-col gap-space-2xs min-w-0">
               <div class="flex flex-wrap items-center gap-space-xs">
                 <h1 class="font-headline-md text-headline-md text-on-surface font-bold">Welcome back, <span class="donor-name-display">Sarah Jenkins</span> (<span class="donor-age-display">28 yrs</span>)</h1>
@@ -1451,20 +1453,20 @@
               </div>
             </div>
 
-            <!-- Metric 2: Availability Switch -->
-            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between gap-space-sm">
+            <!-- Metric 2: Interactive Availability Switch Card -->
+            <div id="donor-avail-card" class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between gap-space-sm cursor-pointer select-none transition-all hover:shadow hover:border-tertiary/40 border border-transparent">
               <div class="flex items-center justify-between">
                 <span class="font-label-badge text-label-badge uppercase tracking-wider text-secondary">Availability Status</span>
-                <div class="relative inline-block w-10 h-5 align-middle select-none transition duration-200 ease-in">
-                  <input checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-on-primary shadow-sm appearance-none cursor-pointer translate-x-5 transition-transform duration-200 ease-in-out" id="toggleAvailability" name="toggle" type="checkbox"/>
-                  <label class="toggle-label block overflow-hidden h-5 rounded-full bg-tertiary cursor-pointer" for="toggleAvailability"></label>
-                </div>
+                <button type="button" role="switch" aria-checked="true" id="toggleAvailabilityBtn" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-tertiary">
+                  <span class="sr-only">Toggle availability</span>
+                  <span id="toggleAvailabilityKnob" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition-transform duration-200 ease-in-out translate-x-5"></span>
+                </button>
               </div>
               <div>
                 <div id="donor-avail-text" class="font-headline-md text-headline-md text-on-surface font-bold leading-tight">Active / On Call</div>
-                <p class="font-body-sm text-body-sm text-tertiary font-medium mt-1">Ready for Emergency Ping</p>
+                <p id="donor-avail-subtext" class="font-body-sm text-body-sm text-tertiary font-medium mt-1">Ready for Emergency Ping</p>
               </div>
-              <div class="bg-surface-container-low px-space-xs py-1 rounded text-[11px] font-label-badge text-on-surface-variant uppercase">
+              <div id="donor-radius-badge" class="bg-tertiary-container/20 px-space-xs py-1 rounded text-[11px] font-label-badge text-tertiary uppercase font-semibold inline-block w-fit">
                 Radius: 10 miles active
               </div>
             </div>
@@ -1532,13 +1534,13 @@
           </section>
 
           <!-- NEARBY BLOOD REQUESTS INTERACTIVE GRID -->
-          <section id="donor-requests-section" class="flex flex-col gap-space-md">
+          <section id="donor-requests-section" class="scroll-mt-section flex flex-col gap-space-md">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
               <div>
                 <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Nearby Blood Requests</h2>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">Validated clinical demands prioritized by proximity and blood compatibility</p>
               </div>
-              <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); window.PulseRouter.navigate('donor-dashboard');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group w-fit self-start sm:self-center">
+              <button type="button" onclick="window.scrollToDonorSection('donor-overview');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group w-fit self-start sm:self-center">
                 <span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
                 <span>Back to Overview</span>
               </button>
@@ -1597,13 +1599,13 @@
                     <span class="font-bold text-on-surface">Whole Blood (1 Unit)</span>
                   </div>
                   <div class="bg-surface-container-low p-space-xs rounded-lg flex items-center justify-between font-body-sm text-body-sm">
-                    <span class="text-on-surface-variant">Target Window:</span>
-                    <span class="font-semibold text-on-surface">Today, by 6:00 PM</span>
+                    <span class="text-on-surface-variant">Required by:</span>
+                    <span class="font-semibold text-secondary">Today, 18:00</span>
                   </div>
                 </div>
-                <button onclick="window.showToast('Response Logged', 'Children\'s Specialized Care informed of your voluntary donation window.', 'success')" class="w-full py-2.5 px-space-md rounded-xl bg-surface-container text-on-surface font-label-lg text-label-lg font-semibold hover:bg-surface-container-high transition-colors active:scale-98 flex items-center justify-center gap-2">
-                  <span>Respond</span>
-                  <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                <button onclick="window.showToast('Slot Scheduled', 'Slot reserved at Children\'s Specialized Care. Transit QR code active.', 'success')" class="w-full py-2.5 px-space-md rounded-xl bg-surface-container text-on-surface font-label-lg text-label-lg font-semibold hover:bg-surface-container-high transition-colors active:scale-98 flex items-center justify-center gap-2">
+                  <span>Schedule Appointment</span>
+                  <span class="material-symbols-outlined text-[18px]">calendar_month</span>
                 </button>
               </div>
 
@@ -1611,10 +1613,12 @@
               <div class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow p-space-md flex flex-col justify-between gap-space-md">
                 <div class="flex flex-col gap-space-sm">
                   <div class="flex items-start justify-between gap-space-xs">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-label-badge uppercase tracking-wider">
-                      Standard Scheduled
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface font-label-badge text-label-badge uppercase tracking-wider">
+                      Scheduled
                     </span>
-                    <div class="w-9 h-9 rounded-full bg-surface-container text-on-surface font-bold flex items-center justify-center text-label-lg">O-</div>
+                    <div class="flex items-center gap-1">
+                      <span class="w-8 h-8 rounded-full bg-surface-container text-on-surface font-bold flex items-center justify-center text-[12px]">O-</span>
+                    </div>
                   </div>
                   <div>
                     <h3 class="font-title-md text-title-md font-bold text-on-surface">Memorial Heart Institute</h3>
@@ -1640,14 +1644,14 @@
           </section>
 
           <!-- DONATION HISTORY TABLE -->
-          <section id="donor-history-section" class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
+          <section id="donor-history-section" class="scroll-mt-section bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
               <div>
                 <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Donation History &amp; Records</h2>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">Digitally attested clinical verification log per national haemovigilance standards</p>
               </div>
               <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
-                <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); window.PulseRouter.navigate('donor-dashboard');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group">
+                <button type="button" onclick="window.scrollToDonorSection('donor-overview');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group">
                   <span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
                   <span>Back to Overview</span>
                 </button>
@@ -1992,87 +1996,7 @@
       </div>
     </div>
 
-    <!-- ------------------------------------------------------------------- -->
-    <!-- VIEW 6: HOSPITAL VERIFICATION HUB (#/hospital-verification)          -->
-    <!-- ------------------------------------------------------------------- -->
-    <div id="view-hospital-verification" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
-      <div class="max-w-3xl mx-auto flex flex-col gap-space-lg">
-        
-        <!-- Back Navigation Button -->
-        <div class="flex items-center justify-start">
-          <button type="button" onclick="window.PulseRouter.navigate('hospital-dashboard')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-all shadow-xs group cursor-pointer">
-            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
-            <span>Back to Hospital Dashboard</span>
-          </button>
-        </div>
 
-        <!-- Header -->
-        <div class="text-center max-w-xl mx-auto">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high text-secondary font-label-badge text-label-badge uppercase tracking-wider mb-2">
-            <span class="material-symbols-outlined text-[16px] text-primary">policy</span>
-            National Haemovigilance Accreditation Desk
-          </div>
-          <h1 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">Hospital Verification Status</h1>
-          <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-            Clinical security guardrail: A hospital MUST be authenticated and verified before raising emergency blood requisitions.
-          </p>
-        </div>
-
-        <!-- Dynamic Status Display Card (Rendered via JS based on state) -->
-        <div id="verification-status-card">
-          <!-- Filled by renderHospitalVerification() -->
-        </div>
-
-        <!-- INTERACTIVE STATE SWITCHER FOR EVALUATION / PROTOTYPE DEMO -->
-        <div class="bg-surface-container-lowest p-space-md rounded-2xl border border-surface-container-high shadow-sm flex flex-col gap-space-sm">
-          <div class="flex items-center justify-between">
-            <span class="font-label-badge text-label-badge uppercase tracking-wider text-secondary flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[16px] text-primary">tune</span>
-              Prototype Evaluator Controls: Test Verification States
-            </span>
-            <span class="text-body-sm text-[11px] text-on-surface-variant">Switch state to test permission gating:</span>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-            <button data-set-verification="pending" class="p-3 rounded-xl border border-amber-500/40 hover:bg-amber-500/10 flex items-center gap-2 transition-all text-left">
-              <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0 font-bold">
-                <span class="material-symbols-outlined text-[18px]">hourglass_top</span>
-              </span>
-              <div class="flex flex-col min-w-0">
-                <span class="font-title-md text-body-md font-bold text-on-surface leading-tight">Pending</span>
-                <span class="text-[11px] text-on-surface-variant">Requisitions locked</span>
-              </div>
-            </button>
-
-            <button data-set-verification="verified" class="p-3 rounded-xl border border-tertiary/40 hover:bg-tertiary/10 flex items-center gap-2 transition-all text-left">
-              <span class="w-8 h-8 rounded-lg bg-tertiary/20 text-tertiary flex items-center justify-center shrink-0 font-bold">
-                <span class="material-symbols-outlined text-[18px]">verified</span>
-              </span>
-              <div class="flex flex-col min-w-0">
-                <span class="font-title-md text-body-md font-bold text-on-surface leading-tight">Verified</span>
-                <span class="text-[11px] text-on-surface-variant">Full access unlocked</span>
-              </div>
-            </button>
-
-            <button data-set-verification="rejected" class="p-3 rounded-xl border border-error/40 hover:bg-error/10 flex items-center gap-2 transition-all text-left">
-              <span class="w-8 h-8 rounded-lg bg-error/20 text-error flex items-center justify-center shrink-0 font-bold">
-                <span class="material-symbols-outlined text-[18px]">gpp_bad</span>
-              </span>
-              <div class="flex flex-col min-w-0">
-                <span class="font-title-md text-body-md font-bold text-on-surface leading-tight">Rejected</span>
-                <span class="text-[11px] text-on-surface-variant">Access denied / re-submit</span>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-center gap-4 text-center">
-          <a href="#/hospital-dashboard" class="text-primary font-label-md text-label-md hover:underline flex items-center gap-1">
-            <span>Proceed to Hospital Dashboard</span>
-            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </a>
-        </div>
-      </div>
-    </div>
 
     <!-- ------------------------------------------------------------------- -->
     <!-- VIEW 7: HOSPITAL DASHBOARD (#/hospital-dashboard)                    -->
@@ -2095,8 +2019,8 @@
       </div>
 
       <div class="max-w-[1280px] w-full mx-auto px-gutter-desktop py-space-xl flex flex-col lg:flex-row gap-space-xl items-start">
-        <!-- LEFT NAVIGATION SIDEBAR -->
-        <aside class="w-full lg:w-64 shrink-0 flex flex-col gap-space-lg">
+        <!-- LEFT NAVIGATION SIDEBAR (FIXED/STICKY) -->
+        <aside class="w-full lg:w-64 shrink-0 flex flex-col gap-space-lg lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto custom-scrollbar">
           <!-- Profile Card Mini -->
           <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-xs">
             <div class="flex items-center gap-space-sm">
@@ -2120,27 +2044,38 @@
             <span>Raise Blood Request</span>
           </button>
 
-          <!-- Nav Menu -->
-          <nav class="bg-surface-container-lowest rounded-xl p-space-xs shadow-sm flex flex-col gap-1">
-            <a class="flex items-center justify-between px-space-md py-2.5 rounded-lg bg-primary/10 text-primary font-label-lg text-label-lg" href="#/hospital-dashboard">
+          <!-- Nav Menu (In-Page Smooth Scrolling) -->
+          <nav id="hospital-sidebar-nav" class="bg-surface-container-lowest rounded-xl p-space-xs shadow-sm flex flex-col gap-1">
+            <button type="button" data-hospital-nav="overview" onclick="window.scrollToHospitalSection('hospital-overview')" class="hospital-nav-btn flex items-center justify-between px-space-md py-2.5 rounded-lg bg-primary/10 text-primary font-label-lg text-label-lg transition-all text-left w-full cursor-pointer">
               <div class="flex items-center gap-space-sm">
                 <span class="material-symbols-outlined text-[20px]">grid_view</span>
-                <span>Dashboard</span>
+                <span>Dashboard Overview</span>
               </div>
-              <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-            </a>
-            <a class="flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-lg text-label-lg" href="#/matched-donors">
+              <span class="nav-dot w-1.5 h-1.5 rounded-full bg-primary"></span>
+            </button>
+            <button type="button" data-hospital-nav="requests" onclick="window.scrollToHospitalSection('hospital-requests-section')" class="hospital-nav-btn flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-lg text-label-lg text-left w-full cursor-pointer">
+              <div class="flex items-center gap-space-sm">
+                <span class="material-symbols-outlined text-[20px]">e911_emergency</span>
+                <span>Active Requests</span>
+              </div>
+              <span class="hospital-active-requests-count px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-badge text-label-badge">2</span>
+            </button>
+            <button type="button" data-hospital-nav="donors" onclick="window.scrollToHospitalSection('hospital-donors-section')" class="hospital-nav-btn flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-lg text-label-lg text-left w-full cursor-pointer">
               <div class="flex items-center gap-space-sm">
                 <span class="material-symbols-outlined text-[20px]">group</span>
                 <span>Matched Donors</span>
               </div>
-            </a>
-            <a class="flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-lg text-label-lg" href="#/request-tracking">
+              <span id="hospital-sidebar-donors-badge" class="flex items-center justify-center text-tertiary" title="Active Donor Notifications">
+                <span class="material-symbols-outlined text-[20px] text-tertiary animate-pulse">notifications_active</span>
+              </span>
+            </button>
+            <button type="button" data-hospital-nav="tracking" onclick="window.scrollToHospitalSection('hospital-tracking-section')" class="hospital-nav-btn flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-lg text-label-lg text-left w-full cursor-pointer">
               <div class="flex items-center gap-space-sm">
                 <span class="material-symbols-outlined text-[20px]">vital_signs</span>
                 <span>Live Tracking</span>
               </div>
-            </a>
+              <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+            </button>
             <div class="my-1 h-px bg-surface-container"></div>
             <button type="button" onclick="window.logoutUser('hospital')" class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-error hover:bg-error-container/20 font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left" title="Sign out of Hospital Portal">
               <span class="material-symbols-outlined text-[20px]">logout</span>
@@ -2160,342 +2095,371 @@
         </aside>
 
         <!-- MAIN DASHBOARD CONTENT AREA -->
-        <section class="flex-1 flex flex-col gap-space-xl min-w-0 w-full">
+        <main class="flex-1 flex flex-col gap-space-2xl min-w-0 w-full">
           
-          <!-- Facility Switcher & Active Node Bar -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-container-lowest px-4 py-3 rounded-xl border border-surface-container-high shadow-xs">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="material-symbols-outlined text-primary text-[20px] shrink-0">apartment</span>
-              <span class="text-xs font-semibold text-on-surface-variant shrink-0">Active Facility Node:</span>
-              <select id="hospital-facility-switcher" class="text-xs font-bold bg-surface-container-low text-on-surface py-1.5 px-3 rounded-lg border border-outline-variant/50 focus:ring-2 focus:ring-primary focus:outline-none cursor-pointer">
-                <!-- Dynamically populated by renderHospitalDashboard -->
-              </select>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <span class="hospital-node-id font-mono text-[11px] px-2 py-0.5 rounded bg-surface-container text-secondary font-semibold">Node: HSP-88219-NY</span>
-              <a href="#/hospital-register" class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-on-primary hover:bg-primary px-3 py-1.5 rounded-lg bg-primary/10 transition-all">
-                <span class="material-symbols-outlined text-[16px]">add_business</span>
-                <span>Register New Facility</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- Hospital Verification Alert Banner (Toggled via JS) -->
-          <div id="hospital-dashboard-status-banner" class="hidden"></div>
-
-          <!-- TOP HOSPITAL HEADER CARD -->
-          <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col lg:flex-row justify-between lg:items-center gap-space-lg relative overflow-hidden">
-            <div class="absolute right-0 top-0 w-64 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
-            <div class="flex flex-col gap-space-xs">
-              <div class="flex flex-wrap items-center gap-space-xs">
-                <div class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-label-badge uppercase tracking-wider">
-                  <span class="material-symbols-outlined text-[14px]">verified</span>
-                  <span class="hospital-license-display">Verified Hospital (License #HSP-88219-NY)</span>
-                </div>
-                <span class="hospital-trauma-display px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-label-badge">Accredited Trauma I</span>
-                <span class="hospital-category-badge px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed font-label-badge text-label-badge hidden sm:inline">Apex Multi-Specialty</span>
+          <!-- =================================================================== -->
+          <!-- SECTION 1: DASHBOARD OVERVIEW (#hospital-overview)                  -->
+          <!-- =================================================================== -->
+          <div id="hospital-overview" class="scroll-mt-section flex flex-col gap-space-xl">
+            <!-- Facility Switcher & Active Node Bar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-container-lowest px-4 py-3 rounded-xl border border-surface-container-high shadow-xs">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-primary text-[20px] shrink-0">apartment</span>
+                <span class="text-xs font-semibold text-on-surface-variant shrink-0">Active Facility Node:</span>
+                <select id="hospital-facility-switcher" class="text-xs font-bold bg-surface-container-low text-on-surface py-1.5 px-3 rounded-lg border border-outline-variant/50 focus:ring-2 focus:ring-primary focus:outline-none cursor-pointer">
+                  <!-- Dynamically populated by renderHospitalDashboard -->
+                </select>
               </div>
-              <h1 class="hospital-name-display font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">Metro General Hospital &amp; Trauma Center</h1>
-              <div class="flex flex-wrap items-center gap-space-md text-body-sm text-on-surface-variant">
-                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-primary">location_on</span> <span class="hospital-location-display">Ward 4B, Emergency Wing, New York, NY</span></span>
-                <span>•</span>
-                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">domain</span> <span class="hospital-beds-display">650 Beds Capacity</span></span>
-                <span>•</span>
-                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">call</span> <span class="hospital-phone-display">+1 (800) 555-8821</span></span>
-              </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-space-sm shrink-0">
-              <a href="#/hospital-verification" class="px-space-md py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg transition-colors flex items-center gap-space-xs">
-                <span class="material-symbols-outlined text-[18px]">verified</span>
-                <span>Verification Desk</span>
-              </a>
-              <button data-open-modal-request class="px-space-lg py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-md transition-all flex items-center gap-space-xs active:scale-98">
-                <span class="material-symbols-outlined text-[20px]">emergency</span>
-                <span>+ Raise Blood Request</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- HOSPITAL METRIC CARDS -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
-            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-              <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-                <span class="font-label-md text-label-md uppercase tracking-wider">Active Blood Requests</span>
-                <span class="w-8 h-8 rounded-lg bg-error-container/30 flex items-center justify-center text-primary">
-                  <span class="material-symbols-outlined text-[20px]">crisis_alert</span>
-                </span>
-              </div>
-              <div>
-                <div class="font-numeric-metric text-numeric-metric text-on-surface"><span class="hospital-active-requests-count">4</span> <span class="font-headline-sm text-headline-sm font-semibold text-primary">Active</span></div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-                  <span class="text-primary font-semibold">2 Critical</span> (Sub-30m SLA window)
-                </p>
-              </div>
-            </div>
-            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-              <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-                <span class="font-label-md text-label-md uppercase tracking-wider">Pending Donor Match</span>
-                <span class="w-8 h-8 rounded-lg bg-secondary-container/40 flex items-center justify-center text-secondary">
-                  <span class="material-symbols-outlined text-[20px]">person_search</span>
-                </span>
-              </div>
-              <div>
-                <div class="font-numeric-metric text-numeric-metric text-on-surface">1 <span class="font-headline-sm text-headline-sm font-semibold text-secondary">Pending</span></div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[14px] text-primary">hourglass_top</span> Scanning 25-mile network
-                </p>
-              </div>
-            </div>
-            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-              <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-                <span class="font-label-md text-label-md uppercase tracking-wider">Fulfilled This Month</span>
-                <span class="w-8 h-8 rounded-lg bg-tertiary-container/30 flex items-center justify-center text-tertiary">
-                  <span class="material-symbols-outlined text-[20px]">task_alt</span>
-                </span>
-              </div>
-              <div>
-                <div class="font-numeric-metric text-numeric-metric text-on-surface">42 <span class="font-headline-sm text-headline-sm font-semibold text-tertiary">Units</span></div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-                  <span class="text-tertiary font-semibold">+14.2%</span> efficiency vs last period
-                </p>
-              </div>
-            </div>
-            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-              <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-                <span class="font-label-md text-label-md uppercase tracking-wider">Matched Donors</span>
-                <span class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
-                  <span class="material-symbols-outlined text-[20px]">directions_car</span>
-                </span>
-              </div>
-              <div>
-                <div class="font-numeric-metric text-numeric-metric text-on-surface">12 <span class="font-headline-sm text-headline-sm font-semibold text-on-surface-variant">Active</span></div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-                  <span class="text-on-surface font-semibold">9 En Route</span> / 3 Scheduled
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- INTERACTIVE REQUEST TRACKING PREVIEW -->
-          <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-lg">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
-              <div class="flex items-center gap-space-sm">
-                <span class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">
-                  <span class="material-symbols-outlined">vital_signs</span>
-                </span>
-                <div>
-                  <div class="flex items-center gap-space-xs">
-                    <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Live Emergency Tracking</h2>
-                    <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-badge text-label-badge animate-pulse">CRITICAL DISPATCH</span>
-                  </div>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant">Request #REQ-9042 • B+ Platelets (Urgent) • Trauma Surgery Suite 3</p>
-                </div>
-              </div>
-              <a href="#/request-tracking" class="px-4 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-primary-container transition-colors flex items-center gap-1.5 self-start sm:self-auto">
-                <span>Open Interactive Pipeline</span>
-                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-              </a>
-            </div>
-
-            <!-- Mini 6-Stage Stepper Preview -->
-            <div class="w-full pt-space-xs">
-              <div class="grid grid-cols-2 md:grid-cols-6 gap-space-xs relative">
-                <div class="flex flex-col items-center text-center">
-                  <div class="w-10 h-10 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-sm font-label-lg mb-2">
-                    <span class="material-symbols-outlined text-[20px]">check</span>
-                  </div>
-                  <span class="font-label-md text-label-md text-on-surface font-bold">1. Raised</span>
-                  <span class="font-body-sm text-[11px] text-on-surface-variant">14:10 EST</span>
-                </div>
-                <div class="flex flex-col items-center text-center">
-                  <div class="w-10 h-10 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-sm font-label-lg mb-2">
-                    <span class="material-symbols-outlined text-[20px]">check</span>
-                  </div>
-                  <span class="font-label-md text-label-md text-on-surface font-bold">2. Matching</span>
-                  <span class="font-body-sm text-[11px] text-on-surface-variant">16 Found</span>
-                </div>
-                <div class="flex flex-col items-center text-center">
-                  <div class="w-10 h-10 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-sm font-label-lg mb-2">
-                    <span class="material-symbols-outlined text-[20px]">check</span>
-                  </div>
-                  <span class="font-label-md text-label-md text-on-surface font-bold">3. Notified</span>
-                  <span class="font-body-sm text-[11px] text-on-surface-variant">Push Ping Sent</span>
-                </div>
-                <div class="flex flex-col items-center text-center">
-                  <div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center ring-4 ring-primary-fixed shadow-md font-label-lg mb-2 relative">
-                    <span class="material-symbols-outlined text-[20px] animate-pulse">notifications_active</span>
-                  </div>
-                  <span class="font-label-md text-label-md text-primary font-extrabold">4. Donors Accepted</span>
-                  <span class="font-body-sm text-[11px] text-primary font-semibold">3 Confirmed</span>
-                </div>
-                <div class="flex flex-col items-center text-center opacity-50">
-                  <div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-lg mb-2">
-                    <span class="material-symbols-outlined text-[20px]">contact_phone</span>
-                  </div>
-                  <span class="font-label-md text-label-md text-on-surface">5. Connected</span>
-                  <span class="font-body-sm text-[11px] text-on-surface-variant">Intake Bay</span>
-                </div>
-                <div class="flex flex-col items-center text-center opacity-40">
-                  <div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-lg mb-2">
-                    <span class="material-symbols-outlined text-[20px]">bloodtype</span>
-                  </div>
-                  <span class="font-label-md text-label-md text-on-surface">6. Completed</span>
-                  <span class="font-body-sm text-[11px] text-on-surface-variant">Attested</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- TWO-COLUMN SECTION: LIVE MATCHES TABLE & COLD STORAGE INVENTORY -->
-          <div class="grid grid-cols-1 xl:grid-cols-3 gap-space-xl items-start">
-            <!-- LIVE MATCHES TABLE -->
-            <div class="xl:col-span-2 bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Live Donor Matches</h2>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant">Real-time responders matched to open hospital tickets</p>
-                </div>
-                <a href="#/matched-donors" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md font-semibold transition-colors flex items-center gap-1">
-                  <span>View All Matches</span>
-                  <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="hospital-node-id font-mono text-[11px] px-2 py-0.5 rounded bg-surface-container text-secondary font-semibold">Node: HSP-88219-NY</span>
+                <a href="#/hospital-register" class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-on-primary hover:bg-primary px-3 py-1.5 rounded-lg bg-primary/10 transition-all">
+                  <span class="material-symbols-outlined text-[16px]">add_business</span>
+                  <span>Register New Facility</span>
                 </a>
               </div>
-              <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse font-body-sm text-body-sm">
-                  <thead>
-                    <tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
-                      <th class="py-3 px-space-md rounded-l-lg">Donor Name</th>
-                      <th class="py-3 px-space-sm text-center">Group</th>
-                      <th class="py-3 px-space-sm">Distance</th>
-                      <th class="py-3 px-space-sm">Match Score</th>
-                      <th class="py-3 px-space-sm">Status</th>
-                      <th class="py-3 px-space-md text-right rounded-r-lg">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-surface-container">
-                    <tr class="hover:bg-surface/60 transition-colors">
-                      <td class="py-3.5 px-space-md font-semibold text-on-surface">David K.</td>
-                      <td class="py-3.5 px-space-sm text-center"><span class="w-7 h-7 rounded-full bg-surface-container-high inline-flex items-center justify-center font-bold">B+</span></td>
-                      <td class="py-3.5 px-space-sm">1.4 miles</td>
-                      <td class="py-3.5 px-space-sm text-tertiary font-bold">100%</td>
-                      <td class="py-3.5 px-space-sm"><span class="px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge">Accepted (ETA 25m)</span></td>
-                      <td class="py-3.5 px-space-md text-right">
-                        <button onclick="window.showToast('Secure Channel', 'Connecting encrypted intercom to David K.', 'info')" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md">Contact</button>
-                      </td>
-                    </tr>
-                    <tr class="hover:bg-surface/60 transition-colors">
-                      <td class="py-3.5 px-space-md font-semibold text-on-surface">Sarah Jenkins</td>
-                      <td class="py-3.5 px-space-sm text-center"><span class="w-7 h-7 rounded-full bg-primary-fixed text-primary inline-flex items-center justify-center font-bold">O-</span></td>
-                      <td class="py-3.5 px-space-sm">1.8 miles</td>
-                      <td class="py-3.5 px-space-sm text-primary font-bold">Universal</td>
-                      <td class="py-3.5 px-space-sm"><span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge">Available On Call</span></td>
-                      <td class="py-3.5 px-space-md text-right">
-                        <button onclick="window.showToast('Broadcast Sent', 'Emergency ping dispatched to Sarah Jenkins.', 'success')" class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md">Ping Donor</button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+            </div>
+
+            <!-- Hospital Verification Alert Banner (Toggled via JS) -->
+            <div id="hospital-dashboard-status-banner" class="hidden"></div>
+
+            <!-- TOP HOSPITAL HEADER CARD -->
+            <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col lg:flex-row justify-between lg:items-center gap-space-lg relative overflow-hidden">
+              <div class="absolute right-0 top-0 w-64 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
+              <div class="flex flex-col gap-space-xs">
+                <div class="flex flex-wrap items-center gap-space-xs">
+                  <div class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-label-badge uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-[14px]">verified</span>
+                    <span class="hospital-license-display">Verified Hospital (License #HSP-88219-NY)</span>
+                  </div>
+                  <span class="hospital-trauma-display px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-label-badge">Accredited Trauma I</span>
+                  <span class="hospital-category-badge px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed font-label-badge text-label-badge hidden sm:inline">Apex Multi-Specialty</span>
+                </div>
+                <h1 class="hospital-name-display font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">Metro General Hospital &amp; Trauma Center</h1>
+                <div class="flex flex-wrap items-center gap-space-md text-body-sm text-on-surface-variant">
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-primary">location_on</span> <span class="hospital-location-display">Ward 4B, Emergency Wing, New York, NY</span></span>
+                  <span>•</span>
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">domain</span> <span class="hospital-beds-display">650 Beds Capacity</span></span>
+                  <span>•</span>
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">call</span> <span class="hospital-phone-display">+1 (800) 555-8821</span></span>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-space-sm shrink-0">
+                <button type="button" id="btn-open-verification-hub" onclick="window.openVerificationHubModal()" class="px-space-md py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg transition-all flex items-center gap-space-xs cursor-pointer shadow-xs border border-surface-container-high hover:border-tertiary/40 active:scale-98" title="View Healthcare Facility Verification Hub & Accreditation Credentials">
+                  <span class="material-symbols-outlined text-[20px] text-tertiary">domain_verification</span>
+                  <span class="font-semibold">Verification Hub</span>
+                  <span class="inline-flex w-2 h-2 rounded-full bg-tertiary"></span>
+                </button>
+                <button data-open-modal-request class="px-space-lg py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-md transition-all flex items-center gap-space-xs active:scale-98">
+                  <span class="material-symbols-outlined text-[20px]">emergency</span>
+                  <span>+ Raise Blood Request</span>
+                </button>
               </div>
             </div>
 
-            <!-- COLD STORAGE RESERVE QUICK GAUGE -->
-            <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
-              <div class="flex items-center justify-between">
+            <!-- HOSPITAL METRIC CARDS -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+              <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-all" onclick="window.scrollToHospitalSection('hospital-requests-section')">
+                <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
+                  <span class="font-label-md text-label-md uppercase tracking-wider">Active Blood Requests</span>
+                  <span class="w-8 h-8 rounded-lg bg-error-container/30 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[20px]">crisis_alert</span>
+                  </span>
+                </div>
                 <div>
-                  <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Cold Storage Reserve</h2>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant">On-site inventory levels</p>
-                </div>
-                <span class="material-symbols-outlined text-primary text-[24px]">bloodtype</span>
-              </div>
-              <div class="p-space-sm bg-error-container/40 rounded-xl flex items-start gap-space-xs text-on-error-container">
-                <span class="material-symbols-outlined text-error text-[20px] shrink-0 mt-0.5">warning</span>
-                <div class="flex flex-col">
-                  <span class="font-label-badge text-label-badge uppercase tracking-wide text-error">Critical Depletion: O- Reserve</span>
-                  <span class="font-body-sm text-[12px] text-on-surface">Only 2 units remaining in Ward 4B chiller.</span>
+                  <div class="font-numeric-metric text-numeric-metric text-on-surface"><span class="hospital-active-requests-count">2</span> <span class="font-headline-sm text-headline-sm font-semibold text-primary">Active</span></div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
+                    <span class="text-primary font-semibold">1 Critical</span> (Sub-30m SLA window)
+                  </p>
                 </div>
               </div>
-              <div class="grid grid-cols-2 gap-space-sm pt-space-xs">
-                <div class="p-space-sm rounded-xl bg-error-container/20 flex flex-col gap-1">
-                  <div class="flex items-center justify-between">
-                    <span class="font-headline-sm text-title-md font-extrabold text-error">O-</span>
-                    <span class="font-label-badge text-[10px] text-error font-bold uppercase">Critical</span>
+              <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-all" onclick="window.scrollToHospitalSection('hospital-donors-section')">
+                <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
+                  <span class="font-label-md text-label-md uppercase tracking-wider">Available Donors</span>
+                  <span class="w-8 h-8 rounded-lg bg-secondary-container/40 flex items-center justify-center text-secondary">
+                    <span class="material-symbols-outlined text-[20px]">person_search</span>
+                  </span>
+                </div>
+                <div>
+                  <div class="font-numeric-metric text-numeric-metric text-on-surface"><span id="hospital-overview-donors-count">6</span> <span class="font-headline-sm text-headline-sm font-semibold text-secondary">Available</span></div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-tertiary">check_circle</span> Top 3 Closest in 1.8 mi
+                  </p>
+                </div>
+              </div>
+              <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
+                  <span class="font-label-md text-label-md uppercase tracking-wider">Fulfilled This Month</span>
+                  <span class="w-8 h-8 rounded-lg bg-tertiary-container/30 flex items-center justify-center text-tertiary">
+                    <span class="material-symbols-outlined text-[20px]">task_alt</span>
+                  </span>
+                </div>
+                <div>
+                  <div class="font-numeric-metric text-numeric-metric text-on-surface">42 <span class="font-headline-sm text-headline-sm font-semibold text-tertiary">Units</span></div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
+                    <span class="text-tertiary font-semibold">+14.2%</span> efficiency vs last period
+                  </p>
+                </div>
+              </div>
+              <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-all" onclick="window.scrollToHospitalSection('hospital-tracking-section')">
+                <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
+                  <span class="font-label-md text-label-md uppercase tracking-wider">Live Tracking</span>
+                  <span class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+                    <span class="material-symbols-outlined text-[20px]">directions_car</span>
+                  </span>
+                </div>
+                <div>
+                  <div class="font-numeric-metric text-numeric-metric text-on-surface">Stage 4 <span class="font-headline-sm text-headline-sm font-semibold text-primary">Live</span></div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
+                    <span class="text-on-surface font-semibold">2 En Route</span> / ETA 18 mins
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLD STORAGE & AUDIT SECTION -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-space-xl items-start">
+              <!-- COLD STORAGE RESERVE GAUGE -->
+              <div class="xl:col-span-1 bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Cold Storage Reserve</h2>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">On-site chiller inventory</p>
                   </div>
-                  <div class="flex items-baseline justify-between text-body-sm">
-                    <span class="font-numeric-metric text-headline-sm font-extrabold text-error">2</span>
-                    <span class="text-on-surface-variant text-[11px]">/ 15 Min</span>
+                  <span class="material-symbols-outlined text-primary text-[24px]">bloodtype</span>
+                </div>
+                <div class="p-space-sm bg-error-container/40 rounded-xl flex items-start gap-space-xs text-on-error-container">
+                  <span class="material-symbols-outlined text-error text-[20px] shrink-0 mt-0.5">warning</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-badge text-label-badge uppercase tracking-wide text-error">Critical Depletion: O- Reserve</span>
+                    <span class="font-body-sm text-[12px] text-on-surface">Only 2 units remaining in Ward 4B chiller.</span>
                   </div>
                 </div>
-                <div class="p-space-sm rounded-xl bg-surface-container-low flex flex-col gap-1">
-                  <div class="flex items-center justify-between">
-                    <span class="font-headline-sm text-title-md font-extrabold text-on-surface">O+</span>
-                    <span class="font-label-badge text-[10px] text-tertiary font-bold uppercase">Optimal</span>
+                <div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+                  <div class="p-space-sm rounded-xl bg-error-container/20 flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-headline-sm text-title-md font-extrabold text-error">O-</span>
+                      <span class="font-label-badge text-[10px] text-error font-bold uppercase">Critical</span>
+                    </div>
+                    <div class="flex items-baseline justify-between text-body-sm">
+                      <span class="font-numeric-metric text-headline-sm font-extrabold text-error">2</span>
+                      <span class="text-on-surface-variant text-[11px]">/ 15 Min</span>
+                    </div>
                   </div>
-                  <div class="flex items-baseline justify-between text-body-sm">
-                    <span class="font-numeric-metric text-headline-sm font-extrabold text-on-surface">28</span>
-                    <span class="text-on-surface-variant text-[11px]">/ 30 Cap</span>
+                  <div class="p-space-sm rounded-xl bg-surface-container-low flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-headline-sm text-title-md font-extrabold text-on-surface">O+</span>
+                      <span class="font-label-badge text-[10px] text-tertiary font-bold uppercase">Optimal</span>
+                    </div>
+                    <div class="flex items-baseline justify-between text-body-sm">
+                      <span class="font-numeric-metric text-headline-sm font-extrabold text-on-surface">28</span>
+                      <span class="text-on-surface-variant text-[11px]">/ 30 Cap</span>
+                    </div>
+                  </div>
+                  <div class="p-space-sm rounded-xl bg-primary-fixed/20 flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-headline-sm text-title-md font-extrabold text-primary">B+</span>
+                      <span class="font-label-badge text-[10px] text-primary font-bold uppercase">Replenishing</span>
+                    </div>
+                    <div class="flex items-baseline justify-between text-body-sm">
+                      <span class="font-numeric-metric text-headline-sm font-extrabold text-primary">14</span>
+                      <span class="text-on-surface-variant text-[11px]">/ 20 Cap</span>
+                    </div>
+                  </div>
+                  <div class="p-space-sm rounded-xl bg-surface-container-low flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-headline-sm text-title-md font-extrabold text-on-surface">A+</span>
+                      <span class="font-label-badge text-[10px] text-tertiary font-bold uppercase">Optimal</span>
+                    </div>
+                    <div class="flex items-baseline justify-between text-body-sm">
+                      <span class="font-numeric-metric text-headline-sm font-extrabold text-on-surface">22</span>
+                      <span class="text-on-surface-variant text-[11px]">/ 25 Cap</span>
+                    </div>
                   </div>
                 </div>
-                <div class="p-space-sm rounded-xl bg-primary-fixed/20 flex flex-col gap-1">
-                  <div class="flex items-center justify-between">
-                    <span class="font-headline-sm text-title-md font-extrabold text-primary">B+</span>
-                    <span class="font-label-badge text-[10px] text-primary font-bold uppercase">Replenishing</span>
+              </div>
+
+              <!-- AUDIT TRAIL LOG -->
+              <div class="xl:col-span-2 bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-space-sm">
+                    <span class="material-symbols-outlined text-secondary">history_edu</span>
+                    <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Clinical Audit Trail &amp; Chain-of-Custody</h2>
                   </div>
-                  <div class="flex items-baseline justify-between text-body-sm">
-                    <span class="font-numeric-metric text-headline-sm font-extrabold text-primary">14</span>
-                    <span class="text-on-surface-variant text-[11px]">/ 20 Cap</span>
-                  </div>
+                  <span class="font-label-badge text-label-badge text-tertiary uppercase">HIPAA / FDA Certified</span>
                 </div>
-                <div class="p-space-sm rounded-xl bg-surface-container-low flex flex-col gap-1">
-                  <div class="flex items-center justify-between">
-                    <span class="font-headline-sm text-title-md font-extrabold text-on-surface">A+</span>
-                    <span class="font-label-badge text-[10px] text-tertiary font-bold uppercase">Optimal</span>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+                  <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-1">
+                    <div class="flex items-center justify-between text-on-surface-variant font-label-badge text-label-badge">
+                      <span>TX-883921</span>
+                      <span>13:42 EST</span>
+                    </div>
+                    <span class="font-title-md text-title-md text-on-surface font-bold">Unit Dispatched: O-</span>
+                    <span class="font-body-sm text-body-sm text-on-surface-variant">Batch #RC-9901 transferred to ICU Room 12.</span>
                   </div>
-                  <div class="flex items-baseline justify-between text-body-sm">
-                    <span class="font-numeric-metric text-headline-sm font-extrabold text-on-surface">22</span>
-                    <span class="text-on-surface-variant text-[11px]">/ 25 Cap</span>
+                  <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-1">
+                    <div class="flex items-center justify-between text-on-surface-variant font-label-badge text-label-badge">
+                      <span>TX-883919</span>
+                      <span>12:15 EST</span>
+                    </div>
+                    <span class="font-title-md text-title-md text-on-surface font-bold">Intake: Sarah Jenkins</span>
+                    <span class="font-body-sm text-body-sm text-on-surface-variant">450ml Whole Blood logged into cold chain.</span>
+                  </div>
+                  <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-1">
+                    <div class="flex items-center justify-between text-on-surface-variant font-label-badge text-label-badge">
+                      <span>TX-883904</span>
+                      <span>11:04 EST</span>
+                    </div>
+                    <span class="font-title-md text-title-md text-on-surface font-bold">Alert: B+ Low Stock</span>
+                    <span class="font-body-sm text-body-sm text-on-surface-variant">Dispatched broadcast to 16 donors.</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- AUDIT TRAIL LOG -->
-          <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-space-sm">
-                <span class="material-symbols-outlined text-secondary">history_edu</span>
-                <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Clinical Audit Trail &amp; Chain-of-Custody</h2>
-              </div>
-              <span class="font-label-badge text-label-badge text-tertiary uppercase">HIPAA / FDA Compliance Verified</span>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
-              <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-1">
-                <div class="flex items-center justify-between text-on-surface-variant font-label-badge text-label-badge">
-                  <span>TX-883921</span>
-                  <span>13:42 EST</span>
+          <!-- =================================================================== -->
+          <!-- SECTION 2: ACTIVE REQUISITIONS (#hospital-requests-section)          -->
+          <!-- =================================================================== -->
+          <section id="hospital-requests-section" class="scroll-mt-section bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-space-md">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-xs border-b border-surface-container">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="w-8 h-8 rounded-lg bg-error-container/40 text-primary flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined text-[20px]">crisis_alert</span>
+                  </span>
+                  <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Active Requisitions &amp; Emergency Orders</h2>
                 </div>
-                <span class="font-title-md text-title-md text-on-surface font-bold">Unit Dispatched: O- Red Cells</span>
-                <span class="font-body-sm text-body-sm text-on-surface-variant">Batch #RC-9901 transferred to ICU Room 12.</span>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Live clinical orders dispatched across the national haemovigilance network</p>
               </div>
-              <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-1">
-                <div class="flex items-center justify-between text-on-surface-variant font-label-badge text-label-badge">
-                  <span>TX-883919</span>
-                  <span>12:15 EST</span>
-                </div>
-                <span class="font-title-md text-title-md text-on-surface font-bold">Donor Intake: Sarah Jenkins</span>
-                <span class="font-body-sm text-body-sm text-on-surface-variant">450ml Whole Blood donation complete and locked.</span>
-              </div>
-              <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-1">
-                <div class="flex items-center justify-between text-on-surface-variant font-label-badge text-label-badge">
-                  <span>TX-883904</span>
-                  <span>11:04 EST</span>
-                </div>
-                <span class="font-title-md text-title-md text-on-surface font-bold">Automated Alert: B+ Low Stock</span>
-                <span class="font-body-sm text-body-sm text-on-surface-variant">Dispatched broadcast to 16 registered donors.</span>
+              <div class="flex items-center gap-2">
+                <button data-open-modal-request class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-bold transition-all shadow-sm flex items-center gap-1.5 active:scale-98">
+                  <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                  <span>+ New Blood Requisition</span>
+                </button>
               </div>
             </div>
-          </div>
-        </section>
+
+            <!-- Active Requests List Container -->
+            <div id="hospital-requests-container" class="flex flex-col gap-space-sm pt-space-xs">
+              <!-- Dynamically populated by renderHospitalDashboard() -->
+            </div>
+          </section>
+
+          <!-- =================================================================== -->
+          <!-- SECTION 3: MATCHED & AVAILABLE DONORS (#hospital-donors-section)     -->
+          <!-- =================================================================== -->
+          <section id="hospital-donors-section" class="scroll-mt-section bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-space-md">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-xs border-b border-surface-container">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="w-8 h-8 rounded-lg bg-tertiary-container/30 text-tertiary flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined text-[20px]">group</span>
+                  </span>
+                  <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Matched &amp; Available Donors</h2>
+                  <span id="hospital-donors-count-badge" class="px-2.5 py-0.5 rounded-full bg-tertiary-container/30 text-tertiary font-label-badge text-label-badge font-bold uppercase tracking-wider">
+                    6 Available Donors
+                  </span>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                  GPS-triangulated compatible responders (Top 3 closest displayed first)
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-secondary bg-surface-container-low px-3 py-1.5 rounded-lg flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px] text-tertiary">near_me</span>
+                  <span>Sorted by Closest Distance</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Closest 3 Donors (Always visible on top) -->
+            <div id="hospital-donors-top3" class="flex flex-col gap-space-sm pt-space-xs">
+              <!-- Populated dynamically by renderHospitalDashboard() with closest 3 -->
+            </div>
+
+            <!-- Remaining Donors Container (Hidden by default, expands in-place) -->
+            <div id="hospital-donors-more" class="hidden flex-col gap-space-sm transition-all duration-300">
+              <!-- Populated dynamically with donors 4+ -->
+            </div>
+
+            <!-- Show More / Less Toggle Button -->
+            <div id="hospital-donors-toggle-container" class="pt-2">
+              <button id="btn-toggle-more-donors" type="button" class="w-full py-3 px-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-bold transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-99">
+                <span id="btn-toggle-more-donors-text">Show All Available Donors (3 more)</span>
+                <span id="btn-toggle-more-donors-icon" class="material-symbols-outlined text-[20px] transition-transform duration-200">expand_more</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- =================================================================== -->
+          <!-- SECTION 4: LIVE REQUEST TRACKING (#hospital-tracking-section)        -->
+          <!-- =================================================================== -->
+          <section id="hospital-tracking-section" class="scroll-mt-section bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-space-lg">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-space-xs border-b border-surface-container">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-badge text-label-badge font-bold uppercase tracking-wider animate-pulse">
+                    Live Telemetry Pipeline
+                  </span>
+                  <span class="tracking-req-id font-mono font-bold text-primary">#REQ-9042</span>
+                </div>
+                <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Emergency Request Tracking</h2>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                  <span class="tracking-blood-group font-bold text-on-surface">B+</span> • <span class="tracking-component font-medium">Platelets (Apheresis)</span> • <span class="tracking-location">Trauma Surgery Suite 3</span>
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="btn-advance-tracking-stage" type="button" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-bold shadow-md transition-all active:scale-98 flex items-center gap-2 cursor-pointer">
+                  <span class="material-symbols-outlined text-[20px]">fast_forward</span>
+                  <span>Advance to Next Stage</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 6-Stage Stepper Container (Interactive) -->
+            <div class="bg-surface-container-low p-space-md rounded-xl border border-surface-container-high">
+              <div class="mb-3 pb-2 border-b border-surface-container flex items-center justify-between">
+                <span class="font-label-badge text-label-badge uppercase tracking-wider text-secondary">6-Stage Lifecycle Stepper</span>
+                <span class="text-body-sm text-[11px] text-on-surface-variant">Click any step to inspect &amp; simulate status</span>
+              </div>
+              <div id="tracking-stepper" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-space-sm">
+                <!-- Populated by renderRequestTracking() -->
+              </div>
+            </div>
+
+            <!-- Active Stage Detail Card -->
+            <div id="tracking-stage-detail" class="bg-surface-container-low p-space-md rounded-xl border border-surface-container-high">
+              <!-- Populated by renderRequestTracking() -->
+            </div>
+
+            <!-- Inbound Couriers & ETA Telemetry -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+              <div class="bg-surface-container-low p-space-md rounded-xl border border-surface-container-high flex flex-col gap-2">
+                <span class="font-label-badge text-label-badge text-secondary uppercase">Inbound Donor Telemetry</span>
+                <div class="flex items-center gap-3 pt-1">
+                  <div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold">DK</div>
+                  <div class="flex flex-col">
+                    <span class="font-title-md text-title-md font-bold text-on-surface">David K. (B+)</span>
+                    <span class="text-body-sm text-tertiary font-semibold">En Route • GPS ETA: 18 mins (Transit Van #04)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-surface-container-low p-space-md rounded-xl border border-surface-container-high flex flex-col gap-2">
+                <span class="font-label-badge text-label-badge text-secondary uppercase">Clinical Recipient Wing</span>
+                <div class="flex items-center gap-3 pt-1">
+                  <div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined text-[20px]">local_hospital</span>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-title-md text-title-md font-bold text-on-surface">Trauma OR - Suite 3</span>
+                    <span class="text-body-sm text-on-surface-variant">Attending Surgeon: Dr. Vance • Cold-chain intake standby</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </main>
       </div>
     </div>
 
@@ -3016,6 +2980,51 @@
   </div>
 
   <!-- ===================================================================== -->
+  <!-- MODAL: HEALTHCARE FACILITY VERIFICATION HUB                           -->
+  <!-- ===================================================================== -->
+  <div id="modal-verification-hub" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 hidden" onclick="if(event.target === this) window.closeVerificationHubModal()">
+    <div class="bg-surface-container-lowest rounded-2xl max-w-2xl w-full border border-surface-container-high shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+      <!-- Modal Header -->
+      <div class="px-6 py-5 bg-surface-container-low border-b border-surface-container flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-tertiary-container/40 text-tertiary flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[24px]">domain_verification</span>
+          </div>
+          <div>
+            <h3 class="font-title-lg text-title-lg font-bold text-on-surface">Healthcare Facility Verification Hub</h3>
+            <p class="font-body-sm text-xs text-on-surface-variant">National Haemovigilance Accreditation &amp; Regulatory Credentials</p>
+          </div>
+        </div>
+        <button type="button" onclick="window.closeVerificationHubModal()" class="w-8 h-8 rounded-full hover:bg-surface-container text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer" title="Close">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Dynamic Credentials Content -->
+      <div class="p-6 overflow-y-auto flex flex-col gap-5 text-on-surface" id="verification-hub-modal-content">
+        <!-- Dynamically rendered via renderVerificationHubModal() -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 bg-surface-container-low border-t border-surface-container flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-1.5 text-xs text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px] text-tertiary">verified_user</span>
+          <span>Official accreditation verified on National Clinical Grid</span>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button type="button" onclick="window.closeVerificationHubModal()" class="px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-sm font-semibold transition-colors cursor-pointer">
+            Close
+          </button>
+          <button type="button" onclick="window.showToast('Accreditation Validated', 'Official credentials certificate downloaded.', 'success')" class="px-4 py-2 rounded-xl bg-tertiary hover:bg-tertiary/90 text-white font-label-md text-sm font-semibold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">download</span>
+            <span>Download Certificate</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
   <!-- SHARED FOOTER                                                         -->
   <!-- ===================================================================== -->
   <footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-space-2xl mt-auto">
@@ -3028,7 +3037,7 @@
         </div>
         <div class="flex flex-wrap items-center gap-space-lg">
           <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#/landing">Clinical Protocols</a>
-          <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#/hospital-verification">Hospital Verification</a>
+          <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" onclick="window.openVerificationHubModal()">Hospital Verification</a>
           <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#/role-selection">Access Portal</a>
           <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#/landing">HIPAA Compliant</a>
         </div>

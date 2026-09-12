@@ -19,12 +19,16 @@ class PulseRouter {
       'donation-history': 'view-donor-dashboard',
       'donor-history': 'view-donor-dashboard',
       'hospital-register': 'view-hospital-register',
-      'hospital-verification': 'view-hospital-verification',
       'hospital-dashboard': 'view-hospital-dashboard',
+      'hospital-overview': 'view-hospital-dashboard',
+      'hospital-requests': 'view-hospital-dashboard',
+      'hospital-requests-section': 'view-hospital-dashboard',
+      'matched-donors': 'view-hospital-dashboard',
+      'hospital-donors-section': 'view-hospital-dashboard',
+      'request-tracking': 'view-hospital-dashboard',
+      'hospital-tracking-section': 'view-hospital-dashboard',
       'raise-request': 'view-raise-request',
-      'request-confirmation': 'view-request-confirmation',
-      'matched-donors': 'view-matched-donors',
-      'request-tracking': 'view-request-tracking'
+      'request-confirmation': 'view-request-confirmation'
     };
 
     this.currentRoute = 'landing';
@@ -146,6 +150,34 @@ class PulseRouter {
     } else if (['donation-history', 'donor-history', 'donor-history-section'].includes(path)) {
       setTimeout(() => {
         const sec = document.getElementById('donor-history-section');
+        if (sec) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
+          setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
+        }
+      }, 70);
+    } else if (['matched-donors', 'hospital-donors', 'hospital-donors-section'].includes(path)) {
+      setTimeout(() => {
+        const sec = document.getElementById('hospital-donors-section');
+        if (sec) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
+          setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
+        }
+      }, 70);
+    } else if (['request-tracking', 'hospital-tracking', 'hospital-tracking-section'].includes(path)) {
+      setTimeout(() => {
+        const sec = document.getElementById('hospital-tracking-section');
+        if (sec) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
+          setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
+        }
+      }, 70);
+
+    } else if (['hospital-requests', 'hospital-requests-section'].includes(path)) {
+      setTimeout(() => {
+        const sec = document.getElementById('hospital-requests-section');
         if (sec) {
           sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
           sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');

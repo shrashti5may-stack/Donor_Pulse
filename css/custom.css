@@ -171,3 +171,27 @@
   box-shadow: 0 4px 14px rgba(200, 16, 46, 0.35);
 }
 
+/* Toggle Switch Smooth Transitions */
+.toggle-switch-track {
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toggle-switch-knob {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* In-Page Navigation Section Scroll Margin */
+.scroll-mt-section {
+  scroll-margin-top: 1.5rem;
+}
+
+/* Active navigation item highlight */
+.nav-item-active {
+  background-color: rgba(158, 0, 31, 0.1) !important;
+  color: #9e001f !important;
+  font-weight: 700 !important;
+}
+.nav-item-active .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1;
+}
+
+
