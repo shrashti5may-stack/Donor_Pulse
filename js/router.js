@@ -9,6 +9,7 @@ class PulseRouter {
       'landing': 'view-landing',
       'role-selection': 'view-role-selection',
       'donor-register': 'view-donor-register',
+      'donor-profile': 'view-donor-profile',
       'donor-dashboard': 'view-donor-dashboard',
       'nearby-requests': 'view-donor-dashboard',
       'dashboard/requests': 'view-donor-dashboard',
@@ -18,12 +19,16 @@ class PulseRouter {
       'donation-history': 'view-donor-dashboard',
       'donor-history': 'view-donor-dashboard',
       'hospital-register': 'view-hospital-register',
-      'hospital-verification': 'view-hospital-verification',
       'hospital-dashboard': 'view-hospital-dashboard',
+      'hospital-overview': 'view-hospital-dashboard',
+      'hospital-requests': 'view-hospital-dashboard',
+      'hospital-requests-section': 'view-hospital-dashboard',
+      'matched-donors': 'view-hospital-dashboard',
+      'hospital-donors-section': 'view-hospital-dashboard',
+      'request-tracking': 'view-hospital-dashboard',
+      'hospital-tracking-section': 'view-hospital-dashboard',
       'raise-request': 'view-raise-request',
-      'request-confirmation': 'view-request-confirmation',
-      'matched-donors': 'view-matched-donors',
-      'request-tracking': 'view-request-tracking'
+      'request-confirmation': 'view-request-confirmation'
     };
 
     this.currentRoute = 'landing';
@@ -151,6 +156,34 @@ class PulseRouter {
           setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
         }
       }, 70);
+    } else if (['matched-donors', 'hospital-donors', 'hospital-donors-section'].includes(path)) {
+      setTimeout(() => {
+        const sec = document.getElementById('hospital-donors-section');
+        if (sec) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
+          setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
+        }
+      }, 70);
+    } else if (['request-tracking', 'hospital-tracking', 'hospital-tracking-section'].includes(path)) {
+      setTimeout(() => {
+        const sec = document.getElementById('hospital-tracking-section');
+        if (sec) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
+          setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
+        }
+      }, 70);
+
+    } else if (['hospital-requests', 'hospital-requests-section'].includes(path)) {
+      setTimeout(() => {
+        const sec = document.getElementById('hospital-requests-section');
+        if (sec) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
+          setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
+        }
+      }, 70);
     } else {
       // Scroll smoothly to top for standard full page views
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -175,6 +208,7 @@ class PulseRouter {
         const navKey = item.getAttribute('data-donor-nav');
         const isMatch = (navKey === 'requests' && ['nearby-requests', 'dashboard/requests', 'donor-dashboard/requests', 'donor-requests', 'donor-requests-section'].includes(path)) ||
                         (navKey === 'history' && ['donation-history', 'donor-history', 'donor-history-section'].includes(path)) ||
+                        (navKey === 'profile' && path === 'donor-profile') ||
                         (navKey === 'dashboard' && path === 'donor-dashboard');
         
         if (isMatch) {
