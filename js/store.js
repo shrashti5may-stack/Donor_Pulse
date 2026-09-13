@@ -581,6 +581,60 @@ class Store {
     return false;
   }
 
+  // --- Live Donor Tracking for Requisitions ---
+  getRequestDonorTracking(reqId, bloodGroup) {
+    const cleanBlood = (bloodGroup || 'O-').split('/')[0].trim();
+    let donors = this.getMatchedDonors(cleanBlood);
+    if (!donors || donors.length < 4) {
+      const remaining = this.state.matchedDonorsPool.filter(d => !donors.some(x => x.id === d.id));
+      donors = [...(donors || []), ...remaining.slice(0, Math.max(0, 4 - (donors ? donors.length : 0)))];
+    }
+
+    return donors.map((d, index) => {
+      let transitStatus = 'Available On Call';
+      let statusClass = 'bg-surface-container text-on-surface';
+      let transitMode = '🚶 Walking / Local';
+      let progressPct = 10;
+      let landmark = 'Within clinical travel radius';
+
+      if (index === 0) {
+        transitStatus = 'En Route';
+        statusClass = 'bg-primary-fixed text-primary font-bold';
+        transitMode = '🚗 Emergency Vehicle Corridor';
+        progressPct = 80;
+        landmark = 'Approaching hospital perimeter (0.3 mi away)';
+      } else if (index === 1) {
+        transitStatus = 'In Transit';
+        statusClass = 'bg-tertiary-fixed text-on-tertiary-fixed font-bold';
+        transitMode = '🚊 Metro Rapid Line';
+        progressPct = 55;
+        landmark = 'At Medical Plaza Station (2 stops away)';
+      } else if (index === 2) {
+        transitStatus = 'Accepted / Preparing';
+        statusClass = 'bg-secondary-container text-on-secondary-container font-semibold';
+        transitMode = '🚗 Personal Vehicle';
+        progressPct = 25;
+        landmark = 'Departing departure point in 5 mins';
+      } else {
+        transitStatus = d.notified ? 'Notified / Awaiting Reply' : 'Available on Standby';
+        statusClass = d.notified ? 'bg-amber-500/20 text-amber-800' : 'bg-surface-container-high text-on-surface-variant';
+        transitMode = '📍 Standby Radius';
+        progressPct = 10;
+        landmark = `Pre-screened vitals verified • ${d.distance} mi away`;
+      }
+
+      return {
+        ...d,
+        transitStatus,
+        statusClass,
+        transitMode,
+        progressPct,
+        landmark,
+        liveEta: d.eta || `${Math.round(d.distance * 7 + 6)} mins`
+      };
+    });
+  }
+
   resetToDefault() {
     this.state = JSON.parse(JSON.stringify(DEFAULT_STATE));
     this.saveState();
