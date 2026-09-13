@@ -498,9 +498,7 @@ function initInteractiveWidgets() {
       document.querySelectorAll('.hospital-nav-btn').forEach(btn => {
         const navKey = btn.getAttribute('data-hospital-nav');
         if ((sectionId === 'hospital-overview' && navKey === 'overview') ||
-            (sectionId === 'hospital-requests-section' && navKey === 'requests') ||
-            (sectionId === 'hospital-donors-section' && navKey === 'donors') ||
-            (sectionId === 'hospital-tracking-section' && navKey === 'tracking')) {
+            (sectionId === 'hospital-requests-section' && navKey === 'requests')) {
           btn.classList.add('bg-primary/10', 'text-primary', 'font-bold');
           btn.classList.remove('text-on-surface-variant');
         } else {
@@ -1398,15 +1396,16 @@ function renderHospitalRequestsList() {
   }
 
   container.innerHTML = requests.map(req => `
-    <div class="p-space-md rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row md:items-center justify-between gap-space-md hover:border-primary/30 transition-all">
+    <div onclick="window.openHospitalRequestModal('${req.id}')" class="p-space-md rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row md:items-center justify-between gap-space-md hover:border-primary/40 hover:shadow-md transition-all cursor-pointer group">
       <div class="flex items-center gap-space-md min-w-0">
-        <div class="w-12 h-12 rounded-xl bg-error-container/60 text-primary flex items-center justify-center font-bold text-headline-sm shrink-0">
+        <!-- Blood Group Badge: Explicitly Clickable for B+ or O- -->
+        <div onclick="event.stopPropagation(); window.openHospitalRequestModal('${req.id}')" class="w-13 h-13 rounded-xl bg-error-container/80 hover:bg-error-container text-primary flex items-center justify-center font-bold text-headline-sm shrink-0 cursor-pointer shadow-xs hover:scale-105 active:scale-95 transition-all group-hover:ring-2 ring-primary/40" title="Click ${escapeHtml(req.bloodGroup)} to view matched donors, live tracking & requisition details">
           ${escapeHtml(req.bloodGroup)}
         </div>
         <div class="flex flex-col min-w-0">
           <div class="flex flex-wrap items-center gap-2">
             <span class="font-mono font-bold text-sm text-primary">${escapeHtml(req.id)}</span>
-            <span class="font-title-md font-bold text-on-surface">${escapeHtml(req.component)}</span>
+            <span class="font-title-md font-bold text-on-surface group-hover:text-primary transition-colors">${escapeHtml(req.component)}</span>
             <span class="px-2 py-0.5 rounded-full ${req.urgency.includes('Stat') ? 'bg-error-container text-on-error-container animate-pulse' : 'bg-primary-fixed text-primary'} font-label-badge text-label-badge font-bold uppercase">
               ${escapeHtml(req.urgency)}
             </span>
@@ -1420,14 +1419,10 @@ function renderHospitalRequestsList() {
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
-        <button type="button" onclick="window.PulseStore.setSelectedRequestId('${req.id}'); window.scrollToHospitalSection('hospital-tracking-section'); if (window.renderRequestTracking) window.renderRequestTracking();" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold transition-all flex items-center gap-1 cursor-pointer">
-          <span class="material-symbols-outlined text-[18px]">vital_signs</span>
-          <span>Track Status</span>
-        </button>
-        <button type="button" onclick="window.PulseStore.setSelectedRequestId('${req.id}'); window.scrollToHospitalSection('hospital-donors-section');" class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold transition-all shadow flex items-center gap-1 cursor-pointer active:scale-98">
-          <span class="material-symbols-outlined text-[18px]">group</span>
-          <span>View Donors</span>
+      <div class="flex items-center gap-2 shrink-0 self-end md:self-center" onclick="event.stopPropagation()">
+        <button type="button" onclick="window.openHospitalRequestModal('${req.id}')" class="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-bold transition-all shadow flex items-center gap-1.5 cursor-pointer active:scale-98" title="Open matched donors and live tracking pop-up for ${escapeHtml(req.id)}">
+          <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+          <span>View Donors &amp; Live Tracking</span>
         </button>
       </div>
     </div>
@@ -2151,8 +2146,107 @@ window.openDonorRequestModal = function(data) {
     badgeEl.className = `px-2.5 py-0.5 rounded-full font-label-badge text-label-badge uppercase font-bold tracking-wider ${activeDonorRequest.urgencyClass || 'bg-error-container text-on-error-container'}`;
   }
 
+  // Populate dynamic donor availability counts and live tracking pool
+  renderDonorModalTracking();
+
   modal.classList.remove('hidden');
 };
+
+function renderDonorModalTracking() {
+  const container = document.getElementById('donor-modal-tracking-pool');
+  if (!container) return;
+
+  const reqId = activeDonorRequest ? activeDonorRequest.reqId : 'REQ-STMARYS-8921';
+  const blood = activeDonorRequest ? activeDonorRequest.blood : 'O-';
+
+  const trackingPool = (window.PulseStore && typeof window.PulseStore.getRequestDonorTracking === 'function')
+    ? window.PulseStore.getRequestDonorTracking(reqId, blood)
+    : [];
+
+  // Update counters
+  const totalCount = trackingPool.length;
+  const enRouteCount = trackingPool.filter(d => d.transitStatus === 'En Route' || d.transitStatus === 'In Transit').length;
+  const acceptedCount = trackingPool.filter(d => d.transitStatus.includes('Accepted')).length;
+  const standbyCount = Math.max(0, totalCount - enRouteCount - acceptedCount);
+
+  const availBadgeText = document.getElementById('donor-modal-avail-count-text');
+  if (availBadgeText) availBadgeText.textContent = `${totalCount} Available Donors`;
+
+  const statEnRoute = document.getElementById('donor-modal-stat-enroute');
+  if (statEnRoute) statEnRoute.textContent = enRouteCount;
+
+  const statAccepted = document.getElementById('donor-modal-stat-accepted');
+  if (statAccepted) statAccepted.textContent = acceptedCount;
+
+  const statStandby = document.getElementById('donor-modal-stat-standby');
+  if (statStandby) statStandby.textContent = standbyCount;
+
+  if (trackingPool.length === 0) {
+    container.innerHTML = `
+      <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container text-center text-xs text-on-surface-variant">
+        No registered donors currently active in the immediate travel perimeter.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = trackingPool.map((donor, idx) => {
+    const isEnRoute = donor.transitStatus === 'En Route';
+    const isInTransit = donor.transitStatus === 'In Transit';
+    const isMoving = isEnRoute || isInTransit;
+    const progressColor = isEnRoute ? 'bg-primary' : (isInTransit ? 'bg-tertiary' : 'bg-secondary');
+
+    return `
+      <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container hover:border-primary/40 transition-all flex flex-col gap-2.5">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full ${isEnRoute ? 'bg-error-container text-primary' : (isInTransit ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-surface-container-high text-on-surface')} font-bold flex items-center justify-center text-sm shadow-xs shrink-0">
+              ${escapeHtml(donor.initials || 'DN')}
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <h5 class="font-title-md font-bold text-on-surface text-sm">${escapeHtml(donor.name)}</h5>
+                <span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-surface-container text-primary">${escapeHtml(donor.bloodGroup)}</span>
+                <span class="inline-flex items-center text-[11px] text-tertiary font-semibold gap-0.5">
+                  <span class="material-symbols-outlined text-[13px]">verified</span> ${escapeHtml(String(donor.matchScore || 95))}% match
+                </span>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1 flex-wrap">
+                <span class="material-symbols-outlined text-[14px] text-secondary">near_me</span>
+                <span>${donor.distance} mi away</span>
+                <span class="text-outline/40">•</span>
+                <span class="text-secondary font-medium">${escapeHtml(donor.transitMode)}</span>
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col items-end gap-1 shrink-0">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${donor.statusClass} flex items-center gap-1">
+              ${isMoving ? '<span class="w-1.5 h-1.5 rounded-full bg-current animate-ping"></span>' : ''}
+              ${escapeHtml(donor.transitStatus)}
+            </span>
+            <span class="text-[11px] font-mono font-bold text-on-surface">
+              ETA: <span class="${isEnRoute ? 'text-error font-extrabold' : 'text-primary'}">${escapeHtml(donor.liveEta)}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Live Route Progress Bar & Landmark -->
+        <div class="flex flex-col gap-1 pt-1 border-t border-surface-container/60">
+          <div class="flex items-center justify-between text-[11px] text-on-surface-variant">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px] text-tertiary">my_location</span>
+              <span class="truncate max-w-[260px] sm:max-w-none">${escapeHtml(donor.landmark)}</span>
+            </span>
+            <span class="font-mono font-bold text-on-surface shrink-0">${donor.progressPct}% route</span>
+          </div>
+          <div class="w-full h-1.5 rounded-full bg-surface-container overflow-hidden">
+            <div class="h-full rounded-full ${progressColor} transition-all duration-500" style="width: ${donor.progressPct}%"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
 window.closeDonorRequestModal = function() {
   const modal = document.getElementById('modal-donor-request-details');
@@ -2202,7 +2296,295 @@ document.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     window.closeDonorRequestModal();
+    window.closeHospitalRequestModal();
   }
 });
+
+// ============================================================================
+// HOSPITAL ACTIVE REQUISITION DETAILS, MATCHED DONORS & LIVE TRACKING MODAL
+// ============================================================================
+let activeHospitalReq = null;
+
+window.openHospitalRequestModal = function(requestId) {
+  const requests = (window.PulseStore && typeof window.PulseStore.getRequests === 'function')
+    ? window.PulseStore.getRequests()
+    : [];
+
+  const targetReq = requests.find(r => r.id === requestId)
+    || (window.PulseStore && typeof window.PulseStore.getSelectedRequest === 'function' ? window.PulseStore.getSelectedRequest() : null)
+    || {
+      id: 'REQ-9042',
+      bloodGroup: 'B+',
+      component: 'Platelets (Apheresis)',
+      units: 3,
+      urgency: 'Stat Emergency (< 45 Mins)',
+      hospitalName: 'Metro General Hospital',
+      ward: 'Trauma OR - Suite 3',
+      location: 'Ward 4B, Emergency Wing, New York, NY',
+      notes: 'Acute arterial hemorrhage from multi-vehicle accident, cross-match in progress.',
+      createdAt: 'Today, 14:10 EST',
+      status: 'Donors Accepted',
+      trackingStage: 4,
+      matchedCount: 16,
+      acceptedCount: 3,
+      enRouteCount: 2
+    };
+
+  activeHospitalReq = targetReq;
+
+  if (window.PulseStore && typeof window.PulseStore.setSelectedRequestId === 'function') {
+    window.PulseStore.setSelectedRequestId(targetReq.id);
+  }
+
+  const modal = document.getElementById('modal-hospital-request-details');
+  if (!modal) return;
+
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined) el.textContent = val;
+  };
+
+  // Header & identity
+  setEl('modal-hosp-req-blood', targetReq.bloodGroup);
+  setEl('modal-hosp-req-blood-title', targetReq.bloodGroup);
+  setEl('modal-hosp-req-id', `#${targetReq.id}`);
+  setEl('modal-hosp-req-urgency', targetReq.urgency);
+  setEl('modal-hosp-req-component', targetReq.component);
+  setEl('modal-hosp-req-location', `${targetReq.ward} • ${targetReq.location || 'Emergency Wing'}`);
+  setEl('modal-hosp-req-stage-text', `Stage ${targetReq.trackingStage || 1}: ${targetReq.status}`);
+
+  // Metrics
+  setEl('modal-hosp-req-units', `${targetReq.units} Units`);
+  setEl('modal-hosp-req-sla', targetReq.urgency.includes('45') ? '< 45 Mins' : '< 2 Hours');
+  setEl('modal-hosp-req-accepted-count', `${targetReq.acceptedCount || 2} Donors`);
+  setEl('modal-hosp-req-created', targetReq.createdAt || '14:10 EST');
+  setEl('modal-hosp-req-notes', targetReq.notes || 'Acute arterial hemorrhage clinical support protocol.');
+
+  // Stepper, Donors, and Live Tracking
+  renderModalHospitalStepper(targetReq);
+  renderModalHospitalDonors(targetReq);
+  renderModalHospitalTracking(targetReq);
+
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeHospitalRequestModal = function() {
+  const modal = document.getElementById('modal-hospital-request-details');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+};
+
+window.advanceModalHospitalRequestStage = function() {
+  if (!activeHospitalReq) return;
+  const current = activeHospitalReq.trackingStage || 1;
+  const nextStage = current >= 6 ? 1 : current + 1;
+
+  if (window.PulseStore && typeof window.PulseStore.setTrackingStage === 'function') {
+    window.PulseStore.setTrackingStage(activeHospitalReq.id, nextStage);
+  }
+
+  // Refresh active req reference
+  const requests = window.PulseStore.getRequests();
+  activeHospitalReq = requests.find(r => r.id === activeHospitalReq.id) || activeHospitalReq;
+  activeHospitalReq.trackingStage = nextStage;
+
+  const stageText = document.getElementById('modal-hosp-req-stage-text');
+  if (stageText) stageText.textContent = `Stage ${nextStage}: ${activeHospitalReq.status}`;
+
+  renderModalHospitalStepper(activeHospitalReq);
+
+  if (window.renderHospitalDashboard) window.renderHospitalDashboard();
+
+  if (window.showToast) {
+    window.showToast(
+      'Requisition Stage Advanced',
+      `Pipeline for #${activeHospitalReq.id} advanced to Stage ${nextStage}: ${activeHospitalReq.status}`,
+      'success'
+    );
+  }
+};
+
+function renderModalHospitalStepper(req) {
+  const container = document.getElementById('modal-hosp-stepper');
+  if (!container) return;
+
+  const currentStage = req ? (req.trackingStage || 1) : 1;
+
+  const stages = [
+    { num: 1, name: 'Raised', time: req.createdAt || '14:10 EST' },
+    { num: 2, name: 'Matching', time: `${req.matchedCount || 16} Found` },
+    { num: 3, name: 'Notified', time: 'Alert Ping' },
+    { num: 4, name: 'Accepted', time: `${req.acceptedCount || 3} Acc` },
+    { num: 5, name: 'Connected', time: 'Direct Comms' },
+    { num: 6, name: 'Delivered', time: 'Cold Chain' }
+  ];
+
+  container.innerHTML = stages.map(s => {
+    let circleClass = '';
+    let textClass = '';
+    let icon = '';
+
+    if (s.num < currentStage) {
+      circleClass = 'bg-tertiary text-on-tertiary shadow-xs';
+      textClass = 'text-on-surface font-bold';
+      icon = '<span class="material-symbols-outlined text-[18px]">check</span>';
+    } else if (s.num === currentStage) {
+      circleClass = 'bg-primary text-on-primary ring-3 ring-primary-fixed shadow-md';
+      textClass = 'text-primary font-extrabold';
+      icon = '<span class="material-symbols-outlined text-[18px] animate-pulse">sync</span>';
+    } else {
+      circleClass = 'bg-surface-container-high text-on-surface-variant opacity-60';
+      textClass = 'text-on-surface-variant opacity-60';
+      icon = `<span class="text-xs font-bold font-mono">${s.num}</span>`;
+    }
+
+    return `
+      <div onclick="window.PulseStore.setTrackingStage('${req.id}', ${s.num}); window.openHospitalRequestModal('${req.id}'); if(window.renderHospitalDashboard) window.renderHospitalDashboard();" class="flex flex-col items-center text-center cursor-pointer group p-1.5 rounded-lg hover:bg-surface-container transition-colors" title="Jump to Stage ${s.num}: ${s.name}">
+        <div class="w-8 h-8 rounded-full ${circleClass} flex items-center justify-center mb-1.5 transition-transform group-hover:scale-105">
+          ${icon}
+        </div>
+        <span class="text-xs font-semibold ${textClass} leading-tight">${s.num}. ${s.name}</span>
+        <span class="text-[10px] text-on-surface-variant mt-0.5">${s.time}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderModalHospitalDonors(req) {
+  const container = document.getElementById('modal-hosp-matched-donors-container');
+  if (!container) return;
+
+  const bloodGroup = req ? req.bloodGroup : 'B+';
+  const donors = (window.PulseStore && typeof window.PulseStore.getMatchedDonors === 'function')
+    ? window.PulseStore.getMatchedDonors(bloodGroup)
+    : [];
+
+  const countBadgeText = document.getElementById('modal-hosp-matched-count-text');
+  if (countBadgeText) {
+    countBadgeText.textContent = `${donors.length} Matched Donors`;
+  }
+
+  if (donors.length === 0) {
+    container.innerHTML = `
+      <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container text-center text-xs text-on-surface-variant">
+        No compatible verified donors found in immediate 25-mile radius.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = donors.map(donor => `
+    <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container hover:border-primary/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-primary-fixed text-on-primary-fixed font-bold flex items-center justify-center text-sm shadow-xs shrink-0">
+          ${escapeHtml(donor.initials || 'DN')}
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <h5 class="font-title-md font-bold text-on-surface text-sm">${escapeHtml(donor.name)}</h5>
+            <span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-surface-container text-primary">${escapeHtml(donor.bloodGroup)}</span>
+            <span class="inline-flex items-center text-[11px] text-tertiary font-semibold gap-0.5">
+              <span class="material-symbols-outlined text-[13px]">verified</span> ${escapeHtml(String(donor.matchScore || 95))}% match
+            </span>
+          </div>
+          <p class="text-xs text-on-surface-variant mt-0.5 flex items-center gap-2">
+            <span class="flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[14px] text-secondary">near_me</span>
+              <span>${donor.distance} mi away</span>
+            </span>
+            <span class="text-outline/40">•</span>
+            <span class="text-tertiary font-medium">Last donation: ${escapeHtml(donor.lastDonation || 'Recent')}</span>
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${donor.accepted ? 'bg-tertiary-fixed text-on-tertiary-fixed' : (donor.notified ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-high text-on-surface')} flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full ${donor.accepted ? 'bg-tertiary' : 'bg-primary'} animate-pulse"></span>
+          ${donor.accepted ? 'Accepted / On Call' : (donor.notified ? 'Notified / Standby' : 'Ready on Call')}
+        </span>
+        <button type="button" onclick="window.showToast('Direct Intercom Connected', 'Secure dispatch audio channel opened with volunteer ${escapeHtml(donor.name)}.', 'info')" class="p-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors cursor-pointer" title="Direct Audio / Push Ping">
+          <span class="material-symbols-outlined text-[18px]">contact_phone</span>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderModalHospitalTracking(req) {
+  const container = document.getElementById('modal-hosp-tracking-container');
+  if (!container) return;
+
+  const trackingPool = (window.PulseStore && typeof window.PulseStore.getRequestDonorTracking === 'function')
+    ? window.PulseStore.getRequestDonorTracking(req.id, req.bloodGroup)
+    : [];
+
+  if (trackingPool.length === 0) {
+    container.innerHTML = `
+      <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container text-center text-xs text-on-surface-variant">
+        No live transit telemetry currently streaming for this requisition.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = trackingPool.slice(0, 3).map(donor => {
+    const isEnRoute = donor.transitStatus === 'En Route';
+    const isInTransit = donor.transitStatus === 'In Transit';
+    const isMoving = isEnRoute || isInTransit;
+    const progressColor = isEnRoute ? 'bg-primary' : (isInTransit ? 'bg-tertiary' : 'bg-secondary');
+
+    return `
+      <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container hover:border-primary/40 transition-all flex flex-col gap-2.5">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full ${isEnRoute ? 'bg-error-container text-primary' : (isInTransit ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-surface-container-high text-on-surface')} font-bold flex items-center justify-center text-sm shadow-xs shrink-0">
+              ${escapeHtml(donor.initials || 'DN')}
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <h5 class="font-title-md font-bold text-on-surface text-sm">${escapeHtml(donor.name)}</h5>
+                <span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-surface-container text-primary">${escapeHtml(donor.bloodGroup)}</span>
+                <span class="text-xs text-on-surface-variant font-medium">• ${escapeHtml(donor.transitMode)}</span>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px] text-tertiary">near_me</span>
+                <span>${donor.distance} mi away</span>
+                <span class="text-outline/40">•</span>
+                <span class="text-secondary font-medium">Corridor Transit</span>
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col items-end gap-1 shrink-0">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${donor.statusClass} flex items-center gap-1">
+              ${isMoving ? '<span class="w-1.5 h-1.5 rounded-full bg-current animate-ping"></span>' : ''}
+              ${escapeHtml(donor.transitStatus)}
+            </span>
+            <span class="text-[11px] font-mono font-bold text-on-surface">
+              ETA: <span class="${isEnRoute ? 'text-error font-extrabold' : 'text-primary'}">${escapeHtml(donor.liveEta)}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Progress Bar & Landmark -->
+        <div class="flex flex-col gap-1 pt-1 border-t border-surface-container/60">
+          <div class="flex items-center justify-between text-[11px] text-on-surface-variant">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px] text-tertiary">my_location</span>
+              <span class="truncate max-w-[280px] sm:max-w-none">${escapeHtml(donor.landmark)}</span>
+            </span>
+            <span class="font-mono font-bold text-on-surface shrink-0">${donor.progressPct}% route</span>
+          </div>
+          <div class="w-full h-1.5 rounded-full bg-surface-container overflow-hidden">
+            <div class="h-full rounded-full ${progressColor} transition-all duration-500" style="width: ${donor.progressPct}%"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
 
 

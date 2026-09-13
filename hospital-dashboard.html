@@ -57,22 +57,6 @@
 </div>
 <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-badge text-label-badge">4</span>
 </button>
-<button type="button" onclick="document.getElementById('hospital-donors-section')?.scrollIntoView({ behavior: 'smooth' });" class="flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-lg text-label-lg text-left w-full cursor-pointer">
-<div class="flex items-center gap-space-sm">
-<span class="material-symbols-outlined text-[20px]">group</span>
-<span>Matched Donors</span>
-</div>
-<span id="hospital-sidebar-donors-badge" class="flex items-center justify-center text-tertiary" title="Active Donor Notifications">
-  <span class="material-symbols-outlined text-[20px] text-tertiary animate-pulse">notifications_active</span>
-</span>
-</button>
-<button type="button" onclick="document.getElementById('hospital-tracking-section')?.scrollIntoView({ behavior: 'smooth' });" class="flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-lg text-label-lg text-left w-full cursor-pointer">
-<div class="flex items-center gap-space-sm">
-<span class="material-symbols-outlined text-[20px]">vital_signs</span>
-<span>Live Tracking</span>
-</div>
-<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-</button>
 <div class="my-space-xs h-px bg-surface-container"></div>
 <a class="flex items-center justify-between px-space-md py-2.5 rounded-lg text-error hover:bg-error-container/30 transition-colors font-label-lg text-label-lg" href="role-selection.html" title="Sign out of Hospital Portal">
 <div class="flex items-center gap-space-sm">
@@ -187,256 +171,9 @@
             </p>
 </div>
 </div>
-</div>
-<!-- INTERACTIVE REQUEST TRACKING PIPELINE -->
-<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-lg">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
-<div class="flex items-center gap-space-sm">
-<span class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">
-<span class="material-symbols-outlined">vital_signs</span>
-</span>
-<div>
-<div class="flex items-center gap-space-xs">
-<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Live Emergency Tracking</h2>
-<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-badge text-label-badge animate-pulse">CRITICAL DISPATCH</span>
-</div>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Request #REQ-9042 • B+ Platelets (Urgent) • Trauma Surgery Suite 3</p>
-</div>
-</div>
-<div class="flex items-center gap-space-xs">
-<span class="font-label-md text-label-md text-on-surface-variant">Protocol ETA:</span>
-<span class="font-title-md text-title-md text-primary font-extrabold">22 Mins Remaining</span>
-</div>
-</div>
-<!-- 6-STAGE PIPELINE STEPPER -->
-<div class="w-full pt-space-xs">
-<div class="grid grid-cols-2 md:grid-cols-6 gap-space-xs relative">
-<!-- Step 1 -->
-<div class="flex flex-col items-center text-center group">
-<div class="w-10 h-10 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-sm font-label-lg text-label-lg mb-2">
-<span class="material-symbols-outlined text-[20px]">check</span>
-</div>
-<span class="font-label-md text-label-md text-on-surface font-bold">1. Raised</span>
-<span class="font-body-sm text-[11px] text-on-surface-variant">14:10 EST</span>
-</div>
-<!-- Step 2 -->
-<div class="flex flex-col items-center text-center group">
-<div class="w-10 h-10 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-sm font-label-lg text-label-lg mb-2">
-<span class="material-symbols-outlined text-[20px]">check</span>
-</div>
-<span class="font-label-md text-label-md text-on-surface font-bold">2. Matching</span>
-<span class="font-body-sm text-[11px] text-on-surface-variant">16 Found</span>
-</div>
-<!-- Step 3 -->
-<div class="flex flex-col items-center text-center group">
-<div class="w-10 h-10 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-sm font-label-lg text-label-lg mb-2">
-<span class="material-symbols-outlined text-[20px]">check</span>
-</div>
-<span class="font-label-md text-label-md text-on-surface font-bold">3. Notified</span>
-<span class="font-body-sm text-[11px] text-on-surface-variant">High Alert Ping</span>
-</div>
-<!-- Step 4 (Current Stage) -->
-<div class="flex flex-col items-center text-center group">
-<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center ring-4 ring-primary-fixed shadow-md font-label-lg text-label-lg mb-2 relative">
-<span class="material-symbols-outlined text-[20px] animate-pulse">notifications_active</span>
-</div>
-<span class="font-label-md text-label-md text-primary font-extrabold">4. Donors Accepted</span>
-<span class="font-body-sm text-[11px] text-primary font-semibold">3 Acc • 2 En Route</span>
-</div>
-<!-- Step 5 -->
-<div class="flex flex-col items-center text-center group opacity-50">
-<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-lg text-label-lg mb-2">
-<span class="material-symbols-outlined text-[20px]">contact_phone</span>
-</div>
-<span class="font-label-md text-label-md text-on-surface">5. Connected</span>
-<span class="font-body-sm text-[11px] text-on-surface-variant">Pending Gate</span>
-</div>
-<!-- Step 6 -->
-<div class="flex flex-col items-center text-center group opacity-40">
-<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-lg text-label-lg mb-2">
-<span class="material-symbols-outlined text-[20px]">bloodtype</span>
-</div>
-<span class="font-label-md text-label-md text-on-surface">6. Completed</span>
-<span class="font-body-sm text-[11px] text-on-surface-variant">Verification</span>
-</div>
-</div>
-</div>
-<!-- Active Tracker Status Card Detail -->
-<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col md:flex-row items-center justify-between gap-space-md">
-<div class="flex items-center gap-space-md">
-<div class="w-12 h-12 rounded-xl bg-surface-container-lowest flex flex-col items-center justify-center shadow-sm">
-<span class="font-headline-sm text-title-md font-extrabold text-primary">B+</span>
-<span class="font-label-badge text-[9px] uppercase tracking-wider text-on-surface-variant">Platelets</span>
-</div>
-<div>
-<span class="font-title-md text-title-md text-on-surface font-semibold">Recipient: Bed #402 (Surgery in Progress)</span>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Donor #B-8839 (David K.) and #B-9102 reported inbound via Central Crossway.</p>
-</div>
-</div>
-<div class="flex items-center gap-space-xs w-full md:w-auto justify-end">
-<button class="px-space-md py-2 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors">Adjust Quota</button>
-<button class="px-space-md py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md transition-colors">Triage Comms Panel</button>
-</div>
-</div>
-</div>
-<!-- TWO-COLUMN SECTION: LIVE MATCHES TABLE & BLOOD INVENTORY -->
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-space-xl items-start">
-<!-- LIVE DONOR MATCHES TABLE (2 Columns on XL) -->
-<div class="xl:col-span-2 bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
-<div class="flex items-center justify-between">
-<div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Live Donor Matches</h2>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Real-time responders matched to open hospital tickets</p>
-</div>
-<div class="flex items-center gap-space-xs">
-<span class="flex h-2 w-2 rounded-full bg-tertiary"></span>
-<span class="font-label-badge text-label-badge text-tertiary uppercase">3 Synchronized</span>
-</div>
-</div>
-<!-- Table Container (Non-Scrollable & Fully Responsive) -->
-<div class="w-full overflow-hidden table-no-scroll">
-<table class="w-full text-left border-collapse table-auto">
-<thead>
-<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-xs sm:text-label-md uppercase tracking-wider">
-<th class="py-2.5 px-2 sm:px-3 rounded-l-lg">Donor ID / Name</th>
-<th class="py-2.5 px-1.5 sm:px-2 text-center">Group</th>
-<th class="py-2.5 px-1.5 sm:px-2 hidden sm:table-cell">Distance</th>
-<th class="py-2.5 px-1.5 sm:px-2 hidden sm:table-cell">Match Score</th>
-<th class="py-2.5 px-1.5 sm:px-2">Status</th>
-<th class="py-2.5 px-2 sm:px-3 text-right rounded-r-lg">Action</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-surface-container font-body-sm text-body-sm">
-<!-- Row 1 -->
-<tr class="hover:bg-surface/60 transition-colors">
-<td class="py-3 px-2 sm:px-3">
-<div class="flex items-center gap-2">
-<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md font-bold shrink-0 text-xs sm:text-sm">
-                        DK
-                      </div>
-<div class="flex flex-col min-w-0">
-<span class="font-title-md text-xs sm:text-sm font-bold text-on-surface truncate">David K.</span>
-<span class="font-label-badge text-[10px] text-tertiary hidden sm:flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">verified</span> Verified Donor</span>
-<span class="text-[10px] text-on-surface-variant font-normal sm:hidden">1.4 mi • 100%</span>
-</div>
-</div>
-</td>
-<td class="py-3 px-1.5 sm:px-2 text-center">
-<span class="inline-flex w-7 h-7 rounded-full bg-surface-container-high items-center justify-center font-bold text-xs text-on-surface">B+</span>
-</td>
-<td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-on-surface hidden sm:table-cell whitespace-nowrap">1.4 miles</td>
-<td class="py-3 px-1.5 sm:px-2 hidden sm:table-cell">
-<div class="flex items-center gap-1.5 whitespace-nowrap">
-<div class="w-10 sm:w-12 bg-surface-container-high h-2 rounded-full overflow-hidden">
-<div class="bg-tertiary h-full w-full"></div>
-</div>
-<span class="font-label-md text-xs sm:text-label-md font-bold text-tertiary">100%</span>
-</div>
-</td>
-<td class="py-3 px-1.5 sm:px-2">
-<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-[10px] sm:text-label-badge uppercase whitespace-nowrap">
-<span class="w-1.5 h-1.5 rounded-full bg-tertiary shrink-0"></span> Accepted (ETA 25m)
-                    </span>
-</td>
-<td class="py-3 px-2 sm:px-3 text-right whitespace-nowrap">
-<button class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-container hover:bg-primary hover:text-on-primary text-on-surface font-label-md text-xs sm:text-label-md transition-colors inline-flex items-center gap-1 ml-auto">
-<span class="material-symbols-outlined text-[14px] sm:text-[16px]">lock_person</span>
-<span class="hidden md:inline">Contact Securely</span>
-<span class="md:hidden">Contact</span>
-</button>
-</td>
-</tr>
-<!-- Row 2 -->
-<tr class="hover:bg-surface/60 transition-colors">
-<td class="py-3 px-2 sm:px-3">
-<div class="flex items-center gap-2">
-<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md font-bold shrink-0 text-xs sm:text-sm">
-                        ER
-                      </div>
-<div class="flex flex-col min-w-0">
-<span class="font-title-md text-xs sm:text-sm font-bold text-on-surface truncate">Elena R.</span>
-<span class="font-label-badge text-[10px] text-tertiary hidden sm:flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">verified</span> Verified Donor</span>
-<span class="text-[10px] text-on-surface-variant font-normal sm:hidden">2.8 mi • Universal</span>
-</div>
-</div>
-</td>
-<td class="py-3 px-1.5 sm:px-2 text-center">
-<span class="inline-flex w-7 h-7 rounded-full bg-primary-fixed text-on-primary-fixed font-bold text-xs items-center justify-center">O-</span>
-</td>
-<td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-on-surface hidden sm:table-cell whitespace-nowrap">2.8 miles</td>
-<td class="py-3 px-1.5 sm:px-2 hidden sm:table-cell">
-<div class="flex items-center gap-1.5 whitespace-nowrap">
-<div class="w-10 sm:w-12 bg-surface-container-high h-2 rounded-full overflow-hidden">
-<div class="bg-primary h-full w-[95%]"></div>
-</div>
-<span class="font-label-md text-xs sm:text-label-md font-bold text-primary">Universal</span>
-</div>
-</td>
-<td class="py-3 px-1.5 sm:px-2">
-<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-fixed/50 text-secondary font-label-badge text-[10px] sm:text-label-badge uppercase whitespace-nowrap">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary shrink-0"></span> Notified (Awaiting)
-                    </span>
-</td>
-<td class="py-3 px-2 sm:px-3 text-right whitespace-nowrap">
-<button class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs sm:text-label-md transition-colors inline-flex items-center gap-1 ml-auto">
-<span class="material-symbols-outlined text-[14px] sm:text-[16px]">sensors</span>
-<span class="hidden md:inline">Send Ping</span>
-<span class="md:hidden">Ping</span>
-</button>
-</td>
-</tr>
-<!-- Row 3 -->
-<tr class="hover:bg-surface/60 transition-colors">
-<td class="py-3 px-2 sm:px-3">
-<div class="flex items-center gap-2">
-<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md font-bold shrink-0 text-xs sm:text-sm">
-                        MT
-                      </div>
-<div class="flex flex-col min-w-0">
-<span class="font-title-md text-xs sm:text-sm font-bold text-on-surface truncate">Marcus T.</span>
-<span class="font-label-badge text-[10px] text-tertiary hidden sm:flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">verified</span> Verified Donor</span>
-<span class="text-[10px] text-on-surface-variant font-normal sm:hidden">3.5 mi • 100%</span>
-</div>
-</div>
-</td>
-<td class="py-3 px-1.5 sm:px-2 text-center">
-<span class="inline-flex w-7 h-7 rounded-full bg-surface-container-high items-center justify-center font-bold text-xs text-on-surface">B+</span>
-</td>
-<td class="py-3 px-1.5 sm:px-2 text-xs sm:text-sm text-on-surface hidden sm:table-cell whitespace-nowrap">3.5 miles</td>
-<td class="py-3 px-1.5 sm:px-2 hidden sm:table-cell">
-<div class="flex items-center gap-1.5 whitespace-nowrap">
-<div class="w-10 sm:w-12 bg-surface-container-high h-2 rounded-full overflow-hidden">
-<div class="bg-tertiary h-full w-full"></div>
-</div>
-<span class="font-label-md text-xs sm:text-label-md font-bold text-tertiary">100%</span>
-</div>
-</td>
-<td class="py-3 px-1.5 sm:px-2">
-<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-[10px] sm:text-label-badge uppercase whitespace-nowrap">
-<span class="w-1.5 h-1.5 rounded-full bg-tertiary shrink-0"></span> Slot: 3:30 PM
-                    </span>
-</td>
-<td class="py-3 px-2 sm:px-3 text-right whitespace-nowrap">
-<button class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs sm:text-label-md transition-colors inline-flex items-center gap-1 ml-auto">
-<span class="material-symbols-outlined text-[14px] sm:text-[16px]">how_to_reg</span>
-<span class="hidden md:inline">Check In Donor</span>
-<span class="md:hidden">Check In</span>
-</button>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<!-- Bottom Summary in Card -->
-<div class="flex items-center justify-between pt-space-xs text-body-sm text-on-surface-variant">
-<span>Showing top 3 of 12 active dispatched responders</span>
-<a class="text-primary font-label-md text-label-md hover:underline flex items-center gap-0.5" href="#matches">
-              Open Full Triage Registry <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-</a>
-</div>
-</div>
 <!-- BLOOD BANK INVENTORY QUICK GAUGE (1 Column on XL) -->
-<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="xl:col-span-1 bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
 <div class="flex items-center justify-between">
 <div>
 <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Cold Storage Reserve</h2>
@@ -572,9 +309,8 @@
 <span>Trigger Regional Bank Rebalancing</span>
 </button>
 </div>
-</div>
 <!-- RECENT AUDIT TRAIL LOG -->
-<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="xl:col-span-2 bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-space-sm">
 <span class="material-symbols-outlined text-secondary">history_edu</span>
@@ -606,6 +342,7 @@
 </div>
 <span class="font-title-md text-title-md text-on-surface">Automated Alert: A+ Low Stock</span>
 <span class="font-body-sm text-body-sm text-on-surface-variant">System dispatched broadcast to 45 registered campus donors automatically.</span>
+</div>
 </div>
 </div>
 </div>
@@ -758,7 +495,171 @@
   </div>
 </div>
 </main><footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-space-2xl mt-auto"><div class="max-w-[1280px] mx-auto px-gutter-desktop"><div class="flex flex-col md:flex-row items-center justify-between gap-space-lg pb-space-lg"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[24px]">vital_signs</span><span class="font-headline-sm text-headline-sm font-bold text-on-surface">DonorPulse</span><span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span></div><div class="flex items-center gap-space-lg"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="homepage.html">Clinical Protocols</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="role-selection.html">Donor Privacy</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="homepage.html">HIPAA Compliant</a></div></div><div class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><p>© 2024 DonorPulse Emergency Blood Logistics. All rights reserved.</p><div class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-tertiary"></span><span class="font-label-badge text-label-badge uppercase tracking-wider text-tertiary">Central Dispatch Active</span></div></div></div></footer>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: HOSPITAL REQUISITION DETAILS, MATCHED DONORS & LIVE TRACKING  -->
+  <!-- ===================================================================== -->
+  <div id="modal-hospital-request-details" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200" onclick="if(event.target === this) window.closeHospitalRequestModal()">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container-high w-full max-w-3xl max-h-[92vh] overflow-hidden flex flex-col relative" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="p-5 sm:p-6 border-b border-surface-container bg-surface-container-low/50 flex items-start justify-between gap-4">
+        <div class="flex items-start gap-3">
+          <div id="modal-hosp-req-blood" class="w-13 h-13 rounded-2xl bg-error-container text-primary flex items-center justify-center font-bold text-2xl shrink-0 shadow-sm border border-error/20">
+            B+
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-1 flex-wrap">
+              <span id="modal-hosp-req-id" class="font-mono font-bold text-sm text-primary bg-primary-fixed/30 px-2 py-0.5 rounded-md">
+                REQ-9042
+              </span>
+              <span id="modal-hosp-req-urgency" class="px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-badge text-label-badge font-bold uppercase tracking-wider animate-pulse">
+                STAT EMERGENCY (&lt; 45 MINS)
+              </span>
+              <span id="modal-hosp-req-stage-badge" class="px-2.5 py-0.5 rounded-full bg-tertiary-container/40 text-tertiary font-label-badge text-label-badge font-bold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span>
+                <span id="modal-hosp-req-stage-text">Stage 4: Donors Accepted</span>
+              </span>
+            </div>
+            <h3 id="modal-hosp-req-component" class="font-headline-sm text-headline-sm font-bold text-on-surface">Platelets (Apheresis)</h3>
+            <p id="modal-hosp-req-location" class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+              <span class="material-symbols-outlined text-[16px] text-primary">local_hospital</span>
+              <span>Trauma OR - Suite 3 • Ward 4B, Emergency Wing</span>
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="window.closeHospitalRequestModal()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors shrink-0 cursor-pointer" title="Close">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 sm:p-6 overflow-y-auto flex flex-col gap-5 text-on-surface">
+        
+        <!-- Requisition Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container">
+            <span class="text-[11px] font-semibold text-secondary uppercase tracking-wider block">Quantity Demanded</span>
+            <span id="modal-hosp-req-units" class="font-title-md font-extrabold text-on-surface mt-0.5 block">3 Units</span>
+            <span class="text-[11px] text-on-surface-variant">Emergency Reserve</span>
+          </div>
+          <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container">
+            <span class="text-[11px] font-semibold text-secondary uppercase tracking-wider block">Protocol SLA</span>
+            <span id="modal-hosp-req-sla" class="font-title-md font-extrabold text-error mt-0.5 block">&lt; 45 Mins</span>
+            <span class="text-[11px] text-on-surface-variant">Stat SLA window</span>
+          </div>
+          <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container">
+            <span class="text-[11px] font-semibold text-secondary uppercase tracking-wider block">Accepted Donors</span>
+            <span id="modal-hosp-req-accepted-count" class="font-title-md font-extrabold text-tertiary mt-0.5 block">3 Donors</span>
+            <span class="text-[11px] text-on-surface-variant">Confirmed &amp; In Transit</span>
+          </div>
+          <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container">
+            <span class="text-[11px] font-semibold text-secondary uppercase tracking-wider block">Created Time</span>
+            <span id="modal-hosp-req-created" class="font-title-md font-bold text-on-surface mt-0.5 block text-sm sm:text-base">14:10 EST</span>
+            <span class="text-[11px] text-on-surface-variant">Central Dispatch</span>
+          </div>
+        </div>
+
+        <!-- Clinical Notes Banner -->
+        <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex items-start gap-2.5">
+          <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">clinical_notes</span>
+          <div class="text-xs">
+            <span class="font-bold text-on-surface uppercase tracking-wider text-[11px]">Clinical Indication &amp; Case Notes</span>
+            <p id="modal-hosp-req-notes" class="text-on-surface text-sm mt-0.5 leading-relaxed">
+              Acute arterial hemorrhage from multi-vehicle accident, cross-match in progress.
+            </p>
+          </div>
+        </div>
+
+        <!-- LIVE TELEMETRY PIPELINE (6-STAGE STEPPER) -->
+        <div class="p-4 sm:p-5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-error-container text-primary flex items-center justify-center font-bold">
+                <span class="material-symbols-outlined text-[18px]">vital_signs</span>
+              </span>
+              <div>
+                <h4 class="font-title-md font-bold text-on-surface text-sm sm:text-base">Live Telemetry &amp; Dispatch Pipeline</h4>
+                <p class="text-xs text-on-surface-variant">National haemovigilance cold-chain &amp; courier tracking</p>
+              </div>
+            </div>
+            <button type="button" id="btn-modal-hosp-advance-stage" onclick="window.advanceModalHospitalRequestStage()" class="px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs font-bold shadow-xs transition-all flex items-center gap-1 self-start sm:self-center cursor-pointer active:scale-98">
+              <span>Advance to Next Stage</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </button>
+          </div>
+
+          <!-- Stepper Grid -->
+          <div id="modal-hosp-stepper" class="grid grid-cols-2 sm:grid-cols-6 gap-2 pt-2 border-t border-surface-container">
+          </div>
+        </div>
+
+        <!-- MATCHED & AVAILABLE DONORS FOR THIS REQUISITION -->
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-tertiary-container/30 text-tertiary flex items-center justify-center font-bold">
+                <span class="material-symbols-outlined text-[18px]">group</span>
+              </span>
+              <div>
+                <h4 class="font-title-md font-bold text-on-surface text-sm sm:text-base">
+                  Matched Donors for <span id="modal-hosp-req-blood-title" class="text-primary font-extrabold">B+</span>
+                </h4>
+                <p class="text-xs text-on-surface-variant">Compatible responders in immediate travel radius</p>
+              </div>
+            </div>
+            <span id="modal-hosp-matched-count-badge" class="px-3 py-1 rounded-full bg-tertiary text-white font-bold text-xs shadow-xs flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+              <span id="modal-hosp-matched-count-text">4 Matched Donors</span>
+            </span>
+          </div>
+
+          <!-- Matched Donors List Container -->
+          <div id="modal-hosp-matched-donors-container" class="flex flex-col gap-2.5">
+          </div>
+        </div>
+
+        <!-- LIVE TRANSIT TELEMETRY STREAM -->
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-secondary-container text-secondary flex items-center justify-center font-bold">
+                <span class="material-symbols-outlined text-[18px]">near_me</span>
+              </span>
+              <div>
+                <h4 class="font-title-md font-bold text-on-surface text-sm sm:text-base">Inbound Donor Live GPS Telemetry</h4>
+                <p class="text-xs text-on-surface-variant">Real-time corridor speed, ETA and landmark progression</p>
+              </div>
+            </div>
+            <span class="text-[11px] text-tertiary font-semibold flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-tertiary animate-ping"></span>
+              Active Telemetry Stream
+            </span>
+          </div>
+
+          <!-- Tracking Pool Container -->
+          <div id="modal-hosp-tracking-container" class="flex flex-col gap-2.5">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 sm:p-5 bg-surface-container-low border-t border-surface-container flex items-center justify-between gap-3">
+        <button type="button" onclick="window.closeHospitalRequestModal()" class="px-5 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-sm font-semibold transition-colors cursor-pointer flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+          <span>Close Window</span>
+        </button>
+        <button type="button" onclick="window.showToast('Priority Alert Broadcasted', 'All matched donors have received high-priority requisition ping with turn-by-turn navigation.', 'success')" class="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-sm font-bold shadow-md transition-all active:scale-98 cursor-pointer flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">notifications_active</span>
+          <span>Broadcast Priority Ping</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
 <script src="js/store.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
 <script>
   function renderStandaloneVerificationModal() {
     const container = document.getElementById('verification-hub-modal-content');
@@ -842,6 +743,7 @@
       </div>
     `;
   }
+
   window.openVerificationHubModal = function() {
     renderStandaloneVerificationModal();
     const modal = document.getElementById('modal-verification-hub');

@@ -156,22 +156,19 @@ class PulseRouter {
           setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
         }
       }, 70);
-    } else if (['matched-donors', 'hospital-donors', 'hospital-donors-section'].includes(path)) {
+    } else if (['matched-donors', 'hospital-donors', 'hospital-donors-section', 'request-tracking', 'hospital-tracking', 'hospital-tracking-section'].includes(path)) {
       setTimeout(() => {
-        const sec = document.getElementById('hospital-donors-section');
+        const sec = document.getElementById('hospital-requests-section');
         if (sec) {
           sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
           sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
           setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
         }
-      }, 70);
-    } else if (['request-tracking', 'hospital-tracking', 'hospital-tracking-section'].includes(path)) {
-      setTimeout(() => {
-        const sec = document.getElementById('hospital-tracking-section');
-        if (sec) {
-          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          sec.classList.add('transition-all', 'duration-500', 'ring-2', 'ring-primary/40', 'rounded-2xl');
-          setTimeout(() => sec.classList.remove('ring-2', 'ring-primary/40'), 1800);
+        if (window.openHospitalRequestModal) {
+          const reqs = window.PulseStore ? window.PulseStore.getRequests() : [];
+          if (reqs && reqs.length > 0) {
+            window.openHospitalRequestModal(reqs[0].id);
+          }
         }
       }, 70);
 
