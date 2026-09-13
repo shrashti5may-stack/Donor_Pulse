@@ -137,13 +137,14 @@ const DEFAULT_STATE = {
   // Currently active request selected for confirmation & tracking
   selectedRequestId: 'REQ-9042',
 
-  // Mock Pool of Registered Donors
+  // Mock Pool of Registered Donors with Indian Phone Format
   matchedDonorsPool: [
     {
       id: 'D-101',
       name: 'David K.',
       initials: 'DK',
       bloodGroup: 'B+',
+      phone: '+91 98201 44521',
       distance: 1.4,
       matchScore: 100,
       availability: 'Active / On Call',
@@ -159,13 +160,14 @@ const DEFAULT_STATE = {
       name: 'Sarah Jenkins',
       initials: 'SJ',
       bloodGroup: 'O-',
+      phone: '+91 98452 33109',
       distance: 1.8,
       matchScore: 98,
       availability: 'Active / On Call',
       eligibility: 'Eligible Now',
       verified: true,
-      notified: false,
-      accepted: false,
+      notified: true,
+      accepted: true,
       eta: '18 mins',
       lastDonation: 'Oct 14, 2024'
     },
@@ -174,6 +176,7 @@ const DEFAULT_STATE = {
       name: 'Elena R.',
       initials: 'ER',
       bloodGroup: 'O-',
+      phone: '+91 97112 88764',
       distance: 2.8,
       matchScore: 95,
       availability: 'Active / On Call',
@@ -189,6 +192,7 @@ const DEFAULT_STATE = {
       name: 'Marcus T.',
       initials: 'MT',
       bloodGroup: 'B+',
+      phone: '+91 99341 22987',
       distance: 3.5,
       matchScore: 100,
       availability: 'Active / On Call',
@@ -204,6 +208,7 @@ const DEFAULT_STATE = {
       name: 'Chloe Bennett',
       initials: 'CB',
       bloodGroup: 'A-',
+      phone: '+91 98765 12043',
       distance: 4.1,
       matchScore: 85,
       availability: 'Active / On Call',
@@ -219,6 +224,7 @@ const DEFAULT_STATE = {
       name: 'Liam Patel',
       initials: 'LP',
       bloodGroup: 'O+',
+      phone: '+91 98190 77621',
       distance: 4.7,
       matchScore: 90,
       availability: 'Active / On Call',
@@ -228,6 +234,70 @@ const DEFAULT_STATE = {
       accepted: false,
       eta: '35 mins',
       lastDonation: 'May 30, 2024'
+    },
+    {
+      id: 'D-107',
+      name: 'Rohan Mehta',
+      initials: 'RM',
+      bloodGroup: 'O-',
+      phone: '+91 98334 55120',
+      distance: 3.2,
+      matchScore: 96,
+      availability: 'Active / On Call',
+      eligibility: 'Eligible Now',
+      verified: true,
+      notified: true,
+      accepted: true,
+      eta: '22 mins',
+      lastDonation: 'Nov 02, 2024'
+    },
+    {
+      id: 'D-108',
+      name: 'Ananya Sharma',
+      initials: 'AS',
+      bloodGroup: 'O-',
+      phone: '+91 97690 11438',
+      distance: 4.5,
+      matchScore: 94,
+      availability: 'Active / On Call',
+      eligibility: 'Eligible Now',
+      verified: true,
+      notified: false,
+      accepted: false,
+      eta: '45 mins',
+      lastDonation: 'Aug 29, 2024'
+    },
+    {
+      id: 'D-109',
+      name: 'Vikram Singhania',
+      initials: 'VS',
+      bloodGroup: 'B+',
+      phone: '+91 98210 99823',
+      distance: 2.1,
+      matchScore: 100,
+      availability: 'Active / On Call',
+      eligibility: 'Eligible Now',
+      verified: true,
+      notified: true,
+      accepted: true,
+      eta: '15 mins',
+      lastDonation: 'Oct 01, 2024'
+    },
+    {
+      id: 'D-110',
+      name: 'Pooja Verma',
+      initials: 'PV',
+      bloodGroup: 'B-',
+      phone: '+91 99872 66341',
+      distance: 3.8,
+      matchScore: 92,
+      availability: 'Active / On Call',
+      eligibility: 'Eligible Now',
+      verified: true,
+      notified: false,
+      accepted: false,
+      eta: '28 mins',
+      lastDonation: 'Sep 18, 2024'
     }
   ],
 
@@ -277,6 +347,10 @@ class Store {
         const merged = { ...DEFAULT_STATE, ...parsed };
         if (!Array.isArray(merged.registeredHospitals) || merged.registeredHospitals.length === 0) {
           merged.registeredHospitals = [merged.hospital || DEFAULT_STATE.hospital];
+        }
+        // Upgrade matchedDonorsPool if missing phones or outdated
+        if (!Array.isArray(merged.matchedDonorsPool) || merged.matchedDonorsPool.length < DEFAULT_STATE.matchedDonorsPool.length || !merged.matchedDonorsPool[0]?.phone) {
+          merged.matchedDonorsPool = JSON.parse(JSON.stringify(DEFAULT_STATE.matchedDonorsPool));
         }
         return merged;
       }
@@ -584,11 +658,10 @@ class Store {
   // --- Live Donor Tracking for Requisitions ---
   getRequestDonorTracking(reqId, bloodGroup) {
     const cleanBlood = (bloodGroup || 'O-').split('/')[0].trim();
-    let donors = this.getMatchedDonors(cleanBlood);
-    if (!donors || donors.length < 4) {
-      const remaining = this.state.matchedDonorsPool.filter(d => !donors.some(x => x.id === d.id));
-      donors = [...(donors || []), ...remaining.slice(0, Math.max(0, 4 - (donors ? donors.length : 0)))];
-    }
+    // STRICT MEDICAL ACCURACY:
+    // Only return compatible donors strictly mapped via getMatchedDonors.
+    // O- recipients can ONLY receive blood from O- donors. Never pad with incompatible blood types!
+    const donors = this.getMatchedDonors(cleanBlood);
 
     return donors.map((d, index) => {
       let transitStatus = 'Available On Call';

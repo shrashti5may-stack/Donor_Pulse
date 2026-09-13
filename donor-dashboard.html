@@ -682,6 +682,47 @@
       document.body.removeChild(a);
     }
 
+    window.copyDonorPhone = function(btn, phone) {
+      if (!phone) return;
+      const copyToClipboard = (text) => {
+        if (navigator.clipboard && window.isSecureContext) {
+          return navigator.clipboard.writeText(text);
+        }
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          textArea.remove();
+          return Promise.resolve();
+        } catch (err) {
+          textArea.remove();
+          return Promise.reject(err);
+        }
+      };
+
+      copyToClipboard(phone).then(() => {
+        if (btn) {
+          const originalHtml = btn.innerHTML;
+          const originalClasses = btn.className;
+          btn.classList.add('bg-tertiary-container/60', 'text-tertiary', 'border-tertiary/50');
+          btn.innerHTML = `
+            <span class="material-symbols-outlined text-[15px] text-tertiary">check_circle</span>
+            <span class="phone-text font-bold text-tertiary">Copied!</span>
+          `;
+          setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.className = originalClasses;
+          }, 1800);
+        }
+      });
+    };
+
     function openDonorRequestModal(data) {
       activeDonorReq = data || {
         hospital: "St. Mary's General Hospital",
@@ -793,6 +834,15 @@
                     <span class="text-outline/40">•</span>
                     <span class="text-secondary font-medium">${donor.transitMode}</span>
                   </p>
+                  <!-- Donor Phone Number (Indian Format) with Click-to-Copy -->
+                  <div class="mt-1.5 flex items-center gap-2">
+                    <button type="button" onclick="window.copyDonorPhone(this, '${donor.phone || '+91 98452 33109'}'); event.stopPropagation();" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-mono text-xs font-semibold border border-surface-container-high hover:border-primary/40 transition-all cursor-pointer shadow-2xs active:scale-95 group/copy" title="Click to copy Indian phone number">
+                      <span class="material-symbols-outlined text-[15px] text-primary transition-transform group-hover/copy:scale-110">call</span>
+                      <span class="phone-text tracking-wide">${donor.phone || '+91 98452 33109'}</span>
+                      <span class="material-symbols-outlined text-[14px] text-on-surface-variant group-hover/copy:text-primary transition-colors">content_copy</span>
+                    </button>
+                    <span class="text-[11px] text-on-surface-variant hidden sm:inline">(Click to copy)</span>
+                  </div>
                 </div>
               </div>
               <div class="flex flex-col items-end gap-1 shrink-0">

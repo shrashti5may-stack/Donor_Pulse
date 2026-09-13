@@ -2097,6 +2097,58 @@ window.logoutUser = function(role) {
   }
 };
 
+/**
+ * Copy Donor Phone Number to Clipboard with Interactive UI Feedback
+ */
+window.copyDonorPhone = function(btn, phone) {
+  if (!phone) return;
+
+  const copyToClipboard = (text) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      textArea.remove();
+      return Promise.resolve();
+    } catch (err) {
+      textArea.remove();
+      return Promise.reject(err);
+    }
+  };
+
+  copyToClipboard(phone).then(() => {
+    if (btn) {
+      const originalHtml = btn.innerHTML;
+      const originalClasses = btn.className;
+      btn.classList.add('bg-tertiary-container/60', 'text-tertiary', 'border-tertiary/50');
+      btn.innerHTML = `
+        <span class="material-symbols-outlined text-[15px] text-tertiary">check_circle</span>
+        <span class="phone-text font-bold text-tertiary">Copied!</span>
+      `;
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        btn.className = originalClasses;
+      }, 1800);
+    }
+    if (window.showToast) {
+      window.showToast('Phone Copied', `Donor contact ${phone} copied to clipboard.`, 'success');
+    }
+  }).catch(() => {
+    if (window.showToast) {
+      window.showToast('Contact Info', `Donor phone: ${phone}`, 'info');
+    }
+  });
+};
+
 // ============================================================================
 // DONOR BLOOD REQUISITION DETAILS MODAL CONTROLLER
 // ============================================================================
@@ -2217,6 +2269,15 @@ function renderDonorModalTracking() {
                 <span class="text-outline/40">•</span>
                 <span class="text-secondary font-medium">${escapeHtml(donor.transitMode)}</span>
               </p>
+              <!-- Donor Phone Number (Indian Format) with Click-to-Copy -->
+              <div class="mt-1.5 flex items-center gap-2">
+                <button type="button" onclick="window.copyDonorPhone(this, '${escapeHtml(donor.phone || '+91 98452 33109')}'); event.stopPropagation();" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-mono text-xs font-semibold border border-surface-container-high hover:border-primary/40 transition-all cursor-pointer shadow-2xs active:scale-95 group/copy" title="Click to copy Indian phone number">
+                  <span class="material-symbols-outlined text-[15px] text-primary transition-transform group-hover/copy:scale-110">call</span>
+                  <span class="phone-text tracking-wide">${escapeHtml(donor.phone || '+91 98452 33109')}</span>
+                  <span class="material-symbols-outlined text-[14px] text-on-surface-variant group-hover/copy:text-primary transition-colors">content_copy</span>
+                </button>
+                <span class="text-[11px] text-on-surface-variant hidden sm:inline">(Click to copy)</span>
+              </div>
             </div>
           </div>
           <div class="flex flex-col items-end gap-1 shrink-0">
@@ -2490,7 +2551,7 @@ function renderModalHospitalDonors(req) {
               <span class="material-symbols-outlined text-[13px]">verified</span> ${escapeHtml(String(donor.matchScore || 95))}% match
             </span>
           </div>
-          <p class="text-xs text-on-surface-variant mt-0.5 flex items-center gap-2">
+          <p class="text-xs text-on-surface-variant mt-0.5 flex items-center gap-2 flex-wrap">
             <span class="flex items-center gap-0.5">
               <span class="material-symbols-outlined text-[14px] text-secondary">near_me</span>
               <span>${donor.distance} mi away</span>
@@ -2498,6 +2559,15 @@ function renderModalHospitalDonors(req) {
             <span class="text-outline/40">•</span>
             <span class="text-tertiary font-medium">Last donation: ${escapeHtml(donor.lastDonation || 'Recent')}</span>
           </p>
+          <!-- Donor Phone Number (Indian Format) with Click-to-Copy -->
+          <div class="mt-1.5 flex items-center gap-2">
+            <button type="button" onclick="window.copyDonorPhone(this, '${escapeHtml(donor.phone || '+91 98452 33109')}'); event.stopPropagation();" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-mono text-xs font-semibold border border-surface-container-high hover:border-primary/40 transition-all cursor-pointer shadow-2xs active:scale-95 group/copy" title="Click to copy Indian phone number">
+              <span class="material-symbols-outlined text-[15px] text-primary transition-transform group-hover/copy:scale-110">call</span>
+              <span class="phone-text tracking-wide">${escapeHtml(donor.phone || '+91 98452 33109')}</span>
+              <span class="material-symbols-outlined text-[14px] text-on-surface-variant group-hover/copy:text-primary transition-colors">content_copy</span>
+            </button>
+            <span class="text-[11px] text-on-surface-variant hidden sm:inline">(Click to copy)</span>
+          </div>
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
@@ -2505,7 +2575,7 @@ function renderModalHospitalDonors(req) {
           <span class="w-1.5 h-1.5 rounded-full ${donor.accepted ? 'bg-tertiary' : 'bg-primary'} animate-pulse"></span>
           ${donor.accepted ? 'Accepted / On Call' : (donor.notified ? 'Notified / Standby' : 'Ready on Call')}
         </span>
-        <button type="button" onclick="window.showToast('Direct Intercom Connected', 'Secure dispatch audio channel opened with volunteer ${escapeHtml(donor.name)}.', 'info')" class="p-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors cursor-pointer" title="Direct Audio / Push Ping">
+        <button type="button" onclick="window.copyDonorPhone(null, '${escapeHtml(donor.phone || '+91 98452 33109')}'); window.showToast('Direct Intercom Connected', 'Dialing / copying ${escapeHtml(donor.name)} (${escapeHtml(donor.phone || '+91 98452 33109')})', 'info')" class="p-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors cursor-pointer" title="Direct Audio / Push Ping">
           <span class="material-symbols-outlined text-[18px]">contact_phone</span>
         </button>
       </div>
@@ -2530,7 +2600,7 @@ function renderModalHospitalTracking(req) {
     return;
   }
 
-  container.innerHTML = trackingPool.slice(0, 3).map(donor => {
+  container.innerHTML = trackingPool.map(donor => {
     const isEnRoute = donor.transitStatus === 'En Route';
     const isInTransit = donor.transitStatus === 'In Transit';
     const isMoving = isEnRoute || isInTransit;
@@ -2549,12 +2619,21 @@ function renderModalHospitalTracking(req) {
                 <span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-surface-container text-primary">${escapeHtml(donor.bloodGroup)}</span>
                 <span class="text-xs text-on-surface-variant font-medium">• ${escapeHtml(donor.transitMode)}</span>
               </div>
-              <p class="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1">
+              <p class="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1 flex-wrap">
                 <span class="material-symbols-outlined text-[13px] text-tertiary">near_me</span>
                 <span>${donor.distance} mi away</span>
                 <span class="text-outline/40">•</span>
                 <span class="text-secondary font-medium">Corridor Transit</span>
               </p>
+              <!-- Donor Phone Number (Indian Format) with Click-to-Copy -->
+              <div class="mt-1.5 flex items-center gap-2">
+                <button type="button" onclick="window.copyDonorPhone(this, '${escapeHtml(donor.phone || '+91 98452 33109')}'); event.stopPropagation();" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-mono text-xs font-semibold border border-surface-container-high hover:border-primary/40 transition-all cursor-pointer shadow-2xs active:scale-95 group/copy" title="Click to copy Indian phone number">
+                  <span class="material-symbols-outlined text-[15px] text-primary transition-transform group-hover/copy:scale-110">call</span>
+                  <span class="phone-text tracking-wide">${escapeHtml(donor.phone || '+91 98452 33109')}</span>
+                  <span class="material-symbols-outlined text-[14px] text-on-surface-variant group-hover/copy:text-primary transition-colors">content_copy</span>
+                </button>
+                <span class="text-[11px] text-on-surface-variant hidden sm:inline">(Click to copy)</span>
+              </div>
             </div>
           </div>
           <div class="flex flex-col items-end gap-1 shrink-0">
