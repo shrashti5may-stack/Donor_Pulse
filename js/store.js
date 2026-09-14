@@ -563,7 +563,7 @@ class Store {
       ward: newReq.ward || this.state.hospital.location,
       location: newReq.location || this.state.hospital.city,
       notes: newReq.notes || 'Emergency hospital requisition.',
-      createdAt: 'Just now',
+      createdAt: new Date().toLocaleString(),
       status: 'Finding Donors',
       trackingStage: 1, // Start at 1 (Raised)
       matchedCount: Math.floor(6 + Math.random() * 10),
