@@ -70,21 +70,24 @@
 <section id="donor-overview" class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col xl:flex-row xl:items-center justify-between gap-space-md">
 <div class="flex flex-col gap-space-2xs min-w-0">
 <div class="flex flex-wrap items-center gap-space-xs">
-<h1 class="font-headline-md text-headline-md text-on-surface font-bold">Welcome back, Sarah Jenkins</h1>
+<h1 class="font-headline-md text-headline-md text-on-surface font-bold">Welcome back, Sarah Jenkins (28 yrs)</h1>
 <span id="donor-avail-badge" class="inline-flex items-center gap-1.5 px-space-xs py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge uppercase tracking-wide">
 <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Available to Donate
             </span>
 </div>
-<div class="flex flex-wrap items-center gap-y-1 gap-x-space-md text-on-surface-variant font-body-sm text-body-sm pt-space-2xs">
-<span class="flex items-center gap-1">
+<div class="flex flex-col gap-1 text-on-surface-variant font-body-sm text-body-sm pt-space-2xs">
+<div class="flex items-center gap-1.5">
 <span class="material-symbols-outlined text-[16px] text-tertiary">event_available</span>
-<strong class="font-medium text-on-surface">Eligible Now</strong> (Last donation: Oct 14, 2024)
-            </span>
-<span class="text-surface-container-high hidden sm:inline">•</span>
-<span class="flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px] text-secondary">location_on</span>
-              Downtown Metro Center, Sector 4 • Within 5 miles
-            </span>
+<span><strong class="font-medium text-on-surface">Eligible Now</strong> (Last donation: Oct 14, 2024)</span>
+</div>
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="material-symbols-outlined text-[16px] text-secondary shrink-0">location_on</span>
+<span class="donor-location-display font-medium text-on-surface">482 Lexington Ave, Apt 4B, Downtown Metro Center</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-secondary shrink-0">near_me</span>
+<span class="donor-distance-display">Within 10 miles</span>
+</div>
 </div>
 </div>
 <!-- Universal Donor Highlight Card -->
@@ -184,7 +187,7 @@
 </div>
 </div>
 <div class="flex sm:flex-row md:flex-col lg:flex-row items-center gap-space-xs shrink-0 self-start md:self-center">
-<button class="w-full sm:w-auto px-space-lg py-3 rounded-xl bg-on-primary text-primary font-label-lg text-label-lg font-bold shadow-md hover:bg-surface-container transition-all active:scale-98">
+<button id="btn-code-red-respond" type="button" onclick="openImmediateResponseModal()" class="w-full sm:w-auto px-space-lg py-3 rounded-xl bg-on-primary text-primary font-label-lg text-label-lg font-bold shadow-md hover:bg-surface-container transition-all active:scale-98 cursor-pointer">
               Respond Immediately
             </button>
 <button class="w-full sm:w-auto px-space-md py-3 rounded-xl bg-on-primary/15 text-on-primary font-label-lg text-label-lg hover:bg-on-primary/25 transition-all">
@@ -201,10 +204,6 @@
 <p class="font-body-sm text-body-sm text-on-surface-variant">Validated clinical demands prioritized by proximity and blood compatibility</p>
 </div>
 <div class="flex items-center gap-space-xs flex-wrap">
-<button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group cursor-pointer">
-<span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
-<span>Back to Overview</span>
-</button>
 <button class="px-3 py-1.5 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface font-semibold">Closest (&lt;5 mi)</button>
 <button class="px-3 py-1.5 rounded-lg bg-surface-container-low font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Emergency Only</button>
 </div>
@@ -320,10 +319,6 @@
 <p class="font-body-sm text-body-sm text-on-surface-variant">Digitally attested clinical verification log per national haemovigilance standards</p>
 </div>
 <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
-<button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group cursor-pointer">
-<span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
-<span>Back to Overview</span>
-</button>
 <button class="px-space-sm py-2 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors flex items-center gap-1.5">
 <span class="material-symbols-outlined text-[18px]">file_download</span>
 <span>Export Complete Log</span>
@@ -445,7 +440,7 @@
 </section>
 </div>
 </div>
-</div></main><footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-space-2xl mt-auto"><div class="max-w-[1280px] mx-auto px-gutter-desktop"><div class="flex flex-col md:flex-row items-center justify-between gap-space-lg pb-space-lg"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[24px]">vital_signs</span><span class="font-headline-sm text-headline-sm font-bold text-on-surface">DonorPulse</span><span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span></div><div class="flex items-center gap-space-lg"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Clinical Protocols</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Hospital Verification</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Donor Privacy</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">HIPAA Compliant</a></div></div><div class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><p>© 2024 DonorPulse Emergency Blood Logistics. All rights reserved.</p><div class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-tertiary"></span><span class="font-label-badge text-label-badge uppercase tracking-wider text-tertiary">Central Dispatch Active</span></div></div></div></footer>
+</div></main><footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-space-2xl mt-auto"><div class="max-w-[1280px] mx-auto px-gutter-desktop"><div class="flex flex-col md:flex-row items-center justify-between gap-space-lg pb-space-lg"><div class="flex items-center gap-space-xs"><img alt="DonorPulse Logo" class="h-6 w-6 object-contain shrink-0" src="images/logo.svg"/><span class="font-headline-sm text-headline-sm font-bold text-on-surface">DonorPulse</span><span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span></div><div class="flex items-center gap-space-lg"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="https://eraktkosh.mohfw.gov.in/eraktkoshPortal/#/" target="_blank" rel="noopener noreferrer">Clinical Protocols</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="hospital-register.html">Hospital Verification</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="role-selection.html" onclick="if(window.parent &amp;&amp; window.parent.PulseRouter){window.parent.PulseRouter.navigate('role-selection'); window.scrollTo({top:0,behavior:'smooth'}); return false;}">Access Portal</a></div></div><div class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><p>© 2024 DonorPulse Emergency Blood Logistics. All rights reserved.</p><div class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-tertiary"></span><span class="font-label-badge text-label-badge uppercase tracking-wider text-tertiary">Central Dispatch Active</span></div></div></div></footer>
 
   <!-- CERTIFICATE VIEWER MODAL -->
   <div id="modal-certificate" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-inverse-surface/70 backdrop-blur-md overflow-y-auto">
@@ -894,5 +889,316 @@
       closeDonorRequestModal();
       alert('Requisition declined. Other alerts remain active on your dashboard.');
     }
+
+    // Floating Back to Overview Pop-up
+    window.addEventListener('scroll', () => {
+      const container = document.getElementById('floating-back-to-overview-container');
+      if (!container) return;
+      const donorOverview = document.getElementById('donor-overview');
+      let shouldShow = false;
+      if (donorOverview) {
+        shouldShow = donorOverview.getBoundingClientRect().bottom < 80;
+      } else {
+        shouldShow = window.scrollY > 320;
+      }
+      if (shouldShow) {
+        container.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+        container.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      } else {
+        container.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+        container.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      }
+    });
+
+    function openImmediateResponseModal() {
+      const modal = document.getElementById('modal-immediate-response');
+      if (!modal) return;
+      const errorBox = document.getElementById('immediate-response-error');
+      if (errorBox) errorBox.classList.add('hidden');
+      const declineSection = document.getElementById('imm-decline-section');
+      if (declineSection) declineSection.classList.add('hidden');
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeImmediateResponseModal() {
+      const modal = document.getElementById('modal-immediate-response');
+      if (modal) modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function startImmediateDeclination() {
+      const declineSection = document.getElementById('imm-decline-section');
+      if (declineSection) {
+        declineSection.classList.remove('hidden');
+        declineSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function cancelImmediateDeclination() {
+      const declineSection = document.getElementById('imm-decline-section');
+      if (declineSection) declineSection.classList.add('hidden');
+    }
+
+    function confirmImmediateDeclination() {
+      const reasonSelect = document.getElementById('imm-decline-reason');
+      const reasonText = reasonSelect ? reasonSelect.options[reasonSelect.selectedIndex].text : 'Unavailable';
+      closeImmediateResponseModal();
+      const btn = document.getElementById('btn-code-red-respond');
+      if (btn) {
+        btn.className = 'w-full sm:w-auto px-4 py-2 rounded-xl bg-surface-container/60 text-on-surface-variant font-label-md text-xs font-semibold cursor-default';
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">close</span><span>Declined • Transferred to Next Standby</span>';
+        btn.disabled = true;
+      }
+      alert(`Requisition declined (${reasonText.slice(0, 32)}...). Next standby reserve donor alerted immediately.`);
+    }
+
+    function approveImmediateResponse() {
+      const checkHealth = document.getElementById('imm-check-health');
+      const checkWindow = document.getElementById('imm-check-window');
+      const checkHydrated = document.getElementById('imm-check-hydrated');
+      const contactPhone = document.getElementById('imm-contact-phone');
+      const errorBox = document.getElementById('immediate-response-error');
+      const errorText = document.getElementById('immediate-response-error-text');
+      const btnApprove = document.getElementById('btn-approve-immediate-response');
+
+      if ((checkHealth && !checkHealth.checked) || (checkWindow && !checkWindow.checked) || (checkHydrated && !checkHydrated.checked)) {
+        if (errorBox && errorText) {
+          errorText.textContent = 'Please confirm all 3 health and donation eligibility criteria before approving.';
+          errorBox.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (!contactPhone || !contactPhone.value.trim()) {
+        if (errorBox && errorText) {
+          errorText.textContent = 'Please provide a valid callback phone number for the trauma coordinator.';
+          errorBox.classList.remove('hidden');
+        }
+        return;
+      }
+
+      const selectedEtaRadio = document.querySelector('input[name="imm-eta"]:checked');
+      const etaVal = selectedEtaRadio ? selectedEtaRadio.value : '15-20m';
+      const etaDisplay = etaVal === '15-20m' ? '15–20 Mins' : (etaVal === '25-35m' ? '25–35 Mins' : '45–60 Mins');
+
+      if (btnApprove) {
+        btnApprove.disabled = true;
+        btnApprove.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Transmitting Dispatch...</span>';
+      }
+
+      setTimeout(() => {
+        if (btnApprove) {
+          btnApprove.disabled = false;
+          btnApprove.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified_user</span><span>Approve &amp; Confirm Dispatch</span>';
+        }
+        closeImmediateResponseModal();
+        const btn = document.getElementById('btn-code-red-respond');
+        if (btn) {
+          btn.className = 'w-full sm:w-auto px-4 py-2.5 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed font-label-md text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-default';
+          btn.innerHTML = `<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span><span>Dispatched • ETA ${etaDisplay}</span>`;
+          btn.disabled = true;
+        }
+        alert(`Immediate response confirmed! St. Mary's Trauma Bay paged. Estimated arrival logged as ${etaDisplay}. Emergency transit pass active.`);
+      }, 600);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('modal-immediate-response');
+        if (modal && !modal.classList.contains('hidden')) {
+          closeImmediateResponseModal();
+        }
+      }
+    });
   </script>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: CODE RED IMMEDIATE RESPONSE & CLINICAL TRIAGE POPUP          -->
+  <!-- ===================================================================== -->
+  <div id="modal-immediate-response" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/65 backdrop-blur-sm overflow-y-auto animate-fade-in" onclick="if(event.target === this) closeImmediateResponseModal()">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container-high w-full max-w-xl max-h-[92vh] overflow-hidden flex flex-col relative my-6" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="p-5 sm:p-6 bg-surface-container-low/80 border-b border-surface-container relative">
+        <button type="button" onclick="closeImmediateResponseModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer" title="Close">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-badge text-[11px] font-bold uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
+            CODE RED DISPATCH • EMERGENCY REQUISITION
+          </span>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-11 h-11 rounded-xl bg-error-container text-primary flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+            <span class="material-symbols-outlined text-[24px]">e911_emergency</span>
+          </div>
+          <div>
+            <h3 class="font-headline-sm text-lg sm:text-xl font-bold text-on-surface">Immediate Response &amp; Triage Verification</h3>
+            <p class="font-body-sm text-xs sm:text-sm text-on-surface-variant mt-0.5">Review dispatch details before confirming your arrival or declining this request for St. Mary's Trauma Center.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body Form -->
+      <form id="form-immediate-response" onsubmit="event.preventDefault();" class="p-5 sm:p-6 overflow-y-auto flex flex-col gap-4 text-on-surface">
+        
+        <!-- Requisition Snapshot Banner -->
+        <div class="p-3.5 rounded-xl bg-error-container/20 border border-error/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div class="flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">local_hospital</span>
+            <div>
+              <span class="font-bold text-on-surface text-sm block">St. Mary's Trauma Center (Bay 04)</span>
+              <span class="text-on-surface-variant">Trauma Surgery • 1.8 miles away • Sub-30m window</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="px-2.5 py-1 rounded-md bg-error text-white font-bold text-xs tracking-wider">
+              O- Needed
+            </span>
+            <span class="text-[11px] font-mono text-on-surface-variant">REQ-8921</span>
+          </div>
+        </div>
+
+        <!-- Error Notification Banner (Validation) -->
+        <div id="immediate-response-error" class="hidden p-3 rounded-xl bg-error-container/40 border border-error/30 text-on-error-container text-xs flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-error shrink-0">error</span>
+          <span id="immediate-response-error-text">Please complete all required fields below.</span>
+        </div>
+
+        <!-- Question 1: Estimated Response Time / Arrival Window -->
+        <div>
+          <label class="block font-label-md text-xs font-bold text-on-surface mb-2">
+            1. Estimated Arrival Time at St. Mary's Trauma Bay <span class="text-error">*</span>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <label class="p-3 rounded-xl border border-surface-container bg-surface-container-lowest hover:border-primary/50 cursor-pointer flex flex-col gap-1 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-on-surface">15–20 Mins</span>
+                <input type="radio" name="imm-eta" value="15-20m" checked class="text-primary focus:ring-primary h-3.5 w-3.5"/>
+              </div>
+              <span class="text-[11px] text-tertiary font-semibold">Fastest Priority</span>
+            </label>
+            <label class="p-3 rounded-xl border border-surface-container bg-surface-container-lowest hover:border-primary/50 cursor-pointer flex flex-col gap-1 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-on-surface">25–35 Mins</span>
+                <input type="radio" name="imm-eta" value="25-35m" class="text-primary focus:ring-primary h-3.5 w-3.5"/>
+              </div>
+              <span class="text-[11px] text-on-surface-variant">Standard Window</span>
+            </label>
+            <label class="p-3 rounded-xl border border-surface-container bg-surface-container-lowest hover:border-primary/50 cursor-pointer flex flex-col gap-1 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-on-surface">45–60 Mins</span>
+                <input type="radio" name="imm-eta" value="45-60m" class="text-primary focus:ring-primary h-3.5 w-3.5"/>
+              </div>
+              <span class="text-[11px] text-on-surface-variant">Standby Reserve</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 2: Health & Eligibility Checklist -->
+        <div>
+          <label class="block font-label-md text-xs font-bold text-on-surface mb-2">
+            2. Rapid Donor Eligibility &amp; Health Confirmation <span class="text-error">*</span>
+          </label>
+          <div class="flex flex-col gap-2 p-3 rounded-xl bg-surface-container-low border border-surface-container text-xs">
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="imm-check-health" checked class="mt-0.5 rounded text-primary focus:ring-primary h-4 w-4"/>
+              <span class="text-on-surface">I am feeling healthy today with no fever, acute infection, or cold symptoms.</span>
+            </label>
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="imm-check-window" checked class="mt-0.5 rounded text-primary focus:ring-primary h-4 w-4"/>
+              <span class="text-on-surface">My last donation was over 56 days ago (or this is my first donation).</span>
+            </label>
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="imm-check-hydrated" checked class="mt-0.5 rounded text-primary focus:ring-primary h-4 w-4"/>
+              <span class="text-on-surface">I have consumed water and a meal in the last 4 hours.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 3: Transportation Mode -->
+        <div>
+          <label for="imm-transport-mode" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">
+            3. Transit Mode to Hospital Bay
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">directions_car</span>
+            <select id="imm-transport-mode" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm font-medium text-on-surface">
+              <option value="personal_car">Personal Car (Complimentary Emergency Bay Parking)</option>
+              <option value="two_wheeler">Two-Wheeler / Bike (Priority Gate Access)</option>
+              <option value="metro_transit">Metro / Public Transit</option>
+              <option value="request_pickup">Request Hospital Emergency Transit / Cab Dispatch</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Question 4: Primary Phone & Notes -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="imm-contact-phone" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">
+              Trauma Bay Callback Phone <span class="text-error">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">call</span>
+              <input type="text" id="imm-contact-phone" value="+91 98452 33109" required class="w-full pl-10 pr-3 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm font-medium text-on-surface"/>
+            </div>
+          </div>
+          <div>
+            <label for="imm-dispatch-notes" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">
+              Special Notes / Intake Instructions
+            </label>
+            <input type="text" id="imm-dispatch-notes" placeholder="e.g. Arriving via South Gate" class="w-full px-3 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50"/>
+          </div>
+        </div>
+
+        <!-- Declination Options Section (Toggled when user clicks Decline) -->
+        <div id="imm-decline-section" class="hidden p-3.5 rounded-xl bg-surface-container-low border border-error/30 flex flex-col gap-2.5 animate-fade-in">
+          <div class="flex items-center gap-2 text-error text-xs font-bold">
+            <span class="material-symbols-outlined text-[18px]">warning</span>
+            <span>Reason for Declining This Immediate Request</span>
+          </div>
+          <p class="text-[11px] text-on-surface-variant leading-relaxed">
+            Please specify why you are unable to attend so the dispatch algorithm can immediately route this Code Red requisition to the next standby reserve donor.
+          </p>
+          <select id="imm-decline-reason" class="w-full px-3 py-2 rounded-lg border border-surface-container-high bg-surface text-xs text-on-surface font-medium">
+            <option value="too_far">Cannot reach within the 30m trauma window (Distance / Traffic)</option>
+            <option value="unwell">Currently feeling unwell or medically deferred</option>
+            <option value="unavailable">Work, family, or travel conflict</option>
+            <option value="other">Other commitment</option>
+          </select>
+          <div class="flex items-center justify-end gap-2 pt-1">
+            <button type="button" onclick="cancelImmediateDeclination()" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold cursor-pointer">
+              Back to Request
+            </button>
+            <button type="button" onclick="confirmImmediateDeclination()" class="px-3.5 py-1.5 rounded-lg bg-error hover:bg-error/90 text-white text-xs font-bold shadow-xs cursor-pointer">
+              Confirm Declination
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="imm-action-buttons" class="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-3 border-t border-surface-container">
+          <button type="button" onclick="startImmediateDeclination()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-surface-container hover:bg-error-container/40 text-on-surface-variant hover:text-error font-label-md text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+            <span>Decline Request</span>
+          </button>
+          <button type="button" id="btn-approve-immediate-response" onclick="approveImmediateResponse()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">verified_user</span>
+            <span>Approve &amp; Confirm Dispatch</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+<!-- FLOATING BACK TO OVERVIEW POP-UP -->
+<div id="floating-back-to-overview-container" class="fixed bottom-6 right-6 z-40 transition-all duration-300 transform translate-y-12 opacity-0 pointer-events-none">
+  <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface hover:text-primary border border-surface-container-high shadow-xl hover:shadow-2xl transition-all duration-200 active:scale-95 group cursor-pointer text-xs font-bold tracking-wide">
+    <span class="material-symbols-outlined text-[18px] text-primary transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
+    <span>Back to Overview</span>
+  </button>
+</div>
 </body></html>

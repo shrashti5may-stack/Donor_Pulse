@@ -8,6 +8,9 @@ class PulseRouter {
     this.routes = {
       'landing': 'view-landing',
       'role-selection': 'view-role-selection',
+      'login': 'view-role-selection',
+      'donor-login': 'view-role-selection',
+      'hospital-login': 'view-role-selection',
       'donor-register': 'view-donor-register',
       'donor-profile': 'view-donor-profile',
       'donor-dashboard': 'view-donor-dashboard',
@@ -60,7 +63,11 @@ class PulseRouter {
       const queryString = queryKeys.map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
       hash += `?${queryString}`;
     }
-    window.location.hash = hash;
+    if (window.location.hash === hash) {
+      this.handleHashChange();
+    } else {
+      window.location.hash = hash;
+    }
   }
 
   handleHashChange() {
@@ -137,6 +144,25 @@ class PulseRouter {
       }
     }
 
+    // Handle login routes
+    if (['login', 'donor-login', 'hospital-login'].includes(path)) {
+      setTimeout(() => {
+        if (path === 'hospital-login') {
+          if (window.openHospitalLoginModal) {
+            window.openHospitalLoginModal();
+          } else if (window.openLoginModal) {
+            window.openLoginModal('hospital');
+          }
+        } else {
+          if (window.openDonorLoginModal) {
+            window.openDonorLoginModal();
+          } else if (window.openLoginModal) {
+            window.openLoginModal('donor');
+          }
+        }
+      }, 50);
+    }
+
     // Handle smooth in-page positioning for sub-dashboard routes
     if (['nearby-requests', 'dashboard/requests', 'donor-dashboard/requests', 'donor-requests', 'donor-requests-section'].includes(path)) {
       setTimeout(() => {
@@ -183,7 +209,23 @@ class PulseRouter {
       }, 70);
     } else {
       // Scroll smoothly to top for standard full page views
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      if (path === 'role-selection') {
+        const roleSec = document.getElementById('view-role-selection');
+        if (roleSec) {
+          roleSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        setTimeout(() => {
+          window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+          if (roleSec) {
+            roleSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 60);
+      }
     }
 
     // Update global top nav link active classes

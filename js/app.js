@@ -9,6 +9,8 @@ function startApp() {
   initFormControllers();
   initInteractiveWidgets();
   initPrototypeToolbar();
+  initFloatingBackToOverview();
+  initLoginInterface();
   
   // Initial render of all dynamic views
   renderAllViews();
@@ -1167,7 +1169,9 @@ function renderDonorDashboard() {
   setTextContentAll('.donor-blood-display', donor.bloodGroup);
   setTextContentAll('.donor-age-display', `${donor.age} yrs`);
   setTextContentAll('.donor-address-display', donor.address || donor.city);
-  setTextContentAll('.donor-location-display', `${donor.address ? donor.address + ', ' : ''}${donor.city} • Within ${donor.radiusMiles} miles`);
+  const locStr = `${donor.address ? donor.address + ', ' : ''}${donor.city}`;
+  setTextContentAll('.donor-location-display', locStr);
+  setTextContentAll('.donor-distance-display', `Within ${donor.radiusMiles || 10} miles`);
   setTextContentAll('.donor-last-date-display', donor.lastDonationDate || 'First-time Donor');
   setTextContentAll('.donor-donations-display', `${donor.totalDonations} Units`);
   setTextContentAll('.donor-lives-display', `${donor.livesSaved} Lives Saved to Date`);
@@ -2664,6 +2668,569 @@ function renderModalHospitalTracking(req) {
     `;
   }).join('');
 }
+
+// ============================================================================
+// 12. LIVE TELEMETRY TRIGGER HELPER
+// ============================================================================
+window.openHospitalTelemetry = function() {
+  if (window.openHospitalRequestModal) {
+    window.openHospitalRequestModal('REQ-9042');
+    setTimeout(() => {
+      const stepper = document.getElementById('modal-hosp-stepper') || document.getElementById('modal-hosp-tracking-container');
+      if (stepper) {
+        stepper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 150);
+  } else if (window.PulseRouter) {
+    window.PulseRouter.navigate('request-tracking', { id: 'REQ-9042' });
+  }
+};
+
+// ============================================================================
+// 13. FLOATING 'BACK TO OVERVIEW' BOTTOM-RIGHT POP-UP
+// ============================================================================
+function initFloatingBackToOverview() {
+  const container = document.getElementById('floating-back-to-overview-container');
+  const btn = document.getElementById('floating-back-to-overview-btn');
+  if (!container || !btn) return;
+
+  btn.addEventListener('click', () => {
+    const isDonorPage = !!document.getElementById('donor-overview');
+    const isHospitalPage = !!document.querySelector('.hospital-name-display');
+    const currentRoute = window.PulseRouter ? window.PulseRouter.currentRoute : '';
+
+    if (currentRoute.includes('donor') || isDonorPage) {
+      if (typeof window.scrollToDonorSection === 'function') {
+        window.scrollToDonorSection('donor-overview');
+      } else {
+        const ov = document.getElementById('donor-overview');
+        if (ov) ov.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        else window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else if (currentRoute.includes('hospital') || isHospitalPage) {
+      if (typeof window.scrollToHospitalSection === 'function') {
+        window.scrollToHospitalSection('hospital-overview');
+      } else {
+        const ov = document.getElementById('hospital-overview');
+        if (ov) ov.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        else window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  const checkScroll = () => {
+    const donorSec = document.getElementById('view-donor-dashboard');
+    const hospSec = document.getElementById('view-hospital-dashboard');
+    const isDonorActive = (donorSec && donorSec.classList.contains('active')) || (!donorSec && !!document.getElementById('donor-overview'));
+    const isHospActive = (hospSec && hospSec.classList.contains('active')) || (!hospSec && !!document.querySelector('.hospital-name-display'));
+
+    let shouldShow = false;
+
+    if (isDonorActive) {
+      const donorOverview = document.getElementById('donor-overview');
+      if (donorOverview) {
+        const rect = donorOverview.getBoundingClientRect();
+        // scrolled below personal details section
+        if (rect.bottom < 80) {
+          shouldShow = true;
+        }
+      } else if (window.scrollY > 320) {
+        shouldShow = true;
+      }
+    } else if (isHospActive) {
+      const hospHeader = document.querySelector('.hospital-name-display') ? document.querySelector('.hospital-name-display').closest('.bg-surface-container-lowest') : null;
+      if (hospHeader) {
+        const rect = hospHeader.getBoundingClientRect();
+        // scrolled below hospital details section
+        if (rect.bottom < 80) {
+          shouldShow = true;
+        }
+      } else if (window.scrollY > 250) {
+        shouldShow = true;
+      }
+    }
+
+    if (shouldShow) {
+      container.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+      container.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+    } else {
+      container.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+      container.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+    }
+  };
+
+  window.addEventListener('scroll', checkScroll, { passive: true });
+  if (window.PulseRouter) {
+    window.PulseRouter.onRouteChange(() => {
+      setTimeout(checkScroll, 120);
+    });
+  }
+}
+
+// ============================================================================
+// 14. AUTHENTICATION & SEPARATED LOGIN INTERFACE CONTROLLERS
+// ============================================================================
+
+// --- DONOR LOGIN MODAL CONTROLLERS ---
+window.openDonorLoginModal = function() {
+  const modal = document.getElementById('modal-donor-login');
+  if (!modal) return;
+
+  const errorBox = document.getElementById('donor-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
+
+  const idInput = document.getElementById('donor-input-id');
+  const pwdInput = document.getElementById('donor-input-pwd');
+  if (idInput) idInput.value = '';
+  if (pwdInput) {
+    pwdInput.value = '';
+    pwdInput.type = 'password';
+  }
+  const toggleIcon = document.getElementById('donor-pwd-toggle-icon');
+  if (toggleIcon) toggleIcon.textContent = 'visibility';
+
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+
+  if (idInput) {
+    setTimeout(() => idInput.focus(), 100);
+  }
+};
+
+window.closeDonorLoginModal = function() {
+  const modal = document.getElementById('modal-donor-login');
+  if (modal) modal.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+};
+
+window.toggleDonorPasswordVisibility = function() {
+  const pwdInput = document.getElementById('donor-input-pwd');
+  const toggleIcon = document.getElementById('donor-pwd-toggle-icon');
+  if (!pwdInput || !toggleIcon) return;
+  if (pwdInput.type === 'password') {
+    pwdInput.type = 'text';
+    toggleIcon.textContent = 'visibility_off';
+  } else {
+    pwdInput.type = 'password';
+    toggleIcon.textContent = 'visibility';
+  }
+};
+
+window.fillDemoDonorCredentials = function() {
+  const idInput = document.getElementById('donor-input-id');
+  const pwdInput = document.getElementById('donor-input-pwd');
+  if (!idInput || !pwdInput) return;
+  idInput.value = 'DNR-4821';
+  pwdInput.value = 'donor@2024';
+  const errorBox = document.getElementById('donor-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
+};
+
+window.handleDonorLoginSubmit = function(e) {
+  if (e) e.preventDefault();
+  const idInput = document.getElementById('donor-input-id');
+  const pwdInput = document.getElementById('donor-input-pwd');
+  const errorBox = document.getElementById('donor-login-error');
+  const errorText = document.getElementById('donor-login-error-text');
+  const btnSubmit = document.getElementById('btn-donor-login-submit');
+  const btnText = document.getElementById('donor-login-btn-text');
+  const btnIcon = document.getElementById('donor-login-btn-icon');
+
+  const idVal = idInput ? idInput.value.trim() : '';
+  const pwdVal = pwdInput ? pwdInput.value.trim() : '';
+
+  if (!idVal || !pwdVal) {
+    if (errorBox && errorText) {
+      errorText.textContent = 'Please enter both your allotted Donor ID and authorization password.';
+      errorBox.classList.remove('hidden');
+    }
+    return false;
+  }
+
+  // Show authenticating state
+  if (btnSubmit) btnSubmit.disabled = true;
+  if (btnText) btnText.textContent = 'Verifying CDSCO Credentials...';
+  if (btnIcon) {
+    btnIcon.textContent = 'sync';
+    btnIcon.classList.add('animate-spin');
+  }
+
+  setTimeout(() => {
+    // Reset button
+    if (btnSubmit) btnSubmit.disabled = false;
+    if (btnIcon) {
+      btnIcon.textContent = 'verified_user';
+      btnIcon.classList.remove('animate-spin');
+    }
+    if (btnText) btnText.textContent = 'Authenticate & Enter Donor Dashboard';
+
+    window.closeDonorLoginModal();
+
+    window.showToast('Authentication Successful', `Welcome back, verified donor (${idVal}). Access granted.`, 'success');
+    if (window.PulseRouter) {
+      window.PulseRouter.navigate('donor-dashboard');
+    } else {
+      window.location.href = 'donor-dashboard.html';
+    }
+  }, 600);
+
+  return false;
+};
+
+// --- HOSPITAL LOGIN MODAL CONTROLLERS ---
+window.openHospitalLoginModal = function() {
+  const modal = document.getElementById('modal-hospital-login');
+  if (!modal) return;
+
+  const errorBox = document.getElementById('hospital-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
+
+  const idInput = document.getElementById('hospital-input-id');
+  const pwdInput = document.getElementById('hospital-input-pwd');
+  if (idInput) idInput.value = '';
+  if (pwdInput) {
+    pwdInput.value = '';
+    pwdInput.type = 'password';
+  }
+  const toggleIcon = document.getElementById('hospital-pwd-toggle-icon');
+  if (toggleIcon) toggleIcon.textContent = 'visibility';
+
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+
+  if (idInput) {
+    setTimeout(() => idInput.focus(), 100);
+  }
+};
+
+window.closeHospitalLoginModal = function() {
+  const modal = document.getElementById('modal-hospital-login');
+  if (modal) modal.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+};
+
+window.toggleHospitalPasswordVisibility = function() {
+  const pwdInput = document.getElementById('hospital-input-pwd');
+  const toggleIcon = document.getElementById('hospital-pwd-toggle-icon');
+  if (!pwdInput || !toggleIcon) return;
+  if (pwdInput.type === 'password') {
+    pwdInput.type = 'text';
+    toggleIcon.textContent = 'visibility_off';
+  } else {
+    pwdInput.type = 'password';
+    toggleIcon.textContent = 'visibility';
+  }
+};
+
+window.fillDemoHospitalCredentials = function() {
+  const idInput = document.getElementById('hospital-input-id');
+  const pwdInput = document.getElementById('hospital-input-pwd');
+  if (!idInput || !pwdInput) return;
+  idInput.value = 'HSP-88219-NY';
+  pwdInput.value = 'hospital@pulse';
+  const errorBox = document.getElementById('hospital-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
+};
+
+window.handleHospitalLoginSubmit = function(e) {
+  if (e) e.preventDefault();
+  const idInput = document.getElementById('hospital-input-id');
+  const pwdInput = document.getElementById('hospital-input-pwd');
+  const errorBox = document.getElementById('hospital-login-error');
+  const errorText = document.getElementById('hospital-login-error-text');
+  const btnSubmit = document.getElementById('btn-hospital-login-submit');
+  const btnText = document.getElementById('hospital-login-btn-text');
+  const btnIcon = document.getElementById('hospital-login-btn-icon');
+
+  const idVal = idInput ? idInput.value.trim() : '';
+  const pwdVal = pwdInput ? pwdInput.value.trim() : '';
+
+  if (!idVal || !pwdVal) {
+    if (errorBox && errorText) {
+      errorText.textContent = 'Please enter both your allotted Facility ID and authorization key.';
+      errorBox.classList.remove('hidden');
+    }
+    return false;
+  }
+
+  // Show authenticating state
+  if (btnSubmit) btnSubmit.disabled = true;
+  if (btnText) btnText.textContent = 'Verifying CDSCO Credentials...';
+  if (btnIcon) {
+    btnIcon.textContent = 'sync';
+    btnIcon.classList.add('animate-spin');
+  }
+
+  setTimeout(() => {
+    // Reset button
+    if (btnSubmit) btnSubmit.disabled = false;
+    if (btnIcon) {
+      btnIcon.textContent = 'local_hospital';
+      btnIcon.classList.remove('animate-spin');
+    }
+    if (btnText) btnText.textContent = 'Verify & Access Hospital Grid';
+
+    window.closeHospitalLoginModal();
+
+    window.showToast('Clinical Authorization Verified', `Facility ${idVal} authenticated on National Grid.`, 'success');
+    if (window.PulseRouter) {
+      window.PulseRouter.navigate('hospital-dashboard');
+    } else {
+      window.location.href = 'hospital-dashboard.html';
+    }
+  }, 600);
+
+  return false;
+};
+
+// --- BACKWARDS COMPATIBILITY ALIASES ---
+window.openLoginModal = function(role = 'donor') {
+  if (role === 'hospital') {
+    window.openHospitalLoginModal();
+  } else {
+    window.openDonorLoginModal();
+  }
+};
+
+window.closeLoginModal = function() {
+  window.closeDonorLoginModal();
+  window.closeHospitalLoginModal();
+};
+
+window.switchLoginTab = function(role) {
+  if (role === 'hospital') {
+    window.closeDonorLoginModal();
+    window.openHospitalLoginModal();
+  } else {
+    window.closeHospitalLoginModal();
+    window.openDonorLoginModal();
+  }
+};
+
+window.toggleLoginPasswordVisibility = function() {
+  const donorModal = document.getElementById('modal-donor-login');
+  if (donorModal && !donorModal.classList.contains('hidden')) {
+    window.toggleDonorPasswordVisibility();
+  } else {
+    window.toggleHospitalPasswordVisibility();
+  }
+};
+
+window.fillDemoCredentials = function() {
+  const donorModal = document.getElementById('modal-donor-login');
+  if (donorModal && !donorModal.classList.contains('hidden')) {
+    window.fillDemoDonorCredentials();
+  } else {
+    window.fillDemoHospitalCredentials();
+  }
+};
+
+window.handleLoginSubmit = function(e) {
+  const donorModal = document.getElementById('modal-donor-login');
+  if (donorModal && !donorModal.classList.contains('hidden')) {
+    return window.handleDonorLoginSubmit(e);
+  } else {
+    return window.handleHospitalLoginSubmit(e);
+  }
+};
+
+function initLoginInterface() {
+  const donorModal = document.getElementById('modal-donor-login');
+  if (donorModal) {
+    donorModal.addEventListener('click', (e) => {
+      if (e.target === donorModal) {
+        window.closeDonorLoginModal();
+      }
+    });
+  }
+
+  const hospitalModal = document.getElementById('modal-hospital-login');
+  if (hospitalModal) {
+    hospitalModal.addEventListener('click', (e) => {
+      if (e.target === hospitalModal) {
+        window.closeHospitalLoginModal();
+      }
+    });
+  }
+
+  // Also support legacy modal id if present
+  const legacyModal = document.getElementById('modal-login-interface');
+  if (legacyModal) {
+    legacyModal.addEventListener('click', (e) => {
+      if (e.target === legacyModal) {
+        window.closeLoginModal();
+      }
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (donorModal && !donorModal.classList.contains('hidden')) {
+        window.closeDonorLoginModal();
+      }
+      if (hospitalModal && !hospitalModal.classList.contains('hidden')) {
+        window.closeHospitalLoginModal();
+      }
+      if (legacyModal && !legacyModal.classList.contains('hidden')) {
+        window.closeLoginModal();
+      }
+      const immModal = document.getElementById('modal-immediate-response');
+      if (immModal && !immModal.classList.contains('hidden')) {
+        window.closeImmediateResponseModal();
+      }
+    }
+  });
+}
+
+window.goToRoleSelection = function(e) {
+  if (e) {
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+  }
+  if (window.PulseRouter) {
+    window.PulseRouter.navigate('role-selection');
+  } else {
+    window.location.hash = '#/role-selection';
+  }
+
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+
+  const roleSec = document.getElementById('view-role-selection');
+  if (roleSec) {
+    roleSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  setTimeout(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (roleSec) {
+      roleSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 60);
+};
+
+// ============================================================================
+// 15. CODE RED IMMEDIATE RESPONSE MODAL CONTROLLERS
+// ============================================================================
+window.openImmediateResponseModal = function() {
+  const modal = document.getElementById('modal-immediate-response');
+  if (!modal) return;
+
+  const errorBox = document.getElementById('immediate-response-error');
+  if (errorBox) errorBox.classList.add('hidden');
+
+  const declineSection = document.getElementById('imm-decline-section');
+  if (declineSection) declineSection.classList.add('hidden');
+
+  const actionButtons = document.getElementById('imm-action-buttons');
+  if (actionButtons) actionButtons.classList.remove('hidden');
+
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+};
+
+window.closeImmediateResponseModal = function() {
+  const modal = document.getElementById('modal-immediate-response');
+  if (modal) modal.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+};
+
+window.startImmediateDeclination = function() {
+  const declineSection = document.getElementById('imm-decline-section');
+  if (declineSection) {
+    declineSection.classList.remove('hidden');
+    declineSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+};
+
+window.cancelImmediateDeclination = function() {
+  const declineSection = document.getElementById('imm-decline-section');
+  if (declineSection) declineSection.classList.add('hidden');
+};
+
+window.confirmImmediateDeclination = function() {
+  const reasonSelect = document.getElementById('imm-decline-reason');
+  const reasonText = reasonSelect ? reasonSelect.options[reasonSelect.selectedIndex].text : 'Unavailable';
+  
+  window.closeImmediateResponseModal();
+
+  const btn = document.getElementById('btn-code-red-respond');
+  if (btn) {
+    btn.className = 'w-full sm:w-auto px-4 py-2 rounded-xl bg-surface-container/60 text-on-surface-variant font-label-md text-xs font-semibold cursor-default';
+    btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">close</span><span>Declined • Transferred to Next Standby</span>';
+    btn.disabled = true;
+  }
+
+  if (typeof window.showToast === 'function') {
+    window.showToast('Response Logged', `Requisition declined (${reasonText.slice(0, 32)}...). System alerted next reserve donor.`, 'info');
+  } else {
+    alert('Requisition declined. System alerted next available standby donor.');
+  }
+};
+
+window.approveImmediateResponse = function() {
+  const checkHealth = document.getElementById('imm-check-health');
+  const checkWindow = document.getElementById('imm-check-window');
+  const checkHydrated = document.getElementById('imm-check-hydrated');
+  const contactPhone = document.getElementById('imm-contact-phone');
+  const errorBox = document.getElementById('immediate-response-error');
+  const errorText = document.getElementById('immediate-response-error-text');
+  const btnApprove = document.getElementById('btn-approve-immediate-response');
+
+  if ((checkHealth && !checkHealth.checked) || (checkWindow && !checkWindow.checked) || (checkHydrated && !checkHydrated.checked)) {
+    if (errorBox && errorText) {
+      errorText.textContent = 'Please confirm all 3 health and donation eligibility criteria before approving.';
+      errorBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (!contactPhone || !contactPhone.value.trim()) {
+    if (errorBox && errorText) {
+      errorText.textContent = 'Please provide a valid callback phone number for the trauma coordinator.';
+      errorBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  const selectedEtaRadio = document.querySelector('input[name="imm-eta"]:checked');
+  const etaVal = selectedEtaRadio ? selectedEtaRadio.value : '15-20m';
+  const etaDisplay = etaVal === '15-20m' ? '15–20 Mins' : (etaVal === '25-35m' ? '25–35 Mins' : '45–60 Mins');
+
+  if (btnApprove) {
+    btnApprove.disabled = true;
+    btnApprove.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Transmitting Dispatch...</span>';
+  }
+
+  setTimeout(() => {
+    if (btnApprove) {
+      btnApprove.disabled = false;
+      btnApprove.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified_user</span><span>Approve &amp; Confirm Dispatch</span>';
+    }
+
+    window.closeImmediateResponseModal();
+
+    const btn = document.getElementById('btn-code-red-respond');
+    if (btn) {
+      btn.className = 'w-full sm:w-auto px-4 py-2.5 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed font-label-md text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-default';
+      btn.innerHTML = `<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span><span>Dispatched • ETA ${etaDisplay}</span>`;
+      btn.disabled = true;
+    }
+
+    if (typeof window.showToast === 'function') {
+      window.showToast('Immediate Response Confirmed', `St. Mary's Trauma Bay paged. Estimated arrival logged as ${etaDisplay}. Emergency transit pass active.`, 'success');
+    } else {
+      alert(`Donation response confirmed! Estimated arrival logged as ${etaDisplay}. Priority transit pass active.`);
+    }
+  }, 600);
+};
+
+
+
 
 
 

@@ -119,10 +119,10 @@
 </div>
 <!-- Action Area -->
 <div class="flex flex-col gap-2.5 pt-2">
-<a class="w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer" href="donor-dashboard.html">
+<button type="button" onclick="openDonorLoginModal()" class="w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
 <span>Donor Login / Dashboard</span>
 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-</a>
+</button>
 <a class="w-full h-11 bg-surface-container-low hover:bg-surface-container text-primary border border-outline-variant/60 rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer" href="index.html#/donor-register">
 <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
 <span>Register as New Donor</span>
@@ -199,10 +199,10 @@
 </div>
 <!-- Action Area -->
 <div class="flex flex-col gap-2.5 pt-2">
-<a class="w-full h-12 bg-on-surface hover:bg-secondary text-surface rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer" href="hospital-dashboard.html">
+<button type="button" onclick="openHospitalLoginModal()" class="w-full h-12 bg-on-surface hover:bg-secondary text-surface rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
 <span>Hospital Login / Portal</span>
 <span class="material-symbols-outlined text-[18px]">domain</span>
-</a>
+</button>
 <a class="w-full h-11 bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/60 rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer" href="hospital-register.html">
 <span class="material-symbols-outlined text-[18px]">app_registration</span>
 <span>Register Healthcare Facility</span>
@@ -244,7 +244,7 @@
 <div class="flex items-center gap-2 text-secondary">
 <span class="material-symbols-outlined text-[22px] text-tertiary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
 <div class="text-left">
-<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">HIPAA Compliant</p>
+<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">CDSCO Compliant</p>
 <p class="font-body-sm text-[11px] text-secondary">256-bit Health Data Encryption</p>
 </div>
 </div>
@@ -252,7 +252,7 @@
 <div class="flex items-center gap-2 text-secondary">
 <span class="material-symbols-outlined text-[22px] text-primary" style="font-variation-settings: 'FILL' 1;">medical_services</span>
 <div class="text-left">
-<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">AABB Accredited</p>
+<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">NABH Accredited</p>
 <p class="font-body-sm text-[11px] text-secondary">Standard Blood Bank Adherence</p>
 </div>
 </div>
@@ -268,7 +268,7 @@
 <div class="flex items-center gap-2 text-secondary">
 <span class="material-symbols-outlined text-[22px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">policy</span>
 <div class="text-left">
-<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">FDA Regulated</p>
+<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">CDSCO Regulated</p>
 <p class="font-body-sm text-[11px] text-secondary">Biologics Traceability Standards</p>
 </div>
 </div>
@@ -279,4 +279,340 @@
       </p>
 </div>
 </div>
-</div></main></body></html>
+</div></main>
+
+<footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-space-2xl mt-auto">
+  <div class="max-w-[1280px] mx-auto px-gutter-desktop">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-space-lg pb-space-lg">
+      <div class="flex items-center gap-space-xs">
+        <img alt="DonorPulse Logo" class="h-6 w-6 object-contain shrink-0" src="images/logo.svg"/>
+        <span class="font-headline-sm text-headline-sm font-bold text-on-surface">DonorPulse</span>
+        <span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-space-lg">
+        <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="https://eraktkosh.mohfw.gov.in/eraktkoshPortal/#/" target="_blank" rel="noopener noreferrer">Clinical Protocols</a>
+        <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="hospital-register.html">Hospital Verification</a>
+        <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="#" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">Access Portal</a>
+      </div>
+    </div>
+    <div class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-xs font-body-sm text-body-sm text-on-surface-variant border-t border-surface-container-high">
+      <p>© 2024 DonorPulse Emergency Blood Logistics. All rights reserved.</p>
+      <div class="flex items-center gap-space-xs">
+        <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+        <span class="font-label-badge text-label-badge uppercase tracking-wider text-tertiary">Central Dispatch Active</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL 1: SEPARATE DONOR LOGIN POP-UP -->
+<div id="modal-donor-login" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+  <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container-high w-full max-w-md overflow-hidden animate-fade-in relative my-8">
+    <div class="p-6 bg-surface-container-low border-b border-surface-container-high relative">
+      <button type="button" onclick="closeDonorLoginModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer" title="Close Login">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-container/30 text-tertiary font-label-badge text-[11px] font-bold uppercase tracking-wider">
+          <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+          CDSCO &amp; NABH Verified
+        </span>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <span class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[22px]">person</span>
+        </span>
+        <div>
+          <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Donor Portal Authentication</h3>
+          <p class="font-body-sm text-xs text-on-surface-variant mt-0.5">Sign in using your allotted &amp; verified Donor ID and secure password.</p>
+        </div>
+      </div>
+    </div>
+
+    <form id="form-donor-login" onsubmit="handleDonorLoginSubmit(event)" class="p-6 flex flex-col gap-4">
+      <div id="donor-login-error" class="hidden p-3 rounded-xl bg-error-container/40 border border-error/30 text-on-error-container text-xs flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-error shrink-0">error</span>
+        <span id="donor-login-error-text">Please enter both your allotted Donor ID and password.</span>
+      </div>
+
+      <div>
+        <label for="donor-input-id" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">Allotted &amp; Verified Donor ID</label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">badge</span>
+          <input type="text" id="donor-input-id" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="e.g. DNR-4821 or sarah.jenkins@donor.pulse" autocomplete="username"/>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <label for="donor-input-pwd" class="block font-label-md text-xs font-bold text-on-surface">Security Password</label>
+          <span class="text-[11px] text-on-surface-variant">CDSCO Encrypted</span>
+        </div>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">lock</span>
+          <input type="password" id="donor-input-pwd" required class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="Enter allotted security password" autocomplete="current-password"/>
+          <button type="button" onclick="toggleDonorPasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface cursor-pointer p-0.5" title="Toggle password visibility">
+            <span id="donor-pwd-toggle-icon" class="material-symbols-outlined text-[18px]">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between text-xs text-on-surface-variant">
+        <span class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[15px] text-primary">key</span>
+          <span>Demo ID: <strong class="text-on-surface font-mono">DNR-4821</strong></span>
+        </span>
+        <button type="button" onclick="fillDemoDonorCredentials()" class="text-primary font-bold hover:underline cursor-pointer">Auto-Fill</button>
+      </div>
+
+      <button type="submit" id="btn-donor-login-submit" class="mt-2 w-full py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+        <span id="donor-login-btn-icon" class="material-symbols-outlined text-[18px]">verified_user</span>
+        <span id="donor-login-btn-text">Authenticate &amp; Enter Donor Dashboard</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 2: SEPARATE HOSPITAL LOGIN POP-UP -->
+<div id="modal-hospital-login" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+  <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container-high w-full max-w-md overflow-hidden animate-fade-in relative my-8">
+    <div class="p-6 bg-surface-container-low border-b border-surface-container-high relative">
+      <button type="button" onclick="closeHospitalLoginModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer" title="Close Login">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container/50 text-secondary font-label-badge text-[11px] font-bold uppercase tracking-wider">
+          <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+          Institutional License Verified
+        </span>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <span class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[22px]">domain</span>
+        </span>
+        <div>
+          <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Hospital Network Authentication</h3>
+          <p class="font-body-sm text-xs text-on-surface-variant mt-0.5">Sign in using your accredited Facility License ID and institutional key.</p>
+        </div>
+      </div>
+    </div>
+
+    <form id="form-hospital-login" onsubmit="handleHospitalLoginSubmit(event)" class="p-6 flex flex-col gap-4">
+      <div id="hospital-login-error" class="hidden p-3 rounded-xl bg-error-container/40 border border-error/30 text-on-error-container text-xs flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-error shrink-0">error</span>
+        <span id="hospital-login-error-text">Please enter both your allotted Facility ID and authorization key.</span>
+      </div>
+
+      <div>
+        <label for="hospital-input-id" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">Allotted &amp; Verified Hospital ID / License</label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">domain_verification</span>
+          <input type="text" id="hospital-input-id" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="e.g. HSP-88219-NY" autocomplete="username"/>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <label for="hospital-input-pwd" class="block font-label-md text-xs font-bold text-on-surface">Institutional Password / Key</label>
+          <span class="text-[11px] text-on-surface-variant">CDSCO Encrypted</span>
+        </div>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">lock</span>
+          <input type="password" id="hospital-input-pwd" required class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="Enter institutional access password" autocomplete="current-password"/>
+          <button type="button" onclick="toggleHospitalPasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface cursor-pointer p-0.5" title="Toggle password visibility">
+            <span id="hospital-pwd-toggle-icon" class="material-symbols-outlined text-[18px]">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between text-xs text-on-surface-variant">
+        <span class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[15px] text-secondary">key</span>
+          <span>Demo ID: <strong class="text-on-surface font-mono">HSP-88219-NY</strong></span>
+        </span>
+        <button type="button" onclick="fillDemoHospitalCredentials()" class="text-secondary font-bold hover:underline cursor-pointer">Auto-Fill</button>
+      </div>
+
+      <button type="submit" id="btn-hospital-login-submit" class="mt-2 w-full py-3 rounded-xl bg-on-surface hover:bg-secondary text-surface font-label-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+        <span id="hospital-login-btn-icon" class="material-symbols-outlined text-[18px]">local_hospital</span>
+        <span id="hospital-login-btn-text">Verify &amp; Access Hospital Grid</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+function openDonorLoginModal() {
+  const modal = document.getElementById('modal-donor-login');
+  if (!modal) return;
+  const errorBox = document.getElementById('donor-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
+  const idInput = document.getElementById('donor-input-id');
+  const pwdInput = document.getElementById('donor-input-pwd');
+  if (idInput) idInput.value = '';
+  if (pwdInput) { pwdInput.value = ''; pwdInput.type = 'password'; }
+  const toggleIcon = document.getElementById('donor-pwd-toggle-icon');
+  if (toggleIcon) toggleIcon.textContent = 'visibility';
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+  if (idInput) setTimeout(() => idInput.focus(), 100);
+}
+
+function closeDonorLoginModal() {
+  const modal = document.getElementById('modal-donor-login');
+  if (modal) modal.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+}
+
+function toggleDonorPasswordVisibility() {
+  const pwdInput = document.getElementById('donor-input-pwd');
+  const toggleIcon = document.getElementById('donor-pwd-toggle-icon');
+  if (!pwdInput || !toggleIcon) return;
+  if (pwdInput.type === 'password') {
+    pwdInput.type = 'text';
+    toggleIcon.textContent = 'visibility_off';
+  } else {
+    pwdInput.type = 'password';
+    toggleIcon.textContent = 'visibility';
+  }
+}
+
+function fillDemoDonorCredentials() {
+  const idInput = document.getElementById('donor-input-id');
+  const pwdInput = document.getElementById('donor-input-pwd');
+  if (!idInput || !pwdInput) return;
+  idInput.value = 'DNR-4821';
+  pwdInput.value = 'donor@2024';
+  const errorBox = document.getElementById('donor-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
+}
+
+function handleDonorLoginSubmit(e) {
+  if (e) e.preventDefault();
+  const idInput = document.getElementById('donor-input-id');
+  const pwdInput = document.getElementById('donor-input-pwd');
+  const errorBox = document.getElementById('donor-login-error');
+  const errorText = document.getElementById('donor-login-error-text');
+  const btnSubmit = document.getElementById('btn-donor-login-submit');
+  const btnText = document.getElementById('donor-login-btn-text');
+  const btnIcon = document.getElementById('donor-login-btn-icon');
+
+  const idVal = idInput ? idInput.value.trim() : '';
+  const pwdVal = pwdInput ? pwdInput.value.trim() : '';
+
+  if (!idVal || !pwdVal) {
+    if (errorBox && errorText) {
+      errorText.textContent = 'Please enter both your allotted Donor ID and authorization password.';
+      errorBox.classList.remove('hidden');
+    }
+    return false;
+  }
+
+  if (btnSubmit) btnSubmit.disabled = true;
+  if (btnText) btnText.textContent = 'Verifying CDSCO Credentials...';
+  if (btnIcon) { btnIcon.textContent = 'sync'; btnIcon.classList.add('animate-spin'); }
+
+  setTimeout(() => {
+    closeDonorLoginModal();
+    window.location.href = 'donor-dashboard.html';
+  }, 600);
+
+  return false;
+}
+
+function openHospitalLoginModal() {
+  const modal = document.getElementById('modal-hospital-login');
+  if (!modal) return;
+  const errorBox = document.getElementById('hospital-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
+  const idInput = document.getElementById('hospital-input-id');
+  const pwdInput = document.getElementById('hospital-input-pwd');
+  if (idInput) idInput.value = '';
+  if (pwdInput) { pwdInput.value = ''; pwdInput.type = 'password'; }
+  const toggleIcon = document.getElementById('hospital-pwd-toggle-icon');
+  if (toggleIcon) toggleIcon.textContent = 'visibility';
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+  if (idInput) setTimeout(() => idInput.focus(), 100);
+}
+
+function closeHospitalLoginModal() {
+  const modal = document.getElementById('modal-hospital-login');
+  if (modal) modal.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+}
+
+function toggleHospitalPasswordVisibility() {
+  const pwdInput = document.getElementById('hospital-input-pwd');
+  const toggleIcon = document.getElementById('hospital-pwd-toggle-icon');
+  if (!pwdInput || !toggleIcon) return;
+  if (pwdInput.type === 'password') {
+    pwdInput.type = 'text';
+    toggleIcon.textContent = 'visibility_off';
+  } else {
+    pwdInput.type = 'password';
+    toggleIcon.textContent = 'visibility';
+  }
+}
+
+function fillDemoHospitalCredentials() {
+  const idInput = document.getElementById('hospital-input-id');
+  const pwdInput = document.getElementById('hospital-input-pwd');
+  if (!idInput || !pwdInput) return;
+  idInput.value = 'HSP-88219-NY';
+  pwdInput.value = 'hospital@pulse';
+  const errorBox = document.getElementById('hospital-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
+}
+
+function handleHospitalLoginSubmit(e) {
+  if (e) e.preventDefault();
+  const idInput = document.getElementById('hospital-input-id');
+  const pwdInput = document.getElementById('hospital-input-pwd');
+  const errorBox = document.getElementById('hospital-login-error');
+  const errorText = document.getElementById('hospital-login-error-text');
+  const btnSubmit = document.getElementById('btn-hospital-login-submit');
+  const btnText = document.getElementById('hospital-login-btn-text');
+  const btnIcon = document.getElementById('hospital-login-btn-icon');
+
+  const idVal = idInput ? idInput.value.trim() : '';
+  const pwdVal = pwdInput ? pwdInput.value.trim() : '';
+
+  if (!idVal || !pwdVal) {
+    if (errorBox && errorText) {
+      errorText.textContent = 'Please enter both your allotted Facility ID and authorization key.';
+      errorBox.classList.remove('hidden');
+    }
+    return false;
+  }
+
+  if (btnSubmit) btnSubmit.disabled = true;
+  if (btnText) btnText.textContent = 'Verifying CDSCO Credentials...';
+  if (btnIcon) { btnIcon.textContent = 'sync'; btnIcon.classList.add('animate-spin'); }
+
+  setTimeout(() => {
+    closeHospitalLoginModal();
+    window.location.href = 'hospital-dashboard.html';
+  }, 600);
+
+  return false;
+}
+
+// Backwards compatibility aliases
+function openLoginModal(role) {
+  if (role === 'hospital') openHospitalLoginModal();
+  else openDonorLoginModal();
+}
+function closeLoginModal() {
+  closeDonorLoginModal();
+  closeHospitalLoginModal();
+}
+
+document.getElementById('modal-donor-login')?.addEventListener('click', (e) => {
+  if (e.target.id === 'modal-donor-login') closeDonorLoginModal();
+});
+document.getElementById('modal-hospital-login')?.addEventListener('click', (e) => {
+  if (e.target.id === 'modal-hospital-login') closeHospitalLoginModal();
+});
+</script>
+</body></html>

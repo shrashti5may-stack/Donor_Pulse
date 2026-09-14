@@ -110,66 +110,95 @@
 </div>
 </div>
 <!-- HOSPITAL STATISTICS METRIC CARDS -->
-<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
-<!-- Metric 1 -->
-<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-<div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-<span class="font-label-md text-label-md uppercase tracking-wider">Active Blood Requests</span>
-<span class="w-8 h-8 rounded-lg bg-error-container/30 flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-[20px]">crisis_alert</span>
-</span>
-</div>
-<div>
-<div class="font-numeric-metric text-numeric-metric text-on-surface">4 <span class="font-headline-sm text-headline-sm font-semibold text-primary">Active</span></div>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-<span class="text-primary font-semibold">2 Critical</span> (Sub-30m SLA window)
-            </p>
-</div>
-</div>
-<!-- Metric 2 -->
-<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-<div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-<span class="font-label-md text-label-md uppercase tracking-wider">Pending Donor Match</span>
-<span class="w-8 h-8 rounded-lg bg-secondary-container/40 flex items-center justify-center text-secondary">
-<span class="material-symbols-outlined text-[20px]">person_search</span>
-</span>
-</div>
-<div>
-<div class="font-numeric-metric text-numeric-metric text-on-surface">1 <span class="font-headline-sm text-headline-sm font-semibold text-secondary">Pending</span></div>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px] text-primary">hourglass_top</span> Scanning 25-mile network
-            </p>
-</div>
-</div>
-<!-- Metric 3 -->
-<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-<div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-<span class="font-label-md text-label-md uppercase tracking-wider">Fulfilled This Month</span>
-<span class="w-8 h-8 rounded-lg bg-tertiary-container/30 flex items-center justify-center text-tertiary">
-<span class="material-symbols-outlined text-[20px]">task_alt</span>
-</span>
-</div>
-<div>
-<div class="font-numeric-metric text-numeric-metric text-on-surface">42 <span class="font-headline-sm text-headline-sm font-semibold text-tertiary">Units</span></div>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-<span class="text-tertiary font-semibold">+14.2%</span> efficiency vs last period
-            </p>
-</div>
-</div>
-<!-- Metric 4 -->
-<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-<div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-<span class="font-label-md text-label-md uppercase tracking-wider">Matched Donors</span>
-<span class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
-<span class="material-symbols-outlined text-[20px]">directions_car</span>
-</span>
-</div>
-<div>
-<div class="font-numeric-metric text-numeric-metric text-on-surface">12 <span class="font-headline-sm text-headline-sm font-semibold text-on-surface-variant">Active</span></div>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-<span class="text-on-surface font-semibold">9 En Route</span> / 3 Scheduled
-            </p>
-</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 min-[1200px]:grid-cols-4 gap-3.5 w-full">
+  <!-- Card 1: Active Blood Requests -->
+  <div class="bg-surface-container-lowest px-3.5 py-4 sm:p-4 rounded-2xl shadow-sm hover:shadow-md transition-all border border-surface-container-high/60 flex flex-col justify-between min-w-0 overflow-hidden cursor-pointer" onclick="document.getElementById('hospital-requests-section')?.scrollIntoView({ behavior: 'smooth' })">
+    <div class="flex items-center justify-between gap-1.5 mb-3">
+      <span class="text-[10.5px] sm:text-[11px] font-bold text-on-surface-variant uppercase tracking-tight whitespace-nowrap">Active Blood Requests</span>
+      <span class="w-7 h-7 rounded-lg bg-error-container/40 flex items-center justify-center text-primary shrink-0 shadow-2xs">
+        <span class="material-symbols-outlined text-[17px]">crisis_alert</span>
+      </span>
+    </div>
+    <div>
+      <div class="flex items-baseline gap-2 flex-wrap">
+        <span class="text-2xl sm:text-[26px] font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
+          <span class="hospital-active-requests-count">2</span>
+          <span class="text-base sm:text-lg font-bold text-primary ml-0.5">Active</span>
+        </span>
+        <span class="inline-flex items-center text-xs font-bold text-primary bg-error-container/40 px-2 py-0.5 rounded-md whitespace-nowrap">
+          1 Critical
+        </span>
+      </div>
+      <p class="text-xs text-on-surface-variant mt-1.5 font-medium whitespace-nowrap">
+        (Sub-30m SLA window)
+      </p>
+    </div>
+  </div>
+
+  <!-- Card 2: Available Donors -->
+  <div class="bg-surface-container-lowest p-4 rounded-2xl shadow-sm hover:shadow-md transition-all border border-surface-container-high/60 flex flex-col justify-between min-w-0 overflow-hidden cursor-pointer" onclick="document.getElementById('hospital-requests-section')?.scrollIntoView({ behavior: 'smooth' })" title="View Active Requests & Donors">
+    <div class="flex items-center justify-between gap-2 mb-3">
+      <span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider truncate">Available Donors</span>
+      <span class="w-8 h-8 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary shrink-0 shadow-2xs">
+        <span class="material-symbols-outlined text-[18px]">person_search</span>
+      </span>
+    </div>
+    <div>
+      <div class="text-2xl sm:text-[26px] font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
+        <span id="hospital-overview-donors-count">9</span>
+        <span class="text-base sm:text-lg font-semibold text-secondary ml-0.5">Available</span>
+      </div>
+      <p class="text-xs text-on-surface-variant mt-1.5 flex items-center gap-1 font-medium whitespace-nowrap">
+        <span class="material-symbols-outlined text-[14px] text-tertiary">check_circle</span>
+        <span>View in Request Modals</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Card 3: Fulfilled This Month -->
+  <div class="bg-surface-container-lowest p-4 rounded-2xl shadow-sm hover:shadow-md transition-all border border-surface-container-high/60 flex flex-col justify-between min-w-0 overflow-hidden">
+    <div class="flex items-center justify-between gap-2 mb-3">
+      <span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider truncate">Fulfilled This Month</span>
+      <span class="w-8 h-8 rounded-xl bg-tertiary-container/30 flex items-center justify-center text-tertiary shrink-0 shadow-2xs">
+        <span class="material-symbols-outlined text-[18px]">task_alt</span>
+      </span>
+    </div>
+    <div>
+      <div class="text-2xl sm:text-[26px] font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
+        42 <span class="text-base sm:text-lg font-semibold text-tertiary ml-0.5">Units</span>
+      </div>
+      <p class="text-xs text-on-surface-variant mt-1.5 flex items-center gap-1 font-medium whitespace-nowrap">
+        <span class="text-tertiary font-bold">+14.2%</span>
+        <span>vs last period</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Card 4: Live Tracking -->
+  <div class="bg-surface-container-lowest p-4 rounded-2xl shadow-sm hover:shadow-md transition-all border border-surface-container-high/60 flex flex-col justify-between min-w-0 overflow-hidden">
+    <div class="flex items-center justify-between gap-2 mb-3">
+      <span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider truncate">Live Tracking</span>
+      <span class="w-8 h-8 rounded-xl bg-primary-fixed/80 flex items-center justify-center text-on-primary-fixed shrink-0 shadow-2xs">
+        <span class="material-symbols-outlined text-[18px]">directions_car</span>
+      </span>
+    </div>
+    <div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <div class="text-2xl sm:text-[26px] font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
+          2 <span class="text-base sm:text-lg font-bold text-primary ml-0.5">En Route</span>
+        </div>
+        <span class="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+          Stage 4 Live
+        </span>
+      </div>
+      <div class="mt-3">
+        <button type="button" onclick="window.openHospitalTelemetry ? window.openHospitalTelemetry() : window.openHospitalRequestModal('REQ-9042')" class="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm hover:shadow-md cursor-pointer active:scale-95 transition-all group" title="Click to track live dispatch telemetry">
+          <span>Click to Track</span>
+          <span class="material-symbols-outlined text-[15px] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-space-xl items-start">
 <!-- BLOOD BANK INVENTORY QUICK GAUGE (1 Column on XL) -->
@@ -316,7 +345,7 @@
 <span class="material-symbols-outlined text-secondary">history_edu</span>
 <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Clinical Audit Trail &amp; Chain-of-Custody</h2>
 </div>
-<span class="font-label-badge text-label-badge text-tertiary uppercase">HIPAA / FDA Compliance Verified</span>
+<span class="font-label-badge text-label-badge text-tertiary uppercase">CDSCO Certified</span>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
 <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-1">
@@ -494,7 +523,7 @@
     </div>
   </div>
 </div>
-</main><footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-space-2xl mt-auto"><div class="max-w-[1280px] mx-auto px-gutter-desktop"><div class="flex flex-col md:flex-row items-center justify-between gap-space-lg pb-space-lg"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[24px]">vital_signs</span><span class="font-headline-sm text-headline-sm font-bold text-on-surface">DonorPulse</span><span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span></div><div class="flex items-center gap-space-lg"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="homepage.html">Clinical Protocols</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="role-selection.html">Donor Privacy</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="homepage.html">HIPAA Compliant</a></div></div><div class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><p>© 2024 DonorPulse Emergency Blood Logistics. All rights reserved.</p><div class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-tertiary"></span><span class="font-label-badge text-label-badge uppercase tracking-wider text-tertiary">Central Dispatch Active</span></div></div></div></footer>
+</main><footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-space-2xl mt-auto"><div class="max-w-[1280px] mx-auto px-gutter-desktop"><div class="flex flex-col md:flex-row items-center justify-between gap-space-lg pb-space-lg"><div class="flex items-center gap-space-xs"><img alt="DonorPulse Logo" class="h-6 w-6 object-contain shrink-0" src="images/logo.svg"/><span class="font-headline-sm text-headline-sm font-bold text-on-surface">DonorPulse</span><span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span></div><div class="flex items-center gap-space-lg"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="https://eraktkosh.mohfw.gov.in/eraktkoshPortal/#/" target="_blank" rel="noopener noreferrer">Clinical Protocols</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="hospital-register.html">Hospital Verification</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="role-selection.html" onclick="if(window.parent &amp;&amp; window.parent.PulseRouter){window.parent.PulseRouter.navigate('role-selection'); window.scrollTo({top:0,behavior:'smooth'}); return false;}">Access Portal</a></div></div><div class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><p>© 2024 DonorPulse Emergency Blood Logistics. All rights reserved.</p><div class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-tertiary"></span><span class="font-label-badge text-label-badge uppercase tracking-wider text-tertiary">Central Dispatch Active</span></div></div></div></footer>
 
   <!-- ===================================================================== -->
   <!-- MODAL: HOSPITAL REQUISITION DETAILS, MATCHED DONORS & LIVE TRACKING  -->
@@ -762,5 +791,43 @@
       document.querySelectorAll('.hospital-triage-officer').forEach(el => el.textContent = hospital.authorizedPerson);
     }
   }
+
+  // Floating Back to Overview Pop-up
+  window.addEventListener('scroll', () => {
+    const container = document.getElementById('floating-back-to-overview-container');
+    if (!container) return;
+    const hospHeader = document.querySelector('.hospital-name-display')?.closest('.bg-surface-container-lowest');
+    let shouldShow = false;
+    if (hospHeader) {
+      shouldShow = hospHeader.getBoundingClientRect().bottom < 80;
+    } else {
+      shouldShow = window.scrollY > 250;
+    }
+    if (shouldShow) {
+      container.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+      container.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+    } else {
+      container.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+      container.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+    }
+  }, { passive: true });
+
+  window.openHospitalTelemetry = function() {
+    if (window.openHospitalRequestModal) {
+      window.openHospitalRequestModal('REQ-9042');
+      setTimeout(() => {
+        const stepper = document.getElementById('modal-hosp-stepper') || document.querySelector('#modal-hospital-request-details [class*="stepper"]');
+        if (stepper) stepper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
+    }
+  };
 </script>
+
+<!-- FLOATING BACK TO OVERVIEW POP-UP -->
+<div id="floating-back-to-overview-container" class="fixed bottom-6 right-6 z-40 transition-all duration-300 transform translate-y-12 opacity-0 pointer-events-none">
+  <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface hover:text-primary border border-surface-container-high shadow-xl hover:shadow-2xl transition-all duration-200 active:scale-95 group cursor-pointer text-xs font-bold tracking-wide">
+    <span class="material-symbols-outlined text-[18px] text-primary transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
+    <span>Back to Overview</span>
+  </button>
+</div>
 </body></html>

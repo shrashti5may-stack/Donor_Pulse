@@ -143,7 +143,7 @@
       <!-- Logo & Brand -->
       <div class="flex items-center gap-space-lg">
         <a href="#/landing" class="flex items-center gap-space-xs hover:opacity-90 transition-opacity">
-          <img alt="DonorPulse Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VgSsc9WeXKqTOsqmvTmmiqs13qAcz5hO7gIdOxqT5GfIJXup5kKjjCtrNVeGgsL8YK-KjT8aXCWo5S3KVccw4VtisllQ7B7nHmf1oXl_e1cSCpuZ7rTL0kouZzJNPxiy32cOURoQYCrysXev2gd5bTu3R8cXJKxzJDt83u4kLC98mifMwalDpG-8T1zI-jZq8UN6o4qUD8yy8godkxokgbIPm05H0Tom32C6aFpu3ZwKM0HBhaBzOPKjg"/>
+          <img alt="DonorPulse Logo" class="h-8 w-8 object-contain shrink-0" src="images/logo.svg"/>
           <div class="flex flex-col">
             <span class="font-headline-sm text-headline-sm text-on-surface font-extrabold tracking-tight">DonorPulse</span>
             <span class="font-label-badge text-label-badge text-primary font-bold uppercase tracking-wider">Verified Network</span>
@@ -191,7 +191,7 @@
           <div class="hidden md:flex items-center gap-4 font-body-sm text-[13px]">
             <span class="inline-flex items-center gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-[16px] text-tertiary">shield</span> ISO 15189 Certified</span>
             <span class="inline-flex items-center gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-[16px] text-tertiary">verified</span> FDA / AABB Compliant</span>
-            <span class="font-semibold text-on-surface ml-1">24/7 Hotline: <span class="text-primary font-bold">1-800-PULSE-911</span></span>
+            <span class="font-semibold text-on-surface ml-1">24/7 Hotline: <span class="text-primary font-bold">104</span></span>
           </div>
         </div>
       </section>
@@ -937,10 +937,10 @@
               </div>
             </div>
             <div class="flex flex-col gap-2.5 pt-2">
-              <a href="#/donor-dashboard" class="w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
+              <button type="button" onclick="window.openDonorLoginModal()" class="w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
                 <span>Donor Login / Dashboard</span>
                 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-              </a>
+              </button>
               <a href="#/donor-register" class="w-full h-11 bg-surface-container-low hover:bg-surface-container text-primary border border-outline-variant/60 rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
                 <span>Register as New Donor</span>
@@ -999,10 +999,10 @@
               </div>
             </div>
             <div class="flex flex-col gap-2.5 pt-2">
-              <a href="#/hospital-dashboard" class="w-full h-12 bg-on-surface hover:bg-secondary text-surface rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
+              <button type="button" onclick="window.openHospitalLoginModal()" class="w-full h-12 bg-on-surface hover:bg-secondary text-surface rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
                 <span>Hospital Login / Portal</span>
                 <span class="material-symbols-outlined text-[18px]">domain</span>
-              </a>
+              </button>
               <a href="#/hospital-register" class="w-full h-11 bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/60 rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-[18px]">app_registration</span>
                 <span>Register Healthcare Facility</span>
@@ -1386,16 +1386,19 @@
                   <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Available to Donate
                 </span>
               </div>
-              <div class="flex flex-wrap items-center gap-y-1 gap-x-space-md text-on-surface-variant font-body-sm text-body-sm pt-space-2xs">
-                <span class="flex items-center gap-1">
+              <div class="flex flex-col gap-1 text-on-surface-variant font-body-sm text-body-sm pt-space-2xs">
+                <div class="flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[16px] text-tertiary">event_available</span>
-                  <strong class="font-medium text-on-surface">Eligible Now</strong> (Last donation: <span class="donor-last-date-display">Oct 14, 2024</span>)
-                </span>
-                <span class="text-surface-container-high hidden sm:inline">•</span>
-                <span class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[16px] text-secondary">location_on</span>
-                  <span class="donor-location-display">Downtown Metro Center, Sector 4 • Within 10 miles</span>
-                </span>
+                  <span><strong class="font-medium text-on-surface">Eligible Now</strong> (Last donation: <span class="donor-last-date-display">Oct 14, 2024</span>)</span>
+                </div>
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span class="material-symbols-outlined text-[16px] text-secondary shrink-0">location_on</span>
+                  <span class="donor-location-display font-medium text-on-surface">482 Lexington Ave, Apt 4B, Downtown Metro Center</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-on-surface-variant">
+                  <span class="material-symbols-outlined text-[16px] text-secondary shrink-0">near_me</span>
+                  <span class="donor-distance-display">Within 10 miles</span>
+                </div>
               </div>
             </div>
 
@@ -1501,7 +1504,7 @@
                 </div>
               </div>
               <div class="flex sm:flex-row md:flex-col lg:flex-row items-center gap-space-xs shrink-0 self-start md:self-center">
-                <button onclick="window.showToast('Response Confirmed', 'St. Mary\'s Trauma Coordinator notified of your arrival. Transit pass active.', 'success')" class="w-full sm:w-auto px-space-lg py-3 rounded-xl bg-on-primary text-primary font-label-lg text-label-lg font-bold shadow-md hover:bg-surface-container transition-all active:scale-98">
+                <button id="btn-code-red-respond" type="button" onclick="window.openImmediateResponseModal()" class="w-full sm:w-auto px-space-lg py-3 rounded-xl bg-on-primary text-primary font-label-lg text-label-lg font-bold shadow-md hover:bg-surface-container transition-all active:scale-98 cursor-pointer">
                   Respond Immediately
                 </button>
               </div>
@@ -1515,10 +1518,6 @@
                 <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Nearby Blood Requests</h2>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">Validated clinical demands prioritized by proximity and blood compatibility</p>
               </div>
-              <button type="button" onclick="window.scrollToDonorSection('donor-overview');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group w-fit self-start sm:self-center">
-                <span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
-                <span>Back to Overview</span>
-              </button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
               <!-- Card 1 -->
@@ -1624,10 +1623,6 @@
                 <p class="font-body-sm text-body-sm text-on-surface-variant">Digitally attested clinical verification log per national haemovigilance standards</p>
               </div>
               <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
-                <button type="button" onclick="window.scrollToDonorSection('donor-overview');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all shadow-xs group">
-                  <span class="material-symbols-outlined text-[16px] transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
-                  <span>Back to Overview</span>
-                </button>
                 <button onclick="window.showToast('Exporting Log', 'Full clinical PDF transcript downloaded with cryptographic hash.', 'info')" class="px-space-sm py-2 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[18px]">file_download</span>
                   <span>Export Complete Log</span>
@@ -2114,61 +2109,93 @@
             </div>
 
             <!-- HOSPITAL METRIC CARDS -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
-              <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-all" onclick="window.scrollToHospitalSection('hospital-requests-section')">
-                <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-                  <span class="font-label-md text-label-md uppercase tracking-wider">Active Blood Requests</span>
-                  <span class="w-8 h-8 rounded-lg bg-error-container/30 flex items-center justify-center text-primary">
-                    <span class="material-symbols-outlined text-[20px]">crisis_alert</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 min-[1200px]:grid-cols-4 gap-3.5 w-full">
+              <!-- Card 1: Active Blood Requests -->
+              <div class="bg-surface-container-lowest px-3.5 py-4 sm:p-4 rounded-2xl shadow-sm hover:shadow-md transition-all border border-surface-container-high/60 flex flex-col justify-between min-w-0 overflow-hidden cursor-pointer" onclick="window.scrollToHospitalSection('hospital-requests-section')">
+                <div class="flex items-center justify-between gap-1.5 mb-3">
+                  <span class="text-[10.5px] sm:text-[11px] font-bold text-on-surface-variant uppercase tracking-tight whitespace-nowrap">Active Blood Requests</span>
+                  <span class="w-7 h-7 rounded-lg bg-error-container/40 flex items-center justify-center text-primary shrink-0 shadow-2xs">
+                    <span class="material-symbols-outlined text-[17px]">crisis_alert</span>
                   </span>
                 </div>
                 <div>
-                  <div class="font-numeric-metric text-numeric-metric text-on-surface"><span class="hospital-active-requests-count">2</span> <span class="font-headline-sm text-headline-sm font-semibold text-primary">Active</span></div>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-                    <span class="text-primary font-semibold">1 Critical</span> (Sub-30m SLA window)
+                  <div class="flex items-baseline gap-2 flex-wrap">
+                    <span class="text-2xl sm:text-[26px] font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
+                      <span class="hospital-active-requests-count">2</span>
+                      <span class="text-base sm:text-lg font-bold text-primary ml-0.5">Active</span>
+                    </span>
+                    <span class="inline-flex items-center text-xs font-bold text-primary bg-error-container/40 px-2 py-0.5 rounded-md whitespace-nowrap">
+                      1 Critical
+                    </span>
+                  </div>
+                  <p class="text-xs text-on-surface-variant mt-1.5 font-medium whitespace-nowrap">
+                    (Sub-30m SLA window)
                   </p>
                 </div>
               </div>
-              <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-all" onclick="window.scrollToHospitalSection('hospital-requests-section')" title="View Active Requests & Donors">
-                <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-                  <span class="font-label-md text-label-md uppercase tracking-wider">Available Donors</span>
-                  <span class="w-8 h-8 rounded-lg bg-secondary-container/40 flex items-center justify-center text-secondary">
-                    <span class="material-symbols-outlined text-[20px]">person_search</span>
+
+              <!-- Card 2: Available Donors -->
+              <div class="bg-surface-container-lowest p-4 rounded-2xl shadow-sm hover:shadow-md transition-all border border-surface-container-high/60 flex flex-col justify-between min-w-0 overflow-hidden cursor-pointer" onclick="window.scrollToHospitalSection('hospital-requests-section')" title="View Active Requests & Donors">
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider truncate">Available Donors</span>
+                  <span class="w-8 h-8 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary shrink-0 shadow-2xs">
+                    <span class="material-symbols-outlined text-[18px]">person_search</span>
                   </span>
                 </div>
                 <div>
-                  <div class="font-numeric-metric text-numeric-metric text-on-surface"><span id="hospital-overview-donors-count">6</span> <span class="font-headline-sm text-headline-sm font-semibold text-secondary">Available</span></div>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-tertiary">check_circle</span> View in Request Modals
+                  <div class="text-2xl sm:text-[26px] font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
+                    <span id="hospital-overview-donors-count">9</span>
+                    <span class="text-base sm:text-lg font-semibold text-secondary ml-0.5">Available</span>
+                  </div>
+                  <p class="text-xs text-on-surface-variant mt-1.5 flex items-center gap-1 font-medium whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[14px] text-tertiary">check_circle</span>
+                    <span>View in Request Modals</span>
                   </p>
                 </div>
               </div>
-              <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
-                <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-                  <span class="font-label-md text-label-md uppercase tracking-wider">Fulfilled This Month</span>
-                  <span class="w-8 h-8 rounded-lg bg-tertiary-container/30 flex items-center justify-center text-tertiary">
-                    <span class="material-symbols-outlined text-[20px]">task_alt</span>
+
+              <!-- Card 3: Fulfilled This Month -->
+              <div class="bg-surface-container-lowest p-4 rounded-2xl shadow-sm hover:shadow-md transition-all border border-surface-container-high/60 flex flex-col justify-between min-w-0 overflow-hidden">
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider truncate">Fulfilled This Month</span>
+                  <span class="w-8 h-8 rounded-xl bg-tertiary-container/30 flex items-center justify-center text-tertiary shrink-0 shadow-2xs">
+                    <span class="material-symbols-outlined text-[18px]">task_alt</span>
                   </span>
                 </div>
                 <div>
-                  <div class="font-numeric-metric text-numeric-metric text-on-surface">42 <span class="font-headline-sm text-headline-sm font-semibold text-tertiary">Units</span></div>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-                    <span class="text-tertiary font-semibold">+14.2%</span> efficiency vs last period
+                  <div class="text-2xl sm:text-[26px] font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
+                    42 <span class="text-base sm:text-lg font-semibold text-tertiary ml-0.5">Units</span>
+                  </div>
+                  <p class="text-xs text-on-surface-variant mt-1.5 flex items-center gap-1 font-medium whitespace-nowrap">
+                    <span class="text-tertiary font-bold">+14.2%</span>
+                    <span>vs last period</span>
                   </p>
                 </div>
               </div>
-              <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-all" onclick="window.openHospitalRequestModal('REQ-9042')" title="Click to view live tracking popup for REQ-9042">
-                <div class="flex items-center justify-between text-on-surface-variant mb-space-xs">
-                  <span class="font-label-md text-label-md uppercase tracking-wider">Live Tracking</span>
-                  <span class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
-                    <span class="material-symbols-outlined text-[20px]">directions_car</span>
+
+              <!-- Card 4: Live Tracking -->
+              <div class="bg-surface-container-lowest p-4 rounded-2xl shadow-sm hover:shadow-md transition-all border border-surface-container-high/60 flex flex-col justify-between min-w-0 overflow-hidden">
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider truncate">Live Tracking</span>
+                  <span class="w-8 h-8 rounded-xl bg-primary-fixed/80 flex items-center justify-center text-on-primary-fixed shrink-0 shadow-2xs">
+                    <span class="material-symbols-outlined text-[18px]">directions_car</span>
                   </span>
                 </div>
                 <div>
-                  <div class="font-numeric-metric text-numeric-metric text-on-surface">Stage 4 <span class="font-headline-sm text-headline-sm font-semibold text-primary">Live</span></div>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
-                    <span class="text-on-surface font-semibold">2 En Route</span> / Click to Track
-                  </p>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <div class="text-2xl sm:text-[26px] font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
+                      2 <span class="text-base sm:text-lg font-bold text-primary ml-0.5">En Route</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-primary uppercase tracking-wider bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                      Stage 4 Live
+                    </span>
+                  </div>
+                  <div class="mt-3">
+                    <button type="button" onclick="window.openHospitalTelemetry()" class="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm hover:shadow-md cursor-pointer active:scale-95 transition-all group" title="Click to track live dispatch telemetry">
+                      <span>Click to Track</span>
+                      <span class="material-symbols-outlined text-[15px] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2242,7 +2269,7 @@
                     <span class="material-symbols-outlined text-secondary">history_edu</span>
                     <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Clinical Audit Trail &amp; Chain-of-Custody</h2>
                   </div>
-                  <span class="font-label-badge text-label-badge text-tertiary uppercase">HIPAA / FDA Certified</span>
+                  <span class="font-label-badge text-label-badge text-tertiary uppercase">CDSCO Certified</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
                   <div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-1">
@@ -3214,15 +3241,14 @@
     <div class="max-w-[1280px] mx-auto px-gutter-desktop">
       <div class="flex flex-col md:flex-row items-center justify-between gap-space-lg pb-space-lg">
         <div class="flex items-center gap-space-xs">
-          <span class="material-symbols-outlined text-primary text-[24px]">vital_signs</span>
+          <img alt="DonorPulse Logo" class="h-6 w-6 object-contain shrink-0" src="images/logo.svg"/>
           <span class="font-headline-sm text-headline-sm font-bold text-on-surface">DonorPulse</span>
           <span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span>
         </div>
         <div class="flex flex-wrap items-center gap-space-lg">
-          <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#/landing">Clinical Protocols</a>
+          <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="https://eraktkosh.mohfw.gov.in/eraktkoshPortal/#/" target="_blank" rel="noopener noreferrer">Clinical Protocols</a>
           <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" onclick="window.openVerificationHubModal()">Hospital Verification</a>
-          <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#/role-selection">Access Portal</a>
-          <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="#/landing">HIPAA Compliant</a>
+          <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="#/role-selection" onclick="window.goToRoleSelection(event)">Access Portal</a>
         </div>
       </div>
       <div class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-xs font-body-sm text-body-sm text-on-surface-variant border-t border-surface-container-high">
@@ -3234,6 +3260,341 @@
       </div>
     </div>
   </footer>
+
+  <!-- ===================================================================== -->
+  <!-- FLOATING BACK TO OVERVIEW POP-UP                                      -->
+  <!-- ===================================================================== -->
+  <div id="floating-back-to-overview-container" class="fixed bottom-6 right-6 z-40 transition-all duration-300 transform translate-y-12 opacity-0 pointer-events-none">
+    <button id="floating-back-to-overview-btn" type="button" class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface hover:text-primary border border-surface-container-high shadow-xl hover:shadow-2xl transition-all duration-200 active:scale-95 group cursor-pointer text-xs font-bold tracking-wide">
+      <span class="material-symbols-outlined text-[18px] text-primary transition-transform group-hover:-translate-y-0.5">arrow_upward</span>
+      <span>Back to Overview</span>
+    </button>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: SEPARATE DONOR LOGIN POP-UP                                  -->
+  <!-- ===================================================================== -->
+  <div id="modal-donor-login" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container-high w-full max-w-md overflow-hidden animate-fade-in relative my-8">
+      <!-- Modal Header -->
+      <div class="p-6 bg-surface-container-low border-b border-surface-container-high relative">
+        <button type="button" onclick="window.closeDonorLoginModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer" title="Close Login">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-container/30 text-tertiary font-label-badge text-[11px] font-bold uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+            CDSCO &amp; NABH Verified
+          </span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[22px]">person</span>
+          </span>
+          <div>
+            <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Donor Portal Authentication</h3>
+            <p class="font-body-sm text-xs text-on-surface-variant mt-0.5">Sign in using your allotted &amp; verified Donor ID and secure password.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body Form -->
+      <form id="form-donor-login" onsubmit="window.handleDonorLoginSubmit(event)" class="p-6 flex flex-col gap-4">
+        <div id="donor-login-error" class="hidden p-3 rounded-xl bg-error-container/40 border border-error/30 text-on-error-container text-xs flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-error shrink-0">error</span>
+          <span id="donor-login-error-text">Please enter both your allotted Donor ID and password.</span>
+        </div>
+
+        <div>
+          <label for="donor-input-id" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">Allotted &amp; Verified Donor ID</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">badge</span>
+            <input type="text" id="donor-input-id" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="e.g. DNR-4821 or sarah.jenkins@donor.pulse" autocomplete="username"/>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="donor-input-pwd" class="block font-label-md text-xs font-bold text-on-surface">Security Password</label>
+            <span class="text-[11px] text-on-surface-variant">CDSCO Encrypted</span>
+          </div>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">lock</span>
+            <input type="password" id="donor-input-pwd" required class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="Enter allotted security password" autocomplete="current-password"/>
+            <button type="button" onclick="window.toggleDonorPasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface cursor-pointer p-0.5" title="Toggle password visibility">
+              <span id="donor-pwd-toggle-icon" class="material-symbols-outlined text-[18px]">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between text-xs text-on-surface-variant">
+          <span class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[15px] text-primary">key</span>
+            <span>Demo ID: <strong class="text-on-surface font-mono">DNR-4821</strong></span>
+          </span>
+          <button type="button" onclick="window.fillDemoDonorCredentials()" class="text-primary font-bold hover:underline cursor-pointer">Auto-Fill</button>
+        </div>
+
+        <button type="submit" id="btn-donor-login-submit" class="mt-2 w-full py-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+          <span id="donor-login-btn-icon" class="material-symbols-outlined text-[18px]">verified_user</span>
+          <span id="donor-login-btn-text">Authenticate &amp; Enter Donor Dashboard</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: SEPARATE HOSPITAL LOGIN POP-UP                               -->
+  <!-- ===================================================================== -->
+  <div id="modal-hospital-login" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container-high w-full max-w-md overflow-hidden animate-fade-in relative my-8">
+      <!-- Modal Header -->
+      <div class="p-6 bg-surface-container-low border-b border-surface-container-high relative">
+        <button type="button" onclick="window.closeHospitalLoginModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer" title="Close Login">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container/50 text-secondary font-label-badge text-[11px] font-bold uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+            Institutional License Verified
+          </span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[22px]">domain</span>
+          </span>
+          <div>
+            <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Hospital Network Authentication</h3>
+            <p class="font-body-sm text-xs text-on-surface-variant mt-0.5">Sign in using your accredited Facility License ID and institutional key.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body Form -->
+      <form id="form-hospital-login" onsubmit="window.handleHospitalLoginSubmit(event)" class="p-6 flex flex-col gap-4">
+        <div id="hospital-login-error" class="hidden p-3 rounded-xl bg-error-container/40 border border-error/30 text-on-error-container text-xs flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-error shrink-0">error</span>
+          <span id="hospital-login-error-text">Please enter both your allotted Facility ID and authorization key.</span>
+        </div>
+
+        <div>
+          <label for="hospital-input-id" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">Allotted &amp; Verified Hospital ID / License</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">domain_verification</span>
+            <input type="text" id="hospital-input-id" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="e.g. HSP-88219-NY" autocomplete="username"/>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="hospital-input-pwd" class="block font-label-md text-xs font-bold text-on-surface">Institutional Password / Key</label>
+            <span class="text-[11px] text-on-surface-variant">CDSCO Encrypted</span>
+          </div>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">lock</span>
+            <input type="password" id="hospital-input-pwd" required class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="Enter institutional access password" autocomplete="current-password"/>
+            <button type="button" onclick="window.toggleHospitalPasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface cursor-pointer p-0.5" title="Toggle password visibility">
+              <span id="hospital-pwd-toggle-icon" class="material-symbols-outlined text-[18px]">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between text-xs text-on-surface-variant">
+          <span class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[15px] text-secondary">key</span>
+            <span>Demo ID: <strong class="text-on-surface font-mono">HSP-88219-NY</strong></span>
+          </span>
+          <button type="button" onclick="window.fillDemoHospitalCredentials()" class="text-secondary font-bold hover:underline cursor-pointer">Auto-Fill</button>
+        </div>
+
+        <button type="submit" id="btn-hospital-login-submit" class="mt-2 w-full py-3 rounded-xl bg-on-surface hover:bg-secondary text-surface font-label-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+          <span id="hospital-login-btn-icon" class="material-symbols-outlined text-[18px]">local_hospital</span>
+          <span id="hospital-login-btn-text">Verify &amp; Access Hospital Grid</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: CODE RED IMMEDIATE RESPONSE & CLINICAL TRIAGE POPUP          -->
+  <!-- ===================================================================== -->
+  <div id="modal-immediate-response" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/65 backdrop-blur-sm overflow-y-auto animate-fade-in" onclick="if(event.target === this) window.closeImmediateResponseModal()">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container-high w-full max-w-xl max-h-[92vh] overflow-hidden flex flex-col relative my-6" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="p-5 sm:p-6 bg-surface-container-low/80 border-b border-surface-container relative">
+        <button type="button" onclick="window.closeImmediateResponseModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer" title="Close">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-badge text-[11px] font-bold uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
+            CODE RED DISPATCH • EMERGENCY REQUISITION
+          </span>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-11 h-11 rounded-xl bg-error-container text-primary flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+            <span class="material-symbols-outlined text-[24px]">e911_emergency</span>
+          </div>
+          <div>
+            <h3 class="font-headline-sm text-lg sm:text-xl font-bold text-on-surface">Immediate Response &amp; Triage Verification</h3>
+            <p class="font-body-sm text-xs sm:text-sm text-on-surface-variant mt-0.5">Review dispatch details before confirming your arrival or declining this request for St. Mary's Trauma Center.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body Form -->
+      <form id="form-immediate-response" onsubmit="event.preventDefault();" class="p-5 sm:p-6 overflow-y-auto flex flex-col gap-4 text-on-surface">
+        
+        <!-- Requisition Snapshot Banner -->
+        <div class="p-3.5 rounded-xl bg-error-container/20 border border-error/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div class="flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">local_hospital</span>
+            <div>
+              <span class="font-bold text-on-surface text-sm block">St. Mary's Trauma Center (Bay 04)</span>
+              <span class="text-on-surface-variant">Trauma Surgery • 1.8 miles away • Sub-30m window</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="px-2.5 py-1 rounded-md bg-error text-white font-bold text-xs tracking-wider">
+              O- Needed
+            </span>
+            <span class="text-[11px] font-mono text-on-surface-variant">REQ-8921</span>
+          </div>
+        </div>
+
+        <!-- Error Notification Banner (Validation) -->
+        <div id="immediate-response-error" class="hidden p-3 rounded-xl bg-error-container/40 border border-error/30 text-on-error-container text-xs flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-error shrink-0">error</span>
+          <span id="immediate-response-error-text">Please complete all required fields below.</span>
+        </div>
+
+        <!-- Question 1: Estimated Response Time / Arrival Window -->
+        <div>
+          <label class="block font-label-md text-xs font-bold text-on-surface mb-2">
+            1. Estimated Arrival Time at St. Mary's Trauma Bay <span class="text-error">*</span>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <label class="p-3 rounded-xl border border-surface-container bg-surface-container-lowest hover:border-primary/50 cursor-pointer flex flex-col gap-1 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-on-surface">15–20 Mins</span>
+                <input type="radio" name="imm-eta" value="15-20m" checked class="text-primary focus:ring-primary h-3.5 w-3.5"/>
+              </div>
+              <span class="text-[11px] text-tertiary font-semibold">Fastest Priority</span>
+            </label>
+            <label class="p-3 rounded-xl border border-surface-container bg-surface-container-lowest hover:border-primary/50 cursor-pointer flex flex-col gap-1 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-on-surface">25–35 Mins</span>
+                <input type="radio" name="imm-eta" value="25-35m" class="text-primary focus:ring-primary h-3.5 w-3.5"/>
+              </div>
+              <span class="text-[11px] text-on-surface-variant">Standard Window</span>
+            </label>
+            <label class="p-3 rounded-xl border border-surface-container bg-surface-container-lowest hover:border-primary/50 cursor-pointer flex flex-col gap-1 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-on-surface">45–60 Mins</span>
+                <input type="radio" name="imm-eta" value="45-60m" class="text-primary focus:ring-primary h-3.5 w-3.5"/>
+              </div>
+              <span class="text-[11px] text-on-surface-variant">Standby Reserve</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 2: Health & Eligibility Checklist -->
+        <div>
+          <label class="block font-label-md text-xs font-bold text-on-surface mb-2">
+            2. Rapid Donor Eligibility &amp; Health Confirmation <span class="text-error">*</span>
+          </label>
+          <div class="flex flex-col gap-2 p-3 rounded-xl bg-surface-container-low border border-surface-container text-xs">
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="imm-check-health" checked class="mt-0.5 rounded text-primary focus:ring-primary h-4 w-4"/>
+              <span class="text-on-surface">I am feeling healthy today with no fever, acute infection, or cold symptoms.</span>
+            </label>
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="imm-check-window" checked class="mt-0.5 rounded text-primary focus:ring-primary h-4 w-4"/>
+              <span class="text-on-surface">My last donation was over 56 days ago (or this is my first donation).</span>
+            </label>
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="imm-check-hydrated" checked class="mt-0.5 rounded text-primary focus:ring-primary h-4 w-4"/>
+              <span class="text-on-surface">I have consumed water and a meal in the last 4 hours.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 3: Transportation Mode -->
+        <div>
+          <label for="imm-transport-mode" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">
+            3. Transit Mode to Hospital Bay
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">directions_car</span>
+            <select id="imm-transport-mode" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm font-medium text-on-surface">
+              <option value="personal_car">Personal Car (Complimentary Emergency Bay Parking)</option>
+              <option value="two_wheeler">Two-Wheeler / Bike (Priority Gate Access)</option>
+              <option value="metro_transit">Metro / Public Transit</option>
+              <option value="request_pickup">Request Hospital Emergency Transit / Cab Dispatch</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Question 4: Primary Phone & Notes -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="imm-contact-phone" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">
+              Trauma Bay Callback Phone <span class="text-error">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">call</span>
+              <input type="text" id="imm-contact-phone" value="+91 98452 33109" required class="w-full pl-10 pr-3 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm font-medium text-on-surface"/>
+            </div>
+          </div>
+          <div>
+            <label for="imm-dispatch-notes" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">
+              Special Notes / Intake Instructions
+            </label>
+            <input type="text" id="imm-dispatch-notes" placeholder="e.g. Arriving via South Gate" class="w-full px-3 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-xs sm:text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50"/>
+          </div>
+        </div>
+
+        <!-- Declination Options Section (Toggled when user clicks Decline) -->
+        <div id="imm-decline-section" class="hidden p-3.5 rounded-xl bg-surface-container-low border border-error/30 flex flex-col gap-2.5 animate-fade-in">
+          <div class="flex items-center gap-2 text-error text-xs font-bold">
+            <span class="material-symbols-outlined text-[18px]">warning</span>
+            <span>Reason for Declining This Immediate Request</span>
+          </div>
+          <p class="text-[11px] text-on-surface-variant leading-relaxed">
+            Please specify why you are unable to attend so the dispatch algorithm can immediately route this Code Red requisition to the next standby reserve donor.
+          </p>
+          <select id="imm-decline-reason" class="w-full px-3 py-2 rounded-lg border border-surface-container-high bg-surface text-xs text-on-surface font-medium">
+            <option value="too_far">Cannot reach within the 30m trauma window (Distance / Traffic)</option>
+            <option value="unwell">Currently feeling unwell or medically deferred</option>
+            <option value="unavailable">Work, family, or travel conflict</option>
+            <option value="other">Other commitment</option>
+          </select>
+          <div class="flex items-center justify-end gap-2 pt-1">
+            <button type="button" onclick="window.cancelImmediateDeclination()" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold cursor-pointer">
+              Back to Request
+            </button>
+            <button type="button" onclick="window.confirmImmediateDeclination()" class="px-3.5 py-1.5 rounded-lg bg-error hover:bg-error/90 text-white text-xs font-bold shadow-xs cursor-pointer">
+              Confirm Declination
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="imm-action-buttons" class="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-3 border-t border-surface-container">
+          <button type="button" onclick="window.startImmediateDeclination()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-surface-container hover:bg-error-container/40 text-on-surface-variant hover:text-error font-label-md text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+            <span>Decline Request</span>
+          </button>
+          <button type="button" id="btn-approve-immediate-response" onclick="window.approveImmediateResponse()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">verified_user</span>
+            <span>Approve &amp; Confirm Dispatch</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
 
   <!-- Core Scripts -->
   <script src="js/store.js?v=5"></script>
