@@ -194,4 +194,11 @@
   font-variation-settings: 'FILL' 1;
 }
 
+/* Recipient Dashboard Sidebar - Prevent Flexbox Squashing */
+#view-recipient-dashboard aside > * {
+  flex-shrink: 0 !important;
+  min-height: max-content !important;
+}
+
+
 

@@ -66,6 +66,99 @@ const DEFAULT_STATE = {
     rejectionReason: 'State department documentation mismatch on primary accreditation license certificate.'
   },
 
+  // Current Recipient & Patient Profile (Dedicated to Recipient / Family & Friends)
+  recipient: {
+    id: 'CASE-9042',
+    requestId: 'REQ-9042',
+    patientName: 'Devika Sharma',
+    patientAge: 32,
+    patientGender: 'Female',
+    bloodGroup: 'B+',
+    component: 'Platelets (Apheresis)',
+    unitsRequired: 3,
+    unitsArranged: 2,
+    unitsFulfilled: 1,
+    urgency: 'Stat Emergency (< 45 Mins)',
+    hospitalName: 'Metro General Hospital & Trauma Center',
+    hospitalWard: 'ICU Ward 4B, Bed 12',
+    hospitalAddress: '1200 Healthcare Blvd, Suite 100, New York, NY',
+    attendantName: 'Rajesh Sharma',
+    attendantRelation: 'Brother / Primary Attendant',
+    attendantPhone: '+91 95280 33454',
+    attendantEmail: 'rajesh.sharma@familycare.org',
+    doctorName: 'Dr. Aris Thorne, MD',
+    doctorDepartment: 'Trauma & Critical Care',
+    doctorPhone: '+1 (800) 555-8821 Ext 4429',
+    hospitalBloodDesk: '+1 (800) 555-8821',
+    clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
+    handshakeOTP: '7842',
+    trackingStage: 4,
+    broadcastDate: 'Today, 14:10 EST',
+    appealActive: true
+  },
+
+  // Multiple Recipient / Patient Cases available for management
+  recipientCases: [
+    {
+      id: 'CASE-9042',
+      requestId: 'REQ-9042',
+      patientName: 'Devika Sharma',
+      patientAge: 32,
+      patientGender: 'Female',
+      bloodGroup: 'B+',
+      component: 'Platelets (Apheresis)',
+      unitsRequired: 3,
+      unitsArranged: 2,
+      unitsFulfilled: 1,
+      urgency: 'Stat Emergency (< 45 Mins)',
+      hospitalName: 'Metro General Hospital & Trauma Center',
+      hospitalWard: 'ICU Ward 4B, Bed 12',
+      hospitalAddress: '1200 Healthcare Blvd, Suite 100, New York, NY',
+      attendantName: 'Rajesh Sharma',
+      attendantRelation: 'Brother / Primary Attendant',
+      attendantPhone: '+91 95280 33454',
+      attendantEmail: 'rajesh.sharma@familycare.org',
+      doctorName: 'Dr. Aris Thorne, MD',
+      doctorDepartment: 'Trauma & Critical Care',
+      doctorPhone: '+1 (800) 555-8821 Ext 4429',
+      hospitalBloodDesk: '+1 (800) 555-8821',
+      clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
+      handshakeOTP: '7842',
+      trackingStage: 4,
+      broadcastDate: 'Today, 14:10 EST',
+      appealActive: true
+    },
+    {
+      id: 'CASE-8991',
+      requestId: 'REQ-8991',
+      patientName: 'Marcus Vance',
+      patientAge: 46,
+      patientGender: 'Male',
+      bloodGroup: 'O-',
+      component: 'Whole Blood',
+      unitsRequired: 2,
+      unitsArranged: 1,
+      unitsFulfilled: 0,
+      urgency: 'Urgent (< 2 Hours)',
+      hospitalName: "St. Mary's Trauma Center",
+      hospitalWard: 'ICU Triage Bay 2',
+      hospitalAddress: 'Downtown Metro Center, Sector 4',
+      attendantName: 'Elena Vance',
+      attendantRelation: 'Spouse / Family Attendant',
+      attendantPhone: '+91 98110 52391',
+      attendantEmail: 'elena.vance@netcare.org',
+      doctorName: 'Dr. Robert Chen, MD',
+      doctorDepartment: 'General Surgery & Trauma',
+      doctorPhone: '+1 (800) 555-9012 Ext 104',
+      hospitalBloodDesk: '+1 (800) 555-9012',
+      clinicalReason: 'Post-operative severe anemia stabilization.',
+      handshakeOTP: '4190',
+      trackingStage: 2,
+      broadcastDate: 'Today, 12:45 EST',
+      appealActive: true
+    }
+  ],
+
   // Registered Hospital Registry
   registeredHospitals: [
     {
@@ -534,6 +627,58 @@ class Store {
 
   isHospitalVerified() {
     return this.state.hospital.verificationStatus === 'verified';
+  }
+
+  // --- Recipient / Family & Friends methods ---
+  getRecipient() {
+    if (!this.state.recipient) {
+      this.state.recipient = JSON.parse(JSON.stringify(DEFAULT_STATE.recipient));
+    }
+    return this.state.recipient;
+  }
+
+  getRecipientCases() {
+    if (!Array.isArray(this.state.recipientCases) || this.state.recipientCases.length === 0) {
+      this.state.recipientCases = JSON.parse(JSON.stringify(DEFAULT_STATE.recipientCases));
+    }
+    return this.state.recipientCases;
+  }
+
+  switchRecipientCase(caseId) {
+    const cases = this.getRecipientCases();
+    const found = cases.find(c => c.id === caseId || c.requestId === caseId);
+    if (found) {
+      this.state.recipient = found;
+      this.saveState();
+      return found;
+    }
+    return this.state.recipient;
+  }
+
+  updateRecipient(updates) {
+    this.state.recipient = { ...this.getRecipient(), ...updates };
+    const cases = this.getRecipientCases();
+    const idx = cases.findIndex(c => c.id === this.state.recipient.id);
+    if (idx >= 0) {
+      cases[idx] = { ...cases[idx], ...updates };
+    }
+    this.saveState();
+    return this.state.recipient;
+  }
+
+  setRecipientTrackingStage(stage) {
+    if (this.state.recipient) {
+      this.state.recipient.trackingStage = stage;
+      this.saveState();
+    }
+  }
+
+  verifyDonorHandshake(otp) {
+    const recipient = this.getRecipient();
+    if (String(otp).trim() === String(recipient.handshakeOTP).trim()) {
+      return { success: true, message: 'Donor handshake verified! Unit tagged for patient.' };
+    }
+    return { success: false, message: 'Invalid donor verification OTP code.' };
   }
 
   // --- Requests methods ---

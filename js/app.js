@@ -97,8 +97,12 @@ function initRouterHooks() {
       renderDonorDashboard();
     } else if (route === 'donor-profile') {
       populateDonorProfileForm();
-    } else if (['hospital-dashboard', 'hospital-overview', 'hospital-requests', 'hospital-requests-section', 'matched-donors', 'hospital-donors-section', 'request-tracking', 'hospital-tracking-section'].includes(route)) {
-      renderHospitalDashboard();
+    } else if (['recipient-dashboard', 'recipient-overview', 'patient-dashboard', 'family-dashboard', 'recipient-requests', 'recipient-requests-section', 'recipient-donors', 'recipient-donors-section', 'recipient-tracking', 'recipient-tracking-section', 'sos-appeal', 'hospital-dashboard', 'hospital-overview', 'hospital-requests', 'hospital-requests-section', 'matched-donors', 'hospital-donors-section', 'request-tracking', 'hospital-tracking-section'].includes(route)) {
+      if (typeof window.renderRecipientDashboard === 'function') {
+        window.renderRecipientDashboard();
+      } else if (typeof renderHospitalDashboard === 'function') {
+        renderHospitalDashboard();
+      }
     } else if (route === 'request-confirmation') {
       renderRequestConfirmation();
     }
@@ -493,41 +497,57 @@ function initInteractiveWidgets() {
   }
 
   // --- B. In-Page Smooth Scroll Navigation Helpers ---
-  window.scrollToHospitalSection = function(sectionId) {
-    const target = document.getElementById(sectionId);
+  window.scrollToRecipientSection = function(sectionId) {
+    let target = document.getElementById(sectionId);
+    if (!target && sectionId === 'recipient-overview') {
+      target = document.getElementById('hospital-overview') || document.getElementById('view-recipient-dashboard');
+    }
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      document.querySelectorAll('.hospital-nav-btn').forEach(btn => {
-        const navKey = btn.getAttribute('data-hospital-nav');
-        if ((sectionId === 'hospital-overview' && navKey === 'overview') ||
-            (sectionId === 'hospital-requests-section' && navKey === 'requests')) {
-          btn.classList.add('bg-primary/10', 'text-primary', 'font-bold');
-          btn.classList.remove('text-on-surface-variant');
-        } else {
-          btn.classList.remove('bg-primary/10', 'text-primary', 'font-bold');
-          btn.classList.add('text-on-surface-variant');
-        }
-      });
     }
+    if (sectionId === 'recipient-overview' || sectionId === 'hospital-overview') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      if (document.documentElement) document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      if (document.body) document.body.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+    document.querySelectorAll('.recipient-nav-btn, .hospital-nav-btn').forEach(btn => {
+      const navKey = btn.getAttribute('data-recipient-nav') || btn.getAttribute('data-hospital-nav');
+      if ((sectionId.includes('overview') && navKey === 'overview') ||
+          (sectionId.includes('donors') && navKey === 'donors') ||
+          (sectionId.includes('tracking') && navKey === 'tracking') ||
+          (sectionId.includes('requests') && navKey === 'requests')) {
+        btn.classList.add('bg-primary/10', 'text-primary', 'font-bold');
+        btn.classList.remove('text-on-surface-variant');
+      } else {
+        btn.classList.remove('bg-primary/10', 'text-primary', 'font-bold');
+        btn.classList.add('text-on-surface-variant');
+      }
+    });
   };
+  window.scrollToHospitalSection = window.scrollToRecipientSection;
 
   window.scrollToDonorSection = function(sectionId) {
     const target = document.getElementById(sectionId);
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      document.querySelectorAll('.donor-nav-btn').forEach(btn => {
-        const navKey = btn.getAttribute('data-donor-nav');
-        if ((sectionId === 'donor-overview' && navKey === 'dashboard') ||
-            (sectionId === 'donor-requests-section' && navKey === 'requests') ||
-            (sectionId === 'donor-history-section' && navKey === 'history')) {
-          btn.classList.add('bg-surface-container', 'text-primary', 'font-bold');
-          btn.classList.remove('text-on-surface-variant');
-        } else {
-          btn.classList.remove('bg-surface-container', 'text-primary', 'font-bold');
-          btn.classList.add('text-on-surface-variant');
-        }
-      });
     }
+    if (sectionId === 'donor-overview') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      if (document.documentElement) document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      if (document.body) document.body.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+    document.querySelectorAll('.donor-nav-btn').forEach(btn => {
+      const navKey = btn.getAttribute('data-donor-nav');
+      if ((sectionId === 'donor-overview' && navKey === 'dashboard') ||
+          (sectionId === 'donor-requests-section' && navKey === 'requests') ||
+          (sectionId === 'donor-history-section' && navKey === 'history')) {
+        btn.classList.add('bg-surface-container', 'text-primary', 'font-bold');
+        btn.classList.remove('text-on-surface-variant');
+      } else {
+        btn.classList.remove('bg-surface-container', 'text-primary', 'font-bold');
+        btn.classList.add('text-on-surface-variant');
+      }
+    });
   };
 
   // --- C. Verification State Switcher Buttons ---
@@ -1277,110 +1297,359 @@ function populateDonorProfileForm() {
 }
 
 /**
- * Render Hospital Dashboard
+ * ============================================================================
+ * 6. RECIPIENT & FAMILY / FRIENDS DASHBOARD CONTROLLERS
+ * Dedicated to blood recipients, their relatives, or friends coordinating emergency blood.
+ * ============================================================================
  */
-function renderHospitalDashboard() {
-  const hospital = window.PulseStore.getHospital();
-  const isVerified = hospital.verificationStatus === 'verified';
-  const isPending = hospital.verificationStatus === 'pending';
-  const isRejected = hospital.verificationStatus === 'rejected';
+function renderRecipientDashboard() {
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : {
+        id: 'CASE-9042',
+        requestId: 'REQ-9042',
+        patientName: 'Devika Sharma',
+        patientAge: 32,
+        patientGender: 'Female',
+        bloodGroup: 'B+',
+        component: 'Platelets (Apheresis)',
+        unitsRequired: 3,
+        unitsArranged: 2,
+        unitsFulfilled: 1,
+        urgency: 'Stat Emergency (< 45 Mins)',
+        hospitalName: 'Metro General Hospital & Trauma Center',
+        hospitalWard: 'ICU Ward 4B, Bed 12',
+        hospitalAddress: '1200 Healthcare Blvd, Suite 100, New York, NY',
+        attendantName: 'Rajesh Sharma',
+        attendantRelation: 'Brother / Primary Attendant',
+        attendantPhone: '+91 95280 33454',
+        attendantEmail: 'rajesh.sharma@familycare.org',
+        doctorName: 'Dr. Aris Thorne, MD',
+        doctorDepartment: 'Trauma & Critical Care',
+        doctorPhone: '+1 (800) 555-8821 Ext 4429',
+        hospitalBloodDesk: '+1 (800) 555-8821',
+        clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
+        handshakeOTP: '7842',
+        trackingStage: 4,
+        broadcastDate: 'Today, 14:10 EST',
+        appealActive: true
+      };
 
-  // Hospital Name & Attributes
-  setTextContentAll('.hospital-name-display', hospital.name);
-  setTextContentAll('.hospital-location-display', `${hospital.location}, ${hospital.city}${hospital.state ? ', ' + hospital.state : ''}`);
-  setTextContentAll('.hospital-license-display', `Verified Hospital (License #${hospital.licenseNumber})`);
-  setTextContentAll('.hospital-triage-officer', hospital.authorizedPerson);
-  setTextContentAll('.hospital-phone-display', hospital.phone);
-  setTextContentAll('.hospital-beds-display', `${hospital.bedCapacity || 450} Beds Capacity`);
-  setTextContentAll('.hospital-trauma-display', hospital.traumaLevel || 'Accredited Trauma I');
-  setTextContentAll('.hospital-category-badge', hospital.category || 'Apex Multi-Specialty');
-  setTextContentAll('.hospital-node-id', `Node: ${hospital.id}`);
+  // Recipient / Patient Identity & Attributes
+  const sidebar = document.querySelector('#view-recipient-dashboard aside');
+  if (sidebar) sidebar.scrollTop = 0;
 
-  // Populate facility switcher dropdown
-  const switcher = document.getElementById('hospital-facility-switcher');
-  if (switcher) {
-    const list = window.PulseStore.getHospitalList();
-    switcher.innerHTML = list.map(h => `
-      <option value="${escapeHtml(h.id)}" ${h.id === hospital.id ? 'selected' : ''}>
-        ${escapeHtml(h.name)} (${escapeHtml(h.id)})
+  setTextContentAll('.patient-name-display', recipient.patientName);
+  setTextContentAll('.patient-blood-display', `${recipient.bloodGroup} ${recipient.component.split(' ')[0]}`);
+  setTextContentAll('.patient-blood-group-badge', recipient.bloodGroup);
+  setTextContentAll('.patient-component-display', recipient.component);
+  setTextContentAll('.patient-meta-display', `${recipient.patientAge} Yrs • ${recipient.patientGender} • ICU Ward 4B`);
+  setTextContentAll('.attendant-name-display', `${recipient.attendantName} (${recipient.attendantRelation})`);
+  setTextContentAll('.attendant-phone-display', recipient.attendantPhone);
+  setTextContentAll('.hospital-name-display', recipient.hospitalName);
+  setTextContentAll('.hospital-location-display', `${recipient.hospitalWard}, ${recipient.hospitalName}`);
+  setTextContentAll('.hospital-phone-display', recipient.hospitalBloodDesk);
+  setTextContentAll('.hospital-ward-display', `${recipient.hospitalName} • ${recipient.hospitalWard}`);
+  setTextContentAll('.doctor-name-display', recipient.doctorName);
+  setTextContentAll('.doctor-meta-display', `${recipient.doctorDepartment} • Ext 4429`);
+  setTextContentAll('.case-id-display', `Case: ${recipient.id}`);
+  setTextContentAll('.recipient-req-id-display', recipient.requestId);
+  setTextContentAll('.handshake-otp-display', recipient.handshakeOTP);
+  setTextContentAll('.recipient-urgency-display', recipient.urgency);
+  setTextContentAll('.patient-units-summary', `${recipient.unitsRequired} Units Req. • ${recipient.unitsFulfilled} Received`);
+  setTextContentAll('.patient-units-needed', `${recipient.unitsRequired} Units`);
+  setTextContentAll('.patient-units-enroute', `${Math.max(0, recipient.unitsArranged - recipient.unitsFulfilled)} En Route`);
+  setTextContentAll('.patient-units-fulfilled', `${recipient.unitsFulfilled} Received`);
+
+  // Progress Bar for Units
+  const pct = Math.min(100, Math.round((recipient.unitsArranged / recipient.unitsRequired) * 100));
+  document.querySelectorAll('.recipient-progress-bar').forEach(bar => {
+    bar.style.width = `${pct}%`;
+  });
+  setTextContentAll('.recipient-progress-pct', `${pct}% Arranged`);
+
+  // Case Switcher Dropdown
+  const switcher = document.getElementById('recipient-case-switcher');
+  if (switcher && typeof window.PulseStore.getRecipientCases === 'function') {
+    const list = window.PulseStore.getRecipientCases();
+    switcher.innerHTML = list.map(c => `
+      <option value="${escapeHtml(c.id)}" ${c.id === recipient.id ? 'selected' : ''}>
+        ${escapeHtml(c.patientName)} (${escapeHtml(c.bloodGroup)} ${escapeHtml(c.component.split(' ')[0])}) — ${escapeHtml(c.hospitalName.split(' ')[0])}
       </option>
     `).join('');
 
     if (!switcher.dataset.hasListener) {
       switcher.dataset.hasListener = 'true';
       switcher.addEventListener('change', (e) => {
-        const newActive = window.PulseStore.switchHospital(e.target.value);
-        if (newActive) {
-          showToast('Facility Active', `Switched dashboard to ${newActive.name}`, 'info');
-          renderHospitalDashboard();
+        const switched = window.PulseStore.switchRecipientCase(e.target.value);
+        if (switched) {
+          showToast('Patient Case Active', `Switched view to ${switched.patientName} (${switched.bloodGroup})`, 'info');
+          renderRecipientDashboard();
         }
       });
     }
   }
 
-  // Status Banner on Hospital Dashboard
-  const statusBanner = document.getElementById('hospital-dashboard-status-banner');
-  if (statusBanner) {
-    if (isVerified) {
-      statusBanner.className = 'hidden';
-    } else if (isPending) {
-      statusBanner.className = 'bg-amber-500/15 border-l-4 border-amber-500 p-4 rounded-xl flex items-center justify-between text-on-surface mb-4';
-      statusBanner.innerHTML = `
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-amber-600 text-[24px]">hourglass_top</span>
-          <div>
-            <span class="font-bold text-amber-700 uppercase font-label-badge text-label-badge tracking-wider">Verification Pending</span>
-            <p class="font-body-sm text-body-sm text-on-surface-variant">Your facility registration is under review. "Raise Blood Request" will unlock once approved.</p>
-          </div>
-        </div>
-        <button type="button" onclick="window.PulseStore.setHospitalVerification('verified'); window.renderHospitalDashboard(); window.showToast('Accreditation Approved', 'Hospital has been verified successfully.', 'success');" class="px-3 py-1.5 rounded-lg bg-amber-600 text-white font-label-md text-label-md font-semibold hover:bg-amber-700 transition-colors cursor-pointer">
-          Approve Facility
-        </button>
-      `;
-    } else if (isRejected) {
-      statusBanner.className = 'bg-error-container/40 border-l-4 border-error p-4 rounded-xl flex items-center justify-between text-on-surface mb-4';
-      statusBanner.innerHTML = `
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-error text-[24px]">cancel</span>
-          <div>
-            <span class="font-bold text-error uppercase font-label-badge text-label-badge tracking-wider">Verification Rejected</span>
-            <p class="font-body-sm text-body-sm text-on-surface-variant">${escapeHtml(hospital.rejectionReason)}</p>
-          </div>
-        </div>
-        <button type="button" onclick="window.PulseStore.setHospitalVerification('verified'); window.renderHospitalDashboard(); window.showToast('Accreditation Approved', 'Hospital has been verified successfully.', 'success');" class="px-3 py-1.5 rounded-lg bg-error text-white font-label-md text-label-md font-semibold hover:bg-on-error-container transition-colors cursor-pointer">
-          Re-Approve
-        </button>
-      `;
-    }
+  // Pre-fill SOS WhatsApp preview text
+  const originUrl = window.location.origin + window.location.pathname;
+  const appealText = `🚨 URGENT BLOOD NEEDED!
+Patient: ${recipient.patientName} (${recipient.bloodGroup})
+Requirement: ${recipient.unitsRequired} Units of ${recipient.component}
+Hospital: ${recipient.hospitalName}, ${recipient.hospitalWard}
+Urgency: ${recipient.urgency}
+Attendant Contact: ${recipient.attendantName} (${recipient.attendantPhone})
+Verified Case: #${recipient.requestId}
+👉 Click to respond or volunteer: ${originUrl}#/emergency-request`;
+
+  const appealTextarea = document.getElementById('recipient-appeal-preview');
+  if (appealTextarea) {
+    appealTextarea.value = appealText;
   }
 
-  // Gated "Raise Blood Request" buttons
-  document.querySelectorAll('[data-open-modal-request]').forEach(btn => {
-    if (isVerified) {
-      btn.classList.remove('opacity-60', 'cursor-not-allowed');
-      btn.removeAttribute('disabled');
-      const lockIcon = btn.querySelector('.lock-indicator');
-      if (lockIcon) lockIcon.remove();
-    } else {
-      btn.classList.add('opacity-60', 'cursor-not-allowed');
-      if (!btn.querySelector('.lock-indicator')) {
-        const span = document.createElement('span');
-        span.className = 'lock-indicator material-symbols-outlined text-[16px] ml-1 text-on-primary/80';
-        span.textContent = 'lock';
-        btn.appendChild(span);
-      }
-    }
-  });
+  // Backwards compatibility with legacy node selectors if present in DOM
+  setTextContentAll('.hospital-license-display', `Verified Patient Case (Requisition #${recipient.requestId})`);
+  setTextContentAll('.hospital-triage-officer', recipient.doctorName);
+  setTextContentAll('.hospital-beds-display', recipient.hospitalWard);
+  setTextContentAll('.hospital-trauma-display', `Urgency: ${recipient.urgency}`);
+  setTextContentAll('.hospital-category-badge', `${recipient.bloodGroup} ${recipient.component}`);
+  setTextContentAll('.hospital-node-id', `Case: ${recipient.id}`);
 
-  // Active requests counter
-  const requests = window.PulseStore.getRequests();
-  setTextContentAll('.hospital-active-requests-count', requests.length);
-
-  // Render all consolidated in-page sections directly on the Hospital Dashboard
-  renderHospitalRequestsList();
-  renderHospitalDonorsPool();
-  if (window.renderRequestTracking) renderRequestTracking();
+  // Render Sub-Sections
+  renderRecipientDonorsSection(recipient);
+  renderRecipientTrackingSection(recipient);
+  renderRecipientRequestsList(recipient);
 }
+
+function renderRecipientDonorsSection(recipient) {
+  const container = document.getElementById('recipient-donors-container');
+  if (!container) return;
+
+  const bloodGroup = recipient.bloodGroup || 'B+';
+  const donors = (window.PulseStore && typeof window.PulseStore.getRequestDonorTracking === 'function')
+    ? window.PulseStore.getRequestDonorTracking(recipient.requestId, bloodGroup)
+    : [];
+
+  const arrivingDonors = donors.slice(0, 3);
+  setTextContentAll('.recipient-donors-count-badge', `${arrivingDonors.length} Donors Responding`);
+  setTextContentAll('.recipient-donors-active-count', arrivingDonors.length);
+
+  if (arrivingDonors.length === 0) {
+    container.innerHTML = `
+      <div class="p-6 text-center bg-surface-container-low rounded-xl">
+        <p class="font-body-md text-on-surface-variant">Searching for nearby volunteer donors...</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = arrivingDonors.map((d, idx) => `
+    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high hover:border-primary/40 hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${idx === 0 ? 'ring-2 ring-primary/20 bg-primary-fixed/5' : ''}">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-12 h-12 rounded-2xl bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-headline-sm shrink-0 shadow-xs">
+          ${escapeHtml(d.initials || d.name.substring(0, 2).toUpperCase())}
+        </div>
+        <div class="flex flex-col min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <h4 class="font-title-md font-bold text-on-surface">${escapeHtml(d.name)}</h4>
+            <span class="px-2 py-0.5 rounded-full ${d.bloodGroup === 'O-' ? 'bg-error-container text-primary font-bold' : 'bg-surface-container-high text-on-surface font-bold'} text-xs">
+              ${escapeHtml(d.bloodGroup)}
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full ${d.statusClass || 'bg-primary-fixed text-primary'} text-[11px] font-bold">
+              ${escapeHtml(d.transitStatus || 'En Route')}
+            </span>
+            ${idx === 0 ? '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">Fastest ETA</span>' : ''}
+          </div>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-surface-variant mt-1">
+            <span class="flex items-center gap-1 font-semibold text-primary">
+              <span class="material-symbols-outlined text-[15px]">timer</span>
+              ETA: ${escapeHtml(d.liveEta || '14 mins')}
+            </span>
+            <span>•</span>
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-[15px] text-tertiary">near_me</span>
+              ${escapeHtml(d.landmark || 'Approaching hospital')}
+            </span>
+            <span>•</span>
+            <span>Match: 100% Compatible</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+        <button type="button" onclick="window.verifyDonorHandshake('${recipient.handshakeOTP}', '${escapeHtml(d.name)}')" class="px-3.5 py-2 rounded-xl bg-tertiary-container/30 hover:bg-tertiary-container/50 text-tertiary font-label-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95" title="Verify Donor at Blood Bank Counter">
+          <span class="material-symbols-outlined text-[16px]">pin</span>
+          <span>Confirm Arrival</span>
+        </button>
+        <a href="tel:${escapeHtml(d.phone || '+91 98201 44521')}" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs" title="Call Donor Directly">
+          <span class="material-symbols-outlined text-[16px] text-primary">call</span>
+          <span>Call Donor</span>
+        </a>
+        <button type="button" onclick="window.showToast('Donor Line Active', 'Opening messaging link to ${escapeHtml(d.name)}', 'info')" class="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface transition-all cursor-pointer" title="Direct Message">
+          <span class="material-symbols-outlined text-[18px]">chat</span>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderRecipientTrackingSection(recipient) {
+  const container = document.getElementById('recipient-stepper-container');
+  if (!container) return;
+
+  const currentStage = recipient.trackingStage || 4;
+  const stages = [
+    { num: 1, name: 'Requisition Raised', sub: 'Broadcasted to Grid', icon: 'campaign' },
+    { num: 2, name: 'Donors Alerted', sub: '16 Paged nearby', icon: 'cell_tower' },
+    { num: 3, name: 'Donors Accepted', sub: '3 Pledged to Donate', icon: 'how_to_reg' },
+    { num: 4, name: 'En Route to Hospital', sub: 'In Transit (~14 mins)', icon: 'directions_car' },
+    { num: 5, name: 'Blood Bank Intake', sub: 'Sample Cross-Match', icon: 'science' },
+    { num: 6, name: 'Transfusion Ready', sub: 'Delivery to Ward 4B', icon: 'favorite' }
+  ];
+
+  container.innerHTML = stages.map(s => {
+    const isCompleted = s.num < currentStage;
+    const isCurrent = s.num === currentStage;
+
+    let badgeClass = 'bg-surface-container-high text-on-surface-variant';
+    let ringClass = '';
+    let statusText = 'Upcoming';
+
+    if (isCompleted) {
+      badgeClass = 'bg-tertiary-fixed text-on-tertiary-fixed font-bold';
+      statusText = 'Completed';
+    } else if (isCurrent) {
+      badgeClass = 'bg-primary text-on-primary font-bold shadow-md';
+      ringClass = 'ring-4 ring-primary/20 animate-pulse';
+      statusText = 'IN PROGRESS';
+    }
+
+    return `
+      <div onclick="window.setRecipientStage(${s.num})" class="flex flex-col items-center text-center p-2.5 rounded-xl hover:bg-surface-container-low transition-all cursor-pointer group" title="Click to view or switch to Stage ${s.num}">
+        <div class="w-11 h-11 rounded-full flex items-center justify-center mb-2 ${badgeClass} ${ringClass} transition-transform group-hover:scale-105">
+          <span class="material-symbols-outlined text-[20px]">${isCompleted ? 'check' : s.icon}</span>
+        </div>
+        <span class="text-xs font-bold text-on-surface leading-tight">${s.name}</span>
+        <span class="text-[10px] text-on-surface-variant mt-0.5">${s.sub}</span>
+        <span class="mt-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${isCurrent ? 'bg-primary-fixed text-primary' : isCompleted ? 'text-tertiary font-semibold' : 'text-secondary'}">
+          ${statusText}
+        </span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderRecipientRequestsList(recipient) {
+  const container = document.getElementById('recipient-requests-container');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-13 h-13 rounded-2xl bg-error-container text-primary flex items-center justify-center font-bold text-2xl shrink-0 shadow-xs">
+          ${escapeHtml(recipient.bloodGroup)}
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="font-mono font-bold text-xs text-primary bg-primary-fixed/30 px-2 py-0.5 rounded">${recipient.requestId}</span>
+            <h4 class="font-title-md font-bold text-on-surface">${escapeHtml(recipient.component)}</h4>
+            <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[11px] font-bold animate-pulse">
+              ${escapeHtml(recipient.urgency)}
+            </span>
+          </div>
+          <p class="text-xs text-on-surface-variant mt-1">
+            <strong>${recipient.unitsRequired} Units Required</strong> (${recipient.unitsArranged} Arranged, ${recipient.unitsFulfilled} Received) • Admitted: ${escapeHtml(recipient.hospitalWard)}
+          </p>
+          <p class="text-xs text-secondary mt-0.5 italic">
+            Clinical note: "${escapeHtml(recipient.clinicalReason)}"
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" onclick="window.copySOSAppealLink()" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">share</span>
+          <span>Share Case</span>
+        </button>
+        <button type="button" data-open-modal-request class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">edit_note</span>
+          <span>Update Need</span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// Global actions for Recipient / Family Dashboard
+window.renderRecipientDashboard = renderRecipientDashboard;
+window.renderHospitalDashboard = renderRecipientDashboard; // alias for backwards compatibility
+
+window.copySOSAppealLink = function() {
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets', hospitalName: 'Metro General Hospital', requestId: 'REQ-9042', attendantPhone: '+91 95280 33454' };
+
+  const originUrl = window.location.origin + window.location.pathname;
+  const text = `🚨 URGENT BLOOD NEEDED!
+Patient: ${recipient.patientName} (${recipient.bloodGroup})
+Requirement: ${recipient.unitsRequired || 3} Units of ${recipient.component}
+Hospital: ${recipient.hospitalName}, ${recipient.hospitalWard || 'Ward 4B'}
+Verified Case ID: #${recipient.requestId}
+Attendant Contact: ${recipient.attendantPhone}
+Please donate or share: ${originUrl}#/emergency-request`;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      window.showToast('Appeal Copied!', 'Emergency appeal text copied to clipboard. Ready to paste in WhatsApp, SMS, or Telegram.', 'success');
+    }).catch(() => {
+      window.showToast('Appeal Ready', 'Please select and copy the appeal text box.', 'info');
+    });
+  } else {
+    window.showToast('Appeal Ready', 'Emergency appeal text is ready in the preview box.', 'info');
+  }
+};
+
+window.shareSOSOnWhatsApp = function() {
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets', hospitalName: 'Metro General Hospital', requestId: 'REQ-9042', attendantPhone: '+91 95280 33454' };
+
+  const originUrl = window.location.origin + window.location.pathname;
+  const msg = `🚨 URGENT BLOOD NEEDED!
+Patient: ${recipient.patientName} (${recipient.bloodGroup})
+Requirement: ${recipient.unitsRequired || 3} Units of ${recipient.component}
+Hospital: ${recipient.hospitalName}, ${recipient.hospitalWard || 'Ward 4B'}
+Verified Request: #${recipient.requestId}
+Attendant Contact: ${recipient.attendantPhone}
+👉 If you can donate or know someone who can, please click: ${originUrl}#/emergency-request`;
+
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+  window.open(waUrl, '_blank');
+};
+
+window.verifyDonorHandshake = function(otp, donorName = 'Volunteer Donor') {
+  const entered = prompt(`Enter Donor Handshake OTP Code to verify arrival at hospital blood bank (Default code: ${otp}):`, otp);
+  if (!entered) return;
+
+  const result = (window.PulseStore && typeof window.PulseStore.verifyDonorHandshake === 'function')
+    ? window.PulseStore.verifyDonorHandshake(entered)
+    : { success: true };
+
+  if (result.success) {
+    window.showToast('Handshake Verified!', `Donor ${donorName} confirmed at Ward 4B Blood Bank counter. Units tagged for patient!`, 'success');
+    if (window.PulseStore && typeof window.PulseStore.setRecipientTrackingStage === 'function') {
+      window.PulseStore.setRecipientTrackingStage(5);
+    }
+    renderRecipientDashboard();
+  } else {
+    window.showToast('Verification Failed', result.message || 'Invalid code.', 'error');
+  }
+};
+
+window.setRecipientStage = function(stageNum) {
+  if (window.PulseStore && typeof window.PulseStore.setRecipientTrackingStage === 'function') {
+    window.PulseStore.setRecipientTrackingStage(stageNum);
+    renderRecipientDashboard();
+    window.showToast('Timeline Updated', `Transfusion pipeline advanced to Stage ${stageNum}`, 'info');
+  }
+};
 
 /**
  * Render Hospital Active Requisitions Section directly on Dashboard
@@ -2689,42 +2958,71 @@ window.openHospitalTelemetry = function() {
 // ============================================================================
 // 13. FLOATING 'BACK TO OVERVIEW' BOTTOM-RIGHT POP-UP
 // ============================================================================
+window.scrollToPageOverview = function(e) {
+  if (e) {
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+    if (typeof e.stopPropagation === 'function') e.stopPropagation();
+  }
+
+  const donorSec = document.getElementById('view-donor-dashboard');
+  const hospSec = document.getElementById('view-hospital-dashboard');
+  const currentRoute = (window.PulseRouter && window.PulseRouter.currentRoute) ? window.PulseRouter.currentRoute.toLowerCase() : '';
+  const currentHash = (window.location.hash || '').toLowerCase();
+  const currentPath = (window.location.pathname || '').toLowerCase();
+
+  const isHospitalActive = (hospSec && hospSec.classList.contains('active')) ||
+                           currentRoute.includes('hospital') ||
+                           currentHash.includes('hospital') ||
+                           currentPath.includes('hospital') ||
+                           (!hospSec && !donorSec && !!document.querySelector('.hospital-name-display'));
+
+  const isDonorActive = (donorSec && donorSec.classList.contains('active')) ||
+                        currentRoute.includes('donor') ||
+                        currentHash.includes('donor') ||
+                        currentPath.includes('donor') ||
+                        (!donorSec && !hospSec && !!document.getElementById('donor-overview'));
+
+  if (isHospitalActive) {
+    if (typeof window.scrollToHospitalSection === 'function') {
+      window.scrollToHospitalSection('hospital-overview');
+    } else {
+      const ov = document.getElementById('hospital-overview');
+      if (ov) ov.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  } else if (isDonorActive) {
+    if (typeof window.scrollToDonorSection === 'function') {
+      window.scrollToDonorSection('donor-overview');
+    } else {
+      const ov = document.getElementById('donor-overview');
+      if (ov) ov.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // Smoothly scroll window, html, and body to the top
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  if (document.documentElement) document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  if (document.body) document.body.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+};
+
 function initFloatingBackToOverview() {
   const container = document.getElementById('floating-back-to-overview-container');
   const btn = document.getElementById('floating-back-to-overview-btn');
   if (!container || !btn) return;
 
-  btn.addEventListener('click', () => {
-    const isDonorPage = !!document.getElementById('donor-overview');
-    const isHospitalPage = !!document.querySelector('.hospital-name-display');
-    const currentRoute = window.PulseRouter ? window.PulseRouter.currentRoute : '';
-
-    if (currentRoute.includes('donor') || isDonorPage) {
-      if (typeof window.scrollToDonorSection === 'function') {
-        window.scrollToDonorSection('donor-overview');
-      } else {
-        const ov = document.getElementById('donor-overview');
-        if (ov) ov.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        else window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    } else if (currentRoute.includes('hospital') || isHospitalPage) {
-      if (typeof window.scrollToHospitalSection === 'function') {
-        window.scrollToHospitalSection('hospital-overview');
-      } else {
-        const ov = document.getElementById('hospital-overview');
-        if (ov) ov.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        else window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
+  btn.onclick = function(e) {
+    window.scrollToPageOverview(e);
+  };
 
   const checkScroll = () => {
     const donorSec = document.getElementById('view-donor-dashboard');
     const hospSec = document.getElementById('view-hospital-dashboard');
-    const isDonorActive = (donorSec && donorSec.classList.contains('active')) || (!donorSec && !!document.getElementById('donor-overview'));
-    const isHospActive = (hospSec && hospSec.classList.contains('active')) || (!hospSec && !!document.querySelector('.hospital-name-display'));
+    const currentRoute = (window.PulseRouter && window.PulseRouter.currentRoute) ? window.PulseRouter.currentRoute.toLowerCase() : '';
+    const isDonorActive = (donorSec && donorSec.classList.contains('active')) ||
+                          (currentRoute.includes('donor')) ||
+                          (!donorSec && !hospSec && !!document.getElementById('donor-overview'));
+    const isHospActive = (hospSec && hospSec.classList.contains('active')) ||
+                         (currentRoute.includes('hospital')) ||
+                         (!hospSec && !donorSec && !!document.querySelector('.hospital-name-display'));
 
     let shouldShow = false;
 
@@ -2924,15 +3222,16 @@ window.toggleHospitalPasswordVisibility = function() {
   }
 };
 
-window.fillDemoHospitalCredentials = function() {
+window.fillDemoRecipientCredentials = function() {
   const idInput = document.getElementById('hospital-input-id');
   const pwdInput = document.getElementById('hospital-input-pwd');
   if (!idInput || !pwdInput) return;
-  idInput.value = 'HSP-88219-NY';
-  pwdInput.value = 'hospital@pulse';
+  idInput.value = 'CASE-9042';
+  pwdInput.value = '+91 95280 33454';
   const errorBox = document.getElementById('hospital-login-error');
   if (errorBox) errorBox.classList.add('hidden');
 };
+window.fillDemoHospitalCredentials = window.fillDemoRecipientCredentials;
 
 window.handleHospitalLoginSubmit = function(e) {
   if (e) e.preventDefault();
@@ -2949,7 +3248,7 @@ window.handleHospitalLoginSubmit = function(e) {
 
   if (!idVal || !pwdVal) {
     if (errorBox && errorText) {
-      errorText.textContent = 'Please enter both your allotted Facility ID and authorization key.';
+      errorText.textContent = 'Please enter both your Patient Case ID / Requisition ID and attendant mobile number.';
       errorBox.classList.remove('hidden');
     }
     return false;
@@ -2957,7 +3256,7 @@ window.handleHospitalLoginSubmit = function(e) {
 
   // Show authenticating state
   if (btnSubmit) btnSubmit.disabled = true;
-  if (btnText) btnText.textContent = 'Verifying CDSCO Credentials...';
+  if (btnText) btnText.textContent = 'Authenticating Patient Case...';
   if (btnIcon) {
     btnIcon.textContent = 'sync';
     btnIcon.classList.add('animate-spin');
@@ -2967,23 +3266,28 @@ window.handleHospitalLoginSubmit = function(e) {
     // Reset button
     if (btnSubmit) btnSubmit.disabled = false;
     if (btnIcon) {
-      btnIcon.textContent = 'local_hospital';
+      btnIcon.textContent = 'volunteer_activism';
       btnIcon.classList.remove('animate-spin');
     }
-    if (btnText) btnText.textContent = 'Verify & Access Hospital Grid';
+    if (btnText) btnText.textContent = 'Access Recipient Portal';
 
     window.closeHospitalLoginModal();
 
-    window.showToast('Clinical Authorization Verified', `Facility ${idVal} authenticated on National Grid.`, 'success');
+    window.showToast('Patient Case Authenticated', `Welcome back. Access granted for Case ${idVal}.`, 'success');
     if (window.PulseRouter) {
-      window.PulseRouter.navigate('hospital-dashboard');
+      window.PulseRouter.navigate('recipient-dashboard');
     } else {
-      window.location.href = 'hospital-dashboard.html';
+      window.location.href = 'index.html#/recipient-dashboard';
     }
-  }, 600);
+  }, 500);
 
   return false;
 };
+
+// Aliases for Recipient Login
+window.openRecipientLoginModal = window.openHospitalLoginModal;
+window.closeRecipientLoginModal = window.closeHospitalLoginModal;
+window.handleRecipientLoginSubmit = window.handleHospitalLoginSubmit;
 
 // --- BACKWARDS COMPATIBILITY ALIASES ---
 window.openLoginModal = function(role = 'donor') {

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>DonorPulse — Recipient &amp; Family Care Coordination Dashboard</title>
+  <meta name="description" content="Dedicated portal for blood recipients and family attendants to track emergency blood requests, verify donor arrival PINs, broadcast WhatsApp appeals, and monitor transfusion progress."/>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(200, 16, 46, 0); }
+    }
+    .pulse-glow { animation: pulseGlow 2.5s infinite; }
+  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-high": "#e6e8ea",
+            "primary-fixed": "#ffdad8",
+            "inverse-primary": "#ffb3b1",
+            "tertiary-fixed": "#85f8c4",
+            "outline": "#906f6e",
+            "surface-variant": "#e0e3e5",
+            "on-primary": "#ffffff",
+            "surface-dim": "#d8dadc",
+            "inverse-on-surface": "#eff1f3",
+            "on-tertiary-container": "#85f8c3",
+            "outline-variant": "#e5bdbb",
+            "surface-container-highest": "#e0e3e5",
+            "on-secondary-fixed-variant": "#3f465c",
+            "on-tertiary-fixed-variant": "#005137",
+            "on-tertiary-fixed": "#002114",
+            "on-surface-variant": "#5c403f",
+            "secondary": "#565e74",
+            "on-primary-container": "#ffdad8",
+            "on-error-container": "#93000a",
+            "tertiary-container": "#00734f",
+            "on-secondary-fixed": "#131b2e",
+            "primary-fixed-dim": "#ffb3b1",
+            "on-secondary": "#ffffff",
+            "secondary-fixed-dim": "#bec6e0",
+            "on-secondary-container": "#5c647a",
+            "surface-container-low": "#f2f4f6",
+            "on-primary-fixed": "#410007",
+            "tertiary-fixed-dim": "#68dba9",
+            "on-primary-fixed-variant": "#92001c",
+            "on-surface": "#191c1e",
+            "on-tertiary": "#ffffff",
+            "error": "#ba1a1a",
+            "on-background": "#191c1e",
+            "secondary-container": "#dae2fd",
+            "surface-container-lowest": "#ffffff",
+            "surface": "#f7f9fb",
+            "on-error": "#ffffff",
+            "inverse-surface": "#2d3133",
+            "primary": "#9e001f",
+            "error-container": "#ffdad6",
+            "surface-container": "#eceef0",
+            "surface-bright": "#f7f9fb",
+            "background": "#f7f9fb",
+            "surface-tint": "#bf0229",
+            "tertiary": "#00583c",
+            "primary-container": "#c8102e",
+            "secondary-fixed": "#dae2fd"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            "2xl": "1rem",
+            full: "9999px"
+          },
+          fontFamily: {
+            "label-badge": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "numeric-metric": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "title-md": ["Inter"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- TOP TELEMETRY NOTIFICATION BAR -->
+  <div class="bg-surface-container-high px-4 sm:px-6 py-2 flex items-center justify-between text-xs sm:text-sm shadow-xs border-b border-surface-container">
+    <div class="flex items-center gap-2.5">
+      <span class="flex h-2.5 w-2.5 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+      </span>
+      <span class="font-bold text-primary uppercase tracking-wider text-[11px] sm:text-xs">Emergency Blood Requisition Active</span>
+      <span class="text-on-surface-variant hidden md:inline text-xs">| Case <strong class="font-mono text-on-surface">#CASE-9042</strong> • Transfusion Coordination Live</span>
+    </div>
+    <div class="flex items-center gap-3 text-on-surface-variant text-xs">
+      <span class="hidden sm:flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-tertiary">check_circle</span> Attendant Verified</span>
+      <span class="flex items-center gap-1 font-semibold text-primary"><span class="material-symbols-outlined text-[15px]">lock</span> Encrypted PIN: 7842</span>
+    </div>
+  </div>
+
+  <main class="w-full flex-1 max-w-[1280px] mx-auto px-4 sm:px-6 py-6 lg:py-8">
+    <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+      
+      <!-- =================================================================== -->
+      <!-- LEFT SIDEBAR: PATIENT & ATTENDANT PROFILE                           -->
+      <!-- =================================================================== -->
+      <aside class="w-full lg:w-72 shrink-0 flex flex-col gap-5 lg:sticky lg:top-6">
+        
+        <!-- Recipient Profile Card -->
+        <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-13 h-13 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xl shadow-xs shrink-0">
+              <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                <span class="text-[11px] font-bold text-primary uppercase tracking-wider">Patient Case</span>
+              </div>
+              <h2 id="sidebar-patient-name" class="font-bold text-lg text-on-surface truncate">Devika Sharma</h2>
+              <span id="sidebar-case-id" class="font-mono text-xs text-on-surface-variant">CASE-9042</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-on-surface-variant">Required Component:</span>
+              <span id="sidebar-blood-component" class="font-bold text-primary">Platelets (Apheresis)</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-on-surface-variant">Blood Group:</span>
+              <span id="sidebar-blood-group" class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary font-bold text-sm">B+</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-on-surface-variant">Hospital Facility:</span>
+              <span class="font-semibold text-on-surface truncate text-right">Metro General Hospital</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-on-surface-variant">Admitted Ward:</span>
+              <span class="font-medium text-on-surface">Trauma Ward 4B, Bed 12</span>
+            </div>
+          </div>
+
+          <!-- Attendant Contact Block -->
+          <div class="p-3.5 rounded-xl bg-secondary-container/20 border border-secondary/20 flex flex-col gap-1.5">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-secondary">Authorized Attendant</span>
+            <div class="flex items-center justify-between">
+              <div>
+                <p id="sidebar-attendant-name" class="font-bold text-sm text-on-surface">Rajesh Sharma</p>
+                <p class="text-xs text-secondary">Brother of Patient</p>
+              </div>
+              <a href="tel:+919528033454" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors" title="Call Attendant">
+                <span class="material-symbols-outlined text-[18px]">call</span>
+              </a>
+            </div>
+            <div class="pt-1 text-xs text-on-surface-variant font-mono flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">smartphone</span>
+              <span>+91 95280 33454</span>
+            </div>
+          </div>
+
+          <!-- Case Switcher (For Multiple Loved Ones) -->
+          <div class="flex items-center justify-between pt-1 text-xs">
+            <span class="text-on-surface-variant font-medium">Switch Active Case:</span>
+            <select id="case-switcher-select" onchange="switchCase(this.value)" class="text-xs font-semibold text-primary bg-surface-container rounded-lg px-2 py-1 border border-surface-container-high cursor-pointer">
+              <option value="CASE-9042" selected>Devika (B+ Platelets)</option>
+              <option value="CASE-5510">Amit Verma (O- PRBC)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- High Priority 1-Click WhatsApp Appeal Button -->
+        <button type="button" onclick="shareSOSOnWhatsApp()" class="w-full py-4 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5 active:scale-98 cursor-pointer pulse-glow">
+          <span class="material-symbols-outlined text-[24px]">share</span>
+          <span>Broadcast 1-Click WhatsApp SOS</span>
+        </button>
+
+        <!-- Sidebar Navigation Buttons -->
+        <nav class="bg-surface-container-lowest p-2 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-1 text-sm">
+          <button type="button" onclick="scrollToSection('recipient-overview')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-primary/10 text-primary font-semibold text-left w-full cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[20px]">overview</span>
+              <span>Case Overview</span>
+            </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          </button>
+          
+          <button type="button" onclick="scrollToSection('recipient-donors-section')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors font-medium text-left w-full cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[20px]">group</span>
+              <span>Responding Donors</span>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-primary-fixed text-primary font-bold text-xs">3 Responders</span>
+          </button>
+
+          <button type="button" onclick="scrollToSection('recipient-pipeline-section')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors font-medium text-left w-full cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[20px]">timeline</span>
+              <span>Transfusion Pipeline</span>
+            </div>
+            <span class="text-xs text-tertiary font-bold">Stage 3 of 6</span>
+          </button>
+
+          <button type="button" onclick="scrollToSection('recipient-requests-section')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors font-medium text-left w-full cursor-pointer">
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[20px]">e911_emergency</span>
+              <span>Active Requisitions</span>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-bold text-xs">1 Urgent</span>
+          </button>
+
+          <div class="my-1.5 h-px bg-surface-container"></div>
+
+          <a href="index.html#/raise-request" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-primary hover:bg-primary/5 transition-colors font-semibold">
+            <span class="material-symbols-outlined text-[20px]">add_circle</span>
+            <span>Raise Urgent Blood Request</span>
+          </a>
+
+          <a href="role-selection.html" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-error hover:bg-error-container/30 transition-colors font-semibold">
+            <span class="material-symbols-outlined text-[20px]">logout</span>
+            <span>Exit Dashboard / Logout</span>
+          </a>
+        </nav>
+
+        <!-- Hospital Blood Bank Desk Hotline Card -->
+        <div class="p-4 rounded-2xl bg-surface-container-lowest border border-surface-container-high shadow-xs flex flex-col gap-2">
+          <div class="flex items-center gap-2 text-xs font-bold text-secondary uppercase tracking-wider">
+            <span class="material-symbols-outlined text-[16px] text-primary">local_hospital</span>
+            <span>Metro Hospital Blood Bank Desk</span>
+          </div>
+          <p class="text-xs text-on-surface-variant">Desk In-Charge: <strong>Sister Mary / Dr. Thorne</strong></p>
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-xs font-mono font-semibold text-on-surface">Ext: 4429 • Blood Bank</span>
+            <a href="tel:+919528033454" class="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-bold text-xs flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">call</span> Call Desk
+            </a>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- =================================================================== -->
+      <!-- MAIN RECIPIENT DASHBOARD VIEW                                       -->
+      <!-- =================================================================== -->
+      <section class="flex-1 flex flex-col gap-6 min-w-0 w-full">
+        
+        <!-- SECTION 1: TOP EMERGENCY HERO CARD WITH DONOR PIN -->
+        <div id="recipient-overview" class="bg-surface-container-lowest p-6 sm:p-8 rounded-2xl shadow-sm border border-surface-container-high relative overflow-hidden">
+          <div class="absolute right-0 top-0 w-80 h-full bg-gradient-to-l from-primary/10 via-primary-container/5 to-transparent pointer-events-none"></div>
+
+          <div class="flex flex-col gap-4 relative z-10">
+            <!-- Header Badges -->
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-on-primary text-xs font-bold tracking-wide">
+                  <span class="material-symbols-outlined text-[16px]">emergency</span>
+                  CODE RED REQUISITION
+                </span>
+                <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface text-xs font-semibold">
+                  Requisition ID: <strong id="hero-req-id" class="font-mono text-primary">#REQ-9042</strong>
+                </span>
+              </div>
+              
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-on-surface-variant">Live Dispatch SLA:</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span> 18 min Window
+                </span>
+              </div>
+            </div>
+
+            <!-- Patient Headline & Needs -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
+              <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight">
+                  <span id="hero-patient-name">Devika Sharma</span> Needs Urgent <span id="hero-blood-need" class="text-primary font-black">B+ Platelets</span>
+                </h1>
+                <p class="text-sm text-on-surface-variant mt-1">
+                  Admitted to <strong class="text-on-surface">Metro General Hospital &amp; Trauma Center</strong> (Ward 4B Bed 12) • Attendant: <span id="hero-attendant-name" class="font-semibold text-on-surface">Rajesh Sharma</span>
+                </p>
+              </div>
+
+              <!-- DONOR ARRIVAL PIN HANDSHAKE CARD -->
+              <div class="bg-gradient-to-br from-primary-fixed/60 to-primary-container/20 border-2 border-primary/30 p-4 rounded-2xl flex flex-col items-center justify-center shrink-0 min-w-[210px] text-center shadow-xs">
+                <div class="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+                  <span class="material-symbols-outlined text-[15px]">pin</span>
+                  <span>Donor Arrival PIN</span>
+                </div>
+                <div id="hero-handshake-pin" class="font-mono text-3xl font-black text-primary tracking-widest my-0.5">
+                  7842
+                </div>
+                <p class="text-[11px] text-on-surface-variant max-w-[190px] leading-tight">
+                  Share with arriving donors to verify at Metro Blood Bank desk.
+                </p>
+              </div>
+            </div>
+
+            <!-- Action Buttons Toolbar -->
+            <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-surface-container">
+              <button type="button" onclick="shareSOSOnWhatsApp()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow transition-all flex items-center gap-2 cursor-pointer active:scale-98">
+                <span class="material-symbols-outlined text-[18px]">share</span>
+                <span>Send WhatsApp SOS Appeal</span>
+              </button>
+              
+              <button type="button" onclick="copySOSAppealLink()" class="px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer">
+                <span class="material-symbols-outlined text-[18px] text-primary">content_copy</span>
+                <span id="copy-btn-text">Copy SOS Appeal Link</span>
+              </button>
+
+              <a href="index.html#/matched-donors" class="px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ml-auto">
+                <span class="material-symbols-outlined text-[18px] text-primary">group</span>
+                <span>Proximity Matching Grid</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECTION 2: 4 KEY RECIPIENT TELEMETRY METRIC CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Metric 1: Units Required vs Secured -->
+          <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-secondary">Units Progress</span>
+              <span class="w-8 h-8 rounded-lg bg-primary-fixed/60 text-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px]">bloodtype</span>
+              </span>
+            </div>
+            <div>
+              <div class="flex items-baseline gap-2">
+                <span id="metric-units-secured" class="text-3xl font-extrabold text-on-surface">2</span>
+                <span class="text-sm font-bold text-on-surface-variant">/ <span id="metric-units-total">3</span> Units Secured</span>
+              </div>
+              <div class="w-full bg-surface-container rounded-full h-2 mt-2 overflow-hidden">
+                <div id="metric-units-progress-bar" class="bg-primary h-full rounded-full transition-all duration-500" style="width: 66%;"></div>
+              </div>
+            </div>
+            <p class="text-xs text-on-surface-variant">1 unit remaining for scheduled surgical trauma standby.</p>
+          </div>
+
+          <!-- Metric 2: Responding Donors -->
+          <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-secondary">Volunteer Donors</span>
+              <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px]">volunteer_activism</span>
+              </span>
+            </div>
+            <div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-emerald-700">3</span>
+                <span class="text-sm font-bold text-on-surface-variant">Responders</span>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-1">1 Arrived at desk • 2 En route</p>
+            </div>
+            <button type="button" onclick="scrollToSection('recipient-donors-section')" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 text-left">
+              <span>View live donor coordinates</span>
+              <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+            </button>
+          </div>
+
+          <!-- Metric 3: Transfusion Pipeline Status -->
+          <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-secondary">Pipeline Telemetry</span>
+              <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px]">vital_signs</span>
+              </span>
+            </div>
+            <div>
+              <span id="metric-stage-pill" class="inline-block px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-bold">
+                Stage 3: Donor Arrived
+              </span>
+              <p class="text-xs text-on-surface-variant mt-2">Volunteer is at blood bank desk completing verification handshake.</p>
+            </div>
+            <button type="button" onclick="scrollToSection('recipient-pipeline-section')" class="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1 text-left">
+              <span>Inspect all 6 transfusion stages</span>
+              <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+            </button>
+          </div>
+
+          <!-- Metric 4: Attendant Hotline & PIN -->
+          <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-secondary">Attendant Security</span>
+              <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px]">verified_user</span>
+              </span>
+            </div>
+            <div>
+              <div class="text-xs text-on-surface-variant">Attendant Hotline:</div>
+              <span class="font-bold text-sm text-on-surface">+91 95280 33454</span>
+              <div class="text-xs text-on-surface-variant mt-1">Verification PIN: <strong class="text-primary font-mono font-bold text-sm">7842</strong></div>
+            </div>
+            <p class="text-xs text-secondary">Only share PIN with registered attending blood bank nurses.</p>
+          </div>
+
+        </div>
+
+        <!-- SECTION 3: 1-CLICK WHATSAPP & SOCIAL SOS MOBILIZATION HUB -->
+        <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-surface-container-lowest p-6 rounded-2xl border border-emerald-200 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="flex items-start gap-4 max-w-2xl">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
+              <span class="material-symbols-outlined text-[32px]">share</span>
+            </div>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900 text-[11px] font-bold uppercase tracking-wider">Rapid Community Appeal</span>
+                <span class="text-xs text-emerald-700 font-semibold">• 1-Tap Family &amp; Friends Mobilization</span>
+              </div>
+              <h2 class="text-xl font-bold text-on-surface">Urgent Blood SOS: Mobilize Donors on WhatsApp</h2>
+              <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Broadcast this pre-formatted verified medical appeal containing the patient's room, required blood component, and direct hospital coordinates directly to WhatsApp groups, family contacts, and volunteer circles.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full lg:w-auto">
+            <button type="button" onclick="shareSOSOnWhatsApp()" class="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+              <span class="material-symbols-outlined text-[20px]">chat</span>
+              <span>Open in WhatsApp</span>
+            </button>
+            <button type="button" onclick="copySOSAppealLink()" class="px-5 py-3.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container text-on-surface border border-emerald-300 font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px] text-emerald-700">share_reviews</span>
+              <span>Copy Appeal Text</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 4: LIVE RESPONDING DONORS & ARRIVAL HANDSHAKE -->
+        <div id="recipient-donors-section" class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-surface-container">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>
+                <h3 class="text-xl font-bold text-on-surface">Volunteer Donors Arriving &amp; En Route</h3>
+              </div>
+              <p class="text-xs sm:text-sm text-on-surface-variant mt-0.5">
+                Volunteers who answered the emergency requisition for Devika Sharma (B+ Platelets).
+              </p>
+            </div>
+
+            <!-- Handshake PIN Quick Verification Box -->
+            <div class="flex items-center gap-2 bg-surface-container-low p-2 rounded-xl border border-surface-container">
+              <div class="flex flex-col text-right">
+                <span class="text-[11px] font-bold text-secondary uppercase">Quick Handshake</span>
+                <span class="text-xs text-on-surface">Verify Donor arrival:</span>
+              </div>
+              <input type="text" id="donor-handshake-input" placeholder="Enter PIN" maxlength="4" class="w-24 px-2.5 py-1.5 rounded-lg border border-surface-container-high bg-white text-center font-mono font-bold text-sm focus:border-primary focus:ring-1 focus:ring-primary"/>
+              <button type="button" onclick="verifyDonorHandshake()" class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all cursor-pointer">
+                Verify
+              </button>
+            </div>
+          </div>
+
+          <!-- Handshake Feedback Alert -->
+          <div id="handshake-alert" class="hidden p-3.5 rounded-xl text-xs font-semibold flex items-center justify-between">
+            <span id="handshake-alert-text"></span>
+            <button type="button" onclick="document.getElementById('handshake-alert').classList.add('hidden')" class="text-xs underline cursor-pointer">Dismiss</button>
+          </div>
+
+          <!-- Donors List -->
+          <div id="recipient-donors-list" class="flex flex-col gap-3">
+            <!-- Donor 1: Sarah Jenkins (Arrived) -->
+            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:bg-surface-container">
+              <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-full bg-primary/10 text-primary font-bold text-lg flex items-center justify-center shrink-0">
+                  SJ
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-bold text-base text-on-surface">Sarah Jenkins</h4>
+                    <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-bold uppercase">Arrived at Blood Bank</span>
+                    <span class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-[11px] font-bold">B+ Donor</span>
+                  </div>
+                  <p class="text-xs text-on-surface-variant mt-0.5">
+                    Proximity: <strong>1.8 mi away</strong> • Verified ID: <span class="font-mono">#DNR-8924</span> • Intake Desk: Metro Trauma Blood Bank
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <span class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                  PIN Verified (7842)
+                </span>
+                <a href="tel:+919528033454" class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">call</span>
+                  <span>Contact Donor</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Donor 2: Michael Chang (En Route) -->
+            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:bg-surface-container">
+              <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-full bg-secondary-container/60 text-secondary font-bold text-lg flex items-center justify-center shrink-0">
+                  MC
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-bold text-base text-on-surface">Michael Chang</h4>
+                    <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 text-[11px] font-bold uppercase">En Route (ETA 12m)</span>
+                    <span class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-[11px] font-bold">B+ Donor</span>
+                  </div>
+                  <p class="text-xs text-on-surface-variant mt-0.5">
+                    Proximity: <strong>3.4 mi away</strong> • Verified ID: <span class="font-mono">#DNR-5521</span> • In Transit via Ambulance Corridor
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <button type="button" onclick="document.getElementById('donor-handshake-input').value='7842'; document.getElementById('donor-handshake-input').focus();" class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container transition-all cursor-pointer">
+                  Awaiting Handshake PIN
+                </button>
+                <a href="tel:+919528033454" class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">call</span>
+                  <span>Call Michael</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Donor 3: David Miller (Accepted) -->
+            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:bg-surface-container">
+              <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-full bg-surface-container text-on-surface-variant font-bold text-lg flex items-center justify-center shrink-0">
+                  DM
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-bold text-base text-on-surface">David Miller</h4>
+                    <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[11px] font-bold uppercase">Accepted SOS</span>
+                    <span class="px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface text-[11px] font-bold">O+ Universal Component</span>
+                  </div>
+                  <p class="text-xs text-on-surface-variant mt-0.5">
+                    Proximity: <strong>4.9 mi away</strong> • Verified ID: <span class="font-mono">#DNR-3319</span> • Standby Donor
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <a href="tel:+919528033454" class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">call</span>
+                  <span>Coordinate</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 5: 6-STAGE RECIPIENT TRANSFUSION PIPELINE -->
+        <div id="recipient-pipeline-section" class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-bold uppercase tracking-wider">End-to-End Care Stepper</span>
+                <span class="text-xs text-on-surface-variant">• Patient Bedside Transparency</span>
+              </div>
+              <h3 class="text-xl font-bold text-on-surface mt-1">Live Transfusion Progress Pipeline</h3>
+              <p class="text-xs sm:text-sm text-on-surface-variant mt-0.5">
+                Track every clinical phase from emergency requisition to bedside transfusion in Trauma Ward 4B.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-on-surface-variant">Attendant Stage Control:</span>
+              <button type="button" onclick="advanceStageDemo()" class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">fast_forward</span>
+                <span>Next Stage Demo</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 6 Steps Interactive Horizontal / Responsive Pipeline -->
+          <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+            
+            <!-- Step 1: Raised -->
+            <div id="stage-card-1" onclick="setRecipientStage(1)" class="p-3.5 rounded-xl bg-emerald-50 border-2 border-emerald-500 flex flex-col gap-2 cursor-pointer transition-all">
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">1</span>
+                <span class="material-symbols-outlined text-[18px] text-emerald-600">check_circle</span>
+              </div>
+              <div>
+                <p class="font-bold text-xs text-on-surface">Requisition Raised</p>
+                <p class="text-[11px] text-emerald-800 font-semibold">Completed</p>
+              </div>
+              <p class="text-[10px] text-on-surface-variant leading-tight">Emergency order verified by Dr. Thorne.</p>
+            </div>
+
+            <!-- Step 2: Matched -->
+            <div id="stage-card-2" onclick="setRecipientStage(2)" class="p-3.5 rounded-xl bg-emerald-50 border-2 border-emerald-500 flex flex-col gap-2 cursor-pointer transition-all">
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">2</span>
+                <span class="material-symbols-outlined text-[18px] text-emerald-600">check_circle</span>
+              </div>
+              <div>
+                <p class="font-bold text-xs text-on-surface">Donors Alerted</p>
+                <p class="text-[11px] text-emerald-800 font-semibold">Completed</p>
+              </div>
+              <p class="text-[10px] text-on-surface-variant leading-tight">Broadcasted to B+ &amp; O+ reserves.</p>
+            </div>
+
+            <!-- Step 3: Arrived (ACTIVE) -->
+            <div id="stage-card-3" onclick="setRecipientStage(3)" class="p-3.5 rounded-xl bg-primary/10 border-2 border-primary flex flex-col gap-2 cursor-pointer transition-all shadow-xs">
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-full bg-primary text-white font-bold text-xs flex items-center justify-center animate-pulse">3</span>
+                <span class="material-symbols-outlined text-[18px] text-primary">local_hospital</span>
+              </div>
+              <div>
+                <p class="font-bold text-xs text-primary">Donor Arrived</p>
+                <p class="text-[11px] text-primary font-bold">Active Phase</p>
+              </div>
+              <p class="text-[10px] text-on-surface-variant leading-tight">Donor at Metro Blood Bank with PIN 7842.</p>
+            </div>
+
+            <!-- Step 4: Cross-Matching -->
+            <div id="stage-card-4" onclick="setRecipientStage(4)" class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col gap-2 cursor-pointer transition-all opacity-70 hover:opacity-100">
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant font-bold text-xs flex items-center justify-center">4</span>
+                <span class="material-symbols-outlined text-[18px] text-on-surface-variant">biotech</span>
+              </div>
+              <div>
+                <p class="font-bold text-xs text-on-surface">Cross-Matching</p>
+                <p class="text-[11px] text-on-surface-variant">Pending</p>
+              </div>
+              <p class="text-[10px] text-on-surface-variant leading-tight">Laboratory compatibility assay &amp; screening.</p>
+            </div>
+
+            <!-- Step 5: Apheresis Prep -->
+            <div id="stage-card-5" onclick="setRecipientStage(5)" class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col gap-2 cursor-pointer transition-all opacity-70 hover:opacity-100">
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant font-bold text-xs flex items-center justify-center">5</span>
+                <span class="material-symbols-outlined text-[18px] text-on-surface-variant">vaccines</span>
+              </div>
+              <div>
+                <p class="font-bold text-xs text-on-surface">Component Prep</p>
+                <p class="text-[11px] text-on-surface-variant">Pending</p>
+              </div>
+              <p class="text-[10px] text-on-surface-variant leading-tight">Platelet centrifugation &amp; cold chain packaging.</p>
+            </div>
+
+            <!-- Step 6: Transfusion Done -->
+            <div id="stage-card-6" onclick="setRecipientStage(6)" class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col gap-2 cursor-pointer transition-all opacity-70 hover:opacity-100">
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant font-bold text-xs flex items-center justify-center">6</span>
+                <span class="material-symbols-outlined text-[18px] text-on-surface-variant">task_alt</span>
+              </div>
+              <div>
+                <p class="font-bold text-xs text-on-surface">Bedside Infusion</p>
+                <p class="text-[11px] text-on-surface-variant">Final Stage</p>
+              </div>
+              <p class="text-[10px] text-on-surface-variant leading-tight">Intravenous transfusion completed at Ward 4B.</p>
+            </div>
+
+          </div>
+
+          <!-- Active Stage Detailed Info Banner -->
+          <div id="active-stage-banner" class="p-4 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between text-xs">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[22px] text-primary">info</span>
+              <div>
+                <span class="font-bold text-on-surface">Current Active Stage Details:</span>
+                <span id="active-stage-explanation" class="text-on-surface-variant ml-1">Volunteer donor Sarah Jenkins has checked in at the Blood Bank Reception. Verification PIN 7842 matched successfully.</span>
+              </div>
+            </div>
+            <span class="text-secondary font-mono text-[11px] shrink-0 hidden sm:inline">Telemetry Ref: #STAGE-03</span>
+          </div>
+
+        </div>
+
+        <!-- SECTION 6: ACTIVE REQUISITIONS TABLE -->
+        <div id="recipient-requests-section" class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-xl font-bold text-on-surface">Active Patient Requisitions</h3>
+              <p class="text-xs sm:text-sm text-on-surface-variant mt-0.5">
+                All clinical blood and component requests linked to Patient Case <strong class="text-on-surface">#CASE-9042</strong>.
+              </p>
+            </div>
+            <a href="index.html#/raise-request" class="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs sm:text-sm font-bold shadow flex items-center gap-2 transition-all self-start sm:self-auto">
+              <span class="material-symbols-outlined text-[18px]">add_circle</span>
+              <span>Raise Additional Unit Request</span>
+            </a>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs sm:text-sm border-collapse">
+              <thead>
+                <tr class="border-b border-surface-container text-on-surface-variant text-[11px] uppercase tracking-wider">
+                  <th class="py-3 px-3">Requisition</th>
+                  <th class="py-3 px-3">Component</th>
+                  <th class="py-3 px-3">Units</th>
+                  <th class="py-3 px-3">Hospital Location</th>
+                  <th class="py-3 px-3">Responders</th>
+                  <th class="py-3 px-3">Status</th>
+                  <th class="py-3 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container">
+                <tr class="hover:bg-surface-container-low transition-colors">
+                  <td class="py-3 px-3 font-mono font-bold text-primary">#REQ-9042</td>
+                  <td class="py-3 px-3 font-bold text-on-surface">Platelets (Apheresis) • B+</td>
+                  <td class="py-3 px-3 font-semibold">2 of 3 Units</td>
+                  <td class="py-3 px-3 text-on-surface-variant">Metro Trauma Ward 4B</td>
+                  <td class="py-3 px-3">
+                    <span class="font-bold text-emerald-700">3 Donors Responding</span>
+                  </td>
+                  <td class="py-3 px-3">
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold uppercase">
+                      Donor Arrived
+                    </span>
+                  </td>
+                  <td class="py-3 px-3 text-right">
+                    <button type="button" onclick="shareSOSOnWhatsApp()" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer mr-1">
+                      SOS
+                    </button>
+                    <a href="index.html#/request-tracking" class="px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold inline-block">
+                      Track
+                    </a>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-surface-container-low transition-colors">
+                  <td class="py-3 px-3 font-mono font-bold text-secondary">#REQ-8841</td>
+                  <td class="py-3 px-3 font-medium text-on-surface">Whole Blood (Packed Cells) • B+</td>
+                  <td class="py-3 px-3 font-semibold">2 of 2 Units</td>
+                  <td class="py-3 px-3 text-on-surface-variant">Metro Trauma ICU-2</td>
+                  <td class="py-3 px-3">
+                    <span class="text-on-surface-variant font-medium">2 Donors Completed</span>
+                  </td>
+                  <td class="py-3 px-3">
+                    <span class="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-bold uppercase">
+                      Transfused
+                    </span>
+                  </td>
+                  <td class="py-3 px-3 text-right">
+                    <span class="text-xs text-on-surface-variant">Archived</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- FLOATING BACK TO TOP BUTTON -->
+  <div id="floating-back-to-top" class="fixed bottom-6 right-6 z-40 transition-all duration-300 transform translate-y-12 opacity-0 pointer-events-none">
+    <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface hover:text-primary border border-surface-container-high shadow-xl hover:shadow-2xl transition-all duration-200 active:scale-95 cursor-pointer text-xs font-bold tracking-wide">
+      <span class="material-symbols-outlined text-[18px] text-primary">arrow_upward</span>
+      <span>Back to Top</span>
+    </button>
+  </div>
+
+  <!-- SCRIPT LOGIC FOR RECIPIENT DASHBOARD -->
+  <script>
+    // Smooth scroll helper
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // WhatsApp SOS Appeal Generator
+    function shareSOSOnWhatsApp() {
+      const patient = document.getElementById('sidebar-patient-name')?.textContent || 'Devika Sharma';
+      const bloodGroup = document.getElementById('sidebar-blood-group')?.textContent || 'B+';
+      const component = document.getElementById('sidebar-blood-component')?.textContent || 'Platelets';
+      const hospital = 'Metro General Hospital & Trauma Center (Ward 4B Bed 12)';
+      const attendantPhone = '+91 95280 33454';
+      const pin = '7842';
+
+      const msg = `🚨 *URGENT BLOOD SOS APPEAL via DonorPulse Grid* 🚨\n\n` +
+        `Patient *${patient}* urgently requires *${bloodGroup} ${component}* for emergency surgery.\n\n` +
+        `🏥 *Hospital Location:* ${hospital}\n` +
+        `🔑 *Donor Arrival Verification PIN:* ${pin}\n` +
+        `📞 *Attendant Contact:* ${attendantPhone}\n\n` +
+        `If you or someone in your network can donate ${bloodGroup} or universal O+ platelets, please report immediately to Metro Blood Bank Desk with PIN ${pin}.\n\n` +
+        `Live coordination link: ${window.location.origin}/index.html#/recipient-dashboard`;
+
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    }
+
+    // Copy SOS Appeal Text
+    function copySOSAppealLink() {
+      const text = `🚨 URGENT BLOOD APPEAL: Devika Sharma urgently needs B+ Platelets at Metro General Hospital (Ward 4B Bed 12). Donor PIN: 7842. Contact Attendant: +91 95280 33454. Link: ${window.location.origin}/index.html#/recipient-dashboard`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          const btnText = document.getElementById('copy-btn-text');
+          if (btnText) {
+            btnText.textContent = 'Link & SOS Copied!';
+            setTimeout(() => { btnText.textContent = 'Copy SOS Appeal Link'; }, 2500);
+          }
+        });
+      }
+    }
+
+    // Verify Donor Handshake PIN
+    function verifyDonorHandshake() {
+      const input = document.getElementById('donor-handshake-input');
+      const val = input ? input.value.trim() : '';
+      const alertBox = document.getElementById('handshake-alert');
+      const alertText = document.getElementById('handshake-alert-text');
+      if (!alertBox || !alertText) return;
+
+      alertBox.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-900', 'border-emerald-300', 'bg-error-container', 'text-on-error-container');
+
+      if (val === '7842') {
+        alertBox.classList.add('bg-emerald-100', 'text-emerald-900', 'border', 'border-emerald-300');
+        alertText.innerHTML = `✅ <strong>PIN 7842 Verified!</strong> Responding donor arrival confirmed. Intake desk logged at ${new Date().toLocaleTimeString()}.`;
+        if (input) input.value = '';
+      } else {
+        alertBox.classList.add('bg-error-container', 'text-on-error-container', 'border', 'border-error/30');
+        alertText.innerHTML = `❌ <strong>Invalid PIN:</strong> Entered "${val}". The authorized Donor Handshake PIN for this case is <strong>7842</strong>.`;
+      }
+    }
+
+    // Transfusion Pipeline Stages
+    const stageExplanations = {
+      1: "Emergency requisition submitted and verified by attending surgical triage doctor.",
+      2: "Hyper-compatible blood and platelet donors alerted across 5.0 mi radius.",
+      3: "Volunteer donor Sarah Jenkins checked in at Metro Blood Bank Desk with PIN 7842.",
+      4: "Blood sample undergoing cross-matching, antibody screening, and viral safety assay.",
+      5: "Platelet unit collected via apheresis kit and packaged under cold-chain protocol.",
+      6: "Unit delivered to Trauma Ward 4B and intravenous bedside transfusion completed successfully."
+    };
+
+    let currentStage = 3;
+    function setRecipientStage(stageNum) {
+      currentStage = stageNum;
+      for (let i = 1; i <= 6; i++) {
+        const card = document.getElementById(`stage-card-${i}`);
+        if (!card) continue;
+        card.classList.remove('border-primary', 'bg-primary/10', 'border-emerald-500', 'bg-emerald-50', 'opacity-70', 'shadow-xs');
+        if (i < stageNum) {
+          card.classList.add('bg-emerald-50', 'border-2', 'border-emerald-500');
+        } else if (i === stageNum) {
+          card.classList.add('bg-primary/10', 'border-2', 'border-primary', 'shadow-xs');
+        } else {
+          card.classList.add('bg-surface-container-low', 'opacity-70');
+        }
+      }
+
+      const explanationEl = document.getElementById('active-stage-explanation');
+      if (explanationEl && stageExplanations[stageNum]) {
+        explanationEl.textContent = stageExplanations[stageNum];
+      }
+
+      const pill = document.getElementById('metric-stage-pill');
+      if (pill) {
+        pill.textContent = `Stage ${stageNum} of 6`;
+      }
+    }
+
+    function advanceStageDemo() {
+      const next = currentStage < 6 ? currentStage + 1 : 1;
+      setRecipientStage(next);
+    }
+
+    // Switch Case Demo
+    function switchCase(caseId) {
+      if (caseId === 'CASE-5510') {
+        document.getElementById('sidebar-patient-name').textContent = 'Amit Verma';
+        document.getElementById('sidebar-case-id').textContent = 'CASE-5510';
+        document.getElementById('sidebar-blood-group').textContent = 'O-';
+        document.getElementById('sidebar-blood-component').textContent = 'PRBC (Packed Red Cells)';
+        document.getElementById('sidebar-attendant-name').textContent = 'Pooja Verma';
+        document.getElementById('hero-patient-name').textContent = 'Amit Verma';
+        document.getElementById('hero-blood-need').textContent = 'O- Packed Red Cells';
+        document.getElementById('hero-req-id').textContent = '#REQ-5510';
+        document.getElementById('hero-attendant-name').textContent = 'Pooja Verma';
+        document.getElementById('hero-handshake-pin').textContent = '4912';
+      } else {
+        document.getElementById('sidebar-patient-name').textContent = 'Devika Sharma';
+        document.getElementById('sidebar-case-id').textContent = 'CASE-9042';
+        document.getElementById('sidebar-blood-group').textContent = 'B+';
+        document.getElementById('sidebar-blood-component').textContent = 'Platelets (Apheresis)';
+        document.getElementById('sidebar-attendant-name').textContent = 'Rajesh Sharma';
+        document.getElementById('hero-patient-name').textContent = 'Devika Sharma';
+        document.getElementById('hero-blood-need').textContent = 'B+ Platelets';
+        document.getElementById('hero-req-id').textContent = '#REQ-9042';
+        document.getElementById('hero-attendant-name').textContent = 'Rajesh Sharma';
+        document.getElementById('hero-handshake-pin').textContent = '7842';
+      }
+    }
+
+    // Floating Back to Top Button
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('floating-back-to-top');
+      if (!btn) return;
+      if (window.scrollY > 300) {
+        btn.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+        btn.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      } else {
+        btn.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+        btn.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>
