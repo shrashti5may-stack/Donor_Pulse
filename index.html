@@ -858,12 +858,16 @@
     <!-- ------------------------------------------------------------------- -->
     <div id="view-role-selection" class="view-section w-full">
       <div class="relative w-full max-w-[1400px] xl:max-w-[1520px] 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 min-h-[calc(100vh-2rem)] lg:h-[calc(100vh-1rem)] flex flex-col justify-between items-center">
-        <!-- Back Navigation -->
-        <div class="w-full flex justify-start mb-1 sm:mb-2 relative z-10 shrink-0">
+        <!-- Back Navigation & Brand -->
+        <div class="w-full flex justify-between items-center mb-1 sm:mb-2 relative z-10 shrink-0">
           <button type="button" onclick="window.PulseRouter.navigate('landing')" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-surface-container-high/80 hover:bg-surface-container text-on-surface font-label-md text-xs sm:text-sm font-semibold transition-all shadow-xs group cursor-pointer">
             <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
             <span>Back to Home Page</span>
           </button>
+          <div class="flex items-center gap-2">
+            <img alt="DonorPulse Logo" class="h-6 w-6 object-contain" src="images/logo-icon.png"/>
+            <span class="font-bold text-sm text-on-surface tracking-tight">DonorPulse</span>
+          </div>
         </div>
 
         <!-- Ambient Glow -->
@@ -877,8 +881,11 @@
             <span class="text-secondary font-label-badge text-[11px]">•</span>
             <span class="font-label-badge text-[11px] text-secondary font-semibold uppercase">Secure Authentication Gateway</span>
           </div>
-          <h1 class="font-display-hero text-2xl sm:text-3xl lg:text-[36px] xl:text-[40px] text-on-surface tracking-tight max-w-2xl mt-0.5 leading-tight font-extrabold">
-            Welcome to <span class="text-primary tracking-tight">DonorPulse</span>
+          <h1 class="font-display-hero text-2xl sm:text-3xl lg:text-[36px] xl:text-[40px] text-on-surface tracking-tight max-w-3xl mt-0.5 leading-tight font-extrabold inline-flex items-center justify-center gap-2.5 sm:gap-3 flex-wrap">
+            <span>Welcome to <span class="text-primary tracking-tight">DonorPulse</span></span>
+            <a href="#/landing" class="inline-flex items-center justify-center hover:opacity-90 transition-opacity group cursor-pointer shrink-0" title="DonorPulse Home">
+              <img alt="DonorPulse Logo" class="h-9 w-9 sm:h-11 sm:w-11 lg:h-12 lg:w-12 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200" src="images/logo-icon.png"/>
+            </a>
           </h1>
           <p class="text-xs sm:text-sm text-secondary max-w-xl mx-auto leading-normal">
             Select your portal to log in or register for donor access and hospital clinical triage.
