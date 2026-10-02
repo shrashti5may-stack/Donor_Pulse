@@ -1078,25 +1078,48 @@ function initBloodCompatibilityWidget() {
 }
 
 
+function resetRaiseRequestModal(modal) {
+  if (!modal) modal = document.getElementById('modal-request');
+  if (!modal) return;
+  const form = modal.querySelector('form.form-blood-request') || modal.querySelector('form');
+  if (form) form.reset();
+
+  modal.querySelectorAll('input:not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="file"])').forEach(i => i.value = '');
+  modal.querySelectorAll('textarea').forEach(t => t.value = '');
+  modal.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+
+  modal.querySelectorAll('input[name="blood_type"]').forEach(r => r.checked = false);
+  modal.querySelectorAll('.blood-radio-btn').forEach(btn => {
+    btn.classList.remove('bg-primary', 'text-white', 'shadow-md');
+    btn.classList.add('bg-surface-container', 'text-on-surface');
+  });
+
+  const fileInput = modal.querySelector('.proof-file-input');
+  if (fileInput) fileInput.value = '';
+  const fileLabel = modal.querySelector('.proof-filename-display');
+  if (fileLabel) fileLabel.textContent = 'No document attached yet';
+  const sizeLabel = modal.querySelector('.proof-filesize-display');
+  if (sizeLabel) sizeLabel.textContent = 'Upload hospital requisition slip, doctor prescription, or lab report (PDF/JPG/PNG)';
+
+  const authTag = modal.querySelector('.proof-auth-tag');
+  if (authTag) authTag.classList.add('hidden');
+
+  const viewProofBtn = modal.querySelector('.proof-view-btn');
+  if (viewProofBtn) viewProofBtn.classList.add('hidden');
+
+  const uploadBtnText = modal.querySelector('.proof-upload-btn-text');
+  if (uploadBtnText) uploadBtnText.textContent = 'Upload';
+
+  const badge = modal.querySelector('.proof-verification-badge');
+  if (badge) badge.classList.add('hidden');
+}
+
 function openRequestModal() {
   const modal = document.getElementById('modal-request');
   if (modal) {
+    resetRaiseRequestModal(modal);
     modal.classList.remove('hidden');
     document.body.classList.add('overflow-hidden');
-    
-    // Highlight currently checked blood radio button
-    const checked = modal.querySelector('input[name="blood_type"]:checked');
-    if (checked) {
-      modal.querySelectorAll('.blood-radio-btn').forEach(btn => {
-        btn.classList.remove('bg-primary', 'text-white', 'shadow-md');
-        btn.classList.add('bg-surface-container', 'text-on-surface');
-      });
-      const activeDiv = checked.nextElementSibling;
-      if (activeDiv) {
-        activeDiv.classList.add('bg-primary', 'text-white', 'shadow-md');
-        activeDiv.classList.remove('bg-surface-container', 'text-on-surface');
-      }
-    }
   }
 }
 
@@ -1138,8 +1161,18 @@ function fillDemoRaiseRequest() {
   const sizeLabel = modal.querySelector('.proof-filesize-display');
   if (sizeLabel) sizeLabel.textContent = '1.4 MB • Official Hospital Seal & Doctor Signature Detected';
 
+  const authTag = modal.querySelector('.proof-auth-tag');
+  if (authTag) authTag.classList.remove('hidden');
+
+  const viewProofBtn = modal.querySelector('.proof-view-btn');
+  if (viewProofBtn) viewProofBtn.classList.remove('hidden');
+
+  const uploadBtnText = modal.querySelector('.proof-upload-btn-text');
+  if (uploadBtnText) uploadBtnText.textContent = 'Replace';
+
   const badge = modal.querySelector('.proof-verification-badge');
   if (badge) {
+    badge.classList.remove('hidden');
     badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex flex-col gap-1.5 transition-all';
     const statusText = badge.querySelector('.proof-status-text');
     if (statusText) statusText.textContent = 'Authenticity Check: 100% Genuine Requisition';
@@ -1170,8 +1203,13 @@ function handleProofFileSelect(event) {
   document.querySelectorAll('.proof-filename-display').forEach(el => el.textContent = fileName);
   document.querySelectorAll('.proof-filesize-display').forEach(el => el.textContent = `${fileSize} • Uploaded Document`);
 
+  document.querySelectorAll('.proof-auth-tag').forEach(el => el.classList.remove('hidden'));
+  document.querySelectorAll('.proof-view-btn').forEach(el => el.classList.remove('hidden'));
+  document.querySelectorAll('.proof-upload-btn-text').forEach(el => el.textContent = 'Replace');
+
   // Simulate instant AI OCR & security seal verification scan
   document.querySelectorAll('.proof-verification-badge').forEach(badge => {
+    badge.classList.remove('hidden');
     badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs flex flex-col gap-1.5 transition-all animate-pulse';
     const statusText = badge.querySelector('.proof-status-text');
     if (statusText) statusText.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin inline-block mr-1 align-text-bottom">sync</span> Verifying document signatures &amp; hospital seal...';
@@ -1179,6 +1217,7 @@ function handleProofFileSelect(event) {
 
   setTimeout(() => {
     document.querySelectorAll('.proof-verification-badge').forEach(badge => {
+      badge.classList.remove('hidden');
       badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex flex-col gap-1.5 transition-all';
       const statusText = badge.querySelector('.proof-status-text');
       if (statusText) statusText.textContent = 'Authenticity Check: 100% Genuine Requisition';
@@ -1248,6 +1287,7 @@ window.openRaiseRequestModal = openRequestModal;
 window.closeRaiseRequestModal = closeRequestModal;
 window.openRequestModal = openRequestModal;
 window.closeRequestModal = closeRequestModal;
+window.resetRaiseRequestModal = resetRaiseRequestModal;
 window.fillDemoRaiseRequest = fillDemoRaiseRequest;
 window.handleProofFileSelect = handleProofFileSelect;
 window.openMedicalProofViewer = openMedicalProofViewer;
