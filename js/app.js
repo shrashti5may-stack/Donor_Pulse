@@ -1461,9 +1461,10 @@ function renderRecipientDashboard() {
   setTextContentAll('.attendant-name-display', cleanRelation ? `${recipient.attendantName} (${cleanRelation})` : recipient.attendantName);
   setTextContentAll('.attendant-phone-display', recipient.attendantPhone);
   setTextContentAll('.hospital-name-display', recipient.hospitalName);
-  setTextContentAll('.hospital-location-display', `${recipient.hospitalWard}, ${recipient.hospitalName}`);
+  setTextContentAll('.hospital-location-display', `${recipient.hospitalWard}, ${cleanHospital}`);
   setTextContentAll('.hospital-phone-display', recipient.hospitalBloodDesk);
-  setTextContentAll('.hospital-ward-display', `${cleanHospital} • ${cleanWard}`);
+  const shortHospital = cleanHospital.replace(/\s+Hospital$/i, '');
+  setTextContentAll('.hospital-ward-display', `${shortHospital}, ${cleanWard}`);
   setTextContentAll('.doctor-name-display', recipient.doctorName);
   setTextContentAll('.doctor-meta-display', `${recipient.doctorDepartment} • Ext 4429`);
   setTextContentAll('.case-id-display', `Case: ${recipient.id}`);
