@@ -184,13 +184,12 @@
             </div>
           </div>
 
-          <!-- Case Switcher (For Multiple Loved Ones) -->
-          <div class="flex items-center justify-between pt-1 text-xs">
-            <span class="text-on-surface-variant font-medium">Switch Active Case:</span>
-            <select id="case-switcher-select" onchange="switchCase(this.value)" class="text-xs font-semibold text-primary bg-surface-container rounded-lg px-2 py-1 border border-surface-container-high cursor-pointer">
-              <option value="CASE-9042" selected>Devika (B+ Platelets)</option>
-              <option value="CASE-5510">Amit Verma (O- PRBC)</option>
-            </select>
+          <!-- Active Case Display (Static, no switching after login) -->
+          <div class="flex items-center justify-between pt-1 text-xs whitespace-nowrap">
+            <span class="text-on-surface-variant font-medium">Active Case:</span>
+            <span class="text-xs font-bold text-primary bg-surface-container rounded-lg px-2 py-0.5 border border-surface-container-high">
+              Devika (B+ Platelets)
+            </span>
           </div>
         </div>
 
@@ -241,9 +240,9 @@
             <span>Raise Urgent Blood Request</span>
           </a>
 
-          <a href="role-selection.html" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-error hover:bg-error-container/30 transition-colors font-semibold">
+          <a href="role-selection.html" onclick="if(window.logoutUser){event.preventDefault();window.logoutUser('recipient');}" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-error hover:bg-error-container/30 transition-colors font-semibold" title="Sign out of Recipient Portal">
             <span class="material-symbols-outlined text-[20px]">logout</span>
-            <span>Exit Dashboard / Logout</span>
+            <span>Log Out</span>
           </a>
         </nav>
 

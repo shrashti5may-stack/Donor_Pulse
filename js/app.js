@@ -1339,20 +1339,25 @@ function renderRecipientDashboard() {
   const sidebar = document.querySelector('#view-recipient-dashboard aside');
   if (sidebar) sidebar.scrollTop = 0;
 
+  const cleanRelation = (recipient.attendantRelation || '').split('/')[0].trim();
+  const cleanHospital = recipient.hospitalName.split('&')[0].trim();
+  const cleanWard = recipient.hospitalWard.split(',')[0].trim();
+
   setTextContentAll('.patient-name-display', recipient.patientName);
   setTextContentAll('.patient-blood-display', `${recipient.bloodGroup} ${recipient.component.split(' ')[0]}`);
   setTextContentAll('.patient-blood-group-badge', recipient.bloodGroup);
   setTextContentAll('.patient-component-display', recipient.component);
   setTextContentAll('.patient-meta-display', `${recipient.patientAge} Yrs • ${recipient.patientGender} • ICU Ward 4B`);
-  setTextContentAll('.attendant-name-display', `${recipient.attendantName} (${recipient.attendantRelation})`);
+  setTextContentAll('.attendant-name-display', cleanRelation ? `${recipient.attendantName} (${cleanRelation})` : recipient.attendantName);
   setTextContentAll('.attendant-phone-display', recipient.attendantPhone);
   setTextContentAll('.hospital-name-display', recipient.hospitalName);
   setTextContentAll('.hospital-location-display', `${recipient.hospitalWard}, ${recipient.hospitalName}`);
   setTextContentAll('.hospital-phone-display', recipient.hospitalBloodDesk);
-  setTextContentAll('.hospital-ward-display', `${recipient.hospitalName} • ${recipient.hospitalWard}`);
+  setTextContentAll('.hospital-ward-display', `${cleanHospital} • ${cleanWard}`);
   setTextContentAll('.doctor-name-display', recipient.doctorName);
   setTextContentAll('.doctor-meta-display', `${recipient.doctorDepartment} • Ext 4429`);
   setTextContentAll('.case-id-display', `Case: ${recipient.id}`);
+  setTextContentAll('.patient-case-display', `${recipient.patientName} (${recipient.bloodGroup} ${recipient.component.split(' ')[0]}) — ${cleanHospital}`);
   setTextContentAll('.recipient-req-id-display', recipient.requestId);
   setTextContentAll('.handshake-otp-display', recipient.handshakeOTP);
   setTextContentAll('.recipient-urgency-display', recipient.urgency);
@@ -1368,7 +1373,7 @@ function renderRecipientDashboard() {
   });
   setTextContentAll('.recipient-progress-pct', `${pct}% Arranged`);
 
-  // Case Switcher Dropdown
+  // Case Switcher Dropdown (Supported if element exists in DOM)
   const switcher = document.getElementById('recipient-case-switcher');
   if (switcher && typeof window.PulseStore.getRecipientCases === 'function') {
     const list = window.PulseStore.getRecipientCases();
@@ -2359,7 +2364,16 @@ document.addEventListener('DOMContentLoaded', () => {
  * Global User Logout Handler
  */
 window.logoutUser = function(role) {
-  const roleName = role === 'hospital' ? 'Hospital Portal' : 'Donor Portal';
+  let roleName = 'Donor Portal';
+  if (role === 'hospital') {
+    roleName = 'Hospital Portal';
+  } else if (role === 'recipient' || role === 'family' || role === 'patient') {
+    roleName = 'Recipient Portal';
+  } else if (role === 'donor') {
+    roleName = 'Donor Portal';
+  } else if (typeof role === 'string' && role.trim()) {
+    roleName = `${role.charAt(0).toUpperCase() + role.slice(1)} Portal`;
+  }
   if (window.showToast) {
     window.showToast('Logged Out', `Successfully signed out of the ${roleName}.`, 'info');
   }

@@ -194,10 +194,27 @@
   font-variation-settings: 'FILL' 1;
 }
 
-/* Recipient Dashboard Sidebar - Prevent Flexbox Squashing */
+/* Recipient Dashboard Sidebar - Prevent Flexbox Squashing & Force Non-Scrollable Layout */
+#view-recipient-dashboard aside {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
 #view-recipient-dashboard aside > * {
   flex-shrink: 0 !important;
   min-height: max-content !important;
+}
+
+#view-recipient-dashboard aside .recipient-nav-btn {
+  white-space: nowrap !important;
+}
+
+#view-recipient-dashboard aside .recipient-nav-btn span {
+  white-space: nowrap !important;
+}
+
+#view-recipient-dashboard .hospital-location-display {
+  white-space: nowrap !important;
 }
 
 

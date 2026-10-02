@@ -2000,97 +2000,98 @@
       </div>
 
       <div class="max-w-[1280px] w-full mx-auto px-gutter-desktop py-space-xl flex flex-col lg:flex-row gap-space-xl items-start">
-        <!-- LEFT NAVIGATION SIDEBAR (FIXED/STICKY) -->
-        <aside class="w-full lg:w-72 shrink-0 flex flex-col gap-3 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-2rem)] overflow-y-auto custom-scrollbar p-1">
+        <!-- LEFT NAVIGATION SIDEBAR (FIXED/STICKY, NON-SCROLLABLE) -->
+        <aside class="w-full lg:w-[325px] shrink-0 flex flex-col gap-2.5 lg:sticky lg:top-4 lg:self-start p-1 overflow-visible">
           
           <!-- Patient & Attendant Profile Card -->
-          <div style="flex-shrink: 0 !important; min-height: max-content !important;" class="bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-3 relative shrink-0">
-            <div class="h-1.5 -mt-4 -mx-4 mb-0.5 rounded-t-2xl bg-gradient-to-r from-primary to-rose-400"></div>
-            <div class="flex items-center gap-space-sm">
-              <div class="w-12 h-12 rounded-xl bg-error-container/60 text-primary flex items-center justify-center font-headline-sm text-headline-sm font-bold shrink-0 shadow-xs">
-                <span class="material-symbols-outlined text-[26px]">volunteer_activism</span>
+          <div style="flex-shrink: 0 !important; min-height: max-content !important;" class="bg-surface-container-lowest p-3.5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-2.5 relative shrink-0">
+            <div class="h-1.5 -mt-3.5 -mx-3.5 mb-0.5 rounded-t-2xl bg-gradient-to-r from-primary to-rose-400"></div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-xl bg-error-container/60 text-primary flex items-center justify-center font-headline-sm text-headline-sm font-bold shrink-0 shadow-xs">
+                <span class="material-symbols-outlined text-[22px]">volunteer_activism</span>
               </div>
               <div class="flex flex-col min-w-0">
-                <span class="patient-name-display font-headline-sm text-title-md truncate text-on-surface font-extrabold">Devika Sharma</span>
-                <span class="patient-blood-display font-label-badge text-label-badge text-primary font-bold uppercase tracking-wide">B+ Platelets</span>
+                <span class="patient-name-display font-headline-sm text-base truncate text-on-surface font-extrabold whitespace-nowrap">Devika Sharma</span>
+                <span class="patient-blood-display font-label-badge text-label-badge text-primary font-bold uppercase tracking-wide whitespace-nowrap">B+ Platelets</span>
               </div>
             </div>
 
-            <div class="p-2.5 rounded-xl bg-surface-container-low flex flex-col gap-1 text-xs">
-              <div class="flex items-center justify-between text-on-surface-variant">
-                <span>Family Attendant:</span>
-                <span class="attendant-name-display font-semibold text-on-surface">Rajesh (Brother)</span>
+            <div class="p-2 rounded-xl bg-surface-container-low flex flex-col gap-1 text-xs">
+              <div class="flex items-center justify-between gap-1 text-on-surface-variant whitespace-nowrap">
+                <span class="shrink-0 text-[11px]">Attendant:</span>
+                <span class="attendant-name-display font-semibold text-on-surface text-[11px] truncate text-right">Rajesh Sharma (Brother)</span>
               </div>
-              <div class="flex items-center justify-between text-on-surface-variant">
-                <span>Hospital &amp; Ward:</span>
-                <span class="hospital-ward-display font-medium text-on-surface truncate">Metro General, ICU 4B</span>
+              <div class="flex items-center justify-between gap-1 text-on-surface-variant whitespace-nowrap">
+                <span class="shrink-0 text-[11px]">Hospital &amp; Ward:</span>
+                <span class="hospital-ward-display font-medium text-on-surface text-[11px] truncate text-right">Metro General, ICU 4B</span>
               </div>
-              <div class="flex items-center justify-between text-on-surface-variant pt-1 border-t border-surface-container">
-                <span>Fulfillment:</span>
-                <span class="patient-units-summary font-bold text-primary">3 Req. • 1 Received</span>
+              <div class="flex items-center justify-between gap-1 text-on-surface-variant pt-1 border-t border-surface-container whitespace-nowrap">
+                <span class="shrink-0 text-[11px]">Fulfillment:</span>
+                <span class="patient-units-summary font-bold text-primary text-[11px] truncate text-right">3 Units Req. • 1 Received</span>
               </div>
             </div>
           </div>
 
           <!-- Quick Action: Raise / Update Requisition -->
-          <button data-open-modal-request style="flex-shrink: 0 !important;" class="w-full shrink-0 py-3.5 px-space-md bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-space-xs active:scale-98 cursor-pointer">
-            <span class="material-symbols-outlined text-[20px]">emergency</span>
-            <span>+ Request Additional Blood</span>
+          <button data-open-modal-request style="flex-shrink: 0 !important;" class="w-full shrink-0 py-2.5 px-3 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-xs font-bold shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-98 cursor-pointer whitespace-nowrap">
+            <span class="material-symbols-outlined text-[18px]">emergency</span>
+            <span class="whitespace-nowrap">+ Request Additional Blood</span>
           </button>
 
           <!-- 1-Click WhatsApp SOS Share Button -->
-          <button type="button" onclick="window.shareSOSOnWhatsApp()" style="flex-shrink: 0 !important;" class="w-full shrink-0 py-3 px-space-md bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-label-lg text-sm font-bold shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+          <button type="button" onclick="window.shareSOSOnWhatsApp()" style="flex-shrink: 0 !important;" class="w-full shrink-0 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98 whitespace-nowrap">
             <span class="material-symbols-outlined text-[18px]">share</span>
-            <span>Share SOS on WhatsApp</span>
+            <span class="whitespace-nowrap">Share SOS on WhatsApp</span>
           </button>
 
           <!-- Nav Menu (In-Page Navigation) -->
-          <nav id="recipient-sidebar-nav" style="flex-shrink: 0 !important;" class="bg-surface-container-lowest shrink-0 rounded-xl p-space-xs shadow-sm border border-surface-container-high flex flex-col gap-1">
-            <button type="button" data-recipient-nav="overview" onclick="window.scrollToRecipientSection('recipient-overview')" class="recipient-nav-btn flex items-center justify-between px-space-md py-2.5 rounded-lg bg-primary/10 text-primary font-label-lg text-label-lg transition-all text-left w-full cursor-pointer">
-              <div class="flex items-center gap-space-sm">
-                <span class="material-symbols-outlined text-[20px]">grid_view</span>
-                <span>Case Overview</span>
+          <nav id="recipient-sidebar-nav" style="flex-shrink: 0 !important;" class="bg-surface-container-lowest shrink-0 rounded-xl p-1.5 shadow-sm border border-surface-container-high flex flex-col gap-1">
+            <button type="button" data-recipient-nav="overview" onclick="window.scrollToRecipientSection('recipient-overview')" class="recipient-nav-btn flex items-center justify-between px-3 py-2 rounded-lg bg-primary/10 text-primary text-xs font-bold transition-all text-left w-full cursor-pointer whitespace-nowrap">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-[18px] shrink-0">grid_view</span>
+                <span class="whitespace-nowrap">Case Overview</span>
               </div>
-              <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></span>
             </button>
-            <button type="button" data-recipient-nav="donors" onclick="window.scrollToRecipientSection('recipient-donors-section')" class="recipient-nav-btn flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-lg text-label-lg text-left w-full cursor-pointer">
-              <div class="flex items-center gap-space-sm">
-                <span class="material-symbols-outlined text-[20px]">two_wheeler</span>
-                <span>Incoming Donors</span>
+            <button type="button" data-recipient-nav="donors" onclick="window.scrollToRecipientSection('recipient-donors-section')" class="recipient-nav-btn flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all text-xs font-semibold text-left w-full cursor-pointer whitespace-nowrap">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-[18px] shrink-0">two_wheeler</span>
+                <span class="whitespace-nowrap">Incoming Donors</span>
               </div>
-              <span class="recipient-donors-active-count px-2 py-0.5 rounded-full bg-error-container text-primary font-label-badge text-label-badge font-bold">3</span>
+              <span class="recipient-donors-active-count px-2 py-0.5 rounded-full bg-error-container text-primary font-bold text-[11px] shrink-0">3</span>
             </button>
-            <button type="button" data-recipient-nav="tracking" onclick="window.scrollToRecipientSection('recipient-tracking-section')" class="recipient-nav-btn flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-lg text-label-lg text-left w-full cursor-pointer">
-              <div class="flex items-center gap-space-sm">
-                <span class="material-symbols-outlined text-[20px]">timeline</span>
-                <span>Transfusion Timeline</span>
+            <button type="button" data-recipient-nav="tracking" onclick="window.scrollToRecipientSection('recipient-tracking-section')" class="recipient-nav-btn flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all text-xs font-semibold text-left w-full cursor-pointer whitespace-nowrap">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-[18px] shrink-0">timeline</span>
+                <span class="whitespace-nowrap">Transfusion Timeline</span>
               </div>
-              <span class="text-[11px] font-bold text-tertiary">Stage 4</span>
+              <span class="text-[11px] font-bold text-tertiary shrink-0">Stage 4</span>
             </button>
-            <button type="button" data-recipient-nav="requests" onclick="window.scrollToRecipientSection('recipient-requests-section')" class="recipient-nav-btn flex items-center justify-between px-space-md py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all font-label-lg text-label-lg text-left w-full cursor-pointer">
-              <div class="flex items-center gap-space-sm">
-                <span class="material-symbols-outlined text-[20px]">receipt_long</span>
-                <span>Active Requisitions</span>
+            <button type="button" data-recipient-nav="requests" onclick="window.scrollToRecipientSection('recipient-requests-section')" class="recipient-nav-btn flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all text-xs font-semibold text-left w-full cursor-pointer whitespace-nowrap">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-[18px] shrink-0">receipt_long</span>
+                <span class="whitespace-nowrap">Active Requisitions</span>
               </div>
-              <span class="recipient-req-id-display font-mono text-[11px] text-secondary">REQ-9042</span>
+              <span class="recipient-req-id-display font-mono text-[11px] text-secondary shrink-0">REQ-9042</span>
             </button>
-            <div class="my-1 h-px bg-surface-container"></div>
-            <button type="button" onclick="window.logoutUser('recipient')" class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-error hover:bg-error-container/20 font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left" title="Switch Patient Case / Log Out">
-              <span class="material-symbols-outlined text-[20px]">logout</span>
-              <span>Switch Case / Logout</span>
+            <div class="my-0.5 h-px bg-surface-container"></div>
+            <button type="button" onclick="window.logoutUser('recipient')" class="flex items-center gap-2 px-3 py-2 rounded-lg text-error hover:bg-error-container/20 text-xs font-semibold transition-colors cursor-pointer w-full text-left whitespace-nowrap" title="Sign out of Recipient Portal">
+              <span class="material-symbols-outlined text-[18px] shrink-0">logout</span>
+              <span class="whitespace-nowrap">Log Out</span>
             </button>
           </nav>
 
-          <!-- Hospital Blood Bank & Ward Contact Card -->
-          <div style="flex-shrink: 0 !important;" class="bg-surface-container-low shrink-0 p-space-md rounded-xl flex flex-col gap-space-xs text-body-sm border border-surface-container-high/60">
-            <span class="font-label-badge text-label-badge uppercase tracking-wider text-secondary font-bold">Hospital Blood Bank Desk</span>
-            <span class="hospital-name-display font-title-md text-title-md text-on-surface font-bold">Metro General Hospital</span>
-            <span class="text-on-surface-variant text-xs">Ward 4B Blood Bank &amp; Chiller Unit</span>
-            <div class="flex items-center gap-space-xs mt-1 text-tertiary font-label-md text-label-md font-semibold select-all" title="Hospital Desk Direct Call">
-              <span class="material-symbols-outlined text-[16px]">call</span>
-              <span class="hospital-phone-display">+1 (800) 555-8821</span>
+          <!-- Hospital Blood Bank & Ward Contact Card (Compact) -->
+          <div style="flex-shrink: 0 !important;" class="bg-surface-container-low shrink-0 p-2.5 rounded-xl flex flex-col gap-1 text-xs border border-surface-container-high/60">
+            <div class="flex items-center justify-between whitespace-nowrap">
+              <span class="font-label-badge text-label-badge uppercase tracking-wider text-secondary font-bold text-[10px]">Blood Bank Desk</span>
+              <a href="tel:+18005558821" class="hospital-phone-display text-tertiary font-bold text-[11px] hover:underline flex items-center gap-0.5" title="Hospital Desk Direct Call">
+                <span class="material-symbols-outlined text-[13px]">call</span>
+                <span>+1 (800) 555-8821</span>
+              </a>
             </div>
-            <div class="mt-1 pt-2 border-t border-surface-container text-[11px] text-on-surface-variant flex items-center justify-between">
+            <span class="hospital-name-display font-bold text-on-surface text-xs truncate">Metro General Hospital</span>
+            <div class="pt-1 border-t border-surface-container text-[11px] text-on-surface-variant flex items-center justify-between whitespace-nowrap">
               <span>Attending Doctor:</span>
               <strong class="doctor-name-display text-on-surface">Dr. Aris Thorne, MD</strong>
             </div>
@@ -2105,14 +2106,14 @@
           <!-- =================================================================== -->
           <div id="recipient-overview" class="scroll-mt-section flex flex-col gap-space-xl">
             
-            <!-- Patient Case Switcher & Active Case Bar -->
+            <!-- Patient Active Case Bar (Non-Switchable after login) -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-container-lowest px-4 py-3 rounded-2xl border border-surface-container-high shadow-xs">
               <div class="flex items-center gap-2 min-w-0">
                 <span class="material-symbols-outlined text-primary text-[22px] shrink-0">personal_injury</span>
                 <span class="text-xs font-bold text-on-surface-variant shrink-0">Managing Emergency Case:</span>
-                <select id="recipient-case-switcher" class="text-xs font-bold bg-surface-container-low text-on-surface py-1.5 px-3 rounded-xl border border-outline-variant/50 focus:ring-2 focus:ring-primary focus:outline-none cursor-pointer">
-                  <!-- Dynamically populated by renderRecipientDashboard -->
-                </select>
+                <span class="text-xs font-bold bg-surface-container-low text-on-surface py-1.5 px-3 rounded-xl border border-outline-variant/40 shrink-0">
+                  <span class="patient-case-display">Devika Sharma (B+ Platelets) — Metro General Hospital</span>
+                </span>
               </div>
               <div class="flex items-center gap-2 shrink-0">
                 <span class="case-id-display font-mono text-[11px] px-2.5 py-1 rounded bg-surface-container text-secondary font-bold">Case: CASE-9042</span>
@@ -2142,19 +2143,19 @@
                 </h1>
 
                 <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-on-surface-variant mt-1">
-                  <span class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[16px] text-primary">local_hospital</span>
-                    <span class="hospital-location-display">ICU Ward 4B, Metro General Hospital &amp; Trauma Center</span>
+                  <span class="flex items-center gap-1 whitespace-nowrap shrink-0">
+                    <span class="material-symbols-outlined text-[16px] text-primary shrink-0">local_hospital</span>
+                    <span class="hospital-location-display whitespace-nowrap">ICU Ward 4B, Bed 12, Metro General Hospital &amp; Trauma Center</span>
                   </span>
                   <span>•</span>
-                  <span class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[16px] text-secondary">person</span>
-                    <span class="patient-meta-display">32 Yrs • Female • ICU Bed 12</span>
+                  <span class="flex items-center gap-1 whitespace-nowrap shrink-0">
+                    <span class="material-symbols-outlined text-[16px] text-secondary shrink-0">person</span>
+                    <span class="patient-meta-display whitespace-nowrap">32 Yrs • Female • ICU Bed 12</span>
                   </span>
                   <span>•</span>
-                  <span class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[16px] text-tertiary">contact_phone</span>
-                    <span>Attendant: <strong class="attendant-name-display text-on-surface">Rajesh Sharma (+91 95280 33454)</strong></span>
+                  <span class="flex items-center gap-1 whitespace-nowrap shrink-0">
+                    <span class="material-symbols-outlined text-[16px] text-tertiary shrink-0">contact_phone</span>
+                    <span class="whitespace-nowrap">Attendant: <strong class="attendant-name-display text-on-surface">Rajesh Sharma (+91 95280 33454)</strong></span>
                   </span>
                 </div>
               </div>
