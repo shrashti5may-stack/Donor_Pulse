@@ -915,7 +915,7 @@ class Store {
         statusClass = 'bg-primary-fixed text-primary font-bold';
         transitMode = '🚗 Emergency Vehicle Corridor';
         progressPct = 80;
-        landmark = 'Approaching hospital perimeter (0.3 mi away)';
+        landmark = 'Approaching hospital perimeter (0.5 km away)';
       } else if (index === 1) {
         transitStatus = 'In Transit';
         statusClass = 'bg-tertiary-fixed text-on-tertiary-fixed font-bold';
@@ -933,7 +933,7 @@ class Store {
         statusClass = d.notified ? 'bg-amber-500/20 text-amber-800' : 'bg-surface-container-high text-on-surface-variant';
         transitMode = '📍 Standby Radius';
         progressPct = 10;
-        landmark = `Pre-screened vitals verified • ${d.distance} mi away`;
+        landmark = `Pre-screened vitals verified • ${d.distance} km away`;
       }
 
       return {
