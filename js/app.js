@@ -123,10 +123,10 @@ function initFormControllers() {
         fullName: formData.get('fullName')?.toString().trim() || 'New Registered Donor',
         age: parseInt(formData.get('age') || 25, 10),
         bloodGroup: formData.get('bloodGroup')?.toString().trim() || 'O-',
-        phone: formData.get('phone')?.toString().trim() || '+1 (555) 000-0000',
-        email: formData.get('email')?.toString().trim() || 'donor@pulse.org',
-        address: formData.get('address')?.toString().trim() || 'Metro District',
-        city: formData.get('city')?.toString().trim() || 'Downtown Metro Center',
+        phone: formData.get('phone')?.toString().trim() || '+91 98452 33109',
+        email: formData.get('email')?.toString().trim() || 'ananya.sharma@donor-pulse.in',
+        address: formData.get('address')?.toString().trim() || '#482, 12th Main Road, HAL 2nd Stage, Indiranagar',
+        city: formData.get('city')?.toString().trim() || 'Bengaluru, Karnataka',
         medicalHistory: formData.get('medicalHistory')?.toString().trim() || 'Pre-screened verified donor. Clinical vitals within healthy standard range.',
         lastDonationDate: formData.get('lastDonationDate') || 'First-time Donor',
         availability: formData.get('availability') === 'on' || formData.get('availability') === 'true',
@@ -143,7 +143,7 @@ function initFormControllers() {
     if (btnDemoDonor) {
       btnDemoDonor.addEventListener('click', () => {
         fillDonorFormDemo();
-        showToast('Demo Donor Data Loaded', 'Alex Morgan (A+ Donor) profile pre-filled for testing.', 'info');
+        showToast('Demo Donor Data Loaded', 'Arjun Nair (A+ Donor) profile pre-filled for testing.', 'info');
       });
     }
   }
@@ -273,17 +273,17 @@ function initFormControllers() {
         location: formData.get('hospitalLocation')?.toString().trim() || 'Emergency Wing',
         bedCapacity: parseInt(formData.get('bedCapacity') || 450, 10),
         traumaLevel: formData.get('traumaLevel')?.toString().trim() || 'Trauma Level 1',
-        address: formData.get('address')?.toString().trim() || '742 Healthcare Expressway',
-        city: formData.get('city')?.toString().trim() || 'Chicago',
-        state: formData.get('state')?.toString().trim() || 'IL',
-        zip: formData.get('zip')?.toString().trim() || '60611',
-        phone: formData.get('phone')?.toString().trim() || '+1 (800) 555-8821',
-        email: formData.get('email')?.toString().trim() || 'triage@hospitaldomain.org',
-        licenseNumber: formData.get('licenseNumber')?.toString().trim() || 'HSP-90412-IL',
-        authorizedPerson: formData.get('authorizedPerson')?.toString().trim() || 'Dr. Evelyn Vance, MD',
-        roleTitle: formData.get('roleTitle')?.toString().trim() || 'Chief Medical Officer & Triage Director',
-        documentType: formData.get('documentType')?.toString().trim() || 'State Department Health Operating License',
-        documentNumber: formData.get('documentNumber')?.toString().trim() || 'CERT-IL-2024-89240',
+        address: formData.get('address')?.toString().trim() || '154/11 Bannerghatta Main Road',
+        city: formData.get('city')?.toString().trim() || 'Bengaluru',
+        state: formData.get('state')?.toString().trim() || 'Karnataka',
+        zip: formData.get('zip')?.toString().trim() || '560076',
+        phone: formData.get('phone')?.toString().trim() || '+91 (80) 2630-4050',
+        email: formData.get('email')?.toString().trim() || 'triage@apollo-bengaluru.in',
+        licenseNumber: formData.get('licenseNumber')?.toString().trim() || 'NABH-BB-KA-88219',
+        authorizedPerson: formData.get('authorizedPerson')?.toString().trim() || 'Dr. Aravind Sharma, MD',
+        roleTitle: formData.get('roleTitle')?.toString().trim() || 'Medical Director & Chief of Transfusion Medicine',
+        documentType: formData.get('documentType')?.toString().trim() || 'CDSCO & State Drug Controller Blood Bank Operating License',
+        documentNumber: formData.get('documentNumber')?.toString().trim() || 'CERT-KA-2026-89240',
         fileName: currentProofAttachment.attached ? currentProofAttachment.fileName : 'clinical_establishment_license.pdf',
         fileSize: currentProofAttachment.attached ? currentProofAttachment.fileSize : '2.1 MB',
         verificationStatus: autoVerify ? 'verified' : 'pending'
@@ -307,8 +307,8 @@ function initFormControllers() {
     if (btnDemoHospital) {
       btnDemoHospital.addEventListener('click', () => {
         fillHospitalFormDemo();
-        updateProofUI('state_accreditation_certificate_2024.pdf', '2.4 MB');
-        showToast('Sample Facility Loaded', 'St. Jude Memorial Hospital details & verification proof loaded.', 'info');
+        updateProofUI('state_accreditation_certificate_2026.pdf', '2.4 MB');
+        showToast('Sample Facility Loaded', 'Apollo Hospitals & Apex Trauma Centre details & verification proof loaded.', 'info');
       });
     }
   }
@@ -325,7 +325,7 @@ function initFormControllers() {
       const bloodGroup = form.querySelector('input[name="blood_type"]:checked')?.value || 'B+';
       const component = form.querySelector('[name="component"]')?.value || 'Platelets (Apheresis)';
       const units = parseInt(form.querySelector('[name="units"]')?.value || 3, 10);
-      const hospitalName = form.querySelector('[name="hospitalName"]')?.value?.trim() || 'Metro General Hospital & Trauma Center';
+      const hospitalName = form.querySelector('[name="hospitalName"]')?.value?.trim() || 'Apollo Hospitals & Apex Trauma Centre';
       const ward = form.querySelector('[name="ward"]')?.value?.trim() || 'ICU Ward 4B, Bed 12';
       const attendantName = form.querySelector('[name="attendantName"]')?.value?.trim() || 'Rajesh Sharma';
       const attendantRelation = form.querySelector('[name="attendantRelation"]')?.value?.trim() || 'Brother / Attendant';
@@ -333,9 +333,9 @@ function initFormControllers() {
       const urgency = form.querySelector('[name="urgency"]')?.value || 'Stat Emergency (< 45 Mins)';
       const notes = form.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood request for patient.';
       const proofDocType = form.querySelector('[name="proofDocType"]')?.value || 'Hospital Blood Requisition Slip (Form 27-C Stamped)';
-      const doctorRegId = form.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Dr. Aris Thorne (MCI-48921/DL)';
+      const doctorRegId = form.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Dr. Aravind Sharma (NMC/KMC-48921)';
       const ipdCaseNo = form.querySelector('[name="ipdCaseNo"]')?.value?.trim() || 'IPD-9042-ICU';
-      const proofFileName = form.querySelector('.proof-filename-display')?.textContent?.trim() || 'metro_gen_blood_requisition_form27c_signed.pdf';
+      const proofFileName = form.querySelector('.proof-filename-display')?.textContent?.trim() || 'apollo_blood_requisition_form27c_signed.pdf';
 
       let newPatient = null;
       if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
@@ -394,14 +394,14 @@ function initFormControllers() {
 function fillDonorFormDemo() {
   const form = document.getElementById('form-donor-register');
   if (!form) return;
-  setInputValue(form, 'fullName', 'Alex Morgan');
+  setInputValue(form, 'fullName', 'Arjun Nair');
   setInputValue(form, 'age', '29');
   setInputValue(form, 'bloodGroup', 'A+');
-  setInputValue(form, 'phone', '+1 (555) 342-8891');
-  setInputValue(form, 'email', 'alex.morgan@healthgrid.org');
-  setInputValue(form, 'address', '742 Evergreen Terrace');
-  setInputValue(form, 'city', 'Metro West District');
-  setInputValue(form, 'lastDonationDate', '2024-11-05');
+  setInputValue(form, 'phone', '+91 98451 44290');
+  setInputValue(form, 'email', 'arjun.nair@donor-pulse.in');
+  setInputValue(form, 'address', '#24, 4th Cross, Koramangala 4th Block');
+  setInputValue(form, 'city', 'Bengaluru, Karnataka');
+  setInputValue(form, 'lastDonationDate', '2026-06-14');
   setInputValue(form, 'radiusMiles', '10');
   setInputValue(form, 'medicalHistory', 'Pre-screened whole blood donor. Optimal hemoglobin 15.2 g/dL. No restrictions.');
   const avail = form.querySelector('[name="availability"]');
@@ -411,22 +411,22 @@ function fillDonorFormDemo() {
 function fillHospitalFormDemo() {
   const form = document.getElementById('form-hospital-register');
   if (!form) return;
-  setInputValue(form, 'hospitalName', 'St. Jude Memorial Hospital & Trauma Center');
-  setInputValue(form, 'hospitalCategory', 'Apex Multi-Specialty & Trauma Center');
+  setInputValue(form, 'hospitalName', 'Apollo Hospitals & Apex Trauma Centre');
+  setInputValue(form, 'hospitalCategory', 'Apex Multi-Specialty & Level 1 Trauma Center');
   setInputValue(form, 'hospitalLocation', 'Trauma Resuscitation Wing, Floor 1');
-  setInputValue(form, 'bedCapacity', '450');
+  setInputValue(form, 'bedCapacity', '650');
   setInputValue(form, 'traumaLevel', 'Trauma Level 1');
-  setInputValue(form, 'address', '742 Healthcare Expressway, Medical District');
-  setInputValue(form, 'city', 'Chicago');
-  setInputValue(form, 'state', 'IL');
-  setInputValue(form, 'zip', '60611');
-  setInputValue(form, 'phone', '+1 (312) 555-0199');
-  setInputValue(form, 'email', 'emergency.triage@stjudememorial.org');
-  setInputValue(form, 'licenseNumber', 'HSP-99214-IL');
-  setInputValue(form, 'authorizedPerson', 'Dr. Evelyn Vance, MD');
+  setInputValue(form, 'address', '154/11 Bannerghatta Main Road');
+  setInputValue(form, 'city', 'Bengaluru');
+  setInputValue(form, 'state', 'Karnataka');
+  setInputValue(form, 'zip', '560076');
+  setInputValue(form, 'phone', '+91 (80) 2630-4050');
+  setInputValue(form, 'email', 'emergency.triage@apollo-bengaluru.in');
+  setInputValue(form, 'licenseNumber', 'NABH-BB-KA-88219');
+  setInputValue(form, 'authorizedPerson', 'Dr. Aravind Sharma, MD');
   setInputValue(form, 'roleTitle', 'Chief Medical Officer & Triage Director');
-  setInputValue(form, 'documentType', 'State Department Health Operating License');
-  setInputValue(form, 'documentNumber', 'CERT-IL-2024-89240');
+  setInputValue(form, 'documentType', 'CDSCO & State Drug Controller Blood Bank Operating License');
+  setInputValue(form, 'documentNumber', 'CERT-KA-2026-89240');
 }
 
 function setInputValue(form, name, value) {
@@ -489,7 +489,7 @@ function initInteractiveWidgets() {
 
     if (radiusBadge) {
       if (isAvailable) {
-        radiusBadge.textContent = 'RADIUS: 10 MILES ACTIVE';
+        radiusBadge.textContent = 'RADIUS: 10 KM ACTIVE';
         radiusBadge.className = 'bg-tertiary-container/20 px-space-xs py-1 rounded text-[11px] font-label-badge text-tertiary uppercase font-semibold inline-block w-fit';
       } else {
         radiusBadge.textContent = 'STATUS: PAUSED / OFFLINE';
@@ -1143,7 +1143,7 @@ function fillDemoRaiseRequest() {
   setVal('patientName', 'Devika Sharma');
   setVal('patientAge', '32');
   setVal('patientGender', 'Female');
-  setVal('hospitalName', 'Metro General Hospital & Trauma Center');
+  setVal('hospitalName', 'Apollo Hospitals & Apex Trauma Centre');
   setVal('ward', 'ICU Ward 4B, Bed 12');
   setVal('component', 'Platelets (Apheresis)');
   setVal('units', '3');
@@ -1153,11 +1153,11 @@ function fillDemoRaiseRequest() {
   setVal('attendantPhone', '+91 95280 33454');
   setVal('notes', 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.');
   setVal('proofDocType', 'Hospital Blood Requisition Slip (Form 27-C Stamped)');
-  setVal('doctorRegId', 'Dr. Aris Thorne (MCI-48921/DL)');
+  setVal('doctorRegId', 'Dr. Aravind Sharma (NMC/KMC-48921)');
   setVal('ipdCaseNo', 'IPD-9042-ICU');
 
   const fileLabel = modal.querySelector('.proof-filename-display');
-  if (fileLabel) fileLabel.textContent = 'metro_gen_blood_requisition_form27c_signed.pdf';
+  if (fileLabel) fileLabel.textContent = 'apollo_blood_requisition_form27c_signed.pdf';
   const sizeLabel = modal.querySelector('.proof-filesize-display');
   if (sizeLabel) sizeLabel.textContent = '1.4 MB • Official Hospital Seal & Doctor Signature Detected';
 
@@ -1245,7 +1245,7 @@ function openMedicalProofViewer(customData) {
   const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 3;
   const urgency = (form && form.querySelector('[name="urgency"]')?.value) || currentPatient.urgency || 'Stat Emergency (< 45 Mins)';
   const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.';
-  const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Dr. Aris Thorne (MCI-48921/DL)';
+  const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Dr. Aravind Sharma (NMC/KMC-48921)';
   const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-9042-ICU';
 
   const setText = (id, txt) => {
@@ -1330,10 +1330,10 @@ function renderVerificationHubModal() {
             <span class="font-bold text-sm uppercase ${isVerified ? 'text-tertiary' : 'text-amber-800'}">
               ${isVerified ? 'Accreditation Approved & Active' : 'Accreditation Review Pending'}
             </span>
-            <span class="px-2 py-0.5 rounded-full bg-surface-container-high text-xs font-mono font-bold">${escapeHtml(hospital.licenseNumber || 'HSP-99214-IL')}</span>
+            <span class="px-2 py-0.5 rounded-full bg-surface-container-high text-xs font-mono font-bold">${escapeHtml(hospital.licenseNumber || 'NABH-BB-KA-88219')}</span>
           </div>
           <h4 class="font-title-md font-bold text-on-surface mt-0.5">${escapeHtml(hospital.name || 'Healthcare Facility')}</h4>
-          <p class="text-xs text-on-surface-variant mt-0.5">National Node ID: <span class="font-mono font-semibold text-primary">${escapeHtml(hospital.id || 'HSP-35349-IL')}</span></p>
+          <p class="text-xs text-on-surface-variant mt-0.5">National Node ID: <span class="font-mono font-semibold text-primary">${escapeHtml(hospital.id || 'HSP-35349-KA')}</span></p>
         </div>
       </div>
       <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${isVerified ? 'bg-tertiary text-white' : 'bg-amber-600 text-white'} text-xs font-bold shrink-0">
@@ -1362,7 +1362,7 @@ function renderVerificationHubModal() {
       </div>
       <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container">
         <span class="text-xs text-on-surface-variant block font-medium">24/7 Triage Hotline</span>
-        <span class="font-semibold text-on-surface">${escapeHtml(hospital.phone || '+1 (312) 555-0199')}</span>
+        <span class="font-semibold text-on-surface">${escapeHtml(hospital.phone || '+91 (80) 2630-4050')}</span>
       </div>
       <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container">
         <span class="text-xs text-on-surface-variant block font-medium">Authorized Superintendent / Officer</span>
@@ -1452,7 +1452,7 @@ function renderDonorDashboard() {
   setTextContentAll('.donor-address-display', donor.address || donor.city);
   const locStr = `${donor.address ? donor.address + ', ' : ''}${donor.city}`;
   setTextContentAll('.donor-location-display', locStr);
-  setTextContentAll('.donor-distance-display', `Within ${donor.radiusMiles || 10} miles`);
+  setTextContentAll('.donor-distance-display', `Within ${donor.radiusMiles || 10} km`);
   setTextContentAll('.donor-last-date-display', donor.lastDonationDate || 'First-time Donor');
   setTextContentAll('.donor-donations-display', `${donor.totalDonations} Units`);
   setTextContentAll('.donor-lives-display', `${donor.livesSaved} Lives Saved to Date`);
@@ -1484,7 +1484,7 @@ function renderDonorDashboard() {
   // Dynamic Urgent Notification Banner on Donor Dashboard
   const codeRedTitle = document.getElementById('donor-code-red-title');
   if (codeRedTitle) {
-    codeRedTitle.innerHTML = `CRITICAL: Urgent ${donor.bloodGroup} units needed at St. Mary's Trauma Center`;
+    codeRedTitle.innerHTML = `CRITICAL: Urgent ${donor.bloodGroup} units needed at Manipal Hospital Trauma Center`;
   }
 
   // Availability Toggle & Badge
@@ -1578,27 +1578,27 @@ function renderRecipientDashboard() {
         unitsArranged: 2,
         unitsFulfilled: 1,
         urgency: 'Stat Emergency (< 45 Mins)',
-        hospitalName: 'Metro General Hospital & Trauma Center',
+        hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
         hospitalWard: 'ICU Ward 4B, Bed 12',
-        hospitalAddress: '1200 Healthcare Blvd, Suite 100, New York, NY',
+        hospitalAddress: '154/11 Bannerghatta Main Road, Bengaluru, Karnataka 560076',
         attendantName: 'Rajesh Sharma',
         attendantRelation: 'Brother / Primary Attendant',
         attendantPhone: '+91 95280 33454',
-        attendantEmail: 'rajesh.sharma@familycare.org',
-        doctorName: 'Dr. Aris Thorne, MD',
+        attendantEmail: 'rajesh.sharma@familycare.in',
+        doctorName: 'Dr. Aravind Sharma, MD',
         doctorDepartment: 'Trauma & Critical Care',
-        doctorPhone: '+1 (800) 555-8821 Ext 4429',
-        hospitalBloodDesk: '+1 (800) 555-8821',
+        doctorPhone: '+91 (80) 2630-4050 Ext 4429',
+        hospitalBloodDesk: '+91 (80) 2630-4050',
         clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
         handshakeOTP: '7842',
         trackingStage: 4,
-        broadcastDate: 'Today, 14:10 EST',
+        broadcastDate: 'Today, 14:10 IST',
         appealActive: true,
         verificationProof: {
           documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped)',
-          doctorRegId: 'Dr. Aris Thorne (MCI-48921/DL)',
+          doctorRegId: 'Dr. Aravind Sharma (NMC/KMC-48921)',
           ipdCaseNo: 'IPD-9042-ICU',
-          fileName: 'metro_gen_blood_requisition_form27c_signed.pdf',
+          fileName: 'apollo_blood_requisition_form27c_signed.pdf',
           fileSize: '1.4 MB',
           status: 'VERIFIED_GENUINE',
           verificationScore: '100% Genuine Requisition'
@@ -1860,7 +1860,7 @@ window.renderHospitalDashboard = renderRecipientDashboard; // alias for backward
 window.copySOSAppealLink = function() {
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
-    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets', hospitalName: 'Metro General Hospital', requestId: 'REQ-9042', attendantPhone: '+91 95280 33454' };
+    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', requestId: 'REQ-9042', attendantPhone: '+91 95280 33454' };
 
   const originUrl = window.location.origin + window.location.pathname;
   const text = `🚨 URGENT BLOOD NEEDED!
@@ -1885,7 +1885,7 @@ Please donate or share: ${originUrl}#/emergency-request`;
 window.shareSOSOnWhatsApp = function() {
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
-    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets', hospitalName: 'Metro General Hospital', requestId: 'REQ-9042', attendantPhone: '+91 95280 33454' };
+    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', requestId: 'REQ-9042', attendantPhone: '+91 95280 33454' };
 
   const originUrl = window.location.origin + window.location.pathname;
   const msg = `🚨 URGENT BLOOD NEEDED!
@@ -2041,7 +2041,7 @@ function renderHospitalDonorsPool() {
             <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-on-surface-variant mt-1">
               <span class="flex items-center gap-1 font-semibold text-primary">
                 <span class="material-symbols-outlined text-[16px] text-primary">pin_drop</span>
-                ${donor.distance} miles away
+                ${donor.distance} km away
               </span>
               <span>•</span>
               <span class="text-tertiary font-medium">Match: ${donor.matchScore}%</span>
@@ -2368,7 +2368,7 @@ function renderMatchedDonors() {
           <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-on-surface-variant mt-1">
             <span class="flex items-center gap-1">
               <span class="material-symbols-outlined text-[16px] text-primary">pin_drop</span>
-              ${donor.distance} miles away
+              ${donor.distance} km away
             </span>
             <span>•</span>
             <span class="text-tertiary font-medium">Match: ${donor.matchScore}%</span>
@@ -2521,12 +2521,12 @@ let currentCertificateData = null;
 
 window.openCertificateModal = function(data) {
   currentCertificateData = data || {
-    id: 'CERT-88391',
-    date: 'October 14, 2024',
-    hospital: 'City Central Blood Bank',
-    type: 'Whole Blood (1 Unit - 450 mL)',
-    bay: 'Donation Bay #04',
-    doctor: 'Dr. R. Adams',
+    id: 'CERT-AIIMS-2026-9041',
+    date: 'September 18, 2026',
+    hospital: 'AIIMS Transfusion Medicine Centre, New Delhi',
+    type: 'Platelets (SDP - 2 Units)',
+    bay: 'Apheresis Suite Bay 2',
+    doctor: 'Dr. Rajesh Sharma, MD',
     hash: 'e92f8b1c4a0d92e5f67a8b9c0d1e2f3a4b5c6d7e',
     image: 'images/certificate-sarah-jenkins.jpg'
   };
@@ -2649,7 +2649,7 @@ window.openDonorPassQRModal = function() {
   if (!modal) return;
 
   const donor = window.PulseStore ? window.PulseStore.getDonor() : null;
-  const donorName = (donor && donor.fullName) ? donor.fullName : 'Sarah Jenkins';
+  const donorName = (donor && donor.fullName) ? donor.fullName : 'Ananya Sharma';
   const bloodGroup = (donor && donor.bloodGroup) ? donor.bloodGroup : 'O-';
   const hb = (donor && donor.vitals && donor.vitals.hemoglobin) ? donor.vitals.hemoglobin : '14.8 g/dL';
   const bp = (donor && donor.vitals && donor.vitals.bp) ? donor.vitals.bp : '118/76 mmHg';
@@ -2783,17 +2783,17 @@ let activeDonorRequest = null;
 
 window.openDonorRequestModal = function(data) {
   activeDonorRequest = data || {
-    hospital: "St. Mary's General Hospital",
+    hospital: "Manipal Hospital Comprehensive Trauma Center",
     urgency: 'HIGH EMERGENCY',
     urgencyClass: 'bg-error-container text-on-error-container',
     blood: 'O-',
-    distance: '1.8 miles away • Trauma Level 1',
+    distance: '1.8 km away • Level 1 Trauma Care',
     demand: '3 Units Needed',
     requiredBy: 'Next 2 Hours',
-    reason: 'Immediate blood inventory shortage following a multi-vehicle highway collision. Emergency surgical transfusion required.',
-    doctor: 'Dr. H. Vance, MD (Chief Trauma Surgeon)',
-    reqId: 'REQ-STMARYS-8921',
-    location: "Trauma Wing, Bay 04, 1200 St. Mary's Blvd",
+    reason: 'Immediate blood inventory shortage following an emergency trauma case. Emergency surgical transfusion required.',
+    doctor: 'Dr. Harish Vance, MD (Chief Trauma Surgeon)',
+    reqId: 'REQ-MANIPAL-8921',
+    location: "Emergency Resuscitation Bay 04, HAL Airport Road, Bengaluru",
     cardId: 'card-request-1'
   };
 
@@ -2942,7 +2942,7 @@ window.closeDonorRequestModal = function() {
 };
 
 window.approveDonorRequest = function() {
-  const req = activeDonorRequest || { hospital: "St. Mary's General Hospital" };
+  const req = activeDonorRequest || { hospital: "Manipal Hospital Comprehensive Trauma Center" };
   window.closeDonorRequestModal();
 
   if (window.showToast) {
@@ -2962,7 +2962,7 @@ window.approveDonorRequest = function() {
 };
 
 window.declineDonorRequest = function() {
-  const req = activeDonorRequest || { hospital: "St. Mary's General Hospital" };
+  const req = activeDonorRequest || { hospital: "Manipal Hospital Comprehensive Trauma Center" };
   window.closeDonorRequestModal();
 
   if (window.showToast) {
@@ -3006,11 +3006,11 @@ window.openHospitalRequestModal = function(requestId) {
       component: 'Platelets (Apheresis)',
       units: 3,
       urgency: 'Stat Emergency (< 45 Mins)',
-      hospitalName: 'Metro General Hospital',
+      hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
       ward: 'Trauma OR - Suite 3',
-      location: 'Ward 4B, Emergency Wing, New York, NY',
-      notes: 'Acute arterial hemorrhage from multi-vehicle accident, cross-match in progress.',
-      createdAt: 'Today, 14:10 EST',
+      location: 'Ward 4B, Emergency Wing, Bannerghatta Main Road, Bengaluru',
+      notes: 'Acute arterial hemorrhage from emergency trauma, cross-match in progress.',
+      createdAt: 'Today, 14:10 IST',
       status: 'Donors Accepted',
       trackingStage: 4,
       matchedCount: 16,
@@ -3880,7 +3880,7 @@ window.approveImmediateResponse = function() {
     }
 
     if (typeof window.showToast === 'function') {
-      window.showToast('Immediate Response Confirmed', `St. Mary's Trauma Bay paged. Estimated arrival logged as ${etaDisplay}. Emergency transit pass active.`, 'success');
+      window.showToast('Immediate Response Confirmed', `Manipal Hospital Trauma Bay paged. Estimated arrival logged as ${etaDisplay}. Emergency transit pass active.`, 'success');
     } else {
       alert(`Donation response confirmed! Estimated arrival logged as ${etaDisplay}. Priority transit pass active.`);
     }

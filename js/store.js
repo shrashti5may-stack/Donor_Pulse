@@ -3,27 +3,27 @@
  * Manages persistent local mock data for Donors, Hospitals, Verification, Requests, and Tracking.
  */
 
-const STORAGE_KEY = 'donorpulse_state_v1';
+const STORAGE_KEY = 'donorpulse_state_in_v3';
 
 const DEFAULT_STATE = {
   // Active role session: 'guest' | 'donor' | 'hospital'
   currentRole: 'donor',
 
-  // Current Donor Profile
+  // Current Donor Profile (Adapted for India - Bengaluru, Karnataka)
   donor: {
     id: 'DP-8924-O',
-    fullName: 'Sarah Jenkins',
+    fullName: 'Ananya Sharma',
     age: 28,
     bloodGroup: 'O-',
-    phone: '+1 (555) 234-5678',
-    email: 'sarah.jenkins@medvolunteer.org',
-    address: '482 Lexington Ave, Apt 4B',
-    city: 'Downtown Metro Center',
-    medicalHistory: 'Hemoglobin 14.8 g/dL (Normal). Regular whole blood donor. No travel abroad in past 6 months. Blood pressure optimal at 118/76 mmHg.',
-    lastDonationDate: '2024-10-14',
+    phone: '+91 98452 33109',
+    email: 'ananya.sharma@donor-pulse.in',
+    address: '#482, 12th Main Road, HAL 2nd Stage, Indiranagar',
+    city: 'Bengaluru, Karnataka',
+    medicalHistory: 'Hemoglobin 14.8 g/dL (Normal). Regular whole blood & apheresis donor. Pre-screened verified volunteer. Blood pressure optimal at 118/76 mmHg. No high-altitude or malaria endemic travel in past 3 months.',
+    lastDonationDate: '2026-09-18',
     nextEligibleDate: 'Eligible Now',
     availability: true, // true = Active / On Call, false = Temporarily Unavailable
-    radiusMiles: 10,
+    radiusMiles: 10, // 10 km radius active
     totalDonations: 8,
     livesSaved: 24,
     rewardPoints: 2450,
@@ -37,33 +37,33 @@ const DEFAULT_STATE = {
     }
   },
 
-  // Current Hospital Profile
+  // Current Hospital Profile (Apollo Hospitals & Apex Trauma Centre, Bengaluru)
   hospital: {
-    id: 'HSP-88219-NY',
-    name: 'Metro General Hospital & Trauma Center',
-    category: 'Apex Multi-Specialty & Trauma Care',
-    location: 'Ward 4B, Emergency Wing',
-    address: '1200 Healthcare Blvd, Suite 100',
-    city: 'New York, NY',
-    state: 'NY',
-    zip: '10001',
-    phone: '+1 (800) 555-8821',
-    email: 'triage@metrogeneral.org',
-    licenseNumber: 'HSP-88219-NY',
-    authorizedPerson: 'Dr. Aris Thorne, MD',
-    roleTitle: 'Chief Triage Officer',
+    id: 'HSP-88219-BLR',
+    name: 'Apollo Hospitals & Apex Trauma Centre',
+    category: 'Apex Multi-Specialty & Trauma Care (NABH Accredited)',
+    location: 'ICU Ward 4B, Emergency Wing',
+    address: '154/11 Bannerghatta Main Road, Opposite IIMB',
+    city: 'Bengaluru',
+    state: 'Karnataka',
+    zip: '560076',
+    phone: '+91 (80) 2630-4050',
+    email: 'triage@apollohospitals-bengaluru.org',
+    licenseNumber: 'NABH-BB-KA-88219',
+    authorizedPerson: 'Dr. Aravind Sharma, MD',
+    roleTitle: 'Chief Medical Superintendent',
     bedCapacity: 650,
-    traumaLevel: 'Trauma Level 1',
+    traumaLevel: 'Trauma Level 1 Apex Centre',
     verificationProof: {
-      documentType: 'State Department Health Operating License',
-      documentNumber: 'ACC-NY-90428-2024',
-      fileName: 'metro_general_accreditation_2024.pdf',
+      documentType: 'NABH Blood Bank Operating License & CDSCO Clearance Form 28-C',
+      documentNumber: 'NABH-BB-KA-90428-2026',
+      fileName: 'apollo_bengaluru_nabh_accreditation.pdf',
       fileSize: '2.4 MB',
-      uploadedAt: 'Oct 12, 2024'
+      uploadedAt: 'Sep 12, 2026'
     },
     // Verification state: 'verified' | 'pending' | 'rejected'
     verificationStatus: 'verified',
-    rejectionReason: 'State department documentation mismatch on primary accreditation license certificate.'
+    rejectionReason: 'State blood transfusion council documentation mismatch on primary accreditation license certificate.'
   },
 
   // Current Recipient & Patient Profile (Dedicated to Recipient / Family & Friends)
@@ -79,35 +79,35 @@ const DEFAULT_STATE = {
     unitsArranged: 2,
     unitsFulfilled: 1,
     urgency: 'Stat Emergency (< 45 Mins)',
-    hospitalName: 'Metro General Hospital & Trauma Center',
+    hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
     hospitalWard: 'ICU Ward 4B, Bed 12',
-    hospitalAddress: '1200 Healthcare Blvd, Suite 100, New York, NY',
+    hospitalAddress: '154/11 Bannerghatta Main Road, Opposite IIMB, Bengaluru, Karnataka 560076',
     attendantName: 'Rajesh Sharma',
     attendantRelation: 'Brother / Primary Attendant',
     attendantPhone: '+91 95280 33454',
-    attendantEmail: 'rajesh.sharma@familycare.org',
-    doctorName: 'Dr. Aris Thorne, MD',
+    attendantEmail: 'rajesh.sharma@familycare.org.in',
+    doctorName: 'Dr. Aravind Sharma, MD',
     doctorDepartment: 'Trauma & Critical Care',
-    doctorPhone: '+1 (800) 555-8821 Ext 4429',
-    hospitalBloodDesk: '+1 (800) 555-8821',
+    doctorPhone: '+91 (80) 2630-4050 Ext 4429',
+    hospitalBloodDesk: '+91 (80) 2630-4050',
     clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
     handshakeOTP: '7842',
     trackingStage: 4,
-    broadcastDate: 'Today, 14:10 EST',
+    broadcastDate: 'Today, 14:10 IST',
     appealActive: true,
     verificationProof: {
-      documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped)',
-      doctorRegId: 'Dr. Aris Thorne (MCI-48921/DL)',
+      documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
+      doctorRegId: 'Dr. Aravind Sharma (NMC/KMC-48921)',
       ipdCaseNo: 'IPD-9042-ICU',
-      fileName: 'metro_gen_blood_requisition_form27c_signed.pdf',
+      fileName: 'apollo_blood_requisition_form27c_signed.pdf',
       fileSize: '1.4 MB',
       status: 'VERIFIED_GENUINE',
       verificationScore: '100% Genuine Requisition',
       doctorVerified: true,
       hospitalSealDetected: true,
       fraudRiskScore: '0.0%',
-      verifiedAt: 'Today, 14:05 EST',
-      issuer: 'Metro General Hospital & Trauma Center'
+      verifiedAt: 'Today, 14:05 IST',
+      issuer: 'Apollo Hospitals & Apex Trauma Centre'
     }
   },
 
@@ -125,41 +125,41 @@ const DEFAULT_STATE = {
       unitsArranged: 2,
       unitsFulfilled: 1,
       urgency: 'Stat Emergency (< 45 Mins)',
-      hospitalName: 'Metro General Hospital & Trauma Center',
+      hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
       hospitalWard: 'ICU Ward 4B, Bed 12',
-      hospitalAddress: '1200 Healthcare Blvd, Suite 100, New York, NY',
+      hospitalAddress: '154/11 Bannerghatta Main Road, Opposite IIMB, Bengaluru, Karnataka 560076',
       attendantName: 'Rajesh Sharma',
       attendantRelation: 'Brother / Primary Attendant',
       attendantPhone: '+91 95280 33454',
-      attendantEmail: 'rajesh.sharma@familycare.org',
-      doctorName: 'Dr. Aris Thorne, MD',
+      attendantEmail: 'rajesh.sharma@familycare.org.in',
+      doctorName: 'Dr. Aravind Sharma, MD',
       doctorDepartment: 'Trauma & Critical Care',
-      doctorPhone: '+1 (800) 555-8821 Ext 4429',
-      hospitalBloodDesk: '+1 (800) 555-8821',
+      doctorPhone: '+91 (80) 2630-4050 Ext 4429',
+      hospitalBloodDesk: '+91 (80) 2630-4050',
       clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
       handshakeOTP: '7842',
       trackingStage: 4,
-      broadcastDate: 'Today, 14:10 EST',
+      broadcastDate: 'Today, 14:10 IST',
       appealActive: true,
       verificationProof: {
-        documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped)',
-        doctorRegId: 'Dr. Aris Thorne (MCI-48921/DL)',
+        documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
+        doctorRegId: 'Dr. Aravind Sharma (NMC/KMC-48921)',
         ipdCaseNo: 'IPD-9042-ICU',
-        fileName: 'metro_gen_blood_requisition_form27c_signed.pdf',
+        fileName: 'apollo_blood_requisition_form27c_signed.pdf',
         fileSize: '1.4 MB',
         status: 'VERIFIED_GENUINE',
         verificationScore: '100% Genuine Requisition',
         doctorVerified: true,
         hospitalSealDetected: true,
         fraudRiskScore: '0.0%',
-        verifiedAt: 'Today, 14:05 EST',
-        issuer: 'Metro General Hospital & Trauma Center'
+        verifiedAt: 'Today, 14:05 IST',
+        issuer: 'Apollo Hospitals & Apex Trauma Centre'
       }
     },
     {
       id: 'CASE-8991',
       requestId: 'REQ-8991',
-      patientName: 'Marcus Vance',
+      patientName: 'Rohan Verma',
       patientAge: 46,
       patientGender: 'Male',
       bloodGroup: 'O-',
@@ -168,21 +168,21 @@ const DEFAULT_STATE = {
       unitsArranged: 1,
       unitsFulfilled: 0,
       urgency: 'Urgent (< 2 Hours)',
-      hospitalName: "St. Mary's Trauma Center",
+      hospitalName: 'Manipal Hospital Comprehensive Trauma Center',
       hospitalWard: 'ICU Triage Bay 2',
-      hospitalAddress: 'Downtown Metro Center, Sector 4',
-      attendantName: 'Elena Vance',
+      hospitalAddress: '98 HAL Old Airport Road, Kodihalli, Bengaluru, Karnataka 560017',
+      attendantName: 'Pooja Verma',
       attendantRelation: 'Spouse / Family Attendant',
       attendantPhone: '+91 98110 52391',
-      attendantEmail: 'elena.vance@netcare.org',
-      doctorName: 'Dr. Robert Chen, MD',
+      attendantEmail: 'pooja.verma@netcare.org.in',
+      doctorName: 'Dr. Harish Vance, MS (MCh Trauma)',
       doctorDepartment: 'General Surgery & Trauma',
-      doctorPhone: '+1 (800) 555-9012 Ext 104',
-      hospitalBloodDesk: '+1 (800) 555-9012',
-      clinicalReason: 'Post-operative severe anemia stabilization.',
+      doctorPhone: '+91 (80) 2502-4444 Ext 104',
+      hospitalBloodDesk: '+91 (80) 2502-4444',
+      clinicalReason: 'Post-operative severe anemia stabilization following trauma resuscitation.',
       handshakeOTP: '4190',
       trackingStage: 2,
-      broadcastDate: 'Today, 12:45 EST',
+      broadcastDate: 'Today, 12:45 IST',
       appealActive: true
     }
   ],
@@ -190,27 +190,27 @@ const DEFAULT_STATE = {
   // Registered Hospital Registry
   registeredHospitals: [
     {
-      id: 'HSP-88219-NY',
-      name: 'Metro General Hospital & Trauma Center',
-      category: 'Apex Multi-Specialty & Trauma Care',
-      location: 'Ward 4B, Emergency Wing',
-      address: '1200 Healthcare Blvd, Suite 100',
-      city: 'New York, NY',
-      state: 'NY',
-      zip: '10001',
-      phone: '+1 (800) 555-8821',
-      email: 'triage@metrogeneral.org',
-      licenseNumber: 'HSP-88219-NY',
-      authorizedPerson: 'Dr. Aris Thorne, MD',
-      roleTitle: 'Chief Triage Officer',
+      id: 'HSP-88219-BLR',
+      name: 'Apollo Hospitals & Apex Trauma Centre',
+      category: 'Apex Multi-Specialty & Trauma Care (NABH Accredited)',
+      location: 'ICU Ward 4B, Emergency Wing',
+      address: '154/11 Bannerghatta Main Road, Opposite IIMB',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      zip: '560076',
+      phone: '+91 (80) 2630-4050',
+      email: 'triage@apollohospitals-bengaluru.org',
+      licenseNumber: 'NABH-BB-KA-88219',
+      authorizedPerson: 'Dr. Aravind Sharma, MD',
+      roleTitle: 'Chief Medical Superintendent',
       bedCapacity: 650,
-      traumaLevel: 'Trauma Level 1',
+      traumaLevel: 'Trauma Level 1 Apex Centre',
       verificationProof: {
-        documentType: 'State Department Health Operating License',
-        documentNumber: 'ACC-NY-90428-2024',
-        fileName: 'metro_general_accreditation_2024.pdf',
+        documentType: 'NABH Blood Bank Operating License & CDSCO Clearance Form 28-C',
+        documentNumber: 'NABH-BB-KA-90428-2026',
+        fileName: 'apollo_bengaluru_nabh_accreditation.pdf',
         fileSize: '2.4 MB',
-        uploadedAt: 'Oct 12, 2024'
+        uploadedAt: 'Sep 12, 2026'
       },
       verificationStatus: 'verified',
       rejectionReason: ''
@@ -225,11 +225,11 @@ const DEFAULT_STATE = {
       component: 'Platelets (Apheresis)',
       units: 3,
       urgency: 'Stat Emergency (< 45 Mins)',
-      hospitalName: 'Metro General Hospital',
+      hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
       ward: 'Trauma OR - Suite 3',
-      location: 'Ward 4B, Emergency Wing, New York, NY',
+      location: '154/11 Bannerghatta Main Road, Bengaluru',
       notes: 'Acute arterial hemorrhage from multi-vehicle accident, cross-match in progress.',
-      createdAt: 'Today, 14:10 EST',
+      createdAt: 'Today, 14:10 IST',
       status: 'Donors Accepted',
       trackingStage: 4, // 1 to 6
       matchedCount: 16,
@@ -242,11 +242,11 @@ const DEFAULT_STATE = {
       component: 'Whole Blood',
       units: 2,
       urgency: 'Urgent (< 2 Hours)',
-      hospitalName: "St. Mary's Trauma Center",
+      hospitalName: 'Manipal Hospital Comprehensive Trauma Center',
       ward: 'ICU Triage Bay 2',
-      location: 'Downtown Metro Center, Sector 4',
+      location: '98 HAL Old Airport Road, Kodihalli, Bengaluru',
       notes: 'Post-operative severe anemia stabilization.',
-      createdAt: 'Today, 12:45 EST',
+      createdAt: 'Today, 12:45 IST',
       status: 'Finding Donors',
       trackingStage: 2,
       matchedCount: 8,
@@ -258,11 +258,11 @@ const DEFAULT_STATE = {
   // Currently active request selected for confirmation & tracking
   selectedRequestId: 'REQ-9042',
 
-  // Mock Pool of Registered Donors with Indian Phone Format
+  // Mock Pool of Registered Donors with Indian Phone Format & Metro Travel
   matchedDonorsPool: [
     {
       id: 'D-101',
-      name: 'David K.',
+      name: 'Deepak Kumar',
       initials: 'DK',
       bloodGroup: 'B+',
       phone: '+91 98201 44521',
@@ -274,12 +274,12 @@ const DEFAULT_STATE = {
       notified: true,
       accepted: true,
       eta: '25 mins',
-      lastDonation: 'Aug 12, 2024'
+      lastDonation: 'Aug 12, 2026'
     },
     {
       id: 'D-102',
-      name: 'Sarah Jenkins',
-      initials: 'SJ',
+      name: 'Ananya Sharma',
+      initials: 'AS',
       bloodGroup: 'O-',
       phone: '+91 98452 33109',
       distance: 1.8,
@@ -290,12 +290,12 @@ const DEFAULT_STATE = {
       notified: true,
       accepted: true,
       eta: '18 mins',
-      lastDonation: 'Oct 14, 2024'
+      lastDonation: 'Sep 18, 2026'
     },
     {
       id: 'D-103',
-      name: 'Elena R.',
-      initials: 'ER',
+      name: 'Kavita Rao',
+      initials: 'KR',
       bloodGroup: 'O-',
       phone: '+91 97112 88764',
       distance: 2.8,
@@ -306,11 +306,11 @@ const DEFAULT_STATE = {
       notified: true,
       accepted: false,
       eta: '32 mins',
-      lastDonation: 'Sep 05, 2024'
+      lastDonation: 'Jul 05, 2026'
     },
     {
       id: 'D-104',
-      name: 'Marcus T.',
+      name: 'Manoj Tiwari',
       initials: 'MT',
       bloodGroup: 'B+',
       phone: '+91 99341 22987',
@@ -322,11 +322,11 @@ const DEFAULT_STATE = {
       notified: true,
       accepted: true,
       eta: 'Slot: 3:30 PM',
-      lastDonation: 'Jul 28, 2024'
+      lastDonation: 'May 28, 2026'
     },
     {
       id: 'D-105',
-      name: 'Chloe Bennett',
+      name: 'Chaitali Banerjee',
       initials: 'CB',
       bloodGroup: 'A-',
       phone: '+91 98765 12043',
@@ -338,11 +338,11 @@ const DEFAULT_STATE = {
       notified: false,
       accepted: false,
       eta: '40 mins',
-      lastDonation: 'Jun 19, 2024'
+      lastDonation: 'Mar 19, 2026'
     },
     {
       id: 'D-106',
-      name: 'Liam Patel',
+      name: 'Lakshman Patel',
       initials: 'LP',
       bloodGroup: 'O+',
       phone: '+91 98190 77621',
@@ -354,7 +354,7 @@ const DEFAULT_STATE = {
       notified: false,
       accepted: false,
       eta: '35 mins',
-      lastDonation: 'May 30, 2024'
+      lastDonation: 'Nov 30, 2025'
     },
     {
       id: 'D-107',
@@ -370,11 +370,11 @@ const DEFAULT_STATE = {
       notified: true,
       accepted: true,
       eta: '22 mins',
-      lastDonation: 'Nov 02, 2024'
+      lastDonation: 'Aug 02, 2025'
     },
     {
       id: 'D-108',
-      name: 'Ananya Sharma',
+      name: 'Aarav Sen',
       initials: 'AS',
       bloodGroup: 'O-',
       phone: '+91 97690 11438',
@@ -386,7 +386,7 @@ const DEFAULT_STATE = {
       notified: false,
       accepted: false,
       eta: '45 mins',
-      lastDonation: 'Aug 29, 2024'
+      lastDonation: 'Apr 29, 2025'
     },
     {
       id: 'D-109',
@@ -402,7 +402,7 @@ const DEFAULT_STATE = {
       notified: true,
       accepted: true,
       eta: '15 mins',
-      lastDonation: 'Oct 01, 2024'
+      lastDonation: 'Dec 01, 2024'
     },
     {
       id: 'D-110',
@@ -418,34 +418,52 @@ const DEFAULT_STATE = {
       notified: false,
       accepted: false,
       eta: '28 mins',
-      lastDonation: 'Sep 18, 2024'
+      lastDonation: 'Aug 18, 2024'
     }
   ],
 
-  // Donation history logs for donor
+  // Donation history logs for donor spanning 2024 to 2026 across Indian healthcare institutions
   donationHistory: [
     {
-      date: 'Oct 14, 2024',
-      center: 'City Central Blood Bank',
-      subtext: 'Donation Bay #04 • Dr. R. Adams',
+      date: 'Sep 18, 2026',
+      center: 'AIIMS Transfusion Medicine Centre, New Delhi',
+      subtext: 'Apheresis Bay #02 • Dr. Rajesh Sharma, MD',
+      type: 'Platelets (Single Donor Platelet)',
+      units: '2 Units (Apheresis)',
+      status: 'Completed (Verified)',
+      badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed'
+    },
+    {
+      date: 'Feb 12, 2026',
+      center: 'Manipal Hospital Comprehensive Blood Centre, Bengaluru',
+      subtext: 'Blood Bank Resuscitation Wing • Dr. Ananya Sen, MD',
       type: 'Whole Blood',
       units: '1 Unit (450 mL)',
       status: 'Completed (Verified)',
       badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed'
     },
     {
-      date: 'Jun 22, 2024',
-      center: 'University Medical Center',
-      subtext: 'Apheresis Wing • Clinical Trial Lab',
-      type: 'Platelets',
-      units: '2 Units (Apheresis)',
+      date: 'Aug 24, 2025',
+      center: 'Tata Memorial Centre Transfusion Unit, Mumbai',
+      subtext: 'Onco-Haematology Bay #05 • Dr. V. K. Murthy',
+      type: 'Packed Red Blood Cells (PRBC)',
+      units: '1 Unit (350 mL)',
       status: 'Completed (Verified)',
       badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed'
     },
     {
-      date: 'Feb 10, 2024',
-      center: "St. Jude Children's Hospital",
-      subtext: 'Mobile Van 02 • Oncology Unit',
+      date: 'Jan 15, 2025',
+      center: 'Apollo Hospitals Blood Bank, Chennai',
+      subtext: 'Transfusion Bay #01 • Dr. Sunita Rao',
+      type: 'Whole Blood',
+      units: '1 Unit (450 mL)',
+      status: 'Completed (Verified)',
+      badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed'
+    },
+    {
+      date: 'May 10, 2024',
+      center: 'Fortis Memorial Research Institute Blood Bank, Gurugram',
+      subtext: 'Mobile Transfusion Unit 02 • Dr. Priya Nair',
       type: 'Whole Blood',
       units: '1 Unit (450 mL)',
       status: 'Completed (Verified)',
@@ -521,13 +539,13 @@ class Store {
 
     this.state.donor = {
       id: newId,
-      fullName: donorData.fullName || 'Registered Donor',
+      fullName: donorData.fullName || 'Registered Volunteer Donor',
       age: parseInt(donorData.age || 25, 10),
       bloodGroup: rawBlood,
-      phone: donorData.phone || '+1 (555) 000-0000',
-      email: donorData.email || 'donor@pulse.org',
-      address: donorData.address || 'Metro District',
-      city: donorData.city || 'Metro Central',
+      phone: donorData.phone || '+91 98000 00000',
+      email: donorData.email || 'donor@donor-pulse.in',
+      address: donorData.address || 'HAL 2nd Stage, Indiranagar',
+      city: donorData.city || 'Bengaluru, Karnataka',
       medicalHistory: donorData.medicalHistory || 'Pre-screened verified donor. Clinical vitals within healthy standard range.',
       lastDonationDate: donorData.lastDonationDate || 'First-time Donor',
       nextEligibleDate: 'Eligible Now',
@@ -582,32 +600,32 @@ class Store {
 
   registerNewHospital(data) {
     const randomId = Math.floor(10000 + Math.random() * 90000);
-    const stateRaw = data.state || data.city || 'GEN';
-    const stateCode = stateRaw.substring(0, 2).toUpperCase().replace(/[^A-Z]/g, 'X');
+    const stateRaw = data.state || data.city || 'KA';
+    const stateCode = stateRaw.substring(0, 2).toUpperCase().replace(/[^A-Z]/g, 'KA');
     const newId = `HSP-${randomId}-${stateCode}`;
 
     const newHospital = {
       id: newId,
-      name: (data.name || 'New Healthcare Facility').trim(),
-      category: data.category || 'Multi-Specialty Hospital',
-      location: data.location || 'Emergency Wing',
-      address: data.address || 'Medical District',
-      city: data.city || 'Metropolitan Core',
-      state: data.state || '',
-      zip: data.zip || '',
-      phone: data.phone || '+1 (800) 555-0199',
-      email: data.email || 'emergency@hospital.org',
-      licenseNumber: data.licenseNumber || `LIC-${randomId}`,
-      authorizedPerson: data.authorizedPerson || 'Medical Superintendent',
-      roleTitle: data.roleTitle || 'Chief Medical Officer',
-      bedCapacity: parseInt(data.bedCapacity || 250, 10),
-      traumaLevel: data.traumaLevel || 'Trauma Level 1',
+      name: (data.name || 'Apollo Hospitals & Apex Trauma Centre').trim(),
+      category: data.category || 'Multi-Specialty & Apex Trauma Care (NABH)',
+      location: data.location || 'Emergency Resuscitation Wing',
+      address: data.address || 'Bannerghatta Main Road',
+      city: data.city || 'Bengaluru, Karnataka',
+      state: data.state || 'Karnataka',
+      zip: data.zip || '560076',
+      phone: data.phone || '+91 (80) 2630-4050',
+      email: data.email || 'triage@apollohospitals-bengaluru.org',
+      licenseNumber: data.licenseNumber || `NABH-BB-${randomId}`,
+      authorizedPerson: data.authorizedPerson || 'Dr. Aravind Sharma, MD',
+      roleTitle: data.roleTitle || 'Chief Medical Superintendent',
+      bedCapacity: parseInt(data.bedCapacity || 650, 10),
+      traumaLevel: data.traumaLevel || 'Trauma Level 1 Apex Centre',
       verificationProof: {
-        documentType: data.documentType || 'State Health Department Operating License',
-        documentNumber: data.documentNumber || `CERT-${randomId}`,
-        fileName: data.fileName || 'hospital_accreditation_proof.pdf',
+        documentType: data.documentType || 'NABH Blood Bank Operating License & CDSCO Clearance Form 28-C',
+        documentNumber: data.documentNumber || `NABH-BB-KA-${randomId}-2026`,
+        fileName: data.fileName || 'hospital_nabh_accreditation.pdf',
         fileSize: data.fileSize || '1.8 MB',
-        uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        uploadedAt: new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })
       },
       verificationStatus: data.verificationStatus || 'verified',
       rejectionReason: ''
@@ -737,7 +755,7 @@ class Store {
     const component = data.component || 'Platelets (Apheresis)';
     const units = parseInt(data.unitsRequired || data.units || 2, 10);
     const urgency = data.urgency || 'Stat Emergency (< 45 Mins)';
-    const hospitalName = (data.hospitalName && data.hospitalName.trim()) ? data.hospitalName.trim() : 'Metro General Hospital & Trauma Center';
+    const hospitalName = (data.hospitalName && data.hospitalName.trim()) ? data.hospitalName.trim() : 'Apollo Hospitals & Apex Trauma Centre';
     const hospitalWard = (data.ward || data.hospitalWard || 'ICU Ward 4B, Bed 12').trim();
     const attendantName = (data.attendantName && data.attendantName.trim()) ? data.attendantName.trim() : 'Immediate Family';
     const attendantRelation = (data.attendantRelation && data.attendantRelation.trim()) ? data.attendantRelation.trim() : 'Family Attendant';
@@ -758,25 +776,25 @@ class Store {
       urgency,
       hospitalName,
       hospitalWard,
-      hospitalAddress: `${hospitalName}, Medical District`,
+      hospitalAddress: `${hospitalName}, Bengaluru`,
       attendantName,
       attendantRelation,
       attendantPhone,
-      attendantEmail: data.attendantEmail || 'attendant@donor-pulse.org',
-      doctorName: data.doctorRegId || data.doctorName || 'Dr. Aris Thorne, MD',
+      attendantEmail: data.attendantEmail || 'attendant@donor-pulse.in',
+      doctorName: data.doctorRegId || data.doctorName || 'Dr. Aravind Sharma, MD',
       doctorDepartment: 'Trauma & Critical Care',
-      doctorPhone: '+1 (800) 555-8821 Ext 4429',
-      hospitalBloodDesk: '+1 (800) 555-8821',
+      doctorPhone: '+91 (80) 2630-4050 Ext 4429',
+      hospitalBloodDesk: '+91 (80) 2630-4050',
       clinicalReason,
       handshakeOTP: otp,
       trackingStage: 1,
       broadcastDate: 'Just now',
       appealActive: true,
       verificationProof: {
-        documentType: data.proofDocType || data.documentType || 'Hospital Blood Requisition Slip (Form 27-C Stamped)',
-        doctorRegId: data.doctorRegId || data.doctorName || 'Dr. Aris Thorne (MCI-48921/DL)',
+        documentType: data.proofDocType || data.documentType || 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
+        doctorRegId: data.doctorRegId || data.doctorName || 'Dr. Aravind Sharma (NMC/KMC-48921)',
         ipdCaseNo: data.ipdCaseNo || 'IPD-9042-ICU',
-        fileName: data.proofFileName || data.fileName || 'metro_gen_blood_requisition_form27c_signed.pdf',
+        fileName: data.proofFileName || data.fileName || 'apollo_blood_requisition_form27c_signed.pdf',
         fileSize: data.proofFileSize || '1.4 MB',
         status: 'VERIFIED_GENUINE',
         verificationScore: '100% Genuine Requisition',

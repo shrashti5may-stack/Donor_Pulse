@@ -183,7 +183,7 @@
             </div>
             <div class="flex items-center justify-between text-xs">
               <span class="text-on-surface-variant">Hospital Facility:</span>
-              <span class="font-semibold text-on-surface truncate text-right">Metro General Hospital</span>
+              <span class="font-semibold text-on-surface truncate text-right">Apollo Hospitals &amp; Apex Trauma Centre</span>
             </div>
             <div class="flex items-center justify-between text-xs">
               <span class="text-on-surface-variant">Admitted Ward:</span>
@@ -364,7 +364,7 @@
                   <span id="hero-patient-name">Devika Sharma</span> Needs Urgent <span id="hero-blood-need" class="text-primary font-black">B+ Platelets</span>
                 </h1>
                 <p class="text-sm text-on-surface-variant mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span class="whitespace-nowrap">Admitted to <strong class="text-on-surface">Metro General Hospital</strong> (Ward 4B Bed 12)</span>
+                  <span class="whitespace-nowrap">Admitted to <strong class="text-on-surface">Apollo Hospitals &amp; Apex Trauma Centre</strong> (Ward 4B Bed 12)</span>
                   <span class="text-outline-variant">•</span>
                   <span class="whitespace-nowrap">Attendant: <strong id="hero-attendant-name" class="font-semibold text-on-surface">Rajesh Sharma (Brother)</strong></span>
                 </p>
@@ -557,20 +557,20 @@
 
           <!-- Donors List -->
           <div id="recipient-donors-list" class="flex flex-col gap-3">
-            <!-- Donor 1: Sarah Jenkins (Arrived) -->
+            <!-- Donor 1: Ananya Sharma (Arrived) -->
             <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:bg-surface-container">
               <div class="flex items-center gap-3.5">
                 <div class="w-12 h-12 rounded-full bg-primary/10 text-primary font-bold text-lg flex items-center justify-center shrink-0">
-                  SJ
+                  AS
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
-                    <h4 class="font-bold text-base text-on-surface">Sarah Jenkins</h4>
+                    <h4 class="font-bold text-base text-on-surface">Ananya Sharma</h4>
                     <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-bold uppercase">Arrived at Blood Bank</span>
                     <span class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-[11px] font-bold">B+ Donor</span>
                   </div>
                   <p class="text-xs text-on-surface-variant mt-0.5">
-                    Proximity: <strong>1.8 km away</strong> • Verified ID: <span class="font-mono">#DNR-8924</span> • Intake Desk: Metro Trauma Blood Bank
+                    Proximity: <strong>1.8 km away</strong> • Verified ID: <span class="font-mono">#DNR-8924</span> • Intake Desk: Apollo Trauma Blood Bank
                   </p>
                 </div>
               </div>
@@ -756,7 +756,7 @@
               <span class="material-symbols-outlined text-[22px] text-primary">info</span>
               <div>
                 <span class="font-bold text-on-surface">Current Active Stage Details:</span>
-                <span id="active-stage-explanation" class="text-on-surface-variant ml-1">Volunteer donor Sarah Jenkins has checked in at the Blood Bank Reception. Verification PIN 7842 matched successfully.</span>
+                <span id="active-stage-explanation" class="text-on-surface-variant ml-1">Volunteer donor Ananya Sharma has checked in at the Blood Bank Reception. Verification PIN 7842 matched successfully.</span>
               </div>
             </div>
             <span class="text-secondary font-mono text-[11px] shrink-0 hidden sm:inline">Telemetry Ref: #STAGE-03</span>
@@ -863,7 +863,7 @@
       const patient = document.getElementById('sidebar-patient-name')?.textContent || 'Devika Sharma';
       const bloodGroup = document.getElementById('sidebar-blood-group')?.textContent || 'B+';
       const component = document.getElementById('sidebar-blood-component')?.textContent || 'Platelets';
-      const hospital = 'Metro General Hospital & Trauma Center (Ward 4B Bed 12)';
+      const hospital = 'Apollo Hospitals & Apex Trauma Centre (Ward 4B Bed 12)';
       const attendantPhone = '+91 95280 33454';
       const pin = '7842';
 
@@ -872,7 +872,7 @@
         `🏥 *Hospital Location:* ${hospital}\n` +
         `🔑 *Donor Arrival Verification PIN:* ${pin}\n` +
         `📞 *Attendant Contact:* ${attendantPhone}\n\n` +
-        `If you or someone in your network can donate ${bloodGroup} or universal O+ platelets, please report immediately to Metro Blood Bank Desk with PIN ${pin}.\n\n` +
+        `If you or someone in your network can donate ${bloodGroup} or universal O+ platelets, please report immediately to Apollo Blood Bank Desk with PIN ${pin}.\n\n` +
         `Live coordination link: ${window.location.origin}/index.html#/recipient-dashboard`;
 
       const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
@@ -881,7 +881,7 @@
 
     // Copy SOS Appeal Text
     function copySOSAppealLink() {
-      const text = `🚨 URGENT BLOOD APPEAL: Devika Sharma urgently needs B+ Platelets at Metro General Hospital (Ward 4B Bed 12). Donor PIN: 7842. Contact Attendant: +91 95280 33454. Link: ${window.location.origin}/index.html#/recipient-dashboard`;
+      const text = `🚨 URGENT BLOOD APPEAL: Devika Sharma urgently needs B+ Platelets at Apollo Hospitals & Apex Trauma Centre (Ward 4B Bed 12). Donor PIN: 7842. Contact Attendant: +91 95280 33454. Link: ${window.location.origin}/index.html#/recipient-dashboard`;
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
           const btnText = document.getElementById('copy-btn-text');
@@ -916,8 +916,8 @@
     // Transfusion Pipeline Stages
     const stageExplanations = {
       1: "Emergency requisition submitted and verified by attending surgical triage doctor.",
-      2: "Hyper-compatible blood and platelet donors alerted across 5.0 mi radius.",
-      3: "Volunteer donor Sarah Jenkins checked in at Metro Blood Bank Desk with PIN 7842.",
+      2: "Hyper-compatible blood and platelet donors alerted across 5.0 km radius.",
+      3: "Volunteer donor Ananya Sharma checked in at Apollo Blood Bank Desk with PIN 7842.",
       4: "Blood sample undergoing cross-matching, antibody screening, and viral safety assay.",
       5: "Platelet unit collected via apheresis kit and packaged under cold-chain protocol.",
       6: "Unit delivered to Trauma Ward 4B and intravenous bedside transfusion completed successfully."
@@ -1060,7 +1060,7 @@
       setVal('patientName', 'Devika Sharma');
       setVal('patientAge', '32');
       setVal('patientGender', 'Female');
-      setVal('hospitalName', 'Metro General Hospital & Trauma Center');
+      setVal('hospitalName', 'Apollo Hospitals & Apex Trauma Centre');
       setVal('ward', 'ICU Ward 4B, Bed 12');
       setVal('component', 'Platelets (Apheresis)');
       setVal('units', '3');
@@ -1070,11 +1070,11 @@
       setVal('attendantPhone', '+91 95280 33454');
       setVal('notes', 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.');
       setVal('proofDocType', 'Hospital Blood Requisition Slip (Form 27-C Stamped)');
-      setVal('doctorRegId', 'Dr. Aris Thorne (MCI-48921/DL)');
+      setVal('doctorRegId', 'Dr. Aravind Sharma (NMC/KMC-48921)');
       setVal('ipdCaseNo', 'IPD-9042-ICU');
 
       const fileLabel = modal.querySelector('.proof-filename-display');
-      if (fileLabel) fileLabel.textContent = 'metro_gen_blood_requisition_form27c_signed.pdf';
+      if (fileLabel) fileLabel.textContent = 'apollo_blood_requisition_form27c_signed.pdf';
       const sizeLabel = modal.querySelector('.proof-filesize-display');
       if (sizeLabel) sizeLabel.textContent = '1.4 MB • Official Hospital Seal & Doctor Signature Detected';
 
@@ -1159,7 +1159,7 @@
       const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 3;
       const urgency = (form && form.querySelector('[name="urgency"]')?.value) || currentPatient.urgency || 'Stat Emergency (< 45 Mins)';
       const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.';
-      const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Dr. Aris Thorne (MCI-48921/DL)';
+      const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Dr. Aravind Sharma (NMC/KMC-48921)';
       const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-9042-ICU';
 
       const setText = (id, txt) => {
@@ -1248,7 +1248,7 @@
           const bloodGroup = reqForm.querySelector('input[name="blood_type"]:checked')?.value || 'B+';
           const component = reqForm.querySelector('[name="component"]')?.value || 'Platelets (Apheresis)';
           const units = parseInt(reqForm.querySelector('[name="units"]')?.value || 3, 10);
-          const hospitalName = reqForm.querySelector('[name="hospitalName"]')?.value?.trim() || 'Metro General Hospital & Trauma Center';
+          const hospitalName = reqForm.querySelector('[name="hospitalName"]')?.value?.trim() || 'Apollo Hospitals & Apex Trauma Centre';
           const ward = reqForm.querySelector('[name="ward"]')?.value?.trim() || 'ICU Ward 4B, Bed 12';
           const attendantName = reqForm.querySelector('[name="attendantName"]')?.value?.trim() || 'Rajesh Sharma';
           const attendantRelation = reqForm.querySelector('[name="attendantRelation"]')?.value?.trim() || 'Brother / Attendant';
@@ -1256,9 +1256,9 @@
           const urgency = reqForm.querySelector('[name="urgency"]')?.value || 'Stat Emergency (< 45 Mins)';
           const notes = reqForm.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood request for patient.';
           const proofDocType = reqForm.querySelector('[name="proofDocType"]')?.value || 'Hospital Blood Requisition Slip (Form 27-C Stamped)';
-          const doctorRegId = reqForm.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Dr. Aris Thorne (MCI-48921/DL)';
+          const doctorRegId = reqForm.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Dr. Aravind Sharma (NMC/KMC-48921)';
           const ipdCaseNo = reqForm.querySelector('[name="ipdCaseNo"]')?.value?.trim() || 'IPD-9042-ICU';
-          const proofFileName = reqForm.querySelector('.proof-filename-display')?.textContent?.trim() || 'metro_gen_blood_requisition_form27c_signed.pdf';
+          const proofFileName = reqForm.querySelector('.proof-filename-display')?.textContent?.trim() || 'apollo_blood_requisition_form27c_signed.pdf';
 
           if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
             window.PulseStore.createNewPatientRequest({
@@ -1363,7 +1363,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div class="flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Hospital / Facility Name *</label>
-              <input required name="hospitalName" type="text" placeholder="e.g. Metro General Hospital &amp; Trauma Center" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input required name="hospitalName" type="text" placeholder="e.g. Apollo Hospitals &amp; Apex Trauma Centre, Bengaluru" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Ward / Bed / Unit Location *</label>
@@ -1508,9 +1508,9 @@
             <div class="sm:col-span-6 flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
                 <span>Doctor Name &amp; Council Reg No. *</span>
-                <span class="text-[10px] text-tertiary font-medium">NMC / MCI</span>
+                <span class="text-[10px] text-tertiary font-medium">NMC / KMC</span>
               </label>
-              <input required name="doctorRegId" type="text" placeholder="e.g. Dr. Aris Thorne (MCI-48921/DL)" value="" class="h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input required name="doctorRegId" type="text" placeholder="e.g. Dr. Aravind Sharma (NMC/KMC-48921)" value="" class="h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
 
             <!-- Hospital IPD / Case No -->
@@ -1574,11 +1574,11 @@
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] text-on-surface-variant pt-1 border-t border-emerald-500/20">
                 <div class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13px] text-emerald-600">check_circle</span>
-                  <span><strong>Seal:</strong> Metro General Red Stamp</span>
+                  <span><strong>Seal:</strong> Apollo Hospitals Red Clinical Stamp</span>
                 </div>
                 <div class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13px] text-emerald-600">check_circle</span>
-                  <span><strong>Doctor Reg:</strong> MCI-48921/DL Active</span>
+                  <span><strong>Doctor Reg:</strong> NMC/KMC-48921 Active</span>
                 </div>
                 <div class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-[13px] text-emerald-600">check_circle</span>
@@ -1683,9 +1683,9 @@
               <span class="material-symbols-outlined text-[28px]">local_hospital</span>
             </div>
             <div>
-              <h4 class="font-bold text-base sm:text-lg text-slate-900 tracking-tight leading-tight uppercase">Metro General Hospital &amp; Trauma Center</h4>
+              <h4 class="font-bold text-base sm:text-lg text-slate-900 tracking-tight leading-tight uppercase">Apollo Hospitals &amp; Apex Trauma Centre</h4>
               <p class="text-[11px] font-semibold text-slate-600">DEPARTMENT OF TRANSFUSION MEDICINE &amp; ADVANCED BLOOD CENTER</p>
-              <p class="text-[10px] text-slate-500">NABH Accredited • Blood Bank License: DL-BLD-2024-9042 • 24x7 Trauma Casualty</p>
+              <p class="text-[10px] text-slate-500">NABH Accredited • Blood Bank License: KA-BB-2026-88219 • 24x7 Trauma Casualty</p>
             </div>
           </div>
           <div class="text-left sm:text-right text-[11px] text-slate-600 flex flex-col">
@@ -1745,11 +1745,11 @@
           <!-- Attending Doctor Verification -->
           <div class="flex flex-col gap-1 text-xs">
             <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Attending Physician</span>
-            <div class="font-serif italic text-base text-slate-800 font-bold">Dr. Aris Thorne</div>
-            <span id="doc-proof-doctor-reg" class="text-[11px] font-bold text-slate-700">Dr. Aris Thorne, MD (MCI-48921/DL)</span>
+            <div class="font-serif italic text-base text-slate-800 font-bold">Dr. Aravind Sharma</div>
+            <span id="doc-proof-doctor-reg" class="text-[11px] font-bold text-slate-700">Dr. Aravind Sharma, MD (NMC/KMC-48921)</span>
             <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-0.5">
               <span class="material-symbols-outlined text-[12px]">verified</span>
-              <span>National Medical Council Reg. Active</span>
+              <span>National Medical Commission Reg. Active</span>
             </span>
           </div>
 
@@ -1757,7 +1757,7 @@
           <div class="flex flex-col items-center justify-center">
             <div class="w-24 h-24 rounded-full border-2 border-dashed border-red-600 text-red-600 flex flex-col items-center justify-center p-1 text-center rotate-[-8deg] shadow-xs bg-red-50/50">
               <span class="material-symbols-outlined text-[18px]">verified</span>
-              <span class="text-[7.5px] font-black uppercase tracking-tight leading-tight">METRO GENERAL HOSPITAL</span>
+              <span class="text-[7.5px] font-black uppercase tracking-tight leading-tight">APOLLO HOSPITALS BENGALURU</span>
               <span class="text-[6.5px] font-bold uppercase text-red-800">TRANSFUSION MEDICINE</span>
               <span class="text-[7px] font-black tracking-widest text-emerald-700">★ VERIFIED REAL ★</span>
             </div>
