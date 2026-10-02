@@ -1,309 +1,203 @@
 <!DOCTYPE html>
 
 <html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>DonorPulse — Select Account Role</title><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {"darkMode":"class","theme":{"extend":{"colors":{"surface-container-high":"#e6e8ea","primary-fixed":"#ffdad8","inverse-primary":"#ffb3b1","tertiary-fixed":"#85f8c4","outline":"#906f6e","surface-variant":"#e0e3e5","on-primary":"#ffffff","surface-dim":"#d8dadc","inverse-on-surface":"#eff1f3","on-tertiary-container":"#85f8c3","outline-variant":"#e5bdbb","surface-container-highest":"#e0e3e5","on-secondary-fixed-variant":"#3f465c","on-tertiary-fixed-variant":"#005137","on-tertiary-fixed":"#002114","on-surface-variant":"#5c403f","secondary":"#565e74","on-primary-container":"#ffdad8","on-error-container":"#93000a","tertiary-container":"#00734f","on-secondary-fixed":"#131b2e","primary-fixed-dim":"#ffb3b1","on-secondary":"#ffffff","secondary-fixed-dim":"#bec6e0","on-secondary-container":"#5c647a","surface-container-low":"#f2f4f6","on-primary-fixed":"#410007","tertiary-fixed-dim":"#68dba9","on-primary-fixed-variant":"#92001c","on-surface":"#191c1e","on-tertiary":"#ffffff","error":"#ba1a1a","on-background":"#191c1e","secondary-container":"#dae2fd","surface-container-lowest":"#ffffff","surface":"#f7f9fb","on-error":"#ffffff","inverse-surface":"#2d3133","primary":"#9e001f","error-container":"#ffdad6","surface-container":"#eceef0","surface-bright":"#f7f9fb","background":"#f7f9fb","surface-tint":"#bf0229","tertiary":"#00583c","primary-container":"#c8102e","secondary-fixed":"#dae2fd"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter-desktop":"1.5rem","space-xs":"0.5rem","gutter-mobile":"1rem","container-max":"1280px","space-md":"1rem","space-lg":"1.5rem","space-sm":"0.75rem","space-3xl":"4rem","space-2xs":"0.25rem","space-xl":"2rem","space-2xl":"3rem"},"fontFamily":{"label-badge":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"numeric-metric":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"display-hero-mobile":["Plus Jakarta Sans"],"body-md":["Inter"],"label-lg":["Plus Jakarta Sans"],"display-hero":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"body-lg":["Inter"],"body-sm":["Inter"],"title-md":["Inter"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"label-badge":["11px",{"lineHeight":"14px","letterSpacing":"0.05em","fontWeight":"700"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"numeric-metric":["36px",{"lineHeight":"44px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-hero-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"800"}],"body-md":["15px",{"lineHeight":"22px","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.025em","fontWeight":"800"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-sm":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"title-md":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col justify-start">
-<div class="w-full max-w-[1280px] mx-auto px-4 md:px-8 pt-6 flex items-center justify-start">
-  <a href="homepage.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-all shadow-xs group cursor-pointer">
-    <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
-    <span>Back to Home Page</span>
-  </a>
-</div>
-<main class="w-full bg-surface flex-1"><div class="flex flex-col w-full">
-<!-- Interactive Background & Ambient Mesh -->
-<div class="relative w-full max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10 flex flex-col items-center">
-<!-- Subtle Ambient Glow -->
-<div class="absolute top-12 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-gradient-to-b from-primary-fixed/30 via-secondary-container/20 to-transparent blur-3xl pointer-events-none rounded-full"></div>
-<!-- Header & Breadcrumb Hierarchy -->
-<div class="relative w-full flex flex-col items-center text-center space-y-3 mb-10 md:mb-14">
-<!-- Breadcrumb Capsule -->
-<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-high/80 backdrop-blur shadow-sm">
-<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-<span class="font-label-badge text-label-badge tracking-wider text-primary uppercase">Direct Dispatch Active</span>
-<span class="text-secondary font-label-badge text-label-badge">•</span>
-<span class="font-label-badge text-label-badge text-secondary font-semibold uppercase">Secure Authentication Gateway</span>
-</div>
-<!-- Main Headline -->
-<h1 class="font-display-hero text-display-hero md:text-[44px] text-on-surface tracking-tight max-w-2xl mt-2">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><link rel="stylesheet" href="css/custom.css"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {"darkMode":"class","theme":{"extend":{"colors":{"surface-container-high":"#EADBCA","primary-fixed":"#F3E6D5","inverse-primary":"#D45060","tertiary-fixed":"#F3E6D5","outline":"#A68A7C","surface-variant":"#F3E6D5","on-primary":"#ffffff","surface-dim":"#E8D8C7","inverse-on-surface":"#FFE2E2","on-tertiary-container":"#BC0202","outline-variant":"#E5D5C3","surface-container-highest":"#E2D0BC","on-secondary-fixed-variant":"#BC0202","on-tertiary-fixed-variant":"#BC0202","on-tertiary-fixed":"#BC0202","on-surface-variant":"#6E554B","secondary":"#D45060","on-primary-container":"#ffffff","on-error-container":"#BC0202","tertiary-container":"#F3E6D5","on-secondary-fixed":"#BC0202","primary-fixed-dim":"#D45060","on-secondary":"#ffffff","secondary-fixed-dim":"#D45060","on-secondary-container":"#BC0202","surface-container-low":"#FBF4EB","on-primary-fixed":"#BC0202","tertiary-fixed-dim":"#D45060","on-primary-fixed-variant":"#BC0202","on-surface":"#2C1810","on-tertiary":"#ffffff","error":"#BC0202","on-background":"#2C1810","secondary-container":"#F3E6D5","surface-container-lowest":"#ffffff","surface":"#FFE2E2","on-error":"#ffffff","inverse-surface":"#2C1810","primary":"#BC0202","error-container":"#F3E6D5","surface-container":"#F3E6D5","surface-bright":"#FFE2E2","background":"#FFE2E2","surface-tint":"#BC0202","tertiary":"#D45060","primary-container":"#BC0202","secondary-fixed":"#F3E6D5"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter-desktop":"1.5rem","space-xs":"0.5rem","gutter-mobile":"1rem","container-max":"1280px","space-md":"1rem","space-lg":"1.5rem","space-sm":"0.75rem","space-3xl":"4rem","space-2xs":"0.25rem","space-xl":"2rem","space-2xl":"3rem"},"fontFamily":{"label-badge":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"numeric-metric":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"display-hero-mobile":["Plus Jakarta Sans"],"body-md":["Inter"],"label-lg":["Plus Jakarta Sans"],"display-hero":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"body-lg":["Inter"],"body-sm":["Inter"],"title-md":["Inter"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"label-badge":["11px",{"lineHeight":"14px","letterSpacing":"0.05em","fontWeight":"700"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"numeric-metric":["36px",{"lineHeight":"44px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-hero-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"800"}],"body-md":["15px",{"lineHeight":"22px","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.025em","fontWeight":"800"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-sm":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"title-md":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col justify-start">
+<main class="w-full bg-surface flex-1">
+  <div class="relative w-full max-w-[1400px] xl:max-w-[1520px] 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 min-h-[calc(100vh-2rem)] lg:h-[calc(100vh-1rem)] flex flex-col justify-between items-center">
+    <!-- Back Navigation -->
+    <div class="w-full flex justify-start mb-1 sm:mb-2 relative z-10 shrink-0">
+      <a href="homepage.html" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-surface-container-high/80 hover:bg-surface-container text-on-surface font-label-md text-xs sm:text-sm font-semibold transition-all shadow-xs group cursor-pointer">
+        <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+        <span>Back to Home Page</span>
+      </a>
+    </div>
+
+    <!-- Ambient Glow -->
+    <div class="absolute top-8 left-1/2 -translate-x-1/2 w-[720px] h-[300px] bg-gradient-to-b from-primary-fixed/30 via-secondary-container/20 to-transparent blur-3xl pointer-events-none rounded-full"></div>
+    
+    <!-- Breadcrumb & Headline -->
+    <div class="relative w-full flex flex-col items-center text-center space-y-1 mb-2 sm:mb-3 shrink-0">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high/80 backdrop-blur shadow-xs">
+        <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+        <span class="font-label-badge text-[11px] tracking-wider text-primary uppercase font-bold">Direct Dispatch Active</span>
+        <span class="text-secondary font-label-badge text-[11px]">•</span>
+        <span class="font-label-badge text-[11px] text-secondary font-semibold uppercase">Secure Authentication Gateway</span>
+      </div>
+      <h1 class="font-display-hero text-2xl sm:text-3xl lg:text-[36px] xl:text-[40px] text-on-surface tracking-tight max-w-2xl mt-0.5 leading-tight font-extrabold">
         Welcome to <span class="text-primary tracking-tight">DonorPulse</span>
-</h1>
-<!-- Subtitle -->
-<p class="font-body-lg text-body-lg text-secondary max-w-xl mx-auto">
+      </h1>
+      <p class="text-xs sm:text-sm text-secondary max-w-xl mx-auto leading-normal">
         Select your portal to log in or register for donor access and hospital clinical triage.
       </p>
-<!-- Realtime System Status Ticker -->
-<div class="flex flex-wrap items-center justify-center gap-4 pt-2 text-secondary">
-<div class="flex items-center gap-1.5 font-label-md text-label-md bg-surface-container-lowest px-3 py-1 rounded-full shadow-sm">
-<span class="material-symbols-outlined text-[16px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-<span>Regional Reserves: <strong class="text-on-surface">Optimal (94.2%)</strong></span>
-</div>
-<div class="flex items-center gap-1.5 font-label-md text-label-md bg-surface-container-lowest px-3 py-1 rounded-full shadow-sm">
-<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">e911_emergency</span>
-<span>Urgent Need: <strong class="text-primary font-bold">O- Negative &amp; Platelets</strong></span>
-</div>
-</div>
-</div>
-<!-- Dual Role Grid -->
-<div class="relative w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-8 items-stretch mb-12">
-<!-- CARD 1: INDIVIDUAL DONOR -->
-<div class="group relative flex flex-col justify-between bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-8 md:p-10 overflow-hidden">
-<!-- Accent Glow & Graphic Motif -->
-<div class="absolute -right-16 -top-16 w-56 h-56 bg-primary-fixed/40 rounded-full blur-2xl group-hover:bg-primary-fixed/60 transition-colors pointer-events-none"></div>
-<div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary-fixed"></div>
-<div>
-<!-- Card Category & Indicator -->
-<div class="flex items-center justify-between mb-6">
-<div class="flex items-center gap-3">
-<div class="w-14 h-14 rounded-xl bg-error-container/60 flex items-center justify-center shadow-inner text-primary">
-<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">bloodtype</span>
-</div>
-<div>
-<span class="font-label-badge text-label-badge tracking-widest text-primary font-bold uppercase">Community Role</span>
-<p class="font-headline-sm text-headline-sm text-on-surface">DONOR PORTAL</p>
-</div>
-</div>
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-error-container font-label-badge text-label-badge text-primary font-bold">
-<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-              INSTANT MATCH
+    </div>
+
+    <!-- Dual Role Grid -->
+    <div class="relative w-full grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-stretch mb-2 sm:mb-3 flex-1 min-h-0">
+      
+      <!-- CARD 1: INDIVIDUAL DONOR -->
+      <div class="group relative flex flex-col justify-between bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-5 lg:p-6 overflow-hidden border border-outline-variant/30">
+        <div class="absolute -right-16 -top-16 w-48 h-48 bg-primary-fixed/40 rounded-full blur-2xl group-hover:bg-primary-fixed/60 transition-colors pointer-events-none"></div>
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary-fixed"></div>
+        <div class="flex-1 flex flex-col justify-start">
+          <div class="flex items-center justify-between mb-2 sm:mb-3">
+            <div class="flex items-center gap-2.5 sm:gap-3">
+              <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-error-container/60 flex items-center justify-center shadow-inner text-primary shrink-0">
+                <span class="material-symbols-outlined text-[26px] sm:text-[28px]" style="font-variation-settings: 'FILL' 1;">bloodtype</span>
+              </div>
+              <div>
+                <span class="font-label-badge text-[11px] tracking-widest text-primary font-bold uppercase block leading-none mb-1">Community Role</span>
+                <p class="font-headline-sm text-base sm:text-lg font-bold text-on-surface leading-tight">DONOR PORTAL</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container font-label-badge text-[11px] text-primary font-bold shadow-xs shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> INSTANT MATCH
             </span>
-</div>
-<!-- Headline & Tagline -->
-<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Individual Donor</h2>
-<p class="font-body-md text-body-md text-secondary mb-6">
+          </div>
+          <h2 class="font-headline-md text-base sm:text-lg font-bold text-on-surface mb-1 leading-snug">Individual Donor</h2>
+          <p class="text-xs sm:text-[13px] text-secondary mb-2 sm:mb-3 leading-normal">
             Find opportunities to donate blood, manage appointments, and deliver measurable impact to emergency cases near you.
           </p>
-<!-- Key Highlights List -->
-<div class="space-y-3.5 mb-8">
-<div class="flex items-start gap-3">
-<div class="w-5 h-5 rounded-full bg-tertiary-fixed flex items-center justify-center mt-0.5 shrink-0 text-on-tertiary-fixed">
-<span class="material-symbols-outlined text-[14px] font-bold">check</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface">Real-time emergency requests and mobile triage near you</span>
-</div>
-<div class="flex items-start gap-3">
-<div class="w-5 h-5 rounded-full bg-tertiary-fixed flex items-center justify-center mt-0.5 shrink-0 text-on-tertiary-fixed">
-<span class="material-symbols-outlined text-[14px] font-bold">check</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface">Next donation eligibility tracker &amp; biological recovery logs</span>
-</div>
-<div class="flex items-start gap-3">
-<div class="w-5 h-5 rounded-full bg-tertiary-fixed flex items-center justify-center mt-0.5 shrink-0 text-on-tertiary-fixed">
-<span class="material-symbols-outlined text-[14px] font-bold">check</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface">Priority booking at certified clinical centers and blood banks</span>
-</div>
-<div class="flex items-start gap-3">
-<div class="w-5 h-5 rounded-full bg-tertiary-fixed flex items-center justify-center mt-0.5 shrink-0 text-on-tertiary-fixed">
-<span class="material-symbols-outlined text-[14px] font-bold">check</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface">Life-saved milestone badges &amp; cryptographic contribution proof</span>
-</div>
-</div>
-<!-- Visual Telemetry Mini-Card -->
-<div class="bg-surface-container-low rounded-xl p-4 mb-8 flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="flex -space-x-2 overflow-hidden">
-<span class="inline-block w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed font-headline-sm text-[12px] flex items-center justify-center shadow">O+</span>
-<span class="inline-block w-8 h-8 rounded-full bg-primary-fixed text-primary font-headline-sm text-[12px] flex items-center justify-center shadow">A-</span>
-<span class="inline-block w-8 h-8 rounded-full bg-surface-container-highest text-secondary font-headline-sm text-[12px] flex items-center justify-center shadow">B+</span>
-</div>
-<div class="flex flex-col">
-<span class="font-title-md text-title-md text-on-surface leading-tight">4,812 Registered</span>
-<span class="font-body-sm text-body-sm text-secondary">Local donors responding in your metro</span>
-</div>
-</div>
-<div class="flex items-center text-tertiary font-label-md text-label-md font-semibold">
-<span class="material-symbols-outlined text-[18px] mr-0.5">trending_up</span>
-              +14% this wk
+          <div class="space-y-1.5 sm:space-y-2 mb-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
+                <span class="material-symbols-outlined text-[12px] font-bold">check</span>
+              </div>
+              <span class="text-xs sm:text-[13px] text-on-surface font-medium leading-tight">Real-time emergency requests and mobile triage near you</span>
             </div>
-</div>
-</div>
-<!-- Action Area -->
-<div class="flex flex-col gap-2.5 pt-2">
-<button type="button" onclick="openDonorLoginModal()" class="w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
-<span>Donor Login / Dashboard</span>
-<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-</button>
-<a class="w-full h-11 bg-surface-container-low hover:bg-surface-container text-primary border border-outline-variant/60 rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer" href="index.html#/donor-register">
-<span class="material-symbols-outlined text-[18px]">how_to_reg</span>
-<span>Register as New Donor</span>
-</a>
-</div>
-</div>
-<!-- CARD 2: RECIPIENT & FAMILY / FRIENDS -->
-<div class="group relative flex flex-col justify-between bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-8 md:p-10 overflow-hidden">
-<!-- Accent Glow & Graphic Motif -->
-<div class="absolute -right-16 -top-16 w-56 h-56 bg-primary-container/20 rounded-full blur-2xl group-hover:bg-primary-container/40 transition-colors pointer-events-none"></div>
-<div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary-container"></div>
-<div>
-<!-- Card Category & Indicator -->
-<div class="flex items-center justify-between mb-6">
-<div class="flex items-center gap-3">
-<div class="w-14 h-14 rounded-xl bg-primary-container/40 flex items-center justify-center shadow-inner text-primary">
-<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
-</div>
-<div>
-<span class="font-label-badge text-label-badge tracking-widest text-primary font-bold uppercase">Recipient &amp; Family</span>
-<p class="font-headline-sm text-headline-sm text-on-surface">PATIENT &amp; ATTENDANT</p>
-</div>
-</div>
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 font-label-badge text-label-badge text-primary font-bold">
-<span class="material-symbols-outlined text-[14px]">shield_with_heart</span>
-              PRIORITY RELIEF
-            </span>
-</div>
-<!-- Headline & Tagline -->
-<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Blood Recipient or Relative / Friend</h2>
-<p class="font-body-md text-body-md text-secondary mb-6">
-            Track emergency blood requisitions, mobilize volunteer donors via 1-click WhatsApp appeals, and monitor donors arriving at the hospital blood bank in real time.
-          </p>
-<!-- Key Highlights List -->
-<div class="space-y-3.5 mb-8">
-<div class="flex items-start gap-3">
-<div class="w-5 h-5 rounded-full bg-primary-container/30 flex items-center justify-center mt-0.5 shrink-0 text-primary">
-<span class="material-symbols-outlined text-[14px] font-bold">check</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface">1-Click WhatsApp SOS appeal broadcasting to family, friends &amp; volunteer networks</span>
-</div>
-<div class="flex items-start gap-3">
-<div class="w-5 h-5 rounded-full bg-primary-container/30 flex items-center justify-center mt-0.5 shrink-0 text-primary">
-<span class="material-symbols-outlined text-[14px] font-bold">check</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface">Live donor arrival tracking &amp; 4-digit security handshake PIN verification</span>
-</div>
-<div class="flex items-start gap-3">
-<div class="w-5 h-5 rounded-full bg-primary-container/30 flex items-center justify-center mt-0.5 shrink-0 text-primary">
-<span class="material-symbols-outlined text-[14px] font-bold">check</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface">Transparent 6-stage transfusion pipeline from cross-match to bedside delivery</span>
-</div>
-<div class="flex items-start gap-3">
-<div class="w-5 h-5 rounded-full bg-primary-container/30 flex items-center justify-center mt-0.5 shrink-0 text-primary">
-<span class="material-symbols-outlined text-[14px] font-bold">check</span>
-</div>
-<span class="font-body-md text-body-md text-on-surface">Direct coordination desk between hospital blood bank and patient attendant</span>
-</div>
-</div>
-<!-- Visual Telemetry Mini-Card -->
-<div class="bg-surface-container-low rounded-xl p-4 mb-8 flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-[20px]">share</span>
-</div>
-<div class="flex flex-col">
-<span class="font-title-md text-title-md text-on-surface leading-tight">Instant SOS Broadcast</span>
-<span class="font-body-sm text-body-sm text-secondary">Family &amp; volunteer donor mobilization</span>
-</div>
-</div>
-<span class="px-2 py-1 rounded bg-primary-container/40 font-label-badge text-label-badge text-primary font-semibold">Live Handshake</span>
-</div>
-</div>
-<!-- Action Area -->
-<div class="flex flex-col gap-2.5 pt-2">
-<button type="button" onclick="openHospitalLoginModal()" class="w-full h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer">
-<span>Recipient / Attendant Login</span>
-<span class="material-symbols-outlined text-[18px]">family_restroom</span>
-</button>
-<a class="w-full h-11 bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/60 rounded-xl font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer" href="index.html#/raise-request">
-<span class="material-symbols-outlined text-[18px]">add_circle</span>
-<span>Raise Urgent Blood Request</span>
-</a>
-</div>
-</div>
-</div>
-<!-- Emergency Hotline Banner -->
-<div class="relative w-full rounded-2xl bg-surface-container-lowest shadow-md p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 mb-12 overflow-hidden">
-<!-- High-visibility accent stroke -->
-<div class="absolute left-0 top-0 bottom-0 w-2 bg-error"></div>
-<div class="flex items-center gap-5">
-<div class="w-14 h-14 rounded-full bg-error-container flex items-center justify-center shrink-0 text-error animate-pulse">
-<span class="material-symbols-outlined text-[30px]" style="font-variation-settings: 'FILL' 1;">phone_in_talk</span>
-</div>
-<div>
-<div class="flex items-center gap-2 mb-1">
-<span class="font-label-badge text-label-badge text-error font-bold uppercase tracking-wider">Critical Redline Alert</span>
-<span class="inline-block w-2 h-2 rounded-full bg-error"></span>
-</div>
-<h3 class="font-headline-sm text-headline-sm text-on-surface">Need immediate rare blood support or surgical supply?</h3>
-<p class="font-body-sm text-body-sm text-secondary">Direct emergency dispatcher link active for Trauma Level 1-4 units and neonatal centers.</p>
-</div>
-</div>
-<div class="flex flex-col sm:flex-row items-center gap-4 shrink-0 w-full md:w-auto">
-<div class="w-full sm:w-auto px-5 py-3 rounded-xl bg-error text-on-error font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 shadow-sm select-all" title="Emergency Contact Number">
-<span class="material-symbols-outlined text-[20px]">call</span>
-<span class="tracking-wide select-all">+91 9528033454</span>
-<button type="button" onclick="navigator.clipboard.writeText('+91 9528033454'); alert('+91 9528033454 copied to clipboard.');" class="ml-1 p-1 rounded-md hover:bg-white/20 active:scale-95 transition-colors cursor-pointer" title="Copy Phone Number">
-<span class="material-symbols-outlined text-[16px]">content_copy</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Security & Institutional Compliance Badges -->
-<div class="w-full flex flex-col items-center border-t border-surface-container-high pt-8">
-<div class="flex flex-wrap items-center justify-center gap-6 md:gap-12 opacity-80">
-<!-- Badge 1 -->
-<div class="flex items-center gap-2 text-secondary">
-<span class="material-symbols-outlined text-[22px] text-tertiary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
-<div class="text-left">
-<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">CDSCO Compliant</p>
-<p class="font-body-sm text-[11px] text-secondary">256-bit Health Data Encryption</p>
-</div>
-</div>
-<!-- Badge 2 -->
-<div class="flex items-center gap-2 text-secondary">
-<span class="material-symbols-outlined text-[22px] text-primary" style="font-variation-settings: 'FILL' 1;">medical_services</span>
-<div class="text-left">
-<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">NABH Accredited</p>
-<p class="font-body-sm text-[11px] text-secondary">Standard Blood Bank Adherence</p>
-</div>
-</div>
-<!-- Badge 3 -->
-<div class="flex items-center gap-2 text-secondary">
-<span class="material-symbols-outlined text-[22px] text-on-surface" style="font-variation-settings: 'FILL' 1;">lock</span>
-<div class="text-left">
-<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">Encrypted Records</p>
-<p class="font-body-sm text-[11px] text-secondary">Zero-Knowledge Patient Identity</p>
-</div>
-</div>
-<!-- Badge 4 -->
-<div class="flex items-center gap-2 text-secondary">
-<span class="material-symbols-outlined text-[22px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">policy</span>
-<div class="text-left">
-<p class="font-label-badge text-label-badge font-bold uppercase leading-tight text-on-surface">CDSCO Regulated</p>
-<p class="font-body-sm text-[11px] text-secondary">Biologics Traceability Standards</p>
-</div>
-</div>
-</div>
-<!-- Micro Copyright & System Note -->
-<p class="font-body-sm text-[12px] text-secondary/70 mt-6 text-center">
-        DonorPulse™ Emergency Logistics Architecture • Version 4.8.2 • Strictly intended for authorized healthcare providers &amp; vetted civilian donors.
-      </p>
-</div>
-</div>
-</div></main>
-
-<footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-space-2xl mt-auto">
-  <div class="max-w-[1280px] mx-auto px-gutter-desktop">
-    <div class="flex flex-col md:flex-row items-center justify-between gap-space-lg pb-space-lg">
-      <div class="flex items-center gap-space-xs">
-        <img alt="DonorPulse Logo" class="h-6 w-6 object-contain shrink-0" src="images/logo.svg"/>
-        <span class="font-headline-sm text-headline-sm font-bold text-on-surface">DonorPulse</span>
-        <span class="font-body-sm text-body-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span>
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
+                <span class="material-symbols-outlined text-[12px] font-bold">check</span>
+              </div>
+              <span class="text-xs sm:text-[13px] text-on-surface font-medium leading-tight">Next donation eligibility tracker &amp; biological recovery logs</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
+                <span class="material-symbols-outlined text-[12px] font-bold">check</span>
+              </div>
+              <span class="text-xs sm:text-[13px] text-on-surface font-medium leading-tight">Priority booking at certified clinical centers and blood banks</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
+                <span class="material-symbols-outlined text-[12px] font-bold">check</span>
+              </div>
+              <span class="text-xs sm:text-[13px] text-on-surface font-medium leading-tight">Life-saved milestone badges &amp; cryptographic contribution proof</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2 pt-1 mt-auto shrink-0">
+          <button type="button" onclick="openDonorLoginModal()" class="w-full h-10 sm:h-11 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-label-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:shadow active:scale-[0.99] transition-all cursor-pointer">
+            <span>Donor Login / Dashboard</span>
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+          <a href="index.html#/donor-register" class="w-full h-9 sm:h-10 bg-surface-container-low hover:bg-surface-container text-primary border border-outline-variant/60 rounded-xl font-label-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+            <span>Register as New Donor</span>
+          </a>
+        </div>
       </div>
-      <div class="flex flex-wrap items-center gap-space-lg">
-        <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="https://eraktkosh.mohfw.gov.in/eraktkoshPortal/#/" target="_blank" rel="noopener noreferrer">Clinical Protocols</a>
-        <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="hospital-register.html">Hospital Verification</a>
-        <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="#" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">Access Portal</a>
+
+      <!-- CARD 2: BLOOD RECIPIENT & FAMILY / FRIENDS PORTAL -->
+      <div class="group relative flex flex-col justify-between bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-5 lg:p-6 overflow-hidden border border-outline-variant/30">
+        <div class="absolute -right-16 -top-16 w-48 h-48 bg-primary-fixed/30 rounded-full blur-2xl group-hover:bg-primary-fixed/50 transition-colors pointer-events-none"></div>
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-rose-400"></div>
+        <div class="flex-1 flex flex-col justify-start">
+          <div class="flex items-center justify-between mb-2 sm:mb-3">
+            <div class="flex items-center gap-2.5 sm:gap-3">
+              <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center shadow-inner text-primary shrink-0">
+                <span class="material-symbols-outlined text-[26px] sm:text-[28px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+              </div>
+              <div>
+                <span class="font-label-badge text-[11px] tracking-widest text-primary font-bold uppercase block leading-none mb-1">Patient &amp; Family Role</span>
+                <p class="font-headline-sm text-base sm:text-lg font-bold text-on-surface leading-tight">RECIPIENT &amp; ATTENDANT</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-primary font-label-badge text-[11px] font-bold shadow-xs shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> PRIORITY RELIEF
+            </span>
+          </div>
+          <h2 class="font-headline-md text-base sm:text-lg font-bold text-on-surface mb-1 leading-snug">Recipient or Relative / Friend</h2>
+          <p class="text-xs sm:text-[13px] text-secondary mb-2 sm:mb-3 leading-normal">
+            Need blood for yourself, a family member, or a friend? Raise an urgent requisition, track responding volunteer donors in real-time, and coordinate with hospital blood banks.
+          </p>
+          <div class="space-y-1.5 sm:space-y-2 mb-2 sm:mb-2.5">
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
+                <span class="material-symbols-outlined text-[12px] font-bold">check</span>
+              </div>
+              <span class="text-xs sm:text-[13px] text-on-surface font-medium leading-tight">Instant emergency blood requisition &amp; SOS broadcast to local donors</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
+                <span class="material-symbols-outlined text-[12px] font-bold">check</span>
+              </div>
+              <span class="text-xs sm:text-[13px] text-on-surface font-medium leading-tight">Live incoming donor GPS &amp; arrival telemetry to your hospital</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
+                <span class="material-symbols-outlined text-[12px] font-bold">check</span>
+              </div>
+              <span class="text-xs sm:text-[13px] text-on-surface font-medium leading-tight">1-Click WhatsApp appeal generator for family and community chats</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-4 h-4 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
+                <span class="material-symbols-outlined text-[12px] font-bold">check</span>
+              </div>
+              <span class="text-xs sm:text-[13px] text-on-surface font-medium leading-tight">Secure donor arrival handshake code for hospital blood bank intake</span>
+            </div>
+          </div>
+          <!-- Telemetry mini-card -->
+          <div class="bg-surface-container-low rounded-xl p-2 sm:p-2.5 mb-2.5 flex items-center justify-between border border-surface-container">
+            <div class="flex items-center gap-2 sm:gap-2.5">
+              <div class="w-7 h-7 rounded-lg bg-error-container/60 flex items-center justify-center text-primary shrink-0">
+                <span class="material-symbols-outlined text-[17px]">timer</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">~14 min Earliest Arrival</span>
+                <span class="text-[11px] text-secondary leading-tight">3 Volunteer Donors responding to Case REQ-9042</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-tertiary-container/30 font-label-badge text-[10px] text-tertiary font-bold shrink-0">Active Case</span>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2 pt-1 mt-auto shrink-0">
+          <button type="button" onclick="openHospitalLoginModal()" class="w-full h-10 sm:h-11 bg-on-surface hover:bg-secondary text-surface rounded-xl font-label-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:shadow active:scale-[0.99] transition-all cursor-pointer">
+            <span>Recipient / Family Login &amp; Dashboard</span>
+            <span class="material-symbols-outlined text-[18px]">family_restroom</span>
+          </button>
+          <a href="index.html#/raise-request" class="w-full h-9 sm:h-10 bg-surface-container-low hover:bg-surface-container text-primary border border-outline-variant/60 rounded-xl font-label-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">emergency_share</span>
+            <span>Raise Patient Blood Request</span>
+          </a>
+        </div>
       </div>
     </div>
-    <div class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-xs font-body-sm text-body-sm text-on-surface-variant border-t border-surface-container-high">
-      <p>© 2024 DonorPulse Emergency Blood Logistics. All rights reserved.</p>
-      <div class="flex items-center gap-space-xs">
-        <span class="w-2 h-2 rounded-full bg-tertiary"></span>
-        <span class="font-label-badge text-label-badge uppercase tracking-wider text-tertiary">Central Dispatch Active</span>
+
+    <!-- Emergency Hotline Banner -->
+    <div class="relative w-full rounded-2xl bg-surface-container-lowest shadow-sm p-3 sm:p-4 flex flex-col md:flex-row items-center justify-between gap-3 overflow-hidden border border-outline-variant/30 shrink-0">
+      <div class="absolute left-0 top-0 bottom-0 w-2 bg-error"></div>
+      <div class="flex items-center gap-3 sm:gap-4 pl-1">
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-error-container flex items-center justify-center shrink-0 text-error animate-pulse">
+          <span class="material-symbols-outlined text-[22px] sm:text-[24px]" style="font-variation-settings: 'FILL' 1;">phone_in_talk</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-0.5">
+            <span class="font-label-badge text-[11px] text-error font-bold uppercase tracking-wider">Critical Redline Alert</span>
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-error"></span>
+          </div>
+          <h3 class="font-headline-sm text-xs sm:text-sm md:text-[15px] font-bold text-on-surface leading-snug">Need immediate rare blood support or surgical supply?</h3>
+          <p class="text-[11px] sm:text-xs text-secondary leading-normal">Direct emergency dispatcher link active for Trauma Level 1-4 units and neonatal centers.</p>
+        </div>
+      </div>
+      <div class="px-4 py-2 rounded-xl bg-error text-on-error font-label-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm shrink-0 select-all" title="Emergency Contact Number">
+        <span class="material-symbols-outlined text-[18px]">call</span>
+        <span class="tracking-wide select-all">+91 9528033454</span>
+        <button type="button" onclick="navigator.clipboard.writeText('+91 9528033454'); alert('+91 9528033454 copied to clipboard.');" class="ml-1 p-0.5 rounded hover:bg-white/20 active:scale-95 transition-colors cursor-pointer" title="Copy Phone Number">
+          <span class="material-symbols-outlined text-[15px]">content_copy</span>
+        </button>
       </div>
     </div>
   </div>
-</footer>
+</main>
 
 <!-- MODAL 1: SEPARATE DONOR LOGIN POP-UP -->
 <div id="modal-donor-login" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">

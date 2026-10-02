@@ -1,5 +1,9 @@
 /* DonorPulse Custom Styles & Animations - Matching Stitch Visual Language */
 
+html, body {
+  background-color: #FFE2E2 !important;
+}
+
 /* Smooth view transitions */
 .view-section {
   display: none !important;
@@ -33,15 +37,15 @@
   border-radius: 9999px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(158, 0, 31, 0.5);
+  background: rgba(188, 2, 2, 0.5);
 }
 
 /* Prototype Tester Float Toolbar */
 .prototype-toolbar {
-  background: rgba(25, 28, 30, 0.94);
+  background: rgba(44, 24, 16, 0.94);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(243, 230, 213, 0.2);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(243, 230, 213, 0.1);
 }
 
 /* Pulse animation for active triage alerts */
@@ -85,7 +89,7 @@
 
 /* Interactive step progress connector line */
 .step-line-active {
-  background-color: #00583c !important;
+  background-color: #BC0202 !important;
 }
 
 /* Card subtle hover elevation */
@@ -94,7 +98,7 @@
 }
 .hover-lift:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 12px 28px -6px rgba(188, 2, 2, 0.08), 0 4px 12px -2px rgba(188, 2, 2, 0.04);
 }
 
 /* Radar Sweep Animation for Telemetry */
@@ -114,10 +118,10 @@
   cursor: pointer;
 }
 .blood-pill.active {
-  background-color: #c8102e !important;
+  background-color: #BC0202 !important;
   color: #ffffff !important;
-  border-color: #c8102e !important;
-  box-shadow: 0 4px 14px rgba(200, 16, 46, 0.35);
+  border-color: #BC0202 !important;
+  box-shadow: 0 4px 14px rgba(188, 2, 2, 0.35);
   transform: scale(1.04);
 }
 
@@ -132,7 +136,7 @@
 }
 .clickable-blood-pill:hover {
   transform: translateY(-2px) scale(1.08);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(188, 2, 2, 0.15);
 }
 .clickable-blood-pill:active {
   transform: translateY(0) scale(0.98);
@@ -140,15 +144,15 @@
 
 /* Matrix Table Interactive Styling */
 .matrix-row-selected {
-  background-color: rgba(200, 16, 46, 0.08) !important;
+  background-color: rgba(188, 2, 2, 0.08) !important;
   font-weight: 700;
 }
 .matrix-row-selected td:first-child {
-  border-left: 3px solid #c8102e;
+  border-left: 3px solid #BC0202;
 }
 
 .matrix-col-selected {
-  background-color: rgba(200, 16, 46, 0.05) !important;
+  background-color: rgba(188, 2, 2, 0.05) !important;
 }
 
 .matrix-cell-interactive {
@@ -160,15 +164,15 @@
 .matrix-cell-interactive:hover {
   transform: scale(1.22);
   z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(188, 2, 2, 0.18);
 }
 
 .matrix-cell-active-match {
-  outline: 2px solid #c8102e;
+  outline: 2px solid #BC0202;
   outline-offset: 2px;
   transform: scale(1.18);
   z-index: 12;
-  box-shadow: 0 4px 14px rgba(200, 16, 46, 0.35);
+  box-shadow: 0 4px 14px rgba(188, 2, 2, 0.35);
 }
 
 /* Toggle Switch Smooth Transitions */
@@ -186,8 +190,8 @@
 
 /* Active navigation item highlight */
 .nav-item-active {
-  background-color: rgba(158, 0, 31, 0.1) !important;
-  color: #9e001f !important;
+  background-color: rgba(188, 2, 2, 0.1) !important;
+  color: #BC0202 !important;
   font-weight: 700 !important;
 }
 .nav-item-active .material-symbols-outlined {

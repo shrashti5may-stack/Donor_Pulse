@@ -143,17 +143,30 @@ class PulseRouter {
 
     // Taskbar should ONLY be visible on the 1st page (view-landing) and not on other pages
     const mainHeader = document.getElementById('main-app-header');
+    const mainFooter = document.getElementById('main-footer');
     const mainElement = document.querySelector('main');
     if (viewId === 'view-landing') {
       if (mainHeader) mainHeader.classList.remove('hidden');
+      if (mainFooter) mainFooter.classList.remove('hidden');
       if (mainElement) {
         mainElement.classList.add('pt-20');
         mainElement.classList.remove('pt-4');
+        mainElement.classList.remove('pt-1');
+      }
+    } else if (viewId === 'view-role-selection') {
+      if (mainHeader) mainHeader.classList.add('hidden');
+      if (mainFooter) mainFooter.classList.add('hidden');
+      if (mainElement) {
+        mainElement.classList.remove('pt-20');
+        mainElement.classList.remove('pt-4');
+        mainElement.classList.add('pt-1');
       }
     } else {
       if (mainHeader) mainHeader.classList.add('hidden');
+      if (mainFooter) mainFooter.classList.remove('hidden');
       if (mainElement) {
         mainElement.classList.remove('pt-20');
+        mainElement.classList.remove('pt-1');
         mainElement.classList.add('pt-4');
       }
     }
