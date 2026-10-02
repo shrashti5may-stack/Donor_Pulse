@@ -5,6 +5,8 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>DonorPulse — Recipient &amp; Family Care Coordination Dashboard</title>
   <meta name="description" content="Dedicated portal for blood recipients and family attendants to track emergency blood requests, verify donor arrival PINs, broadcast WhatsApp appeals, and monitor transfusion progress."/>
+  <link rel="icon" type="image/png" href="images/logo-icon.png"/>
+  <link rel="apple-touch-icon" href="images/logo-icon.png"/>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,6 +108,29 @@
 </head>
 
 <body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- TOP BRAND HEADER -->
+  <header class="w-full bg-surface-container-lowest/95 backdrop-blur-xl border-b border-surface-container shadow-[0_1px_6px_rgba(0,0,0,0.03)] sticky top-0 z-40">
+    <div class="max-w-[1280px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="index.html#/landing" class="flex items-center gap-2.5 hover:opacity-90 transition-opacity" title="Back to DonorPulse Home">
+        <img alt="DonorPulse Logo" class="h-8 w-8 object-contain shrink-0" src="images/logo-icon.png"/>
+        <div class="flex flex-col">
+          <span class="font-headline-sm text-lg sm:text-xl text-on-surface font-extrabold tracking-tight leading-none">DonorPulse</span>
+          <span class="font-label-badge text-[10px] text-primary font-bold uppercase tracking-wider mt-0.5">Recipient Coordination Grid</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-2.5">
+        <a href="role-selection.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high/80 hover:bg-surface-container text-on-surface text-xs font-semibold transition-all">
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span class="hidden sm:inline">Role Switcher</span>
+        </a>
+        <button type="button" onclick="openRaiseRequestModal()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary-container text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">add_circle</span>
+          <span>New Requisition</span>
+        </button>
+      </div>
+    </div>
+  </header>
 
   <!-- TOP TELEMETRY NOTIFICATION BAR -->
   <div class="bg-surface-container-high px-4 sm:px-6 py-2 flex items-center justify-between text-xs sm:text-sm shadow-xs border-b border-surface-container">
@@ -1757,6 +1782,30 @@
 
     </div>
   </div>
+
+  <footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-8 mt-auto border-t border-surface-container-high">
+    <div class="max-w-[1280px] mx-auto px-4 sm:px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 pb-6">
+        <div class="flex items-center gap-2">
+          <img alt="DonorPulse Logo" class="h-7 w-7 object-contain shrink-0" src="images/logo-icon.png"/>
+          <span class="font-headline-sm text-lg font-bold text-on-surface">DonorPulse</span>
+          <span class="font-body-sm text-xs sm:text-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-semibold">
+          <a class="text-on-surface-variant hover:text-on-surface transition-colors" href="https://eraktkosh.mohfw.gov.in/eraktkoshPortal/#/" target="_blank" rel="noopener noreferrer">Clinical Protocols</a>
+          <a class="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="hospital-register.html">Hospital Verification</a>
+          <a class="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="role-selection.html">Access Portal</a>
+        </div>
+      </div>
+      <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-on-surface-variant border-t border-surface-container">
+        <p>© 2024 DonorPulse Emergency Blood Logistics. All rights reserved.</p>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+          <span class="font-label-badge uppercase tracking-wider text-tertiary font-bold text-[10px]">Central Dispatch Active</span>
+        </div>
+      </div>
+    </div>
+  </footer>
 
   <script src="js/store.js"></script>
   <script src="js/blood-cells.js?v=1"></script>
