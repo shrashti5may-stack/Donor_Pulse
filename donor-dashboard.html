@@ -430,12 +430,12 @@
 </div>
 </div>
 <div class="flex items-center gap-space-xs shrink-0 w-full sm:w-auto">
-<button class="flex-1 sm:flex-none px-space-md py-2.5 rounded-xl bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-label-md font-semibold transition-colors shadow-sm">
+<button type="button" onclick="window.openDonorPassQRModal()" class="flex-1 sm:flex-none px-space-md py-2.5 rounded-xl bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-label-md font-semibold transition-colors shadow-sm cursor-pointer active:scale-98">
             Show Pass QR
           </button>
-<button class="flex-1 sm:flex-none px-space-md py-2.5 rounded-xl bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors">
+<a href="index.html#/donor-profile" class="flex-1 sm:flex-none px-space-md py-2.5 rounded-xl bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-label-md font-semibold transition-colors shadow-sm cursor-pointer active:scale-98 text-center">
             Update Vitals
-          </button>
+          </a>
 </div>
 </section>
 </div>
@@ -487,6 +487,99 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- UNIVERSAL HAEMOVIGILANCE DIGITAL PASS QR MODAL                       -->
+  <!-- ===================================================================== -->
+  <div id="modal-donor-pass-qr" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-inverse-surface/75 backdrop-blur-md overflow-y-auto">
+    <div class="bg-surface-container-lowest rounded-3xl max-w-lg w-full p-5 sm:p-7 shadow-2xl flex flex-col gap-5 relative border border-surface-container-high animate-in fade-in zoom-in duration-200 max-h-[92vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between border-b border-surface-container-high pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-inner shrink-0">
+            <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">qr_code_2</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-headline-sm text-lg sm:text-xl font-bold text-on-surface">Digital Haemovigilance Pass</h3>
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 font-label-badge text-xs font-bold uppercase tracking-wider">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Active Check-In
+              </span>
+            </div>
+            <p id="pass-modal-donor-meta" class="font-body-sm text-xs sm:text-sm text-on-surface-variant mt-0.5">
+              Verified Donor: Sarah Jenkins • Blood Group: O- (Universal)
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="window.closeDonorPassQRModal()" class="w-9 h-9 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer shrink-0" aria-label="Close QR Modal">
+          <span class="material-symbols-outlined text-[22px]">close</span>
+        </button>
+      </div>
+
+      <!-- QR Presentation Container -->
+      <div class="flex flex-col items-center justify-center bg-gradient-to-b from-surface-container-low to-surface-container-lowest p-5 rounded-2xl border border-surface-container-high relative overflow-hidden shadow-inner text-center">
+        <!-- Verified Header Banner inside Card -->
+        <div class="w-full flex items-center justify-between pb-3 mb-3 border-b border-surface-container text-xs text-on-surface-variant font-mono">
+          <span class="flex items-center gap-1.5 font-sans font-semibold text-primary">
+            <span class="material-symbols-outlined text-[16px]">verified</span> ISO 15189 Validated
+          </span>
+          <span class="px-2 py-0.5 rounded bg-surface-container text-[11px] font-bold">TOKEN: HAEMO-8924-O</span>
+        </div>
+
+        <!-- QR Image Display with Medical Scanner Border -->
+        <div class="relative p-3 bg-white rounded-2xl shadow-lg border-2 border-primary/20 ring-4 ring-primary/5 group">
+          <img id="pass-modal-qr-img" src="images/demo-donor-pass-qr.jpg" alt="Donor Universal Digital Pass QR Code" class="w-56 h-56 sm:w-64 sm:h-64 object-contain rounded-xl mx-auto block transition-transform duration-200 group-hover:scale-[1.02]" />
+          <!-- Scan Line Accent -->
+          <div class="absolute inset-x-3 top-3 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-75"></div>
+        </div>
+
+        <p class="font-body-sm text-xs text-on-surface-variant mt-4 max-w-sm">
+          Scan this pass at any participating hospital triage bay, mobile blood unit, or apheresis station for immediate donor intake and record lookup.
+        </p>
+      </div>
+
+      <!-- Verified Vitals Snapshot Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-surface-container-low p-3.5 rounded-2xl border border-surface-container-high text-body-sm">
+        <div class="flex flex-col p-2 bg-surface-container-lowest rounded-xl border border-surface-container-high/60">
+          <span class="text-on-surface-variant text-[10px] font-label-badge uppercase tracking-wider font-semibold">Blood Group</span>
+          <span id="pass-modal-blood" class="font-bold text-primary text-sm mt-0.5">O Negative</span>
+        </div>
+        <div class="flex flex-col p-2 bg-surface-container-lowest rounded-xl border border-surface-container-high/60">
+          <span class="text-on-surface-variant text-[10px] font-label-badge uppercase tracking-wider font-semibold">Hemoglobin</span>
+          <span id="pass-modal-hb" class="font-bold text-on-surface text-sm mt-0.5">14.8 g/dL</span>
+        </div>
+        <div class="flex flex-col p-2 bg-surface-container-lowest rounded-xl border border-surface-container-high/60">
+          <span class="text-on-surface-variant text-[10px] font-label-badge uppercase tracking-wider font-semibold">Blood Pressure</span>
+          <span id="pass-modal-bp" class="font-bold text-on-surface text-sm mt-0.5">118/76 mmHg</span>
+        </div>
+        <div class="flex flex-col p-2 bg-surface-container-lowest rounded-xl border border-surface-container-high/60">
+          <span class="text-on-surface-variant text-[10px] font-label-badge uppercase tracking-wider font-semibold">Status</span>
+          <span id="pass-modal-status" class="font-bold text-emerald-600 text-sm mt-0.5 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Eligible
+          </span>
+        </div>
+      </div>
+
+      <!-- Modal Actions Footer -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-surface-container-high">
+        <div class="flex items-center gap-1.5 text-xs text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px] text-primary">security</span>
+          <span>Encrypted with 256-bit HaemoVigil token</span>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button type="button" onclick="window.downloadDonorPassQR()" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-sm font-semibold transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">download</span>
+            <span>Download Pass</span>
+          </button>
+          <button type="button" onclick="window.closeDonorPassQRModal()" class="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-sm font-semibold shadow-md transition-all active:scale-98 cursor-pointer">
+            <span>Done</span>
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -676,6 +769,88 @@
       a.click();
       document.body.removeChild(a);
     }
+
+    // =====================================================================
+    // UNIVERSAL HAEMOVIGILANCE DIGITAL PASS QR MODAL HANDLERS
+    // =====================================================================
+    window.openDonorPassQRModal = function() {
+      const modal = document.getElementById('modal-donor-pass-qr');
+      if (!modal) return;
+
+      const donor = window.PulseStore ? window.PulseStore.getDonor() : null;
+      const donorName = (donor && donor.fullName) ? donor.fullName : 'Sarah Jenkins';
+      const bloodGroup = (donor && donor.bloodGroup) ? donor.bloodGroup : 'O-';
+      const hb = (donor && donor.vitals && donor.vitals.hemoglobin) ? donor.vitals.hemoglobin : '14.8 g/dL';
+      const bp = (donor && donor.vitals && donor.vitals.bp) ? donor.vitals.bp : '118/76 mmHg';
+
+      const metaEl = document.getElementById('pass-modal-donor-meta');
+      if (metaEl) {
+        metaEl.textContent = `Verified Donor: ${donorName} • Blood Group: ${bloodGroup} (Universal)`;
+      }
+
+      const bloodEl = document.getElementById('pass-modal-blood');
+      if (bloodEl) {
+        bloodEl.textContent = bloodGroup.includes('O-') ? `${bloodGroup} (Universal)` : bloodGroup;
+      }
+
+      const hbEl = document.getElementById('pass-modal-hb');
+      if (hbEl) hbEl.textContent = hb;
+
+      const bpEl = document.getElementById('pass-modal-bp');
+      if (bpEl) bpEl.textContent = bp;
+
+      const imgEl = document.getElementById('pass-modal-qr-img');
+      if (imgEl && !imgEl.src.includes('demo-donor-pass-qr.jpg')) {
+        imgEl.src = 'images/demo-donor-pass-qr.jpg';
+      }
+
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeDonorPassQRModal = function() {
+      const modal = document.getElementById('modal-donor-pass-qr');
+      if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    };
+
+    window.downloadDonorPassQR = function() {
+      const a = document.createElement('a');
+      a.href = 'images/demo-donor-pass-qr.jpg';
+      a.download = 'DonorPulse-Haemovigilance-Pass-QR.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const certModal = document.getElementById('modal-certificate');
+      if (certModal) {
+        certModal.addEventListener('click', (e) => {
+          if (e.target.id === 'modal-certificate') {
+            closeCertificateModal();
+          }
+        });
+      }
+
+      const passQrModal = document.getElementById('modal-donor-pass-qr');
+      if (passQrModal) {
+        passQrModal.addEventListener('click', (e) => {
+          if (e.target.id === 'modal-donor-pass-qr') {
+            window.closeDonorPassQRModal();
+          }
+        });
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeCertificateModal();
+          window.closeDonorPassQRModal();
+        }
+      });
+    });
 
     window.copyDonorPhone = function(btn, phone) {
       if (!phone) return;

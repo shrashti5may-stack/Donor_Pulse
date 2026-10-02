@@ -2584,12 +2584,81 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const passQrModal = document.getElementById('modal-donor-pass-qr');
+  if (passQrModal) {
+    passQrModal.addEventListener('click', (e) => {
+      if (e.target.id === 'modal-donor-pass-qr') {
+        window.closeDonorPassQRModal();
+      }
+    });
+  }
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       window.closeCertificateModal();
+      window.closeDonorPassQRModal();
     }
   });
 });
+
+// =====================================================================
+// UNIVERSAL HAEMOVIGILANCE DIGITAL PASS QR MODAL HANDLERS
+// =====================================================================
+window.openDonorPassQRModal = function() {
+  const modal = document.getElementById('modal-donor-pass-qr');
+  if (!modal) return;
+
+  const donor = window.PulseStore ? window.PulseStore.getDonor() : null;
+  const donorName = (donor && donor.fullName) ? donor.fullName : 'Sarah Jenkins';
+  const bloodGroup = (donor && donor.bloodGroup) ? donor.bloodGroup : 'O-';
+  const hb = (donor && donor.vitals && donor.vitals.hemoglobin) ? donor.vitals.hemoglobin : '14.8 g/dL';
+  const bp = (donor && donor.vitals && donor.vitals.bp) ? donor.vitals.bp : '118/76 mmHg';
+
+  const metaEl = document.getElementById('pass-modal-donor-meta');
+  if (metaEl) {
+    metaEl.textContent = `Verified Donor: ${donorName} • Blood Group: ${bloodGroup} (Universal)`;
+  }
+
+  const bloodEl = document.getElementById('pass-modal-blood');
+  if (bloodEl) {
+    bloodEl.textContent = bloodGroup.includes('O-') ? `${bloodGroup} (Universal)` : bloodGroup;
+  }
+
+  const hbEl = document.getElementById('pass-modal-hb');
+  if (hbEl) hbEl.textContent = hb;
+
+  const bpEl = document.getElementById('pass-modal-bp');
+  if (bpEl) bpEl.textContent = bp;
+
+  const imgEl = document.getElementById('pass-modal-qr-img');
+  if (imgEl && !imgEl.src.includes('demo-donor-pass-qr.jpg')) {
+    imgEl.src = 'images/demo-donor-pass-qr.jpg';
+  }
+
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeDonorPassQRModal = function() {
+  const modal = document.getElementById('modal-donor-pass-qr');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+};
+
+window.downloadDonorPassQR = function() {
+  const a = document.createElement('a');
+  a.href = 'images/demo-donor-pass-qr.jpg';
+  a.download = 'DonorPulse-Haemovigilance-Pass-QR.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  if (window.showToast) {
+    window.showToast('Pass QR Downloaded', 'Digital Haemovigilance Pass saved to your device.', 'success');
+  }
+};
 
 /**
  * Global User Logout Handler
