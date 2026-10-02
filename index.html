@@ -971,7 +971,7 @@
               <p class="text-xs sm:text-[13px] text-secondary mb-2 sm:mb-3 leading-normal">
                 Need blood for yourself, a family member, or a friend? Raise an urgent requisition, track responding volunteer donors in real-time, and coordinate with hospital blood banks.
               </p>
-              <div class="space-y-1.5 sm:space-y-2 mb-2 sm:mb-2.5">
+              <div class="space-y-1.5 sm:space-y-2 mb-3">
                 <div class="flex items-center gap-2.5">
                   <div class="w-4 h-4 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
                     <span class="material-symbols-outlined text-[12px] font-bold">check</span>
@@ -996,19 +996,6 @@
                   </div>
                   <span class="text-xs sm:text-[13px] text-on-surface font-medium leading-tight">Secure donor arrival handshake code for hospital blood bank intake</span>
                 </div>
-              </div>
-              <!-- Telemetry mini-card -->
-              <div class="bg-surface-container-low rounded-xl p-2 sm:p-2.5 mb-2.5 flex items-center justify-between border border-surface-container">
-                <div class="flex items-center gap-2 sm:gap-2.5">
-                  <div class="w-7 h-7 rounded-lg bg-error-container/60 flex items-center justify-center text-primary shrink-0">
-                    <span class="material-symbols-outlined text-[17px]">timer</span>
-                  </div>
-                  <div class="flex flex-col">
-                    <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">~14 min Earliest Arrival</span>
-                    <span class="text-[11px] text-secondary leading-tight">3 Volunteer Donors responding to Case REQ-9042</span>
-                  </div>
-                </div>
-                <span class="px-2 py-0.5 rounded bg-tertiary-container/30 font-label-badge text-[10px] text-tertiary font-bold shrink-0">Active Case</span>
               </div>
             </div>
             <div class="flex flex-col gap-2 pt-1 mt-auto shrink-0">
@@ -2032,6 +2019,29 @@
             </div>
           </div>
 
+          <!-- Live Earliest Arrival Telemetry Card (Active Case Feature after Login) -->
+          <div style="flex-shrink: 0 !important;" class="bg-surface-container-lowest rounded-2xl p-3.5 shadow-sm border border-primary/25 flex flex-col gap-2 relative shrink-0">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-error-container/70 flex items-center justify-center text-primary shrink-0 animate-pulse">
+                  <span class="material-symbols-outlined text-[18px]">timer</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">~14 min Earliest Arrival</span>
+                  <span class="text-[11px] text-secondary leading-tight">3 Donors Responding • Case REQ-9042</span>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded bg-tertiary-container/30 font-label-badge text-[10px] text-tertiary font-bold shrink-0">Active Case</span>
+            </div>
+            <div class="p-2 rounded-xl bg-surface-container-low flex items-center justify-between text-[11px] text-on-surface-variant">
+              <span class="flex items-center gap-1 font-semibold text-primary">
+                <span class="material-symbols-outlined text-[14px]">directions_car</span>
+                <span>David K. (En Route)</span>
+              </span>
+              <span class="text-tertiary font-bold">ETA: ~14 mins</span>
+            </div>
+          </div>
+
           <!-- Quick Action: Raise / Update Requisition -->
           <button data-open-modal-request style="flex-shrink: 0 !important;" class="w-full shrink-0 py-2.5 px-3 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-xs font-bold shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-98 cursor-pointer whitespace-nowrap">
             <span class="material-symbols-outlined text-[18px]">emergency</span>
@@ -2135,6 +2145,10 @@
                   </div>
                   <span class="recipient-urgency-display px-space-xs py-0.5 rounded-full bg-error-container text-primary font-label-badge text-label-badge font-bold animate-pulse whitespace-nowrap">Stat Emergency (&lt; 45 Mins)</span>
                   <span class="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-badge text-label-badge font-bold whitespace-nowrap">Stage 4: Donors En Route</span>
+                  <span class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-error-container text-primary font-label-badge text-label-badge font-bold whitespace-nowrap shadow-xs">
+                    <span class="material-symbols-outlined text-[14px]">timer</span>
+                    <span>~14 min Earliest Arrival</span>
+                  </span>
                 </div>
 
                 <h1 class="font-headline-lg text-2xl sm:text-3xl text-on-surface font-extrabold tracking-tight leading-tight">

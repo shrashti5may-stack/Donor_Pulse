@@ -193,6 +193,29 @@
           </div>
         </div>
 
+        <!-- Live Earliest Arrival Telemetry Card (Active Case Feature after Login) -->
+        <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-primary/25 flex flex-col gap-2 relative">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-error-container/70 flex items-center justify-center text-primary shrink-0 animate-pulse">
+                <span class="material-symbols-outlined text-[19px]">timer</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">~14 min Earliest Arrival</span>
+                <span class="text-[11px] text-secondary leading-tight">3 Donors Responding • Case REQ-9042</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-tertiary-container/30 font-label-badge text-[10px] text-tertiary font-bold shrink-0">Active Case</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-surface-container-low flex items-center justify-between text-xs text-on-surface-variant">
+            <span class="flex items-center gap-1 font-semibold text-primary">
+              <span class="material-symbols-outlined text-[15px]">directions_car</span>
+              <span>David K. (En Route)</span>
+            </span>
+            <span class="text-tertiary font-bold">ETA: ~14 mins</span>
+          </div>
+        </div>
+
         <!-- High Priority 1-Click WhatsApp Appeal Button -->
         <button type="button" onclick="shareSOSOnWhatsApp()" class="w-full py-4 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5 active:scale-98 cursor-pointer pulse-glow">
           <span class="material-symbols-outlined text-[24px]">share</span>
@@ -282,6 +305,10 @@
                 </span>
                 <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface text-xs font-semibold">
                   Requisition ID: <strong id="hero-req-id" class="font-mono text-primary">#REQ-9042</strong>
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-primary text-xs font-bold shadow-xs">
+                  <span class="material-symbols-outlined text-[15px] animate-pulse">timer</span>
+                  ~14 min Earliest Arrival
                 </span>
               </div>
               
