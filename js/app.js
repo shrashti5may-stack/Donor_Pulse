@@ -3524,7 +3524,7 @@ window.handleDonorLoginSubmit = function(e) {
     if (window.PulseRouter) {
       window.PulseRouter.navigate('donor-dashboard');
     } else {
-      window.location.href = 'donor-dashboard.html';
+      window.location.href = 'index.html#/donor-dashboard';
     }
   }, 600);
 
