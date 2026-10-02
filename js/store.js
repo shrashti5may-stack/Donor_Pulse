@@ -681,6 +681,101 @@ class Store {
     return { success: false, message: 'Invalid donor verification OTP code.' };
   }
 
+  // --- Recipient & Patient Case methods ---
+  getRecipient() {
+    return this.state.recipient || DEFAULT_STATE.recipient;
+  }
+
+  getRecipientCases() {
+    return this.state.recipientCases || DEFAULT_STATE.recipientCases;
+  }
+
+  setRecipient(recipientData) {
+    this.state.recipient = { ...this.state.recipient, ...recipientData };
+    this.saveState();
+    return this.state.recipient;
+  }
+
+  createNewPatientRequest(data) {
+    const randomCaseNum = Math.floor(1000 + Math.random() * 9000);
+    const caseId = 'CASE-' + randomCaseNum;
+    const reqId = 'REQ-' + randomCaseNum;
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+    const patientName = (data.patientName && data.patientName.trim()) ? data.patientName.trim() : 'Emergency Patient';
+    const patientAge = parseInt(data.patientAge || 30, 10);
+    const patientGender = data.patientGender || 'Female';
+    const bloodGroup = data.bloodGroup || 'O-';
+    const component = data.component || 'Platelets (Apheresis)';
+    const units = parseInt(data.unitsRequired || data.units || 2, 10);
+    const urgency = data.urgency || 'Stat Emergency (< 45 Mins)';
+    const hospitalName = (data.hospitalName && data.hospitalName.trim()) ? data.hospitalName.trim() : 'Metro General Hospital & Trauma Center';
+    const hospitalWard = (data.ward || data.hospitalWard || 'ICU Ward 4B, Bed 12').trim();
+    const attendantName = (data.attendantName && data.attendantName.trim()) ? data.attendantName.trim() : 'Immediate Family';
+    const attendantRelation = (data.attendantRelation && data.attendantRelation.trim()) ? data.attendantRelation.trim() : 'Family Attendant';
+    const attendantPhone = (data.attendantPhone && data.attendantPhone.trim()) ? data.attendantPhone.trim() : '+91 95280 33454';
+    const clinicalReason = (data.notes || data.clinicalReason || 'Acute clinical blood requirement, emergency broadcast.').trim();
+
+    const newPatient = {
+      id: caseId,
+      requestId: reqId,
+      patientName,
+      patientAge,
+      patientGender,
+      bloodGroup,
+      component,
+      unitsRequired: units,
+      unitsArranged: 1,
+      unitsFulfilled: 0,
+      urgency,
+      hospitalName,
+      hospitalWard,
+      hospitalAddress: `${hospitalName}, Medical District`,
+      attendantName,
+      attendantRelation,
+      attendantPhone,
+      attendantEmail: data.attendantEmail || 'attendant@donor-pulse.org',
+      doctorName: data.doctorName || 'Dr. Aris Thorne, MD',
+      doctorDepartment: 'Trauma & Critical Care',
+      doctorPhone: '+1 (800) 555-8821 Ext 4429',
+      hospitalBloodDesk: '+1 (800) 555-8821',
+      clinicalReason,
+      handshakeOTP: otp,
+      trackingStage: 1,
+      broadcastDate: 'Just now',
+      appealActive: true
+    };
+
+    this.state.recipient = newPatient;
+    if (!this.state.recipientCases) this.state.recipientCases = [];
+    this.state.recipientCases.unshift(newPatient);
+
+    // Also push to active requisitions pool
+    const newReq = {
+      id: reqId,
+      bloodGroup,
+      component,
+      units,
+      urgency,
+      hospitalName,
+      ward: hospitalWard,
+      location: newPatient.hospitalAddress,
+      notes: clinicalReason,
+      createdAt: 'Just now',
+      status: 'Finding Donors',
+      trackingStage: 1,
+      matchedCount: Math.floor(6 + Math.random() * 10),
+      acceptedCount: 0,
+      enRouteCount: 0
+    };
+    if (!this.state.requests) this.state.requests = [];
+    this.state.requests.unshift(newReq);
+    this.state.selectedRequestId = reqId;
+
+    this.saveState();
+    return newPatient;
+  }
+
   // --- Requests methods ---
   getRequests() {
     return this.state.requests;

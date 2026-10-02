@@ -313,41 +313,72 @@ function initFormControllers() {
     }
   }
 
-  // C. Blood Request Modal / Form
+  // C. Emergency Patient Blood Request Modal / Form
   const requestForms = document.querySelectorAll('.form-blood-request');
   requestForms.forEach(form => {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      // Ensure hospital is verified
-      if (!window.PulseStore.isHospitalVerified()) {
-        showToast('Access Denied', 'Only accredited and VERIFIED hospitals can raise emergency requisitions.', 'error');
-        closeRequestModal();
-        return;
+      const patientName = form.querySelector('[name="patientName"]')?.value?.trim() || 'Devika Sharma';
+      const patientAge = parseInt(form.querySelector('[name="patientAge"]')?.value || 32, 10);
+      const patientGender = form.querySelector('[name="patientGender"]')?.value || 'Female';
+      const bloodGroup = form.querySelector('input[name="blood_type"]:checked')?.value || 'B+';
+      const component = form.querySelector('[name="component"]')?.value || 'Platelets (Apheresis)';
+      const units = parseInt(form.querySelector('[name="units"]')?.value || 3, 10);
+      const hospitalName = form.querySelector('[name="hospitalName"]')?.value?.trim() || 'Metro General Hospital & Trauma Center';
+      const ward = form.querySelector('[name="ward"]')?.value?.trim() || 'ICU Ward 4B, Bed 12';
+      const attendantName = form.querySelector('[name="attendantName"]')?.value?.trim() || 'Rajesh Sharma';
+      const attendantRelation = form.querySelector('[name="attendantRelation"]')?.value?.trim() || 'Brother / Attendant';
+      const attendantPhone = form.querySelector('[name="attendantPhone"]')?.value?.trim() || '+91 95280 33454';
+      const urgency = form.querySelector('[name="urgency"]')?.value || 'Stat Emergency (< 45 Mins)';
+      const notes = form.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood request for patient.';
+
+      let newPatient = null;
+      if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
+        newPatient = window.PulseStore.createNewPatientRequest({
+          patientName,
+          patientAge,
+          patientGender,
+          bloodGroup,
+          component,
+          unitsRequired: units,
+          hospitalName,
+          ward,
+          attendantName,
+          attendantRelation,
+          attendantPhone,
+          urgency,
+          notes
+        });
+      } else if (window.PulseStore && typeof window.PulseStore.addRequest === 'function') {
+        window.PulseStore.addRequest({
+          bloodGroup,
+          component,
+          units,
+          ward,
+          urgency,
+          notes,
+          location: hospitalName
+        });
       }
 
-      const formData = new FormData(form);
-      const bloodGroup = form.querySelector('input[name="blood_type"]:checked')?.value || 'O-';
-      const component = form.querySelector('[name="component"]')?.value || 'Whole Blood';
-      const units = form.querySelector('[name="units"]')?.value || 3;
-      const ward = form.querySelector('[name="ward"]')?.value || 'Trauma OR - Suite 3';
-      const urgency = form.querySelector('[name="urgency"]')?.value || 'Stat Emergency (< 45 Mins)';
-      const notes = form.querySelector('[name="notes"]')?.value || 'Urgent clinical blood request.';
-      const location = form.querySelector('[name="location"]')?.value || window.PulseStore.getHospital().city;
-
-      const newReq = window.PulseStore.addRequest({
-        bloodGroup,
-        component,
-        units,
-        ward,
-        urgency,
-        notes,
-        location
-      });
-
       closeRequestModal();
-      showToast('Emergency Request Raised', `Requisition #${newReq.id} broadcasted to compatible donors!`, 'success');
-      window.PulseRouter.navigate('request-confirmation', { id: newReq.id });
+      showToast(
+        '🚨 Emergency Requisition Broadcasted!',
+        `Patient ${patientName} (${bloodGroup} ${component}) requisition #${newPatient ? newPatient.requestId : 'REQ-9042'} dispatched to proximate verified donors!`,
+        'success'
+      );
+
+      // Transition to recipient dashboard so the family can immediately monitor live donors & PIN
+      if (window.PulseRouter) {
+        window.PulseRouter.navigate('recipient-dashboard');
+      } else {
+        window.location.href = 'index.html#/recipient-dashboard';
+      }
+
+      if (typeof window.renderRecipientDashboard === 'function') {
+        setTimeout(() => window.renderRecipientDashboard(), 80);
+      }
     });
   });
 }
@@ -578,6 +609,35 @@ function initInteractiveWidgets() {
       e.preventDefault();
       closeRequestModal();
     });
+  });
+
+  const modalReq = document.getElementById('modal-request');
+  if (modalReq) {
+    modalReq.addEventListener('click', (e) => {
+      if (e.target === modalReq) closeRequestModal();
+    });
+    modalReq.querySelectorAll('input[name="blood_type"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        modalReq.querySelectorAll('.blood-radio-btn').forEach(btn => {
+          btn.classList.remove('bg-primary', 'text-white', 'shadow-md');
+          btn.classList.add('bg-surface-container', 'text-on-surface');
+        });
+        const activeDiv = radio.nextElementSibling;
+        if (activeDiv) {
+          activeDiv.classList.add('bg-primary', 'text-white', 'shadow-md');
+          activeDiv.classList.remove('bg-surface-container', 'text-on-surface');
+        }
+      });
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeRequestModal();
+      if (typeof closeDonorLoginModal === 'function') closeDonorLoginModal();
+      if (typeof closeHospitalLoginModal === 'function') closeHospitalLoginModal();
+      if (typeof closeRecipientLoginModal === 'function') closeRecipientLoginModal();
+    }
   });
 
   // --- E. Tracking stepper advance button ---
@@ -1011,18 +1071,24 @@ function initBloodCompatibilityWidget() {
 
 
 function openRequestModal() {
-  if (!window.PulseStore.isHospitalVerified()) {
-    showToast(
-      'Verification Required',
-      'Your hospital must be VERIFIED before raising a blood requisition.',
-      'warning'
-    );
-    return;
-  }
-
   const modal = document.getElementById('modal-request');
   if (modal) {
     modal.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+    
+    // Highlight currently checked blood radio button
+    const checked = modal.querySelector('input[name="blood_type"]:checked');
+    if (checked) {
+      modal.querySelectorAll('.blood-radio-btn').forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-white', 'shadow-md');
+        btn.classList.add('bg-surface-container', 'text-on-surface');
+      });
+      const activeDiv = checked.nextElementSibling;
+      if (activeDiv) {
+        activeDiv.classList.add('bg-primary', 'text-white', 'shadow-md');
+        activeDiv.classList.remove('bg-surface-container', 'text-on-surface');
+      }
+    }
   }
 }
 
@@ -1030,8 +1096,52 @@ function closeRequestModal() {
   const modal = document.getElementById('modal-request');
   if (modal) {
     modal.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
   }
 }
+
+function fillDemoRaiseRequest() {
+  const modal = document.getElementById('modal-request') || document.querySelector('.form-blood-request');
+  if (!modal) return;
+
+  const setVal = (name, val) => {
+    const el = modal.querySelector(`[name="${name}"]`);
+    if (el) el.value = val;
+  };
+
+  setVal('patientName', 'Aarav Singhania');
+  setVal('patientAge', '29');
+  setVal('patientGender', 'Male');
+  setVal('hospitalName', 'Metro General Hospital & Trauma Center');
+  setVal('ward', 'Cardio-Thoracic ICU, Bed 04');
+  setVal('component', 'Platelets (Apheresis)');
+  setVal('units', '3');
+  setVal('urgency', 'Stat Emergency (< 45 Mins)');
+  setVal('attendantName', 'Kavita Singhania');
+  setVal('attendantRelation', 'Spouse / Family Contact');
+  setVal('attendantPhone', '+91 95280 33454');
+  setVal('notes', 'Acute post-operative thrombocytopenia. Require urgent apheresis donor match within 45 minutes.');
+
+  const radio = modal.querySelector('input[name="blood_type"][value="B+"]') || modal.querySelector('input[name="blood_type"][value="O-"]');
+  if (radio) {
+    radio.checked = true;
+    modal.querySelectorAll('.blood-radio-btn').forEach(btn => {
+      btn.classList.remove('bg-primary', 'text-white', 'shadow-md');
+      btn.classList.add('bg-surface-container', 'text-on-surface');
+    });
+    const activeDiv = radio.nextElementSibling;
+    if (activeDiv) {
+      activeDiv.classList.add('bg-primary', 'text-white', 'shadow-md');
+      activeDiv.classList.remove('bg-surface-container', 'text-on-surface');
+    }
+  }
+}
+
+window.openRaiseRequestModal = openRequestModal;
+window.closeRaiseRequestModal = closeRequestModal;
+window.openRequestModal = openRequestModal;
+window.closeRequestModal = closeRequestModal;
+window.fillDemoRaiseRequest = fillDemoRaiseRequest;
 
 function openVerificationHubModal() {
   const modal = document.getElementById('modal-verification-hub');

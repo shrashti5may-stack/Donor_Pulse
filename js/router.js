@@ -44,7 +44,7 @@ class PulseRouter {
       'hospital-donors-section': 'view-recipient-dashboard',
       'request-tracking': 'view-recipient-dashboard',
       'hospital-tracking-section': 'view-recipient-dashboard',
-      'raise-request': 'view-raise-request',
+      'raise-request': 'view-recipient-dashboard',
       'request-confirmation': 'view-request-confirmation'
     };
 
@@ -169,6 +169,17 @@ class PulseRouter {
         mainElement.classList.remove('pt-1');
         mainElement.classList.add('pt-4');
       }
+    }
+
+    // Handle raise request modal route
+    if (path === 'raise-request') {
+      setTimeout(() => {
+        if (window.openRaiseRequestModal) {
+          window.openRaiseRequestModal();
+        } else if (window.openRequestModal) {
+          window.openRequestModal();
+        }
+      }, 50);
     }
 
     // Handle login routes
