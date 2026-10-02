@@ -516,9 +516,6 @@
 
     // Populate initial cell pool
     populateCells();
-
-    // Inject minimal floating control badge
-    injectControlBadge();
   }
 
   /**
@@ -638,51 +635,11 @@
   }
 
   /**
-   * Injects an aesthetic, non-intrusive floating control badge
+   * Cleanup any legacy control badge if present in DOM
    */
   function injectControlBadge() {
-    // Remove if already exists
     const existing = document.getElementById('donor-pulse-cell-badge');
     if (existing) existing.remove();
-
-    const badge = document.createElement('div');
-    badge.id = 'donor-pulse-cell-badge';
-    badge.className = 'blood-flow-toggle';
-    badge.title = 'DonorPulse Haemovigilance Grid — Live Micro-Circulation';
-    badge.innerHTML = `
-      <span class="cell-badge-dot"></span>
-      <span class="cell-badge-text">Micro-Circulation: Active</span>
-      <button type="button" class="cell-badge-btn" aria-label="Toggle blood cell flow">
-        <span class="material-symbols-outlined" style="font-size: 14px;">pause</span>
-      </button>
-    `;
-
-    document.body.appendChild(badge);
-
-    // Toggle button handler
-    const btn = badge.querySelector('.cell-badge-btn');
-    const text = badge.querySelector('.cell-badge-text');
-    const dot = badge.querySelector('.cell-badge-dot');
-
-    badge.addEventListener('click', (e) => {
-      // Toggle play/pause
-      isRunning = !isRunning;
-      if (isRunning) {
-        lastTime = performance.now();
-        animFrameId = requestAnimationFrame(animate);
-        text.textContent = 'Micro-Circulation: Active';
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px;">pause</span>';
-        dot.style.background = '#00583c'; // Green active pulse
-        badge.classList.remove('paused');
-      } else {
-        if (animFrameId) cancelAnimationFrame(animFrameId);
-        animFrameId = null;
-        text.textContent = 'Micro-Circulation: Paused';
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px;">play_arrow</span>';
-        dot.style.background = '#8A0101'; // Muted red paused
-        badge.classList.add('paused');
-      }
-    });
   }
 
   // Public API exposed on window for programmatic control
