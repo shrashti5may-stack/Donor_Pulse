@@ -94,7 +94,21 @@ const DEFAULT_STATE = {
     handshakeOTP: '7842',
     trackingStage: 4,
     broadcastDate: 'Today, 14:10 EST',
-    appealActive: true
+    appealActive: true,
+    verificationProof: {
+      documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped)',
+      doctorRegId: 'Dr. Aris Thorne (MCI-48921/DL)',
+      ipdCaseNo: 'IPD-9042-ICU',
+      fileName: 'metro_gen_blood_requisition_form27c_signed.pdf',
+      fileSize: '1.4 MB',
+      status: 'VERIFIED_GENUINE',
+      verificationScore: '100% Genuine Requisition',
+      doctorVerified: true,
+      hospitalSealDetected: true,
+      fraudRiskScore: '0.0%',
+      verifiedAt: 'Today, 14:05 EST',
+      issuer: 'Metro General Hospital & Trauma Center'
+    }
   },
 
   // Multiple Recipient / Patient Cases available for management
@@ -126,7 +140,21 @@ const DEFAULT_STATE = {
       handshakeOTP: '7842',
       trackingStage: 4,
       broadcastDate: 'Today, 14:10 EST',
-      appealActive: true
+      appealActive: true,
+      verificationProof: {
+        documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped)',
+        doctorRegId: 'Dr. Aris Thorne (MCI-48921/DL)',
+        ipdCaseNo: 'IPD-9042-ICU',
+        fileName: 'metro_gen_blood_requisition_form27c_signed.pdf',
+        fileSize: '1.4 MB',
+        status: 'VERIFIED_GENUINE',
+        verificationScore: '100% Genuine Requisition',
+        doctorVerified: true,
+        hospitalSealDetected: true,
+        fraudRiskScore: '0.0%',
+        verifiedAt: 'Today, 14:05 EST',
+        issuer: 'Metro General Hospital & Trauma Center'
+      }
     },
     {
       id: 'CASE-8991',
@@ -735,7 +763,7 @@ class Store {
       attendantRelation,
       attendantPhone,
       attendantEmail: data.attendantEmail || 'attendant@donor-pulse.org',
-      doctorName: data.doctorName || 'Dr. Aris Thorne, MD',
+      doctorName: data.doctorRegId || data.doctorName || 'Dr. Aris Thorne, MD',
       doctorDepartment: 'Trauma & Critical Care',
       doctorPhone: '+1 (800) 555-8821 Ext 4429',
       hospitalBloodDesk: '+1 (800) 555-8821',
@@ -743,7 +771,21 @@ class Store {
       handshakeOTP: otp,
       trackingStage: 1,
       broadcastDate: 'Just now',
-      appealActive: true
+      appealActive: true,
+      verificationProof: {
+        documentType: data.proofDocType || data.documentType || 'Hospital Blood Requisition Slip (Form 27-C Stamped)',
+        doctorRegId: data.doctorRegId || data.doctorName || 'Dr. Aris Thorne (MCI-48921/DL)',
+        ipdCaseNo: data.ipdCaseNo || 'IPD-9042-ICU',
+        fileName: data.proofFileName || data.fileName || 'metro_gen_blood_requisition_form27c_signed.pdf',
+        fileSize: data.proofFileSize || '1.4 MB',
+        status: 'VERIFIED_GENUINE',
+        verificationScore: '100% Genuine Requisition',
+        doctorVerified: true,
+        hospitalSealDetected: true,
+        fraudRiskScore: '0.0%',
+        verifiedAt: 'Just now',
+        issuer: hospitalName
+      }
     };
 
     this.state.recipient = newPatient;

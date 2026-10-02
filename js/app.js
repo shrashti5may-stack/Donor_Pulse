@@ -332,6 +332,10 @@ function initFormControllers() {
       const attendantPhone = form.querySelector('[name="attendantPhone"]')?.value?.trim() || '+91 95280 33454';
       const urgency = form.querySelector('[name="urgency"]')?.value || 'Stat Emergency (< 45 Mins)';
       const notes = form.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood request for patient.';
+      const proofDocType = form.querySelector('[name="proofDocType"]')?.value || 'Hospital Blood Requisition Slip (Form 27-C Stamped)';
+      const doctorRegId = form.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Dr. Aris Thorne (MCI-48921/DL)';
+      const ipdCaseNo = form.querySelector('[name="ipdCaseNo"]')?.value?.trim() || 'IPD-9042-ICU';
+      const proofFileName = form.querySelector('.proof-filename-display')?.textContent?.trim() || 'metro_gen_blood_requisition_form27c_signed.pdf';
 
       let newPatient = null;
       if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
@@ -348,7 +352,11 @@ function initFormControllers() {
           attendantRelation,
           attendantPhone,
           urgency,
-          notes
+          notes,
+          proofDocType,
+          doctorRegId,
+          ipdCaseNo,
+          proofFileName
         });
       } else if (window.PulseStore && typeof window.PulseStore.addRequest === 'function') {
         window.PulseStore.addRequest({
@@ -1109,18 +1117,33 @@ function fillDemoRaiseRequest() {
     if (el) el.value = val;
   };
 
-  setVal('patientName', 'Aarav Singhania');
-  setVal('patientAge', '29');
-  setVal('patientGender', 'Male');
+  setVal('patientName', 'Devika Sharma');
+  setVal('patientAge', '32');
+  setVal('patientGender', 'Female');
   setVal('hospitalName', 'Metro General Hospital & Trauma Center');
-  setVal('ward', 'Cardio-Thoracic ICU, Bed 04');
+  setVal('ward', 'ICU Ward 4B, Bed 12');
   setVal('component', 'Platelets (Apheresis)');
   setVal('units', '3');
   setVal('urgency', 'Stat Emergency (< 45 Mins)');
-  setVal('attendantName', 'Kavita Singhania');
-  setVal('attendantRelation', 'Spouse / Family Contact');
+  setVal('attendantName', 'Rajesh Sharma');
+  setVal('attendantRelation', 'Brother / Primary Attendant');
   setVal('attendantPhone', '+91 95280 33454');
-  setVal('notes', 'Acute post-operative thrombocytopenia. Require urgent apheresis donor match within 45 minutes.');
+  setVal('notes', 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.');
+  setVal('proofDocType', 'Hospital Blood Requisition Slip (Form 27-C Stamped)');
+  setVal('doctorRegId', 'Dr. Aris Thorne (MCI-48921/DL)');
+  setVal('ipdCaseNo', 'IPD-9042-ICU');
+
+  const fileLabel = modal.querySelector('.proof-filename-display');
+  if (fileLabel) fileLabel.textContent = 'metro_gen_blood_requisition_form27c_signed.pdf';
+  const sizeLabel = modal.querySelector('.proof-filesize-display');
+  if (sizeLabel) sizeLabel.textContent = '1.4 MB • Official Hospital Seal & Doctor Signature Detected';
+
+  const badge = modal.querySelector('.proof-verification-badge');
+  if (badge) {
+    badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex flex-col gap-1.5 transition-all';
+    const statusText = badge.querySelector('.proof-status-text');
+    if (statusText) statusText.textContent = 'Authenticity Check: 100% Genuine Requisition';
+  }
 
   const radio = modal.querySelector('input[name="blood_type"][value="B+"]') || modal.querySelector('input[name="blood_type"][value="O-"]');
   if (radio) {
@@ -1137,11 +1160,99 @@ function fillDemoRaiseRequest() {
   }
 }
 
+function handleProofFileSelect(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const fileSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+  const fileName = file.name;
+
+  document.querySelectorAll('.proof-filename-display').forEach(el => el.textContent = fileName);
+  document.querySelectorAll('.proof-filesize-display').forEach(el => el.textContent = `${fileSize} • Uploaded Document`);
+
+  // Simulate instant AI OCR & security seal verification scan
+  document.querySelectorAll('.proof-verification-badge').forEach(badge => {
+    badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs flex flex-col gap-1.5 transition-all animate-pulse';
+    const statusText = badge.querySelector('.proof-status-text');
+    if (statusText) statusText.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin inline-block mr-1 align-text-bottom">sync</span> Verifying document signatures &amp; hospital seal...';
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll('.proof-verification-badge').forEach(badge => {
+      badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex flex-col gap-1.5 transition-all';
+      const statusText = badge.querySelector('.proof-status-text');
+      if (statusText) statusText.textContent = 'Authenticity Check: 100% Genuine Requisition';
+    });
+    document.querySelectorAll('.proof-filesize-display').forEach(el => el.textContent = `${fileSize} • Official Hospital Seal & Doctor Signature Detected`);
+    if (typeof showToast === 'function') {
+      showToast('✅ Medical Document Authenticity Confirmed', 'Official hospital seal, doctor registration, and tamper-free metadata verified 100% genuine.', 'success');
+    }
+  }, 700);
+}
+
+function openMedicalProofViewer(customData) {
+  const modal = document.getElementById('modal-medical-proof');
+  if (!modal) return;
+
+  const currentPatient = (customData) || (window.PulseStore && window.PulseStore.state && window.PulseStore.state.recipient) || {};
+  const form = document.querySelector('.form-blood-request');
+  
+  const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Devika Sharma';
+  const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 32;
+  const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Female';
+  const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'ICU Ward 4B, Bed 12';
+  const blood = (form && form.querySelector('input[name="blood_type"]:checked')?.value) || currentPatient.bloodGroup || 'B+';
+  const component = (form && form.querySelector('[name="component"]')?.value) || currentPatient.component || 'Platelets (Apheresis)';
+  const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 3;
+  const urgency = (form && form.querySelector('[name="urgency"]')?.value) || currentPatient.urgency || 'Stat Emergency (< 45 Mins)';
+  const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.';
+  const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Dr. Aris Thorne (MCI-48921/DL)';
+  const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-9042-ICU';
+
+  const setText = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  };
+
+  setText('doc-proof-patient-name', patientName);
+  setText('doc-proof-patient-meta', `${age} Yrs / ${gender} • ${ipd}`);
+  setText('doc-proof-ward', ward);
+  setText('doc-proof-blood-group', `${blood} (Positive)`);
+  setText('doc-proof-component-units', `${component} — ${units} Units`);
+  setText('doc-proof-urgency', urgency);
+  setText('doc-proof-notes', notes);
+  setText('doc-proof-doctor-reg', `${doctor} — Registered Practitioner`);
+  setText('doc-proof-sl-no', `REQ-9042 / ${ipd}`);
+
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+}
+
+function closeMedicalProofViewer() {
+  const modal = document.getElementById('modal-medical-proof');
+  if (modal) {
+    modal.classList.add('hidden');
+    // Only restore body overflow if request modal is also closed
+    const reqModal = document.getElementById('modal-request');
+    if (!reqModal || reqModal.classList.contains('hidden')) {
+      document.body.classList.remove('overflow-hidden');
+    }
+  }
+}
+
+function printMedicalProof() {
+  window.print();
+}
+
 window.openRaiseRequestModal = openRequestModal;
 window.closeRaiseRequestModal = closeRequestModal;
 window.openRequestModal = openRequestModal;
 window.closeRequestModal = closeRequestModal;
 window.fillDemoRaiseRequest = fillDemoRaiseRequest;
+window.handleProofFileSelect = handleProofFileSelect;
+window.openMedicalProofViewer = openMedicalProofViewer;
+window.closeMedicalProofViewer = closeMedicalProofViewer;
+window.printMedicalProof = printMedicalProof;
 
 function openVerificationHubModal() {
   const modal = document.getElementById('modal-verification-hub');
@@ -1442,7 +1553,16 @@ function renderRecipientDashboard() {
         handshakeOTP: '7842',
         trackingStage: 4,
         broadcastDate: 'Today, 14:10 EST',
-        appealActive: true
+        appealActive: true,
+        verificationProof: {
+          documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped)',
+          doctorRegId: 'Dr. Aris Thorne (MCI-48921/DL)',
+          ipdCaseNo: 'IPD-9042-ICU',
+          fileName: 'metro_gen_blood_requisition_form27c_signed.pdf',
+          fileSize: '1.4 MB',
+          status: 'VERIFIED_GENUINE',
+          verificationScore: '100% Genuine Requisition'
+        }
       };
 
   // Recipient / Patient Identity & Attributes

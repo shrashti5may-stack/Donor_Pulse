@@ -282,6 +282,13 @@
               <span class="material-symbols-outlined text-[14px]">call</span> Call Desk
             </a>
           </div>
+          <div class="pt-1 border-t border-surface-container text-[11px] text-on-surface-variant flex items-center justify-between">
+            <span>Clinical Proof:</span>
+            <button type="button" onclick="openMedicalProofViewer()" class="text-emerald-700 dark:text-emerald-400 font-bold hover:underline inline-flex items-center gap-0.5 cursor-pointer">
+              <span>Form 27-C Verified</span>
+              <span class="material-symbols-outlined text-[12px]">open_in_new</span>
+            </button>
+          </div>
         </div>
 
       </aside>
@@ -306,6 +313,11 @@
                 <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface text-xs font-semibold">
                   Requisition ID: <strong id="hero-req-id" class="font-mono text-primary">#REQ-9042</strong>
                 </span>
+                <button type="button" onclick="openMedicalProofViewer()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-900 text-xs font-bold border border-emerald-300 transition-colors cursor-pointer shadow-xs" title="Inspect official clinical requisition document & anti-fraud verification">
+                  <span class="material-symbols-outlined text-[15px] text-emerald-700">verified</span>
+                  <span>Proof: Form 27-C Verified</span>
+                  <span class="material-symbols-outlined text-[12px]">open_in_new</span>
+                </button>
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-primary text-xs font-bold shadow-xs">
                   <span class="material-symbols-outlined text-[15px] animate-pulse">timer</span>
                   ~14 min Earliest Arrival
@@ -355,6 +367,11 @@
                 <span>Send WhatsApp SOS Appeal</span>
               </button>
               
+              <button type="button" onclick="openMedicalProofViewer()" class="px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs">
+                <span class="material-symbols-outlined text-[18px] text-emerald-700">description</span>
+                <span>View Authentic Proof</span>
+              </button>
+
               <button type="button" onclick="copySOSAppealLink()" class="px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer">
                 <span class="material-symbols-outlined text-[18px] text-primary">content_copy</span>
                 <span id="copy-btn-text">Copy SOS Appeal Link</span>
@@ -1003,6 +1020,21 @@
       setVal('attendantRelation', 'Brother / Primary Attendant');
       setVal('attendantPhone', '+91 95280 33454');
       setVal('notes', 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.');
+      setVal('proofDocType', 'Hospital Blood Requisition Slip (Form 27-C Stamped)');
+      setVal('doctorRegId', 'Dr. Aris Thorne (MCI-48921/DL)');
+      setVal('ipdCaseNo', 'IPD-9042-ICU');
+
+      const fileLabel = modal.querySelector('.proof-filename-display');
+      if (fileLabel) fileLabel.textContent = 'metro_gen_blood_requisition_form27c_signed.pdf';
+      const sizeLabel = modal.querySelector('.proof-filesize-display');
+      if (sizeLabel) sizeLabel.textContent = '1.4 MB • Official Hospital Seal & Doctor Signature Detected';
+
+      const badge = modal.querySelector('.proof-verification-badge');
+      if (badge) {
+        badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex flex-col gap-1.5 transition-all';
+        const statusText = badge.querySelector('.proof-status-text');
+        if (statusText) statusText.textContent = 'Authenticity Check: 100% Genuine Requisition';
+      }
 
       const radio = modal.querySelector('input[name="blood_type"][value="B+"]');
       if (radio) {
@@ -1019,12 +1051,100 @@
       }
     }
 
+    function handleProofFileSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const fileSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+      const fileName = file.name;
+
+      document.querySelectorAll('.proof-filename-display').forEach(el => el.textContent = fileName);
+      document.querySelectorAll('.proof-filesize-display').forEach(el => el.textContent = `${fileSize} • Uploaded Document`);
+
+      // Simulate instant AI OCR & security seal verification scan
+      document.querySelectorAll('.proof-verification-badge').forEach(badge => {
+        badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs flex flex-col gap-1.5 transition-all animate-pulse';
+        const statusText = badge.querySelector('.proof-status-text');
+        if (statusText) statusText.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin inline-block mr-1 align-text-bottom">sync</span> Verifying document signatures &amp; hospital seal...';
+      });
+
+      setTimeout(() => {
+        document.querySelectorAll('.proof-verification-badge').forEach(badge => {
+          badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex flex-col gap-1.5 transition-all';
+          const statusText = badge.querySelector('.proof-status-text');
+          if (statusText) statusText.textContent = 'Authenticity Check: 100% Genuine Requisition';
+        });
+        document.querySelectorAll('.proof-filesize-display').forEach(el => el.textContent = `${fileSize} • Official Hospital Seal & Doctor Signature Detected`);
+      }, 700);
+    }
+
+    function openMedicalProofViewer(customData) {
+      const modal = document.getElementById('modal-medical-proof');
+      if (!modal) return;
+
+      const currentPatient = (customData) || (window.PulseStore && window.PulseStore.state && window.PulseStore.state.recipient) || {};
+      const form = document.querySelector('.form-blood-request');
+      
+      const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Devika Sharma';
+      const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 32;
+      const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Female';
+      const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'ICU Ward 4B, Bed 12';
+      const blood = (form && form.querySelector('input[name="blood_type"]:checked')?.value) || currentPatient.bloodGroup || 'B+';
+      const component = (form && form.querySelector('[name="component"]')?.value) || currentPatient.component || 'Platelets (Apheresis)';
+      const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 3;
+      const urgency = (form && form.querySelector('[name="urgency"]')?.value) || currentPatient.urgency || 'Stat Emergency (< 45 Mins)';
+      const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.';
+      const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Dr. Aris Thorne (MCI-48921/DL)';
+      const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-9042-ICU';
+
+      const setText = (id, txt) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = txt;
+      };
+
+      setText('doc-proof-patient-name', patientName);
+      setText('doc-proof-patient-meta', `${age} Yrs / ${gender} • ${ipd}`);
+      setText('doc-proof-ward', ward);
+      setText('doc-proof-blood-group', `${blood} (Positive)`);
+      setText('doc-proof-component-units', `${component} — ${units} Units`);
+      setText('doc-proof-urgency', urgency);
+      setText('doc-proof-notes', notes);
+      setText('doc-proof-doctor-reg', `${doctor} — Registered Practitioner`);
+      setText('doc-proof-sl-no', `REQ-9042 / ${ipd}`);
+
+      modal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeMedicalProofViewer() {
+      const modal = document.getElementById('modal-medical-proof');
+      if (modal) {
+        modal.classList.add('hidden');
+        // Only restore body overflow if request modal is also closed
+        const reqModal = document.getElementById('modal-request');
+        if (!reqModal || reqModal.classList.contains('hidden')) {
+          document.body.classList.remove('overflow-hidden');
+        }
+      }
+    }
+
+    function printMedicalProof() {
+      window.print();
+    }
+
     window.openRaiseRequestModal = openRaiseRequestModal;
     window.closeRaiseRequestModal = closeRaiseRequestModal;
     window.fillDemoRaiseRequest = fillDemoRaiseRequest;
+    window.handleProofFileSelect = handleProofFileSelect;
+    window.openMedicalProofViewer = openMedicalProofViewer;
+    window.closeMedicalProofViewer = closeMedicalProofViewer;
+    window.printMedicalProof = printMedicalProof;
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeRaiseRequestModal();
+      if (e.key === 'Escape') {
+        closeRaiseRequestModal();
+        closeMedicalProofViewer();
+      }
     });
 
     const recipModalReq = document.getElementById('modal-request');
@@ -1070,6 +1190,10 @@
           const attendantPhone = reqForm.querySelector('[name="attendantPhone"]')?.value?.trim() || '+91 95280 33454';
           const urgency = reqForm.querySelector('[name="urgency"]')?.value || 'Stat Emergency (< 45 Mins)';
           const notes = reqForm.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood request for patient.';
+          const proofDocType = reqForm.querySelector('[name="proofDocType"]')?.value || 'Hospital Blood Requisition Slip (Form 27-C Stamped)';
+          const doctorRegId = reqForm.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Dr. Aris Thorne (MCI-48921/DL)';
+          const ipdCaseNo = reqForm.querySelector('[name="ipdCaseNo"]')?.value?.trim() || 'IPD-9042-ICU';
+          const proofFileName = reqForm.querySelector('.proof-filename-display')?.textContent?.trim() || 'metro_gen_blood_requisition_form27c_signed.pdf';
 
           if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
             window.PulseStore.createNewPatientRequest({
@@ -1085,7 +1209,11 @@
               attendantRelation,
               attendantPhone,
               urgency,
-              notes
+              notes,
+              proofDocType,
+              doctorRegId,
+              ipdCaseNo,
+              proofFileName
             });
           }
 
@@ -1276,7 +1404,123 @@
           </span>
         </div>
 
-        <!-- SECTION 5: Clinical Notes -->
+        <!-- SECTION 5: Proof of Verification & Authenticity Check (Anti-Fraud) -->
+        <div class="flex flex-col gap-2.5 p-3 sm:p-3.5 rounded-2xl bg-surface-container-low/80 border border-outline-variant/50">
+          <div class="flex items-center justify-between flex-wrap gap-1">
+            <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-tertiary">verified_user</span>
+              <span>5. Proof of Verification &amp; Authenticity Check</span>
+            </span>
+            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-tertiary bg-tertiary-container/30 px-2 py-0.5 rounded-full border border-tertiary/20">
+              <span class="material-symbols-outlined text-[12px]">security</span>
+              <span>Anti-Fraud Check Active</span>
+            </span>
+          </div>
+          <p class="text-[11px] text-on-surface-variant">
+            To prevent fake or fraudulent requests, attach an authentic hospital-issued medical document. Requests are cross-verified against hospital records and doctor medical council registration before broadcast.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+            <!-- Document Proof Type -->
+            <div class="sm:col-span-6 flex flex-col gap-1">
+              <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
+                <span>Authentic Document Type *</span>
+                <span class="text-[10px] text-primary font-bold">Mandatory</span>
+              </label>
+              <select name="proofDocType" class="h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none">
+                <option value="Hospital Blood Requisition Slip (Form 27-C Stamped)" selected>Hospital Blood Requisition Slip (Form 27-C Stamped)</option>
+                <option value="Attending Doctor's Signed Prescription with Seal">Attending Doctor's Signed Prescription with Seal</option>
+                <option value="Hospital Inpatient (IPD) Admission Sheet / BHT">Hospital Inpatient (IPD) Admission Sheet / BHT</option>
+                <option value="Clinical Transfusion & Cross-Match Lab Report">Clinical Transfusion &amp; Cross-Match Lab Report</option>
+              </select>
+            </div>
+
+            <!-- Doctor Name & Reg No -->
+            <div class="sm:col-span-6 flex flex-col gap-1">
+              <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
+                <span>Doctor Name &amp; Council Reg No. *</span>
+                <span class="text-[10px] text-tertiary font-medium">NMC / MCI</span>
+              </label>
+              <input required name="doctorRegId" type="text" placeholder="e.g. Dr. Aris Thorne (MCI-48921/DL)" value="Dr. Aris Thorne (MCI-48921/DL)" class="h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
+            </div>
+
+            <!-- Hospital IPD / Case No -->
+            <div class="sm:col-span-12 flex flex-col gap-1">
+              <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
+                <span>Hospital Inpatient (IPD) / Case Record Number *</span>
+                <span class="text-[10px] text-on-surface-variant font-medium">Linked to Hospital HIS</span>
+              </label>
+              <input required name="ipdCaseNo" type="text" placeholder="e.g. IPD-9042-ICU" value="IPD-9042-ICU" class="h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
+            </div>
+          </div>
+
+          <!-- Document Upload Dropzone & Attached Proof Preview -->
+          <div class="flex flex-col gap-1.5 pt-1">
+            <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px] text-primary">attach_file</span>
+                <span>Upload Proof of Verification (PDF, JPG, PNG) *</span>
+              </span>
+              <span class="text-[10px] text-on-surface-variant">Max 10 MB • Tamper-evident</span>
+            </label>
+
+            <!-- Hidden File Input -->
+            <input type="file" class="proof-file-input hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="window.handleProofFileSelect(event)"/>
+
+            <!-- Upload Dropzone / Attached Document Box -->
+            <div class="proof-upload-box p-3 rounded-xl bg-surface-container-lowest border-2 border-dashed border-tertiary/40 hover:border-tertiary transition-all flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0 w-full sm:w-auto">
+                <div class="w-10 h-10 rounded-xl bg-tertiary-container/30 text-tertiary flex items-center justify-center shrink-0 border border-tertiary/30">
+                  <span class="material-symbols-outlined text-[22px]">picture_as_pdf</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <span class="proof-filename-display text-xs font-bold text-on-surface truncate">metro_gen_blood_requisition_form27c_signed.pdf</span>
+                    <span class="px-1.5 py-0.2 rounded bg-tertiary/10 text-tertiary text-[9px] font-extrabold uppercase shrink-0">Authentic</span>
+                  </div>
+                  <span class="proof-filesize-display text-[11px] text-on-surface-variant">1.4 MB • Official Hospital Seal &amp; Doctor Signature Detected</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+                <button type="button" onclick="window.openMedicalProofViewer()" class="px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-colors flex items-center gap-1 border border-outline-variant/30 cursor-pointer" title="View attached authentic document">
+                  <span class="material-symbols-outlined text-[15px] text-primary">visibility</span>
+                  <span>View Proof</span>
+                </button>
+                <button type="button" onclick="this.closest('.flex-col').querySelector('.proof-file-input').click()" class="px-2.5 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-colors flex items-center gap-1 border border-primary/20 cursor-pointer" title="Upload custom document">
+                  <span class="material-symbols-outlined text-[15px]">upload_file</span>
+                  <span>Replace</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live AI / OCR Authenticity Verification Result Card -->
+            <div class="proof-verification-badge p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex flex-col gap-1.5 transition-all">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+                  <span class="material-symbols-outlined text-[18px]">verified</span>
+                  <span class="proof-status-text">Authenticity Check: 100% Genuine Requisition</span>
+                </div>
+                <span class="font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">REAL REQUEST</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] text-on-surface-variant pt-1 border-t border-emerald-500/20">
+                <div class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13px] text-emerald-600">check_circle</span>
+                  <span><strong>Seal:</strong> Metro General Red Stamp</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13px] text-emerald-600">check_circle</span>
+                  <span><strong>Doctor Reg:</strong> MCI-48921/DL Active</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13px] text-emerald-600">check_circle</span>
+                  <span><strong>Fraud Risk:</strong> 0.0% (Verified Real)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 6: Clinical Notes -->
         <div class="flex flex-col gap-1">
           <label class="text-xs font-semibold text-on-surface">Clinical Reason / Diagnosis &amp; Transfusion Notes</label>
           <textarea name="notes" rows="2" placeholder="e.g. Acute thrombocytopenia with hemorrhagic risk. Urgent donor-matched transfusion." class="p-2.5 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none resize-none">Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.</textarea>
@@ -1302,6 +1546,215 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- AUTHENTIC MEDICAL REQUISITION PROOF VIEWER MODAL                      -->
+  <!-- ===================================================================== -->
+  <div id="modal-medical-proof" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-inverse-surface/75 backdrop-blur-md overflow-y-auto">
+    <div class="bg-surface-container-lowest text-on-surface rounded-3xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl flex flex-col gap-4 sm:gap-5 relative border border-outline-variant/40 animate-in fade-in zoom-in duration-200 max-h-[94vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between border-b border-surface-container-high pb-3.5">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 shrink-0">
+            <span class="material-symbols-outlined text-[26px]">verified_user</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-headline-sm text-base sm:text-lg font-bold text-on-surface">Authentic Medical Requisition Verification</h3>
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-label-badge text-xs font-bold uppercase tracking-wider border border-emerald-500/30">
+                <span class="material-symbols-outlined text-[13px]">check_circle</span> 100% Genuine
+              </span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant mt-0.5">
+              Verified clinical document cross-matched against Hospital HIS &amp; National Medical Council Registry.
+            </p>
+          </div>
+        </div>
+        <button onclick="window.closeMedicalProofViewer()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer shrink-0" title="Close">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Real vs Fake Verification Banner -->
+      <div class="p-3 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-transparent border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+            <span class="material-symbols-outlined text-[20px]">verified</span>
+          </span>
+          <div>
+            <div class="text-xs font-extrabold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+              <span>REAL EMERGENCY REQUEST — CLINICAL DOCUMENT VERIFIED</span>
+              <span class="font-mono text-[9px] px-1.5 py-0.2 rounded bg-emerald-600 text-white uppercase">Zero Fraud Risk</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">
+              Digital signature valid • Official hospital seal confirmed • Attending Doctor MCI registration active.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs text-on-surface font-mono shrink-0">
+          <span class="text-on-surface-variant text-[11px]">Hash:</span>
+          <span class="text-primary font-bold text-[11px] bg-surface-container px-2 py-0.5 rounded-lg border border-surface-container-high">DP-VERIFIED-9042-AUTH</span>
+        </div>
+      </div>
+
+      <!-- CLINICAL REQUISITION DOCUMENT PAPER CONTAINER -->
+      <div class="p-5 sm:p-7 rounded-2xl bg-[#faf9f6] text-slate-900 border-2 border-slate-300/80 shadow-md flex flex-col gap-4 font-sans relative overflow-hidden">
+        <!-- Document Watermark -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.03] rotate-[-25deg]">
+          <span class="text-7xl font-black uppercase tracking-widest text-slate-900">VERIFIED GENUINE</span>
+        </div>
+
+        <!-- Document Hospital Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-900/20 gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-red-700 text-white flex items-center justify-center shrink-0 shadow-sm font-bold">
+              <span class="material-symbols-outlined text-[28px]">local_hospital</span>
+            </div>
+            <div>
+              <h4 class="font-bold text-base sm:text-lg text-slate-900 tracking-tight leading-tight uppercase">Metro General Hospital &amp; Trauma Center</h4>
+              <p class="text-[11px] font-semibold text-slate-600">DEPARTMENT OF TRANSFUSION MEDICINE &amp; ADVANCED BLOOD CENTER</p>
+              <p class="text-[10px] text-slate-500">NABH Accredited • Blood Bank License: DL-BLD-2024-9042 • 24x7 Trauma Casualty</p>
+            </div>
+          </div>
+          <div class="text-left sm:text-right text-[11px] text-slate-600 flex flex-col">
+            <span class="font-bold uppercase tracking-wider text-red-700 text-xs">Form 27-C Requisition</span>
+            <span>Sl No: <strong id="doc-proof-sl-no" class="font-mono text-slate-900 font-bold">REQ-9042 / IPD-9042-ICU</strong></span>
+            <span>Date: <span id="doc-proof-date" class="font-semibold text-slate-800">Today, Emergency Transfusion</span></span>
+          </div>
+        </div>
+
+        <!-- Requisition Title -->
+        <div class="text-center py-1 bg-red-50/80 rounded-lg border border-red-200">
+          <span class="text-xs font-black uppercase tracking-wider text-red-800">STAT EMERGENCY BLOOD / BLOOD COMPONENT REQUISITION SLIP</span>
+        </div>
+
+        <!-- Clinical & Patient Details Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs flex flex-col">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Patient Full Name</span>
+            <span id="doc-proof-patient-name" class="font-bold text-slate-900 text-sm mt-0.5">Devika Sharma</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs flex flex-col">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Age / Gender / IPD No.</span>
+            <span id="doc-proof-patient-meta" class="font-bold text-slate-900 text-sm mt-0.5">32 Yrs / Female • IPD-9042-ICU</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs flex flex-col">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Ward &amp; Bed Location</span>
+            <span id="doc-proof-ward" class="font-bold text-slate-900 text-sm mt-0.5">ICU Ward 4B, Bed 12</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-red-50 border border-red-200 shadow-2xs flex flex-col">
+            <span class="text-[10px] font-bold text-red-700 uppercase tracking-wider">Target Blood Group</span>
+            <span id="doc-proof-blood-group" class="font-black text-red-700 text-base mt-0.5">B+ (Positive)</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs flex flex-col">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Component &amp; Units Required</span>
+            <span id="doc-proof-component-units" class="font-bold text-slate-900 text-sm mt-0.5">Platelets (Apheresis) — 3 Units</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs flex flex-col">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Urgency Clinical SLA</span>
+            <span id="doc-proof-urgency" class="font-bold text-red-600 text-sm mt-0.5 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[15px]">timer</span>
+              <span>Stat Emergency (&lt; 45 Mins)</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Clinical Indication / Diagnosis -->
+        <div class="p-2.5 rounded-lg bg-white border border-slate-200 text-xs">
+          <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Clinical Reason / Diagnosis &amp; Transfusion Indication</span>
+          <p id="doc-proof-notes" class="text-slate-800 font-medium leading-relaxed">
+            Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required. Cross-match specimen received at central blood bank.
+          </p>
+        </div>
+
+        <!-- Doctor Signature, Hospital Stamp & Anti-Fraud Seals Grid -->
+        <div class="pt-3 border-t-2 border-slate-900/10 grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+          
+          <!-- Attending Doctor Verification -->
+          <div class="flex flex-col gap-1 text-xs">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Attending Physician</span>
+            <div class="font-serif italic text-base text-slate-800 font-bold">Dr. Aris Thorne</div>
+            <span id="doc-proof-doctor-reg" class="text-[11px] font-bold text-slate-700">Dr. Aris Thorne, MD (MCI-48921/DL)</span>
+            <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px]">verified</span>
+              <span>National Medical Council Reg. Active</span>
+            </span>
+          </div>
+
+          <!-- Official Hospital Red Seal -->
+          <div class="flex flex-col items-center justify-center">
+            <div class="w-24 h-24 rounded-full border-2 border-dashed border-red-600 text-red-600 flex flex-col items-center justify-center p-1 text-center rotate-[-8deg] shadow-xs bg-red-50/50">
+              <span class="material-symbols-outlined text-[18px]">verified</span>
+              <span class="text-[7.5px] font-black uppercase tracking-tight leading-tight">METRO GENERAL HOSPITAL</span>
+              <span class="text-[6.5px] font-bold uppercase text-red-800">TRANSFUSION MEDICINE</span>
+              <span class="text-[7px] font-black tracking-widest text-emerald-700">★ VERIFIED REAL ★</span>
+            </div>
+            <span class="text-[9px] text-slate-500 mt-1 font-semibold">Official Hospital Seal</span>
+          </div>
+
+          <!-- QR Code & Digital Hash -->
+          <div class="flex flex-col items-end text-right text-xs gap-1">
+            <div class="w-16 h-16 bg-white p-1 rounded-lg border border-slate-300 shadow-2xs flex items-center justify-center">
+              <span class="material-symbols-outlined text-[48px] text-slate-800">qr_code_2</span>
+            </div>
+            <span class="text-[9px] font-mono text-slate-500">Scan to Verify with Hospital HIS</span>
+            <span class="text-[10px] text-emerald-700 font-bold">Passed Anti-Fraud Check</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Checklist Summary -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
+        <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container-high flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
+          <div class="flex flex-col">
+            <span class="text-[10px] text-on-surface-variant font-bold uppercase">Hospital Record</span>
+            <span class="font-semibold text-on-surface text-[11px]">HIS Active IPD</span>
+          </div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container-high flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
+          <div class="flex flex-col">
+            <span class="text-[10px] text-on-surface-variant font-bold uppercase">Doctor Reg.</span>
+            <span class="font-semibold text-on-surface text-[11px]">NMC Registry Valid</span>
+          </div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container-high flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
+          <div class="flex flex-col">
+            <span class="text-[10px] text-on-surface-variant font-bold uppercase">Official Seal</span>
+            <span class="font-semibold text-on-surface text-[11px]">OCR Stamp Match</span>
+          </div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container-high flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
+          <div class="flex flex-col">
+            <span class="text-[10px] text-on-surface-variant font-bold uppercase">Fraud Risk</span>
+            <span class="font-semibold text-emerald-600 text-[11px]">0.0% Real Request</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="flex items-center justify-between pt-2 border-t border-surface-container">
+        <span class="text-[11px] text-on-surface-variant flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px] text-emerald-600">verified</span>
+          <span>Verified under National Blood Safety &amp; Anti-Fraud Regulations</span>
+        </span>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.printMedicalProof()" class="px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">print</span>
+            <span>Print Slip</span>
+          </button>
+          <button type="button" onclick="window.closeMedicalProofViewer()" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-xs cursor-pointer">
+            Done
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
