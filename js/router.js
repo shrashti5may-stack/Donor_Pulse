@@ -11,7 +11,7 @@ class PulseRouter {
       'login': 'view-role-selection',
       'donor-login': 'view-role-selection',
       'hospital-login': 'view-role-selection',
-      'donor-register': 'view-donor-register',
+      'donor-register': 'view-role-selection',
       'donor-profile': 'view-donor-profile',
       'donor-dashboard': 'view-donor-dashboard',
       'nearby-requests': 'view-donor-dashboard',
@@ -178,6 +178,15 @@ class PulseRouter {
           window.openRaiseRequestModal();
         } else if (window.openRequestModal) {
           window.openRequestModal();
+        }
+      }, 50);
+    }
+
+    // Handle donor register modal route
+    if (path === 'donor-register') {
+      setTimeout(() => {
+        if (window.openDonorRegisterModal) {
+          window.openDonorRegisterModal();
         }
       }, 50);
     }

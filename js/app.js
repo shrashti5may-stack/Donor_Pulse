@@ -113,7 +113,67 @@ function initRouterHooks() {
 // 3. FORM CONTROLLERS & DEMO FILLERS
 // ============================================================================
 function initFormControllers() {
-  // A. Donor Registration Form
+  // A0. Donor Registration Popup Modal Form
+  const modalDonorReg = document.getElementById('modal-donor-register');
+  if (modalDonorReg) {
+    modalDonorReg.querySelectorAll('input[name="donor_blood_type"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        modalDonorReg.querySelectorAll('.donor-blood-btn').forEach(btn => {
+          btn.classList.remove('bg-primary', 'text-white', 'shadow-md');
+          btn.classList.add('bg-surface-container', 'text-on-surface');
+        });
+        const activeDiv = radio.nextElementSibling;
+        if (activeDiv) {
+          activeDiv.classList.add('bg-primary', 'text-white', 'shadow-md');
+          activeDiv.classList.remove('bg-surface-container', 'text-on-surface');
+        }
+      });
+    });
+
+    const modalDonorForm = document.getElementById('form-donor-register-modal');
+    if (modalDonorForm) {
+      modalDonorForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('btn-donor-register-submit');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Registering Donor Profile...</span>';
+        }
+
+        const formData = new FormData(modalDonorForm);
+        const bloodGroup = modalDonorForm.querySelector('input[name="donor_blood_type"]:checked')?.value || formData.get('donor_blood_type') || 'A+';
+        const donorData = {
+          fullName: formData.get('fullName')?.toString().trim() || 'Registered Volunteer Donor',
+          age: parseInt(formData.get('age') || 29, 10),
+          gender: formData.get('gender')?.toString().trim() || 'Male',
+          bloodGroup: bloodGroup,
+          phone: formData.get('phone')?.toString().trim() || '+91 98451 44290',
+          email: formData.get('email')?.toString().trim() || 'donor@donor-pulse.in',
+          address: formData.get('address')?.toString().trim() || '#24, 4th Cross, Koramangala 4th Block',
+          city: formData.get('city')?.toString().trim() || 'Bengaluru, Karnataka',
+          medicalHistory: formData.get('medicalHistory')?.toString().trim() || 'Pre-screened whole blood donor. Optimal hemoglobin 15.2 g/dL.',
+          lastDonationDate: formData.get('lastDonationDate') || 'First-time Donor',
+          availability: formData.get('availability') === 'on' || formData.get('availability') === 'true',
+          radiusMiles: parseInt(formData.get('radiusMiles') || 10, 10)
+        };
+
+        window.PulseStore.registerNewDonor(donorData);
+
+        setTimeout(() => {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">how_to_reg</span><span>Complete Registration &amp; Launch Dashboard</span>';
+          }
+          closeDonorRegisterModal();
+          renderDonorDashboard();
+          showToast('Registration Successful', `Welcome, ${donorData.fullName}! Your ${donorData.bloodGroup} donor dashboard is ready.`, 'success');
+          window.PulseRouter.navigate('donor-dashboard');
+        }, 500);
+      });
+    }
+  }
+
+  // A. Donor Registration Form (Page View)
   const donorForm = document.getElementById('form-donor-register');
   if (donorForm) {
     donorForm.addEventListener('submit', (e) => {
@@ -1293,6 +1353,69 @@ window.handleProofFileSelect = handleProofFileSelect;
 window.openMedicalProofViewer = openMedicalProofViewer;
 window.closeMedicalProofViewer = closeMedicalProofViewer;
 window.printMedicalProof = printMedicalProof;
+
+// --- DONOR REGISTRATION POPUP MODAL FUNCTIONS ---
+function openDonorRegisterModal() {
+  const modal = document.getElementById('modal-donor-register');
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+    const nameInput = modal.querySelector('input[name="fullName"]');
+    if (nameInput) setTimeout(() => nameInput.focus(), 100);
+  }
+}
+
+function closeDonorRegisterModal() {
+  const modal = document.getElementById('modal-donor-register');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+  }
+}
+
+function fillDemoDonorRegister() {
+  const modal = document.getElementById('modal-donor-register');
+  if (!modal) return;
+
+  const setVal = (name, val) => {
+    const el = modal.querySelector(`[name="${name}"]`);
+    if (el) el.value = val;
+  };
+
+  setVal('fullName', 'Arjun Nair');
+  setVal('age', '29');
+  setVal('gender', 'Male');
+  setVal('phone', '+91 98451 44290');
+  setVal('email', 'arjun.nair@donor-pulse.in');
+  setVal('city', 'Bengaluru, Karnataka');
+  setVal('address', '#24, 4th Cross, Koramangala 4th Block');
+  setVal('lastDonationDate', '2026-06-14');
+  setVal('radiusMiles', '10');
+  setVal('medicalHistory', 'Pre-screened whole blood donor. Optimal hemoglobin 15.2 g/dL. No restrictions.');
+
+  const avail = modal.querySelector('[name="availability"]');
+  if (avail) avail.checked = true;
+
+  const radio = modal.querySelector('input[name="donor_blood_type"][value="A+"]') || modal.querySelector('input[name="donor_blood_type"][value="O-"]');
+  if (radio) {
+    radio.checked = true;
+    modal.querySelectorAll('.donor-blood-btn').forEach(btn => {
+      btn.classList.remove('bg-primary', 'text-white', 'shadow-md');
+      btn.classList.add('bg-surface-container', 'text-on-surface');
+    });
+    const activeDiv = radio.nextElementSibling;
+    if (activeDiv) {
+      activeDiv.classList.add('bg-primary', 'text-white', 'shadow-md');
+      activeDiv.classList.remove('bg-surface-container', 'text-on-surface');
+    }
+  }
+
+  showToast('Demo Donor Profile Loaded', 'Arjun Nair (A+ Donor) details loaded into registration form.', 'info');
+}
+
+window.openDonorRegisterModal = openDonorRegisterModal;
+window.closeDonorRegisterModal = closeDonorRegisterModal;
+window.fillDemoDonorRegister = fillDemoDonorRegister;
 
 function openVerificationHubModal() {
   const modal = document.getElementById('modal-verification-hub');
