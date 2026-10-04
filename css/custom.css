@@ -256,3 +256,14 @@ section.bg-surface {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+
+/* Donation History Table - Strict No-Horizontal-Scroll */
+#donor-history-section {
+  overflow-x: hidden !important;
+}
+
+#donor-history-section table {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+

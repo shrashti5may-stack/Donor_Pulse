@@ -35,6 +35,17 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* Strict No-Horizontal-Scroll on Donation History */
+    #donor-history-section,
+    #donor-history-section div {
+      overflow-x: hidden !important;
+    }
+    #donor-history-section table {
+      width: 100% !important;
+      max-width: 100% !important;
+      table-layout: auto !important;
+    }
   </style>
 
   <!-- Tailwind CDN & Authentic Stitch Theme Configuration -->
@@ -1638,150 +1649,150 @@
                 </button>
               </div>
             </div>
-            <div class="overflow-x-auto w-full">
+            <div class="w-full overflow-x-hidden">
               <table class="w-full text-left font-body-sm text-body-sm border-collapse">
                 <thead>
-                  <tr class="bg-surface-container-low text-secondary font-label-badge text-label-badge uppercase tracking-wider">
-                    <th class="py-3 px-space-sm rounded-l-lg">Date</th>
-                    <th class="py-3 px-space-sm">Hospital / Center</th>
-                    <th class="py-3 px-space-sm">Donation Type</th>
-                    <th class="py-3 px-space-sm">Units</th>
-                    <th class="py-3 px-space-sm">Status</th>
-                    <th class="py-3 px-space-sm rounded-r-lg text-right">Impact Certificate</th>
+                  <tr class="bg-surface-container-low text-secondary font-label-badge text-label-badge uppercase tracking-wider text-[11px]">
+                    <th class="py-2.5 px-2 rounded-l-lg">Date</th>
+                    <th class="py-2.5 px-2">Hospital / Center</th>
+                    <th class="py-2.5 px-2">Donation Type</th>
+                    <th class="py-2.5 px-2">Units</th>
+                    <th class="py-2.5 px-2">Status</th>
+                    <th class="py-2.5 px-2 rounded-r-lg text-right">Impact Certificate</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-surface-container">
                   <!-- 2026 Record 1 -->
                   <tr class="hover:bg-surface transition-colors">
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">Sep 18, 2026</td>
-                    <td class="py-4 px-space-sm">
-                      <div class="flex flex-col">
-                        <span class="font-medium text-on-surface">AIIMS Transfusion Medicine Centre, New Delhi</span>
-                        <span class="text-[12px] text-on-surface-variant">Apheresis Bay #02 • Dr. Rajesh Sharma, MD</span>
+                    <td class="py-3 px-2 font-semibold text-on-surface whitespace-nowrap text-[12px]">Sep 18, 2026</td>
+                    <td class="py-3 px-2">
+                      <div class="flex flex-col leading-tight">
+                        <span class="font-medium text-on-surface text-[12px]">AIIMS Transfusion Medicine Centre, New Delhi</span>
+                        <span class="text-[11px] text-on-surface-variant">Apheresis Bay #02 • Dr. Rajesh Sharma, MD</span>
                       </div>
                     </td>
-                    <td class="py-4 px-space-sm"><span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-medium whitespace-nowrap">Platelets (SDP)</span></td>
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">2 Units (Apheresis)</td>
-                    <td class="py-4 px-space-sm whitespace-nowrap">
-                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge font-bold">
-                        <span class="material-symbols-outlined text-[15px] shrink-0">verified</span>
-                        <span class="inline-flex flex-col text-left leading-tight">
-                          <span>Completed</span>
-                          <span class="text-[10px] font-medium opacity-85 leading-tight">(Verified)</span>
+                    <td class="py-3 px-2"><span class="px-1.5 py-0.5 rounded bg-surface-container text-on-surface text-[11px] font-medium whitespace-nowrap">Platelets (SDP)</span></td>
+                    <td class="py-3 px-2 font-semibold text-on-surface text-[12px] whitespace-nowrap">2 Units (Apheresis)</td>
+                    <td class="py-3 px-2 whitespace-nowrap">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold leading-tight">
+                        <span class="material-symbols-outlined text-[14px] shrink-0">verified</span>
+                        <span class="flex flex-col text-left leading-none">
+                          <span class="text-[11px]">Completed</span>
+                          <span class="text-[9px] font-normal opacity-85 mt-0.5">(Verified)</span>
                         </span>
                       </span>
                     </td>
-                    <td class="py-4 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-AIIMS-2026-9041', date: 'September 18, 2026', hospital: 'AIIMS Transfusion Medicine Centre, New Delhi', type: 'Platelets (Single Donor Platelet - SDP)', bay: 'Apheresis Bay #02', doctor: 'Dr. Rajesh Sharma, MD', hash: 'e92f8b1c4a0d92e5f67a8b9c0d1e2f3a4b5c6d7e', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
-                        <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
+                    <td class="py-3 px-2 text-right whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-AIIMS-2026-9041', date: 'September 18, 2026', hospital: 'AIIMS Transfusion Medicine Centre, New Delhi', type: 'Platelets (Single Donor Platelet - SDP)', bay: 'Apheresis Bay #02', doctor: 'Dr. Rajesh Sharma, MD', hash: 'e92f8b1c4a0d92e5f67a8b9c0d1e2f3a4b5c6d7e', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface text-[11px] font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                        <span class="material-symbols-outlined text-[15px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
                     </td>
                   </tr>
                   <!-- 2026 Record 2 -->
                   <tr class="hover:bg-surface transition-colors">
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">Feb 12, 2026</td>
-                    <td class="py-4 px-space-sm">
-                      <div class="flex flex-col">
-                        <span class="font-medium text-on-surface">Manipal Hospital Comprehensive Blood Centre, Bengaluru</span>
-                        <span class="text-[12px] text-on-surface-variant">Blood Bank Resuscitation Wing • Dr. Ananya Sen, MD</span>
+                    <td class="py-3 px-2 font-semibold text-on-surface whitespace-nowrap text-[12px]">Feb 12, 2026</td>
+                    <td class="py-3 px-2">
+                      <div class="flex flex-col leading-tight">
+                        <span class="font-medium text-on-surface text-[12px]">Manipal Hospital Comprehensive Blood Centre, Bengaluru</span>
+                        <span class="text-[11px] text-on-surface-variant">Blood Bank Resuscitation Wing • Dr. Ananya Sen, MD</span>
                       </div>
                     </td>
-                    <td class="py-4 px-space-sm"><span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-medium whitespace-nowrap">Whole Blood</span></td>
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">1 Unit (450 mL)</td>
-                    <td class="py-4 px-space-sm whitespace-nowrap">
-                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge font-bold">
-                        <span class="material-symbols-outlined text-[15px] shrink-0">verified</span>
-                        <span class="inline-flex flex-col text-left leading-tight">
-                          <span>Completed</span>
-                          <span class="text-[10px] font-medium opacity-85 leading-tight">(Verified)</span>
+                    <td class="py-3 px-2"><span class="px-1.5 py-0.5 rounded bg-surface-container text-on-surface text-[11px] font-medium whitespace-nowrap">Whole Blood</span></td>
+                    <td class="py-3 px-2 font-semibold text-on-surface text-[12px] whitespace-nowrap">1 Unit (450 mL)</td>
+                    <td class="py-3 px-2 whitespace-nowrap">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold leading-tight">
+                        <span class="material-symbols-outlined text-[14px] shrink-0">verified</span>
+                        <span class="flex flex-col text-left leading-none">
+                          <span class="text-[11px]">Completed</span>
+                          <span class="text-[9px] font-normal opacity-85 mt-0.5">(Verified)</span>
                         </span>
                       </span>
                     </td>
-                    <td class="py-4 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-MANIPAL-2026-7820', date: 'February 12, 2026', hospital: 'Manipal Hospital Comprehensive Blood Centre, Bengaluru', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Blood Bank Resuscitation Wing', doctor: 'Dr. Ananya Sen, MD', hash: 'd83e7a0b3f2c5d4e1a9b8c7d6e5f4a3b2c1d0e9f', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
-                        <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
+                    <td class="py-3 px-2 text-right whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-MANIPAL-2026-7820', date: 'February 12, 2026', hospital: 'Manipal Hospital Comprehensive Blood Centre, Bengaluru', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Blood Bank Resuscitation Wing', doctor: 'Dr. Ananya Sen, MD', hash: 'd83e7a0b3f2c5d4e1a9b8c7d6e5f4a3b2c1d0e9f', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface text-[11px] font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                        <span class="material-symbols-outlined text-[15px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
                     </td>
                   </tr>
                   <!-- 2025 Record 1 -->
                   <tr class="hover:bg-surface transition-colors">
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">Aug 24, 2025</td>
-                    <td class="py-4 px-space-sm">
-                      <div class="flex flex-col">
-                        <span class="font-medium text-on-surface">Tata Memorial Centre Transfusion Unit, Mumbai</span>
-                        <span class="text-[12px] text-on-surface-variant">Onco-Haematology Bay #05 • Dr. V. K. Murthy</span>
+                    <td class="py-3 px-2 font-semibold text-on-surface whitespace-nowrap text-[12px]">Aug 24, 2025</td>
+                    <td class="py-3 px-2">
+                      <div class="flex flex-col leading-tight">
+                        <span class="font-medium text-on-surface text-[12px]">Tata Memorial Centre Transfusion Unit, Mumbai</span>
+                        <span class="text-[11px] text-on-surface-variant">Onco-Haematology Bay #05 • Dr. V. K. Murthy</span>
                       </div>
                     </td>
-                    <td class="py-4 px-space-sm"><span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-medium whitespace-nowrap">Packed RBC</span></td>
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">1 Unit (350 mL)</td>
-                    <td class="py-4 px-space-sm whitespace-nowrap">
-                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge font-bold">
-                        <span class="material-symbols-outlined text-[15px] shrink-0">verified</span>
-                        <span class="inline-flex flex-col text-left leading-tight">
-                          <span>Completed</span>
-                          <span class="text-[10px] font-medium opacity-85 leading-tight">(Verified)</span>
+                    <td class="py-3 px-2"><span class="px-1.5 py-0.5 rounded bg-surface-container text-on-surface text-[11px] font-medium whitespace-nowrap">Packed RBC</span></td>
+                    <td class="py-3 px-2 font-semibold text-on-surface text-[12px] whitespace-nowrap">1 Unit (350 mL)</td>
+                    <td class="py-3 px-2 whitespace-nowrap">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold leading-tight">
+                        <span class="material-symbols-outlined text-[14px] shrink-0">verified</span>
+                        <span class="flex flex-col text-left leading-none">
+                          <span class="text-[11px]">Completed</span>
+                          <span class="text-[9px] font-normal opacity-85 mt-0.5">(Verified)</span>
                         </span>
                       </span>
                     </td>
-                    <td class="py-4 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-TMC-2025-5519', date: 'August 24, 2025', hospital: 'Tata Memorial Centre Transfusion Unit, Mumbai', type: 'Packed Red Blood Cells (1 Unit - 350 mL)', bay: 'Onco-Haematology Bay #05', doctor: 'Dr. V. K. Murthy', hash: '7c4a1e9b2f3d5c6e8a0b1d2f3c4e5a6b7c8d9e0f', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
-                        <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
+                    <td class="py-3 px-2 text-right whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-TMC-2025-5519', date: 'August 24, 2025', hospital: 'Tata Memorial Centre Transfusion Unit, Mumbai', type: 'Packed Red Blood Cells (1 Unit - 350 mL)', bay: 'Onco-Haematology Bay #05', doctor: 'Dr. V. K. Murthy', hash: '7c4a1e9b2f3d5c6e8a0b1d2f3c4e5a6b7c8d9e0f', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface text-[11px] font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                        <span class="material-symbols-outlined text-[15px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
                     </td>
                   </tr>
                   <!-- 2025 Record 2 -->
                   <tr class="hover:bg-surface transition-colors">
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">Jan 15, 2025</td>
-                    <td class="py-4 px-space-sm">
-                      <div class="flex flex-col">
-                        <span class="font-medium text-on-surface">Apollo Hospitals Blood Bank, Chennai</span>
-                        <span class="text-[12px] text-on-surface-variant">Transfusion Bay #01 • Dr. Sunita Rao</span>
+                    <td class="py-3 px-2 font-semibold text-on-surface whitespace-nowrap text-[12px]">Jan 15, 2025</td>
+                    <td class="py-3 px-2">
+                      <div class="flex flex-col leading-tight">
+                        <span class="font-medium text-on-surface text-[12px]">Apollo Hospitals Blood Bank, Chennai</span>
+                        <span class="text-[11px] text-on-surface-variant">Transfusion Bay #01 • Dr. Sunita Rao</span>
                       </div>
                     </td>
-                    <td class="py-4 px-space-sm"><span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-medium whitespace-nowrap">Whole Blood</span></td>
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">1 Unit (450 mL)</td>
-                    <td class="py-4 px-space-sm whitespace-nowrap">
-                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge font-bold">
-                        <span class="material-symbols-outlined text-[15px] shrink-0">verified</span>
-                        <span class="inline-flex flex-col text-left leading-tight">
-                          <span>Completed</span>
-                          <span class="text-[10px] font-medium opacity-85 leading-tight">(Verified)</span>
+                    <td class="py-3 px-2"><span class="px-1.5 py-0.5 rounded bg-surface-container text-on-surface text-[11px] font-medium whitespace-nowrap">Whole Blood</span></td>
+                    <td class="py-3 px-2 font-semibold text-on-surface text-[12px] whitespace-nowrap">1 Unit (450 mL)</td>
+                    <td class="py-3 px-2 whitespace-nowrap">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold leading-tight">
+                        <span class="material-symbols-outlined text-[14px] shrink-0">verified</span>
+                        <span class="flex flex-col text-left leading-none">
+                          <span class="text-[11px]">Completed</span>
+                          <span class="text-[9px] font-normal opacity-85 mt-0.5">(Verified)</span>
                         </span>
                       </span>
                     </td>
-                    <td class="py-4 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-APOLLO-2025-3341', date: 'January 15, 2025', hospital: 'Apollo Hospitals Blood Bank, Chennai', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Transfusion Bay #01', doctor: 'Dr. Sunita Rao', hash: 'b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
-                        <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
+                    <td class="py-3 px-2 text-right whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-APOLLO-2025-3341', date: 'January 15, 2025', hospital: 'Apollo Hospitals Blood Bank, Chennai', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Transfusion Bay #01', doctor: 'Dr. Sunita Rao', hash: 'b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface text-[11px] font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                        <span class="material-symbols-outlined text-[15px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
                     </td>
                   </tr>
                   <!-- 2024 Record 1 -->
                   <tr class="hover:bg-surface transition-colors">
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">May 10, 2024</td>
-                    <td class="py-4 px-space-sm">
-                      <div class="flex flex-col">
-                        <span class="font-medium text-on-surface">Fortis Memorial Research Institute Blood Bank, Gurugram</span>
-                        <span class="text-[12px] text-on-surface-variant">Mobile Transfusion Unit 02 • Dr. Priya Nair</span>
+                    <td class="py-3 px-2 font-semibold text-on-surface whitespace-nowrap text-[12px]">May 10, 2024</td>
+                    <td class="py-3 px-2">
+                      <div class="flex flex-col leading-tight">
+                        <span class="font-medium text-on-surface text-[12px]">Fortis Memorial Research Institute Blood Bank, Gurugram</span>
+                        <span class="text-[11px] text-on-surface-variant">Mobile Transfusion Unit 02 • Dr. Priya Nair</span>
                       </div>
                     </td>
-                    <td class="py-4 px-space-sm"><span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-medium whitespace-nowrap">Whole Blood</span></td>
-                    <td class="py-4 px-space-sm font-semibold text-on-surface whitespace-nowrap">1 Unit (450 mL)</td>
-                    <td class="py-4 px-space-sm whitespace-nowrap">
-                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge font-bold">
-                        <span class="material-symbols-outlined text-[15px] shrink-0">verified</span>
-                        <span class="inline-flex flex-col text-left leading-tight">
-                          <span>Completed</span>
-                          <span class="text-[10px] font-medium opacity-85 leading-tight">(Verified)</span>
+                    <td class="py-3 px-2"><span class="px-1.5 py-0.5 rounded bg-surface-container text-on-surface text-[11px] font-medium whitespace-nowrap">Whole Blood</span></td>
+                    <td class="py-3 px-2 font-semibold text-on-surface text-[12px] whitespace-nowrap">1 Unit (450 mL)</td>
+                    <td class="py-3 px-2 whitespace-nowrap">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-bold leading-tight">
+                        <span class="material-symbols-outlined text-[14px] shrink-0">verified</span>
+                        <span class="flex flex-col text-left leading-none">
+                          <span class="text-[11px]">Completed</span>
+                          <span class="text-[9px] font-normal opacity-85 mt-0.5">(Verified)</span>
                         </span>
                       </span>
                     </td>
-                    <td class="py-4 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-FORTIS-2024-1102', date: 'May 10, 2024', hospital: 'Fortis Memorial Research Institute Blood Bank, Gurugram', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Mobile Transfusion Unit 02', doctor: 'Dr. Priya Nair', hash: '3f5e7a9c1b2d4e6f8a0c2e4f6a8b0d2e4f6a8c0e', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
-                        <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
+                    <td class="py-3 px-2 text-right whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-FORTIS-2024-1102', date: 'May 10, 2024', hospital: 'Fortis Memorial Research Institute Blood Bank, Gurugram', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Mobile Transfusion Unit 02', doctor: 'Dr. Priya Nair', hash: '3f5e7a9c1b2d4e6f8a0c2e4f6a8b0d2e4f6a8c0e', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface text-[11px] font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                        <span class="material-symbols-outlined text-[15px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
                     </td>
