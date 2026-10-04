@@ -668,7 +668,12 @@ function initInteractiveWidgets() {
   document.querySelectorAll('[data-open-modal-request]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      openRequestModal();
+      // If clicked from within the recipient dashboard or requisitions section, open the specialized update units modal
+      if (btn.closest('#recipient-requests-section') || btn.closest('#view-recipient-dashboard')) {
+        openRequestMoreBloodModal();
+      } else {
+        openRequestModal();
+      }
     });
   });
 
@@ -699,9 +704,69 @@ function initInteractiveWidgets() {
     });
   }
 
+  // Listener for update units form
+  const formUpdateUnits = document.getElementById('form-update-blood-units');
+  if (formUpdateUnits) {
+    formUpdateUnits.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('update-units-input');
+      const noteInput = document.getElementById('update-units-note');
+      const newUnits = parseInt(input ? input.value : currentBaseUnits, 10);
+
+      if (isNaN(newUnits) || newUnits < 1) {
+        if (typeof showToast === 'function') {
+          showToast('Invalid Units', 'Please enter at least 1 unit of blood required.', 'warning');
+        }
+        return;
+      }
+
+      const note = noteInput ? noteInput.value.trim() : '';
+
+      // Update in central store
+      let updatedRecipient = null;
+      if (window.PulseStore && typeof window.PulseStore.updateRecipientUnits === 'function') {
+        updatedRecipient = window.PulseStore.updateRecipientUnits(newUnits, note ? { clinicalReason: note } : {});
+      } else if (window.PulseStore && typeof window.PulseStore.updateRecipient === 'function') {
+        updatedRecipient = window.PulseStore.updateRecipient({ unitsRequired: newUnits, ...(note ? { clinicalReason: note } : {}) });
+      }
+
+      closeRequestMoreBloodModal();
+
+      const patientName = (updatedRecipient && updatedRecipient.patientName) || 'Devika Sharma';
+      const bloodGroup = (updatedRecipient && updatedRecipient.bloodGroup) || 'B+';
+      const comp = (updatedRecipient && updatedRecipient.component) || 'Platelets';
+
+      if (typeof showToast === 'function') {
+        showToast(
+          '✅ Blood Requirement Updated!',
+          `Requirement for ${patientName} (${bloodGroup} ${comp}) updated to ${newUnits} Units. Live grid updated.`,
+          'success'
+        );
+      }
+
+      // Re-render UI
+      if (typeof window.renderRecipientDashboard === 'function') {
+        window.renderRecipientDashboard();
+      }
+    });
+  }
+
+  const modalUpdateUnits = document.getElementById('modal-update-units');
+  if (modalUpdateUnits) {
+    modalUpdateUnits.addEventListener('click', (e) => {
+      if (e.target === modalUpdateUnits) closeRequestMoreBloodModal();
+    });
+  }
+
+  const updateUnitsInput = document.getElementById('update-units-input');
+  if (updateUnitsInput) {
+    updateUnitsInput.addEventListener('input', () => updateUnitsDiffDisplay());
+  }
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeRequestModal();
+      closeRequestMoreBloodModal();
       if (typeof closeDonorLoginModal === 'function') closeDonorLoginModal();
       if (typeof closeHospitalLoginModal === 'function') closeHospitalLoginModal();
       if (typeof closeRecipientLoginModal === 'function') closeRecipientLoginModal();
@@ -1343,6 +1408,123 @@ function printMedicalProof() {
   window.print();
 }
 
+// --- REQUEST MORE BLOOD / UPDATE REQUIRED UNITS MODAL ---
+let currentBaseUnits = 3;
+
+function openRequestMoreBloodModal() {
+  const modal = document.getElementById('modal-update-units');
+  if (!modal) return;
+
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets (Apheresis)', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', hospitalWard: 'ICU Ward 4B, Bed 12', requestId: 'REQ-9042', unitsRequired: 3, unitsArranged: 2, unitsFulfilled: 1, attendantName: 'Rajesh Sharma', attendantPhone: '+91 95280 33454', doctorName: 'Dr. Aravind Sharma' };
+
+  currentBaseUnits = parseInt(recipient.unitsRequired || 3, 10);
+
+  // Populate context badges
+  const badgeBlood = modal.querySelector('.update-modal-blood-badge');
+  if (badgeBlood) badgeBlood.textContent = recipient.bloodGroup || 'B+';
+
+  const patientNameEl = modal.querySelector('.update-modal-patient-name');
+  if (patientNameEl) patientNameEl.textContent = recipient.patientName || 'Devika Sharma';
+
+  const reqIdEl = modal.querySelector('.update-modal-req-id');
+  if (reqIdEl) reqIdEl.textContent = '#' + (recipient.requestId || 'REQ-9042');
+
+  const compHospEl = modal.querySelector('.update-modal-component-hospital');
+  if (compHospEl) {
+    compHospEl.textContent = `${recipient.component || 'Platelets (Apheresis)'} • ${recipient.hospitalName || 'Apollo Hospitals & Apex Trauma Centre'} (${recipient.hospitalWard || 'ICU Ward 4B, Bed 12'})`;
+  }
+
+  const attendantEl = modal.querySelector('.update-modal-attendant-info');
+  if (attendantEl) {
+    attendantEl.textContent = `Attendant: ${recipient.attendantName || 'Rajesh Sharma'} (${recipient.attendantPhone || '+91 95280 33454'}) • Doctor: ${recipient.doctorName || 'Dr. Aravind Sharma'} (Form 27-C Verified)`;
+  }
+
+  const currReqEl = modal.querySelector('.update-modal-current-req');
+  if (currReqEl) currReqEl.textContent = `${currentBaseUnits} Units`;
+
+  const arrangedEl = modal.querySelector('.update-modal-arranged');
+  if (arrangedEl) arrangedEl.textContent = `${recipient.unitsArranged || 2} Donors`;
+
+  const fulfilledEl = modal.querySelector('.update-modal-fulfilled');
+  if (fulfilledEl) fulfilledEl.textContent = `${recipient.unitsFulfilled || 1} Received`;
+
+  // Set input value to current units
+  const input = document.getElementById('update-units-input');
+  if (input) {
+    input.value = currentBaseUnits;
+  }
+
+  const noteInput = document.getElementById('update-units-note');
+  if (noteInput) noteInput.value = '';
+
+  updateUnitsDiffDisplay();
+
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+
+  if (input) {
+    setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 80);
+  }
+}
+
+function closeRequestMoreBloodModal() {
+  const modal = document.getElementById('modal-update-units');
+  if (modal) {
+    modal.classList.add('hidden');
+    // Only restore body overflow if other modals are closed
+    const reqModal = document.getElementById('modal-request');
+    if (!reqModal || reqModal.classList.contains('hidden')) {
+      document.body.classList.remove('overflow-hidden');
+    }
+  }
+}
+
+function stepUpdateUnits(delta) {
+  const input = document.getElementById('update-units-input');
+  if (!input) return;
+  let val = parseInt(input.value || currentBaseUnits, 10);
+  if (isNaN(val)) val = currentBaseUnits;
+  val = Math.max(1, Math.min(25, val + delta));
+  input.value = val;
+  updateUnitsDiffDisplay();
+}
+
+function quickAddUnits(amount) {
+  const input = document.getElementById('update-units-input');
+  if (!input) return;
+  input.value = Math.max(1, Math.min(25, currentBaseUnits + amount));
+  updateUnitsDiffDisplay();
+}
+
+function resetUnitsToCurrent() {
+  const input = document.getElementById('update-units-input');
+  if (!input) return;
+  input.value = currentBaseUnits;
+  updateUnitsDiffDisplay();
+}
+
+function updateUnitsDiffDisplay() {
+  const input = document.getElementById('update-units-input');
+  const bannerText = document.getElementById('update-units-diff-text');
+  if (!input || !bannerText) return;
+
+  const newVal = parseInt(input.value || currentBaseUnits, 10);
+  const diff = newVal - currentBaseUnits;
+
+  if (diff > 0) {
+    bannerText.innerHTML = `Increasing requirement by <strong class="text-primary font-bold">+${diff} unit${diff > 1 ? 's' : ''}</strong> (Total <strong>${newVal} Units</strong> needed). Proximate donors alerted.`;
+  } else if (diff < 0) {
+    bannerText.innerHTML = `Decreasing requirement by <strong class="text-secondary font-bold">${diff} unit${Math.abs(diff) > 1 ? 's' : ''}</strong> (New total <strong>${newVal} Units</strong>).`;
+  } else {
+    bannerText.innerHTML = `Requirement remains set to current requirement of <strong>${currentBaseUnits} Units</strong>.`;
+  }
+}
+
 window.openRaiseRequestModal = openRequestModal;
 window.closeRaiseRequestModal = closeRequestModal;
 window.openRequestModal = openRequestModal;
@@ -1353,6 +1535,13 @@ window.handleProofFileSelect = handleProofFileSelect;
 window.openMedicalProofViewer = openMedicalProofViewer;
 window.closeMedicalProofViewer = closeMedicalProofViewer;
 window.printMedicalProof = printMedicalProof;
+
+window.openRequestMoreBloodModal = openRequestMoreBloodModal;
+window.closeRequestMoreBloodModal = closeRequestMoreBloodModal;
+window.stepUpdateUnits = stepUpdateUnits;
+window.quickAddUnits = quickAddUnits;
+window.resetUnitsToCurrent = resetUnitsToCurrent;
+window.updateUnitsDiffDisplay = updateUnitsDiffDisplay;
 
 // --- DONOR REGISTRATION POPUP MODAL FUNCTIONS ---
 function openDonorRegisterModal() {
@@ -1967,7 +2156,7 @@ function renderRecipientRequestsList(recipient) {
           <span class="material-symbols-outlined text-[16px]">share</span>
           <span>Share Case</span>
         </button>
-        <button type="button" data-open-modal-request class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+        <button type="button" onclick="window.openRequestMoreBloodModal()" class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
           <span class="material-symbols-outlined text-[16px]">edit_note</span>
           <span>Update Need</span>
         </button>

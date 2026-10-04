@@ -704,12 +704,27 @@ class Store {
   updateRecipient(updates) {
     this.state.recipient = { ...this.getRecipient(), ...updates };
     const cases = this.getRecipientCases();
-    const idx = cases.findIndex(c => c.id === this.state.recipient.id);
+    const idx = cases.findIndex(c => c.id === this.state.recipient.id || c.requestId === this.state.recipient.requestId);
     if (idx >= 0) {
       cases[idx] = { ...cases[idx], ...updates };
     }
+    // Synchronize matching requisition in requests pool
+    if (Array.isArray(this.state.requests)) {
+      const req = this.state.requests.find(r => r.id === this.state.recipient.requestId);
+      if (req) {
+        if (updates.unitsRequired !== undefined) req.units = updates.unitsRequired;
+        if (updates.urgency !== undefined) req.urgency = updates.urgency;
+        if (updates.clinicalReason !== undefined) req.notes = updates.clinicalReason;
+      }
+    }
     this.saveState();
     return this.state.recipient;
+  }
+
+  updateRecipientUnits(newUnits, extraData = {}) {
+    const units = parseInt(newUnits, 10);
+    if (isNaN(units) || units < 1) return this.getRecipient();
+    return this.updateRecipient({ unitsRequired: units, ...extraData });
   }
 
   setRecipientTrackingStage(stage) {
