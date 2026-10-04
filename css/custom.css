@@ -2,6 +2,31 @@
 
 html, body {
   background-color: #FFE2E2 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow-x: hidden !important;
+  position: relative;
+  overscroll-behavior-x: none !important;
+}
+
+/* Prevent any horizontal movement or shift on all main containers, sections, and dashboards */
+main,
+.view-section,
+#view-landing,
+#view-role-selection,
+#view-donor-dashboard,
+#view-recipient-dashboard,
+#view-donor-profile,
+#view-donor-register,
+#view-hospital-register,
+#view-raise-request,
+#view-request-confirmation,
+#view-matched-donors,
+#view-request-tracking {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
 }
 
 /* Smooth view transitions */
@@ -198,13 +223,20 @@ html, body {
   font-variation-settings: 'FILL' 1;
 }
 
-/* Recipient Dashboard Sidebar - Prevent Flexbox Squashing & Force Non-Scrollable Layout */
-#view-recipient-dashboard aside {
-  overflow: visible !important;
+/* Dashboard Sidebars - Move naturally up and down with the dashboard (never fixed or sticky) */
+#view-recipient-dashboard aside,
+#view-donor-dashboard aside,
+aside.donor-sidebar,
+aside.recipient-sidebar {
+  position: static !important;
+  top: auto !important;
+  align-self: auto !important;
   max-height: none !important;
+  overflow: visible !important;
 }
 
-#view-recipient-dashboard aside > * {
+#view-recipient-dashboard aside > *,
+#view-donor-dashboard aside > * {
   flex-shrink: 0 !important;
   min-height: max-content !important;
 }
@@ -224,8 +256,10 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
   pointer-events: none;
   z-index: 0;
   will-change: transform;
@@ -257,13 +291,23 @@ section.bg-surface {
   pointer-events: none !important;
 }
 
-/* Donation History Table - Strict No-Horizontal-Scroll */
-#donor-history-section {
+/* Donation History Table & Dashboard Sections - Strict No-Horizontal-Scroll */
+#donor-history-section,
+#donor-requests-section,
+#donor-overview,
+#recipient-donors-section,
+#recipient-tracking-section,
+#recipient-requests-section,
+#recipient-overview {
+  max-width: 100% !important;
+  width: 100% !important;
   overflow-x: hidden !important;
+  box-sizing: border-box !important;
 }
 
 #donor-history-section table {
   width: 100% !important;
   max-width: 100% !important;
+  table-layout: auto !important;
 }
 

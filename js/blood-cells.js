@@ -523,8 +523,8 @@
    */
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2 for performance
-    width = window.innerWidth;
-    height = window.innerHeight;
+    width = document.documentElement.clientWidth || window.innerWidth;
+    height = document.documentElement.clientHeight || window.innerHeight;
 
     if (canvas) {
       canvas.width = Math.floor(width * dpr);
