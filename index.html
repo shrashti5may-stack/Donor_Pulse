@@ -2471,7 +2471,38 @@
 
             <!-- Requests List Container -->
             <div id="recipient-requests-container" class="flex flex-col gap-space-sm pt-space-xs">
-              <!-- Dynamically populated by renderRecipientDashboard() -->
+              <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-13 h-13 rounded-2xl bg-error-container text-primary flex items-center justify-center font-bold text-2xl shrink-0 shadow-xs">
+                    B+
+                  </div>
+                  <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="font-mono font-bold text-xs text-primary bg-primary-fixed/30 px-2 py-0.5 rounded">REQ-9042</span>
+                      <h4 class="font-title-md font-bold text-on-surface">Platelets (Apheresis)</h4>
+                      <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[11px] font-bold animate-pulse">
+                        Stat Emergency (&lt; 45 Mins)
+                      </span>
+                    </div>
+                    <p class="text-xs text-on-surface-variant mt-1">
+                      <strong>3 Units Required</strong> (2 Arranged, 1 Received) • Admitted: ICU Ward 4B, Bed 12
+                    </p>
+                    <p class="text-xs text-secondary mt-0.5 italic">
+                      Clinical note: "Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required."
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button type="button" onclick="window.copySOSAppealLink()" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">share</span>
+                    <span>Share Case</span>
+                  </button>
+                  <button type="button" onclick="window.openUpdateNeedModal()" class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">edit_note</span>
+                    <span>Update Need</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -3019,156 +3050,296 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- REQUEST MORE BLOOD / UPDATE REQUIRED UNITS MODAL                      -->
+  <!-- 1. UPDATE NEED (BEFORE DONOR ARRIVAL) MODAL                           -->
   <!-- ===================================================================== -->
-  <div class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-inverse-surface/60 backdrop-blur-md" id="modal-update-units">
-    <div class="bg-surface-container-lowest rounded-2xl max-w-lg w-full p-4 sm:p-6 shadow-2xl flex flex-col gap-4 relative animate-in fade-in zoom-in duration-150 max-h-[92vh] overflow-y-auto border border-outline-variant/30">
+  <div class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-inverse-surface/60 backdrop-blur-md" id="modal-update-need" style="display: none;">
+    <div class="bg-surface-container-lowest rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl flex flex-col gap-3.5 relative animate-in fade-in zoom-in duration-150 max-h-[95vh] overflow-y-auto border border-outline-variant/30">
       
       <!-- Modal Header -->
-      <div class="flex items-start justify-between pb-3 border-b border-surface-container">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-error-container/60 flex items-center justify-center text-primary font-bold shrink-0">
-            <span class="material-symbols-outlined text-[24px]">bloodtype</span>
+      <div class="flex items-center justify-between pb-3 border-b border-surface-container">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
+            <span class="material-symbols-outlined text-[20px]">edit_calendar</span>
           </div>
-          <div>
-            <h3 class="font-headline-sm text-base sm:text-lg text-on-surface font-extrabold flex items-center gap-2">
-              <span>Request More Blood Units</span>
-              <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">Active Case</span>
-            </h3>
-            <p class="text-xs text-on-surface-variant">Update blood units needed • Basic patient &amp; hospital details are already registered</p>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-headline-sm text-base font-extrabold text-on-surface leading-tight">
+                Update Blood Need
+              </h3>
+              <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-wide shrink-0">
+                Before Donor Arrival
+              </span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-tight mt-0.5">
+              Adjust required units while donors are en route • Registered case saved
+            </p>
           </div>
         </div>
-        <button type="button" onclick="window.closeRequestMoreBloodModal()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" title="Close">
+        <button type="button" onclick="window.closeUpdateNeedModal()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer shrink-0 ml-2" title="Close">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
 
-      <!-- Verified Case Information (Read-Only Context) -->
-      <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2.5">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-secondary flex items-center gap-1">
-            <span class="material-symbols-outlined text-[14px] text-tertiary">verified</span>
-            <span>Registered Case &amp; Patient Details (Saved)</span>
-          </span>
-          <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold text-[10px] border border-emerald-500/30 flex items-center gap-1">
-            <span class="material-symbols-outlined text-[12px]">check_circle</span>
-            <span>Verified Patient Requisition</span>
-          </span>
-        </div>
-
-        <div class="flex items-center gap-3 pt-1">
-          <div class="w-12 h-12 rounded-xl bg-error-container text-primary flex items-center justify-center font-extrabold text-xl shrink-0 update-modal-blood-badge">
-            B+
-          </div>
-          <div class="min-w-0 flex-1">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="font-bold text-sm text-on-surface update-modal-patient-name">Devika Sharma</span>
-              <span class="font-mono text-xs text-primary font-bold bg-primary/10 px-2 py-0.5 rounded update-modal-req-id">#REQ-9042</span>
+      <!-- Consolidated Single Patient & Case Summary Card -->
+      <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2.5">
+        <div class="flex items-center justify-between gap-2">
+          <!-- Patient & Hospital Info -->
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-11 h-11 rounded-xl bg-error-container text-primary flex items-center justify-center font-extrabold text-lg shrink-0 update-need-blood-badge shadow-xs">
+              B+
             </div>
-            <p class="text-xs text-on-surface-variant mt-0.5 truncate update-modal-component-hospital">
-              Platelets (Apheresis) • Apollo Hospitals &amp; Apex Trauma Centre (ICU Ward 4B, Bed 12)
-            </p>
-            <p class="text-[11px] text-secondary mt-0.5 update-modal-attendant-info">
-              Attendant: Rajesh Sharma (+91 95280 33454) • Doctor: Dr. Aravind Sharma (Form 27-C Verified)
-            </p>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-sm text-on-surface update-need-patient-name leading-none">Devika Sharma</span>
+                <span class="font-mono text-[11px] text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded update-need-req-id">#REQ-9042</span>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-1 leading-tight update-need-component-hospital">
+                Platelets (Apheresis) • Apollo Hospitals (ICU Ward 4B, Bed 12)
+              </p>
+            </div>
+          </div>
+
+          <!-- Status Badge -->
+          <div class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[11px] font-bold shrink-0">
+            <span class="material-symbols-outlined text-[14px] animate-bounce">directions_car</span>
+            <span>En Route (Stage 4)</span>
+          </div>
+        </div>
+
+        <!-- Inline Metric Chips Strip -->
+        <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-surface-container/60 text-center">
+          <div class="px-2 py-1 rounded-lg bg-surface-container-lowest border border-surface-container/80">
+            <span class="text-[9px] uppercase font-bold text-on-surface-variant block">Currently Req.</span>
+            <span class="text-xs font-extrabold text-on-surface update-need-current-req">3 Units</span>
+          </div>
+          <div class="px-2 py-1 rounded-lg bg-secondary-container/20 border border-secondary-container/40">
+            <span class="text-[9px] uppercase font-bold text-secondary block">En Route</span>
+            <span class="text-xs font-extrabold text-secondary update-need-arranged">2 Donors</span>
+          </div>
+          <div class="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+            <span class="text-[9px] uppercase font-bold text-emerald-700 dark:text-emerald-400 block">Fulfilled</span>
+            <span class="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 update-need-fulfilled">1 Received</span>
           </div>
         </div>
       </div>
 
-      <!-- Current Units Summary Chips -->
-      <div class="grid grid-cols-3 gap-2 text-center">
-        <div class="p-2 rounded-xl bg-surface-container-lowest border border-surface-container">
-          <span class="text-[10px] uppercase font-bold text-on-surface-variant block">Currently Req.</span>
-          <span class="text-sm font-extrabold text-on-surface update-modal-current-req">3 Units</span>
-        </div>
-        <div class="p-2 rounded-xl bg-secondary-container/20 border border-secondary-container/30">
-          <span class="text-[10px] uppercase font-bold text-secondary block">Arranged</span>
-          <span class="text-sm font-extrabold text-secondary update-modal-arranged">2 Donors</span>
-        </div>
-        <div class="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-          <span class="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 block">Fulfilled</span>
-          <span class="text-sm font-extrabold text-emerald-700 dark:text-emerald-400 update-modal-fulfilled">1 Received</span>
-        </div>
-      </div>
-
-      <!-- Form: ONLY Asking for Updated Units -->
-      <form id="form-update-blood-units" class="flex flex-col gap-4">
+      <!-- Form: Target Units & Pre-Arrival Note -->
+      <form id="form-update-need" class="flex flex-col gap-3">
         
-        <!-- Main Field: Updated Amount of Blood Units -->
-        <div class="flex flex-col gap-2 p-4 rounded-xl bg-primary/5 border-2 border-primary/30">
+        <!-- Hero Interactive Stepper Box -->
+        <div class="flex flex-col gap-2 p-3.5 rounded-xl bg-primary/5 border border-primary/25">
           <div class="flex items-center justify-between">
-            <label for="update-units-input" class="text-xs sm:text-sm font-bold text-on-surface flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[18px] text-primary">water_drop</span>
-              <span>Updated Total Blood Units Required *</span>
+            <label for="update-need-units-input" class="text-xs font-bold text-on-surface flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-primary">water_drop</span>
+              <span>Target Units Needed Before Donor Arrival *</span>
             </label>
-            <span class="text-[11px] font-bold text-primary">Units Needed</span>
+            <span class="text-[10px] font-bold text-primary uppercase">Doctor Order</span>
           </div>
 
-          <p class="text-xs text-on-surface-variant">
-            Specify the new total unit requirement ordered by the attending physician.
-          </p>
-
-          <!-- Interactive Stepper Controller -->
-          <div class="flex items-center justify-center gap-3 py-2">
-            <button type="button" onclick="window.stepUpdateUnits(-1)" class="w-11 h-11 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-lg flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs border border-outline-variant/30" title="Decrease by 1 unit">
-              <span class="material-symbols-outlined text-[20px]">remove</span>
+          <!-- Stepper Controller -->
+          <div class="flex items-center justify-center gap-3 py-1">
+            <button type="button" onclick="window.stepUpdateNeedUnits(-1)" class="w-10 h-10 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-lg flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs border border-outline-variant/30" title="Decrease by 1 unit">
+              <span class="material-symbols-outlined text-[18px]">remove</span>
             </button>
             <div class="relative flex items-center">
-              <input id="update-units-input" name="updatedUnits" type="number" min="1" max="25" value="3" required class="w-24 h-12 text-center text-2xl font-extrabold text-primary rounded-xl bg-surface-container-lowest border-2 border-primary focus:ring-4 focus:ring-primary/20 focus:outline-none shadow-inner"/>
-              <span class="absolute right-2.5 text-[10px] font-bold uppercase text-on-surface-variant pointer-events-none">Units</span>
+              <input id="update-need-units-input" name="newUnits" type="number" min="1" max="25" value="3" required class="w-24 h-11 text-center text-2xl font-extrabold text-primary rounded-xl bg-surface-container-lowest border-2 border-primary focus:ring-4 focus:ring-primary/20 focus:outline-none shadow-inner"/>
+              <span class="absolute right-2.5 text-[9px] font-bold uppercase text-on-surface-variant pointer-events-none">Units</span>
             </div>
-            <button type="button" onclick="window.stepUpdateUnits(1)" class="w-11 h-11 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-bold text-lg flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-md" title="Increase by 1 unit">
-              <span class="material-symbols-outlined text-[20px]">add</span>
+            <button type="button" onclick="window.stepUpdateNeedUnits(1)" class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-bold text-lg flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-sm" title="Increase by 1 unit">
+              <span class="material-symbols-outlined text-[18px]">add</span>
             </button>
           </div>
 
-          <!-- Quick Increment Buttons -->
-          <div class="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-            <span class="text-[11px] text-on-surface-variant mr-1">Quick Add:</span>
-            <button type="button" onclick="window.quickAddUnits(1)" class="px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all border border-outline-variant/20 cursor-pointer">
-              +1 Unit
+          <!-- Quick Select Chips -->
+          <div class="flex items-center justify-center gap-1.5 flex-wrap">
+            <span class="text-[10px] text-on-surface-variant mr-0.5">Quick set:</span>
+            <button type="button" onclick="window.setUpdateNeedUnits(2)" class="px-2.5 py-0.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-bold transition-all border border-outline-variant/20 cursor-pointer">
+              2 Units
             </button>
-            <button type="button" onclick="window.quickAddUnits(2)" class="px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all border border-outline-variant/20 cursor-pointer">
-              +2 Units
+            <button type="button" onclick="window.setUpdateNeedUnits(3)" class="px-2.5 py-0.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-bold transition-all border border-outline-variant/20 cursor-pointer">
+              3 Units
             </button>
-            <button type="button" onclick="window.quickAddUnits(3)" class="px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all border border-outline-variant/20 cursor-pointer">
-              +3 Units
+            <button type="button" onclick="window.setUpdateNeedUnits(4)" class="px-2.5 py-0.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-bold transition-all border border-outline-variant/20 cursor-pointer">
+              4 Units
             </button>
-            <button type="button" onclick="window.resetUnitsToCurrent()" class="px-2.5 py-1 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-secondary text-xs font-semibold transition-all border border-secondary/20 cursor-pointer">
+            <button type="button" onclick="window.setUpdateNeedUnits(5)" class="px-2.5 py-0.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-bold transition-all border border-outline-variant/20 cursor-pointer">
+              5 Units
+            </button>
+            <button type="button" onclick="window.resetUpdateNeedUnits()" class="px-2.5 py-0.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-secondary text-[11px] font-semibold transition-all border border-secondary/20 cursor-pointer">
               Reset
             </button>
           </div>
 
           <!-- Live Dynamic Delta Calculation -->
-          <div id="update-units-diff-banner" class="mt-1 p-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/30 text-xs flex items-center gap-2">
-            <span class="material-symbols-outlined text-[16px] text-primary shrink-0">info</span>
-            <span id="update-units-diff-text" class="text-on-surface">Requirement is currently set to <strong>3 Units</strong>.</span>
+          <div id="update-need-diff-banner" class="p-2 rounded-lg bg-surface-container-lowest border border-outline-variant/30 text-[11px] flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[15px] text-primary shrink-0">info</span>
+            <span id="update-need-diff-text" class="text-on-surface">Target requirement currently set to <strong>3 Units</strong>.</span>
           </div>
         </div>
 
-        <!-- Optional: Clinical Update Note -->
+        <!-- Optional: Pre-Arrival Clinical Note -->
         <div class="flex flex-col gap-1">
-          <label for="update-units-note" class="text-xs font-semibold text-on-surface flex items-center justify-between">
-            <span>Physician Order Reason / Note (Optional)</span>
-            <span class="text-[10px] text-on-surface-variant">Logged in requisition trail</span>
+          <label for="update-need-note" class="text-xs font-semibold text-on-surface flex items-center justify-between">
+            <span>Doctor Reason / Pre-Arrival Note (Optional)</span>
+            <span class="text-[10px] text-on-surface-variant">Requisition log</span>
           </label>
-          <input id="update-units-note" name="updateNote" type="text" placeholder="e.g. Additional units ordered after evening lab evaluation" class="h-9 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
-        </div>
-
-        <!-- Broadcast Notice -->
-        <div class="p-2.5 rounded-xl bg-tertiary-container/20 border border-tertiary-container/30 flex items-center gap-2 text-xs text-on-surface">
-          <span class="material-symbols-outlined text-[16px] text-tertiary shrink-0 animate-pulse">cell_tower</span>
-          <span>Verified proximate donors in radius will receive the updated unit allocation in real time.</span>
+          <input id="update-need-note" name="updateNote" type="text" placeholder="e.g. Revised to 4 units during pre-transfusion triage" class="h-9 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
         </div>
 
         <!-- Modal Footer Actions -->
-        <div class="flex items-center justify-end gap-3 pt-2 border-t border-surface-container">
-          <button type="button" onclick="window.closeRequestMoreBloodModal()" class="px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs sm:text-sm font-semibold transition-colors cursor-pointer">
+        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-surface-container">
+          <button type="button" onclick="window.closeUpdateNeedModal()" class="px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-colors cursor-pointer">
             Cancel
           </button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-98">
-            <span class="material-symbols-outlined text-[18px]">check_circle</span>
-            <span>Update Blood Requirement</span>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer active:scale-98">
+            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+            <span>Update Need Before Donor Arrival</span>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 2. REQUEST MORE BLOOD (POST-RECEIPT EXTRA UNITS) MODAL                -->
+  <!-- ===================================================================== -->
+  <div class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-inverse-surface/60 backdrop-blur-md" id="modal-request-more-blood" style="display: none;">
+    <div class="bg-surface-container-lowest rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl flex flex-col gap-3.5 relative animate-in fade-in zoom-in duration-150 max-h-[95vh] overflow-y-auto border border-outline-variant/30">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-surface-container">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0">
+            <span class="material-symbols-outlined text-[20px]">add_circle</span>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-headline-sm text-base font-extrabold text-on-surface leading-tight">
+                Request Extra Blood Units
+              </h3>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold tracking-wide shrink-0">
+                Post-Receipt Order
+              </span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-tight mt-0.5">
+              1 unit already received • Order supplementary units without re-entering basic info
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="window.closeRequestMoreBloodModal()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer shrink-0 ml-2" title="Close">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Consolidated Single Patient & Delivery Context Card -->
+      <div class="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/25 flex flex-col gap-2.5">
+        <div class="flex items-center justify-between gap-2">
+          <!-- Patient & Hospital Info -->
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-11 h-11 rounded-xl bg-error-container text-primary flex items-center justify-center font-extrabold text-lg shrink-0 request-more-blood-badge shadow-xs">
+              B+
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-sm text-on-surface request-more-patient-name leading-none">Devika Sharma</span>
+                <span class="font-mono text-[11px] text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded request-more-req-id">#REQ-9042</span>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-1 leading-tight request-more-comp-hosp">
+                Platelets (Apheresis) • Apollo Hospitals (ICU Ward 4B, Bed 12)
+              </p>
+            </div>
+          </div>
+
+          <!-- Verified Delivery Badge -->
+          <div class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold shrink-0">
+            <span class="material-symbols-outlined text-[14px]">task_alt</span>
+            <span>1 Unit Fulfilled</span>
+          </div>
+        </div>
+
+        <!-- Inline Metric Chips Strip -->
+        <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-emerald-500/20 text-center">
+          <div class="px-2 py-1 rounded-lg bg-surface-container-lowest border border-emerald-500/30">
+            <span class="text-[9px] uppercase font-bold text-emerald-700 dark:text-emerald-400 block">Already Received</span>
+            <span class="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 request-more-fulfilled-display">1 Unit</span>
+          </div>
+          <div class="px-2 py-1 rounded-lg bg-primary/10 border border-primary/30">
+            <span class="text-[9px] uppercase font-bold text-primary block">Extra Units Needed</span>
+            <span class="text-xs font-extrabold text-primary request-more-extra-display">+1 Extra</span>
+          </div>
+          <div class="px-2 py-1 rounded-lg bg-surface-container-lowest border border-outline-variant/30">
+            <span class="text-[9px] uppercase font-bold text-on-surface-variant block">New Total Target</span>
+            <span class="text-xs font-extrabold text-on-surface request-more-total-display">2 Units Total</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form: Extra Units & Clinical Reason -->
+      <form id="form-request-more-blood" class="flex flex-col gap-3">
+        
+        <!-- Hero Interactive Stepper Box -->
+        <div class="flex flex-col gap-2 p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/25">
+          <div class="flex items-center justify-between">
+            <label for="extra-units-input" class="text-xs font-bold text-on-surface flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-emerald-600 dark:text-emerald-400">water_drop</span>
+              <span>How Many EXTRA Units Are Required? *</span>
+            </label>
+            <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase">Supplementary</span>
+          </div>
+
+          <!-- Stepper Controller -->
+          <div class="flex items-center justify-center gap-3 py-1">
+            <button type="button" onclick="window.stepExtraUnits(-1)" class="w-10 h-10 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-lg flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs border border-outline-variant/30" title="Decrease by 1 unit">
+              <span class="material-symbols-outlined text-[18px]">remove</span>
+            </button>
+            <div class="relative flex items-center">
+              <input id="extra-units-input" name="extraUnits" type="number" min="1" max="15" value="1" required class="w-24 h-11 text-center text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 rounded-xl bg-surface-container-lowest border-2 border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/20 focus:outline-none shadow-inner"/>
+              <span class="absolute right-2.5 text-[9px] font-bold uppercase text-on-surface-variant pointer-events-none">Extra</span>
+            </div>
+            <button type="button" onclick="window.stepExtraUnits(1)" class="w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-lg flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-sm" title="Increase by 1 unit">
+              <span class="material-symbols-outlined text-[18px]">add</span>
+            </button>
+          </div>
+
+          <!-- Quick Select Chips -->
+          <div class="flex items-center justify-center gap-1.5 flex-wrap">
+            <span class="text-[10px] text-on-surface-variant mr-0.5">Quick add:</span>
+            <button type="button" onclick="window.setExtraUnits(1)" class="px-2.5 py-0.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-bold transition-all border border-outline-variant/20 cursor-pointer">
+              +1 Extra Unit
+            </button>
+            <button type="button" onclick="window.setExtraUnits(2)" class="px-2.5 py-0.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-bold transition-all border border-outline-variant/20 cursor-pointer">
+              +2 Extra Units
+            </button>
+            <button type="button" onclick="window.setExtraUnits(3)" class="px-2.5 py-0.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-bold transition-all border border-outline-variant/20 cursor-pointer">
+              +3 Extra Units
+            </button>
+          </div>
+
+          <!-- Live Dynamic Extra Calculation Banner -->
+          <div id="extra-units-calc-banner" class="p-2 rounded-lg bg-surface-container-lowest border border-outline-variant/30 text-[11px] flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[15px] text-emerald-600 shrink-0">calculate</span>
+            <span id="extra-units-calc-text" class="text-on-surface">1 unit already received + <strong>1 extra unit</strong> = <strong>2 Units Total Requisition</strong>.</span>
+          </div>
+        </div>
+
+        <!-- Clinical Reason for Extra Need -->
+        <div class="flex flex-col gap-1">
+          <label for="extra-blood-reason" class="text-xs font-semibold text-on-surface flex items-center justify-between">
+            <span>Clinical Reason for Extra Blood Need (Required) *</span>
+            <span class="text-[10px] text-on-surface-variant">Medical justification</span>
+          </label>
+          <input id="extra-blood-reason" name="clinicalReason" type="text" required placeholder="e.g. Platelet count sub-optimal post-infusion; additional unit requested" class="h-9 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs font-medium focus:ring-2 focus:ring-emerald-600 focus:outline-none"/>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-surface-container">
+          <button type="button" onclick="window.closeRequestMoreBloodModal()" class="px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-colors cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer active:scale-98">
+            <span class="material-symbols-outlined text-[16px]">send</span>
+            <span>Broadcast Request for Extra Units</span>
           </button>
         </div>
       </form>
@@ -4718,10 +4889,58 @@
     </div>
   </div>
 
-  <!-- Core Scripts -->
-  <script src="js/store.js?v=6"></script>
-  <script src="js/router.js?v=6"></script>
-  <script src="js/app.js?v=6"></script>
-  <script src="js/blood-cells.js?v=3"></script>
+  <!-- Core Scripts with Cache-Busting -->
+  <script src="js/store.js?v=20261004d"></script>
+  <script src="js/router.js?v=20261004d"></script>
+  <script src="js/app.js?v=20261004d"></script>
+  <script src="js/blood-cells.js?v=20261004d"></script>
+
+  <!-- Global Direct Action Handler for "Update Need" and "Request More Blood" -->
+  <script>
+    (function() {
+      // Capture-phase event delegation: guarantees Update Need and Request More Blood ALWAYS work
+      document.addEventListener('click', function(e) {
+        var target = e.target;
+        var btn = target.closest ? target.closest('button, a') : null;
+        if (!btn && target.tagName === 'BUTTON') btn = target;
+        if (!btn) return;
+
+        var text = (btn.innerText || btn.textContent || '').trim();
+        if (text.indexOf('Update Need') !== -1) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window.openUpdateNeedModal === 'function') {
+            window.openUpdateNeedModal();
+          } else {
+            var modal = document.getElementById('modal-update-need');
+            if (modal) {
+              modal.classList.remove('hidden');
+              modal.style.display = 'flex';
+              modal.style.visibility = 'visible';
+              modal.style.opacity = '1';
+              modal.style.zIndex = '99999';
+              document.body.classList.add('overflow-hidden');
+            }
+          }
+        } else if (text.indexOf('Request More Blood') !== -1 || text.indexOf('Request Additional Blood') !== -1) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window.openRequestMoreBloodModal === 'function') {
+            window.openRequestMoreBloodModal();
+          } else {
+            var modal = document.getElementById('modal-request-more-blood') || document.getElementById('modal-update-units');
+            if (modal) {
+              modal.classList.remove('hidden');
+              modal.style.display = 'flex';
+              modal.style.visibility = 'visible';
+              modal.style.opacity = '1';
+              modal.style.zIndex = '99999';
+              document.body.classList.add('overflow-hidden');
+            }
+          }
+        }
+      }, true);
+    })();
+  </script>
 </body>
 </html>

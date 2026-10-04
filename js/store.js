@@ -727,6 +727,52 @@ class Store {
     return this.updateRecipient({ unitsRequired: units, ...extraData });
   }
 
+  // 1. "Update Need": Update blood units required before donor arrives
+  updateNeedBeforeDonorArrival(newUnits, note = '') {
+    const recipient = this.getRecipient();
+    const units = Math.max(1, parseInt(newUnits, 10) || recipient.unitsRequired);
+    const updates = {
+      unitsRequired: units,
+      preArrivalNote: note || `Updated need to ${units} units before donor arrival.`,
+      clinicalReason: note ? `${note} (Pre-arrival update)` : recipient.clinicalReason
+    };
+    return this.updateRecipient(updates);
+  }
+
+  // 2. "Request More Blood": Request extra units when blood was already received once
+  requestExtraBloodAfterReceived(extraUnits, clinicalReason = '') {
+    const recipient = this.getRecipient();
+    const extra = Math.max(1, parseInt(extraUnits, 10) || 1);
+    const fulfilled = Math.max(1, recipient.unitsFulfilled || 1); // Confirmed at least 1 unit already received once
+    const totalRequired = fulfilled + extra;
+
+    const updates = {
+      unitsFulfilled: fulfilled,
+      unitsRequired: totalRequired,
+      unitsArranged: fulfilled, // extra units are not yet arranged
+      trackingStage: 2, // Reset to "Donors Alerted for Supplementary Units"
+      clinicalReason: clinicalReason || `Supplementary order: +${extra} extra units requested after ${fulfilled} unit received once.`,
+      handshakeOTP: Math.floor(1000 + Math.random() * 9000).toString(),
+      extraNeedRequested: true,
+      lastExtraRequestAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST'
+    };
+
+    const updated = this.updateRecipient(updates);
+
+    if (Array.isArray(this.state.requests)) {
+      const req = this.state.requests.find(r => r.id === recipient.requestId);
+      if (req) {
+        req.units = totalRequired;
+        req.status = `Alerting for +${extra} Extra Units`;
+        req.trackingStage = 2;
+        req.acceptedCount = 0;
+        req.enRouteCount = 0;
+      }
+    }
+    this.saveState();
+    return updated;
+  }
+
   setRecipientTrackingStage(stage) {
     if (this.state.recipient) {
       this.state.recipient.trackingStage = stage;
