@@ -1316,7 +1316,14 @@ function openMedicalProofViewer(customData) {
   setText('doc-proof-patient-name', patientName);
   setText('doc-proof-patient-meta', `${age} Yrs / ${gender} • ${ipd}`);
   setText('doc-proof-ward', ward);
-  setText('doc-proof-blood-group', `${blood} (Positive)`);
+  const bloodText = (blood.includes('Positive') || blood.includes('Negative'))
+    ? blood
+    : blood.endsWith('+')
+      ? `${blood} (Positive)`
+      : blood.endsWith('-')
+        ? `${blood} (Negative)`
+        : blood;
+  setText('doc-proof-blood-group', bloodText);
   setText('doc-proof-component-units', `${component} — ${units} Units`);
   setText('doc-proof-urgency', urgency);
   setText('doc-proof-notes', notes);
