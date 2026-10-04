@@ -3055,8 +3055,22 @@ window.openCertificateModal = function(data) {
     bay: 'Apheresis Suite Bay 2',
     doctor: 'Dr. Rajesh Sharma, MD',
     hash: 'e92f8b1c4a0d92e5f67a8b9c0d1e2f3a4b5c6d7e',
-    image: 'images/certificate-sarah-jenkins.jpg'
+    image: 'images/certificate-2026-09-18.jpg'
   };
+
+  const dateImageMap = {
+    'September 18, 2026': 'images/certificate-2026-09-18.jpg',
+    'February 12, 2026': 'images/certificate-2026-02-12.jpg',
+    'August 24, 2025': 'images/certificate-2025-08-24.jpg',
+    'January 15, 2025': 'images/certificate-2025-01-15.jpg',
+    'May 10, 2024': 'images/certificate-2024-05-10.jpg'
+  };
+
+  if (!currentCertificateData.image || currentCertificateData.image === 'images/certificate-sarah-jenkins.jpg') {
+    if (dateImageMap[currentCertificateData.date]) {
+      currentCertificateData.image = dateImageMap[currentCertificateData.date];
+    }
+  }
 
   const modal = document.getElementById('modal-certificate');
   if (!modal) return;
@@ -3080,7 +3094,7 @@ window.openCertificateModal = function(data) {
 
   const imgEl = document.getElementById('cert-modal-img');
   if (imgEl) {
-    imgEl.src = currentCertificateData.image || 'images/certificate-sarah-jenkins.jpg';
+    imgEl.src = currentCertificateData.image || 'images/certificate-2026-09-18.jpg';
   }
 
   modal.classList.remove('hidden');
@@ -3095,7 +3109,7 @@ window.closeCertificateModal = function() {
   }
 };
 
-window.downloadCertificate = function(certId, imageSrc = 'images/certificate-sarah-jenkins.jpg') {
+window.downloadCertificate = function(certId, imageSrc = 'images/certificate-2026-09-18.jpg') {
   const a = document.createElement('a');
   a.href = imageSrc;
   a.download = `DonorPulse-Certificate-${certId || 'CERT-88391'}.jpg`;
@@ -3110,12 +3124,12 @@ window.downloadCertificate = function(certId, imageSrc = 'images/certificate-sar
 
 window.downloadCertificateFromModal = function() {
   const certId = currentCertificateData ? currentCertificateData.id : 'CERT-88391';
-  const img = currentCertificateData ? currentCertificateData.image : 'images/certificate-sarah-jenkins.jpg';
+  const img = currentCertificateData ? currentCertificateData.image : 'images/certificate-2026-09-18.jpg';
   window.downloadCertificate(certId, img);
 };
 
 window.printCertificate = function() {
-  const imgUrl = (currentCertificateData && currentCertificateData.image) ? currentCertificateData.image : 'images/certificate-sarah-jenkins.jpg';
+  const imgUrl = (currentCertificateData && currentCertificateData.image) ? currentCertificateData.image : 'images/certificate-2026-09-18.jpg';
   const printWindow = window.open('', '_blank');
   if (printWindow) {
     printWindow.document.write(`

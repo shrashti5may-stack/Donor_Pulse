@@ -21,7 +21,7 @@
         padding: 0;
         width: 100% !important;
         max-width: 100vw !important;
-        overflow-x: hidden !important;
+        overflow-x: clip !important;
         position: relative;
       }
       body {
@@ -47,7 +47,8 @@
     #view-request-tracking {
       width: 100% !important;
       max-width: 100% !important;
-      overflow-x: hidden !important;
+      overflow-x: clip !important;
+      overflow-y: visible !important;
       box-sizing: border-box !important;
     }
 
@@ -1361,10 +1362,10 @@
     <!-- ------------------------------------------------------------------- -->
     <!-- VIEW 4: DONOR DASHBOARD (#/donor-dashboard)                          -->
     <!-- ------------------------------------------------------------------- -->
-    <div id="view-donor-dashboard" class="view-section w-full max-w-full overflow-x-hidden">
-      <div class="max-w-[1280px] w-full mx-auto px-gutter-desktop py-space-lg flex flex-col lg:flex-row gap-space-lg items-start">
-        <!-- LEFT NAVIGATION SIDEBAR (NATURAL SCROLL) -->
-        <aside class="w-full lg:w-64 shrink-0 flex flex-col gap-space-md">
+    <div id="view-donor-dashboard" class="view-section w-full max-w-full overflow-x-clip">
+      <div class="max-w-[1280px] w-full mx-auto px-gutter-desktop pt-2 pb-space-lg flex flex-col lg:flex-row gap-space-lg items-start">
+        <!-- LEFT NAVIGATION SIDEBAR (STICKY ON SCREEN) -->
+        <aside class="w-full lg:w-64 shrink-0 flex flex-col gap-space-md lg:sticky lg:top-3 lg:self-start lg:max-h-[calc(100vh-1.5rem)] lg:overflow-y-auto" style="scrollbar-width: none;">
           <!-- Donor ID Card Brief -->
           <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center gap-space-sm">
             <div class="relative">
@@ -1726,7 +1727,7 @@
                       </span>
                     </td>
                     <td class="py-3.5 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-AIIMS-2026-9041', date: 'September 18, 2026', hospital: 'AIIMS Transfusion Medicine Centre, New Delhi', type: 'Platelets (Single Donor Platelet - SDP)', bay: 'Apheresis Bay #02', doctor: 'Dr. Rajesh Sharma, MD', hash: 'e92f8b1c4a0d92e5f67a8b9c0d1e2f3a4b5c6d7e', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-AIIMS-2026-9041', date: 'September 18, 2026', hospital: 'AIIMS Transfusion Medicine Centre, New Delhi', type: 'Platelets (Single Donor Platelet - SDP)', bay: 'Apheresis Bay #02', doctor: 'Dr. Rajesh Sharma, MD', hash: 'e92f8b1c4a0d92e5f67a8b9c0d1e2f3a4b5c6d7e', image: 'images/certificate-2026-09-18.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
                         <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
@@ -1758,7 +1759,7 @@
                       </span>
                     </td>
                     <td class="py-3.5 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-MANIPAL-2026-7820', date: 'February 12, 2026', hospital: 'Manipal Hospital Comprehensive Blood Centre, Bengaluru', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Blood Bank Resuscitation Wing', doctor: 'Dr. Ananya Sen, MD', hash: 'd83e7a0b3f2c5d4e1a9b8c7d6e5f4a3b2c1d0e9f', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-MANIPAL-2026-7820', date: 'February 12, 2026', hospital: 'Manipal Hospital Comprehensive Blood Centre, Bengaluru', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Blood Bank Resuscitation Wing', doctor: 'Dr. Ananya Sen, MD', hash: 'd83e7a0b3f2c5d4e1a9b8c7d6e5f4a3b2c1d0e9f', image: 'images/certificate-2026-02-12.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
                         <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
@@ -1790,7 +1791,7 @@
                       </span>
                     </td>
                     <td class="py-3.5 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-TMC-2025-5519', date: 'August 24, 2025', hospital: 'Tata Memorial Centre Transfusion Unit, Mumbai', type: 'Packed Red Blood Cells (1 Unit - 350 mL)', bay: 'Onco-Haematology Bay #05', doctor: 'Dr. V. K. Murthy', hash: '7c4a1e9b2f3d5c6e8a0b1d2f3c4e5a6b7c8d9e0f', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-TMC-2025-5519', date: 'August 24, 2025', hospital: 'Tata Memorial Centre Transfusion Unit, Mumbai', type: 'Packed Red Blood Cells (1 Unit - 350 mL)', bay: 'Onco-Haematology Bay #05', doctor: 'Dr. V. K. Murthy', hash: '7c4a1e9b2f3d5c6e8a0b1d2f3c4e5a6b7c8d9e0f', image: 'images/certificate-2025-08-24.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
                         <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
@@ -1822,7 +1823,7 @@
                       </span>
                     </td>
                     <td class="py-3.5 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-APOLLO-2025-3341', date: 'January 15, 2025', hospital: 'Apollo Hospitals Blood Bank, Chennai', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Transfusion Bay #01', doctor: 'Dr. Sunita Rao', hash: 'b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-APOLLO-2025-3341', date: 'January 15, 2025', hospital: 'Apollo Hospitals Blood Bank, Chennai', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Transfusion Bay #01', doctor: 'Dr. Sunita Rao', hash: 'b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4', image: 'images/certificate-2025-01-15.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
                         <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
@@ -1854,7 +1855,7 @@
                       </span>
                     </td>
                     <td class="py-3.5 px-space-sm text-right whitespace-nowrap">
-                      <button onclick="window.openCertificateModal({ id: 'CERT-FORTIS-2024-1102', date: 'May 10, 2024', hospital: 'Fortis Memorial Research Institute Blood Bank, Gurugram', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Mobile Transfusion Unit 02', doctor: 'Dr. Priya Nair', hash: '3f5e7a9c1b2d4e6f8a0c2e4f6a8b0d2e4f6a8c0e', image: 'images/certificate-sarah-jenkins.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
+                      <button onclick="window.openCertificateModal({ id: 'CERT-FORTIS-2024-1102', date: 'May 10, 2024', hospital: 'Fortis Memorial Research Institute Blood Bank, Gurugram', type: 'Whole Blood (1 Unit - 450 mL)', bay: 'Mobile Transfusion Unit 02', doctor: 'Dr. Priya Nair', hash: '3f5e7a9c1b2d4e6f8a0c2e4f6a8b0d2e4f6a8c0e', image: 'images/certificate-2024-05-10.jpg' })" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap">
                         <span class="material-symbols-outlined text-[18px] text-primary group-hover:text-inherit">workspace_premium</span>
                         <span>View Certificate</span>
                       </button>
@@ -2121,7 +2122,7 @@
     <!-- ------------------------------------------------------------------- -->
     <!-- VIEW 7: RECIPIENT & FAMILY DASHBOARD (#/recipient-dashboard)         -->
     <!-- ------------------------------------------------------------------- -->
-    <div id="view-recipient-dashboard" class="view-section w-full max-w-full overflow-x-hidden">
+    <div id="view-recipient-dashboard" class="view-section w-full max-w-full overflow-x-clip">
       <!-- Operational Telemetry Bar -->
       <div class="bg-surface-container-high px-gutter-desktop py-space-xs flex items-center justify-between text-body-sm shadow-sm border-b border-surface-container w-full max-w-full overflow-hidden">
         <div class="flex items-center gap-space-sm">
@@ -2139,8 +2140,8 @@
       </div>
 
       <div class="max-w-[1280px] w-full mx-auto px-gutter-desktop py-space-xl flex flex-col lg:flex-row gap-space-xl items-start">
-        <!-- LEFT NAVIGATION SIDEBAR (NATURAL SCROLL) -->
-        <aside class="w-full lg:w-[325px] shrink-0 flex flex-col gap-2.5 p-1 overflow-visible">
+        <!-- LEFT NAVIGATION SIDEBAR (STICKY ON SCREEN) -->
+        <aside class="w-full lg:w-[325px] shrink-0 flex flex-col gap-2.5 p-1 lg:sticky lg:top-3 lg:self-start lg:max-h-[calc(100vh-1.5rem)] lg:overflow-y-auto overflow-x-hidden" style="scrollbar-width: none;">
           
           <!-- Patient & Attendant Profile Card -->
           <div style="flex-shrink: 0 !important; min-height: max-content !important;" class="bg-surface-container-lowest p-3.5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-2.5 relative shrink-0">
