@@ -199,27 +199,27 @@
                 <span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                 <span class="text-[11px] font-bold text-primary uppercase tracking-wider">Patient Case</span>
               </div>
-              <h2 id="sidebar-patient-name" class="font-bold text-lg text-on-surface truncate">Devika Sharma</h2>
-              <span id="sidebar-case-id" class="font-mono text-xs text-on-surface-variant">CASE-9042</span>
+              <h2 id="sidebar-patient-name" class="font-bold text-lg text-on-surface truncate">No Active Patient Case</h2>
+              <span id="sidebar-case-id" class="font-mono text-xs text-on-surface-variant">Standby</span>
             </div>
           </div>
 
           <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2">
             <div class="flex items-center justify-between text-xs">
               <span class="text-on-surface-variant">Required Component:</span>
-              <span id="sidebar-blood-component" class="font-bold text-primary">Platelets (Apheresis)</span>
+              <span id="sidebar-blood-component" class="font-bold text-primary">None</span>
             </div>
             <div class="flex items-center justify-between text-xs">
               <span class="text-on-surface-variant">Blood Group:</span>
-              <span id="sidebar-blood-group" class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary font-bold text-sm">B+</span>
+              <span id="sidebar-blood-group" class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary font-bold text-sm">--</span>
             </div>
             <div class="flex items-center justify-between text-xs">
               <span class="text-on-surface-variant">Hospital Facility:</span>
-              <span class="font-semibold text-on-surface truncate text-right">Apollo Hospitals &amp; Apex Trauma Centre</span>
+              <span id="sidebar-hospital-facility" class="font-semibold text-on-surface truncate text-right">Standby</span>
             </div>
             <div class="flex items-center justify-between text-xs">
               <span class="text-on-surface-variant">Admitted Ward:</span>
-              <span class="font-medium text-on-surface">Trauma Ward 4B, Bed 12</span>
+              <span id="sidebar-admitted-ward" class="font-medium text-on-surface">Standby Ward</span>
             </div>
           </div>
 
@@ -228,24 +228,24 @@
             <span class="text-[11px] font-bold uppercase tracking-wider text-secondary">Authorized Attendant</span>
             <div class="flex items-center justify-between">
               <div>
-                <p id="sidebar-attendant-name" class="font-bold text-sm text-on-surface">Rajesh Sharma</p>
-                <p class="text-xs text-secondary">Brother of Patient</p>
+                <p id="sidebar-attendant-name" class="font-bold text-sm text-on-surface">No Attendant</p>
+                <p class="text-xs text-secondary">Standby</p>
               </div>
-              <a href="tel:+919528033454" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors" title="Call Attendant">
+              <a href="tel:" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors" title="Call Attendant">
                 <span class="material-symbols-outlined text-[18px]">call</span>
               </a>
             </div>
             <div class="pt-1 text-xs text-on-surface-variant font-mono flex items-center gap-1">
               <span class="material-symbols-outlined text-[14px]">smartphone</span>
-              <span>+91 95280 33454</span>
+              <span id="sidebar-attendant-phone">--</span>
             </div>
           </div>
 
           <!-- Active Case Display (Static, no switching after login) -->
           <div class="flex items-center justify-between pt-1 text-xs whitespace-nowrap">
             <span class="text-on-surface-variant font-medium">Active Case:</span>
-            <span class="text-xs font-bold text-primary bg-surface-container rounded-lg px-2 py-0.5 border border-surface-container-high">
-              Devika (B+ Platelets)
+            <span id="sidebar-active-case-text" class="text-xs font-bold text-primary bg-surface-container rounded-lg px-2 py-0.5 border border-surface-container-high">
+              No Active Case
             </span>
           </div>
         </div>
@@ -254,22 +254,19 @@
         <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-primary/25 flex flex-col gap-2 relative">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg bg-error-container/70 flex items-center justify-center text-primary shrink-0 animate-pulse">
+              <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
                 <span class="material-symbols-outlined text-[19px]">timer</span>
               </div>
               <div class="flex flex-col">
-                <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">~14 min Earliest Arrival</span>
-                <span class="text-[11px] text-secondary leading-tight">3 Donors Responding • Case REQ-9042</span>
+                <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">Standby Telemetry</span>
+                <span class="text-[11px] text-secondary leading-tight">No Active Requisition</span>
               </div>
             </div>
-            <span class="px-2 py-0.5 rounded bg-tertiary-container/30 font-label-badge text-[10px] text-tertiary font-bold shrink-0">Active Case</span>
+            <span class="px-2 py-0.5 rounded bg-surface-container font-label-badge text-[10px] text-secondary font-bold shrink-0">Standby</span>
           </div>
           <div class="p-2.5 rounded-xl bg-surface-container-low flex items-center justify-between text-xs text-on-surface-variant">
-            <span class="flex items-center gap-1 font-semibold text-primary">
-              <span class="material-symbols-outlined text-[15px]">directions_car</span>
-              <span>David K. (En Route)</span>
-            </span>
-            <span class="text-tertiary font-bold">ETA: ~14 mins</span>
+            <span>Awaiting emergency case broadcast</span>
+            <span class="text-secondary font-bold">ETA: --</span>
           </div>
         </div>
 
@@ -368,23 +365,23 @@
                   CODE RED REQUISITION
                 </span>
                 <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface text-xs font-semibold">
-                  Requisition ID: <strong id="hero-req-id" class="font-mono text-primary">#REQ-9042</strong>
+                  Requisition ID: <strong id="hero-req-id" class="font-mono text-primary">#NONE</strong>
                 </span>
                 <button type="button" onclick="openMedicalProofViewer()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-900 text-xs font-bold border border-emerald-300 transition-colors cursor-pointer shadow-xs" title="Inspect official clinical requisition document & anti-fraud verification">
                   <span class="material-symbols-outlined text-[15px] text-emerald-700">verified</span>
                   <span>Proof: Form 27-C Verified</span>
                   <span class="material-symbols-outlined text-[12px]">open_in_new</span>
                 </button>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-primary text-xs font-bold shadow-xs">
-                  <span class="material-symbols-outlined text-[15px] animate-pulse">timer</span>
-                  ~14 min Earliest Arrival
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-on-surface-variant text-xs font-bold shadow-xs">
+                  <span class="material-symbols-outlined text-[15px]">timer</span>
+                  Standby Telemetry
                 </span>
               </div>
               
               <div class="flex items-center gap-2">
                 <span class="text-xs text-on-surface-variant">Live Dispatch SLA:</span>
-                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1">
-                  <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span> 18 min Window
+                <span class="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-xs font-bold flex items-center gap-1">
+                  Standby
                 </span>
               </div>
             </div>
@@ -393,12 +390,12 @@
             <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pt-2">
               <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight">
-                  <span id="hero-patient-name">Devika Sharma</span> Needs Urgent <span id="hero-blood-need" class="text-primary font-black">B+ Platelets</span>
+                  <span id="hero-patient-name">No Patient Case</span> — <span id="hero-blood-need" class="text-primary font-black">Requisition Standby</span>
                 </h1>
                 <p class="text-sm text-on-surface-variant mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span class="whitespace-nowrap">Admitted to <strong class="text-on-surface">Apollo Hospitals &amp; Apex Trauma Centre</strong> (Ward 4B Bed 12)</span>
+                  <span class="whitespace-nowrap">Portal on standby for patient emergency requisition</span>
                   <span class="text-outline-variant">•</span>
-                  <span class="whitespace-nowrap">Attendant: <strong id="hero-attendant-name" class="font-semibold text-on-surface">Rajesh Sharma (Brother)</strong></span>
+                  <span class="whitespace-nowrap">Attendant: <strong id="hero-attendant-name" class="font-semibold text-on-surface">No Active Attendant</strong></span>
                 </p>
               </div>
 
@@ -409,7 +406,7 @@
                   <span>Donor Arrival PIN</span>
                 </div>
                 <div id="hero-handshake-pin" class="font-mono text-3xl font-black text-primary tracking-widest my-0.5">
-                  7842
+                  ----
                 </div>
                 <p class="text-[11px] text-on-surface-variant max-w-[190px] leading-tight">
                   Share with arriving donors to verify at Metro Blood Bank desk.
@@ -599,89 +596,10 @@
 
           <!-- Donors List -->
           <div id="recipient-donors-list" class="flex flex-col gap-3">
-            <!-- Donor 1: Ananya Sharma (Arrived) -->
-            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:bg-surface-container">
-              <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-full bg-primary/10 text-primary font-bold text-lg flex items-center justify-center shrink-0">
-                  AS
-                </div>
-                <div>
-                  <div class="flex items-center gap-2">
-                    <h4 class="font-bold text-base text-on-surface">Ananya Sharma</h4>
-                    <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-bold uppercase">Arrived at Blood Bank</span>
-                    <span class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-[11px] font-bold">B+ Donor</span>
-                  </div>
-                  <p class="text-xs text-on-surface-variant mt-0.5">
-                    Proximity: <strong>1.8 km away</strong> • Verified ID: <span class="font-mono">#DNR-8924</span> • Intake Desk: Apollo Trauma Blood Bank
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                <span class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[16px]">check_circle</span>
-                  PIN Verified (7842)
-                </span>
-                <a href="tel:+919528033454" class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[16px]">call</span>
-                  <span>Contact Donor</span>
-                </a>
-              </div>
-            </div>
-
-            <!-- Donor 2: Michael Chang (En Route) -->
-            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:bg-surface-container">
-              <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-full bg-secondary-container/60 text-secondary font-bold text-lg flex items-center justify-center shrink-0">
-                  MC
-                </div>
-                <div>
-                  <div class="flex items-center gap-2">
-                    <h4 class="font-bold text-base text-on-surface">Michael Chang</h4>
-                    <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 text-[11px] font-bold uppercase">En Route (ETA 12m)</span>
-                    <span class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-[11px] font-bold">B+ Donor</span>
-                  </div>
-                  <p class="text-xs text-on-surface-variant mt-0.5">
-                    Proximity: <strong>3.4 km away</strong> • Verified ID: <span class="font-mono">#DNR-5521</span> • In Transit via Ambulance Corridor
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                <button type="button" onclick="document.getElementById('donor-handshake-input').value='7842'; document.getElementById('donor-handshake-input').focus();" class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-container transition-all cursor-pointer">
-                  Awaiting Handshake PIN
-                </button>
-                <a href="tel:+919528033454" class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[16px]">call</span>
-                  <span>Call Michael</span>
-                </a>
-              </div>
-            </div>
-
-            <!-- Donor 3: David Miller (Accepted) -->
-            <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:bg-surface-container">
-              <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-full bg-surface-container text-on-surface-variant font-bold text-lg flex items-center justify-center shrink-0">
-                  DM
-                </div>
-                <div>
-                  <div class="flex items-center gap-2">
-                    <h4 class="font-bold text-base text-on-surface">David Miller</h4>
-                    <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[11px] font-bold uppercase">Accepted SOS</span>
-                    <span class="px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface text-[11px] font-bold">O+ Universal Component</span>
-                  </div>
-                  <p class="text-xs text-on-surface-variant mt-0.5">
-                    Proximity: <strong>4.9 km away</strong> • Verified ID: <span class="font-mono">#DNR-3319</span> • Standby Donor
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                <a href="tel:+919528033454" class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[16px]">call</span>
-                  <span>Coordinate</span>
-                </a>
-              </div>
+            <div class="p-6 rounded-2xl bg-surface-container-low border border-dashed border-outline-variant/60 text-center flex flex-col items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[32px] text-primary">cell_tower</span>
+              <h4 class="font-bold text-sm text-on-surface">Connecting to Live Donor Network...</h4>
+              <p class="text-xs text-on-surface-variant max-w-sm">Fetching verified responding donors and transit telemetry from the national haemovigilance grid.</p>
             </div>
           </div>
         </div>
@@ -905,19 +823,17 @@
 
     // WhatsApp SOS Appeal Generator
     function shareSOSOnWhatsApp() {
-      const patient = document.getElementById('sidebar-patient-name')?.textContent || 'Devika Sharma';
-      const bloodGroup = document.getElementById('sidebar-blood-group')?.textContent || 'B+';
-      const component = document.getElementById('sidebar-blood-component')?.textContent || 'Platelets';
-      const hospital = 'Apollo Hospitals & Apex Trauma Centre (Ward 4B Bed 12)';
-      const attendantPhone = '+91 95280 33454';
-      const pin = '7842';
-
+      const recipient = window.PulseStore ? window.PulseStore.getRecipient() : null;
+      if (!recipient) {
+        alert('No active emergency requisition found. Please raise a patient requisition first.');
+        return;
+      }
       const msg = `🚨 *URGENT BLOOD SOS APPEAL via DonorPulse Grid* 🚨\n\n` +
-        `Patient *${patient}* urgently requires *${bloodGroup} ${component}* for emergency surgery.\n\n` +
-        `🏥 *Hospital Location:* ${hospital}\n` +
-        `🔑 *Donor Arrival Verification PIN:* ${pin}\n` +
-        `📞 *Attendant Contact:* ${attendantPhone}\n\n` +
-        `If you or someone in your network can donate ${bloodGroup} or universal O+ platelets, please report immediately to Apollo Blood Bank Desk with PIN ${pin}.\n\n` +
+        `Patient *${recipient.patientName}* urgently requires *${recipient.bloodGroup} ${recipient.component}* for emergency surgery.\n\n` +
+        `🏥 *Hospital Location:* ${recipient.hospitalName} (${recipient.hospitalWard})\n` +
+        `🔑 *Donor Arrival Verification PIN:* ${recipient.handshakeOTP}\n` +
+        `📞 *Attendant Contact:* ${recipient.attendantPhone}\n\n` +
+        `If you or someone in your network can donate ${recipient.bloodGroup}, please report immediately.\n\n` +
         `Live coordination link: ${window.location.origin}/index.html#/recipient-dashboard`;
 
       const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
@@ -926,7 +842,12 @@
 
     // Copy SOS Appeal Text
     function copySOSAppealLink() {
-      const text = `🚨 URGENT BLOOD APPEAL: Devika Sharma urgently needs B+ Platelets at Apollo Hospitals & Apex Trauma Centre (Ward 4B Bed 12). Donor PIN: 7842. Contact Attendant: +91 95280 33454. Link: ${window.location.origin}/index.html#/recipient-dashboard`;
+      const recipient = window.PulseStore ? window.PulseStore.getRecipient() : null;
+      if (!recipient) {
+        alert('No active emergency requisition found. Please raise a patient requisition first.');
+        return;
+      }
+      const text = `🚨 URGENT BLOOD APPEAL: ${recipient.patientName} urgently needs ${recipient.bloodGroup} ${recipient.component} at ${recipient.hospitalName} (${recipient.hospitalWard}). Donor PIN: ${recipient.handshakeOTP}. Contact Attendant: ${recipient.attendantPhone}. Link: ${window.location.origin}/index.html#/recipient-dashboard`;
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
           const btnText = document.getElementById('copy-btn-text');
@@ -1000,30 +921,47 @@
       setRecipientStage(next);
     }
 
-    // Switch Case Demo
+    // Dynamic Case Sync from PulseStore
+    function syncRecipientUI(recipient) {
+      const data = recipient || (window.PulseStore ? window.PulseStore.getRecipient() : null);
+      const setName = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val; };
+      if (!data) {
+        setName('sidebar-patient-name', 'No Active Patient Case');
+        setName('sidebar-case-id', 'Standby');
+        setName('sidebar-blood-group', '--');
+        setName('sidebar-blood-component', 'None');
+        setName('sidebar-attendant-name', 'No Attendant');
+        setName('sidebar-attendant-phone', '--');
+        setName('sidebar-hospital-facility', 'Standby');
+        setName('sidebar-admitted-ward', 'Standby Ward');
+        setName('sidebar-active-case-text', 'No Active Case');
+        setName('hero-patient-name', 'No Patient Case');
+        setName('hero-blood-need', 'Requisition Standby');
+        setName('hero-req-id', '#NONE');
+        setName('hero-attendant-name', 'No Active Attendant');
+        setName('hero-handshake-pin', '----');
+        return;
+      }
+      setName('sidebar-patient-name', data.patientName);
+      setName('sidebar-case-id', data.id);
+      setName('sidebar-blood-group', data.bloodGroup);
+      setName('sidebar-blood-component', data.component);
+      setName('sidebar-attendant-name', data.attendantName);
+      setName('sidebar-attendant-phone', data.attendantPhone || '--');
+      setName('sidebar-hospital-facility', data.hospitalName);
+      setName('sidebar-admitted-ward', data.hospitalWard);
+      setName('sidebar-active-case-text', `${data.patientName} (${data.bloodGroup})`);
+      setName('hero-patient-name', data.patientName);
+      setName('hero-blood-need', `${data.bloodGroup} ${(data.component || '').split(' ')[0]}`);
+      setName('hero-req-id', '#' + data.requestId);
+      setName('hero-attendant-name', data.attendantName);
+      setName('hero-handshake-pin', data.handshakeOTP);
+    }
+
     function switchCase(caseId) {
-      if (caseId === 'CASE-5510') {
-        document.getElementById('sidebar-patient-name').textContent = 'Amit Verma';
-        document.getElementById('sidebar-case-id').textContent = 'CASE-5510';
-        document.getElementById('sidebar-blood-group').textContent = 'O-';
-        document.getElementById('sidebar-blood-component').textContent = 'PRBC (Packed Red Cells)';
-        document.getElementById('sidebar-attendant-name').textContent = 'Pooja Verma';
-        document.getElementById('hero-patient-name').textContent = 'Amit Verma';
-        document.getElementById('hero-blood-need').textContent = 'O- Packed Red Cells';
-        document.getElementById('hero-req-id').textContent = '#REQ-5510';
-        document.getElementById('hero-attendant-name').textContent = 'Pooja Verma';
-        document.getElementById('hero-handshake-pin').textContent = '4912';
-      } else {
-        document.getElementById('sidebar-patient-name').textContent = 'Devika Sharma';
-        document.getElementById('sidebar-case-id').textContent = 'CASE-9042';
-        document.getElementById('sidebar-blood-group').textContent = 'B+';
-        document.getElementById('sidebar-blood-component').textContent = 'Platelets (Apheresis)';
-        document.getElementById('sidebar-attendant-name').textContent = 'Rajesh Sharma';
-        document.getElementById('hero-patient-name').textContent = 'Devika Sharma';
-        document.getElementById('hero-blood-need').textContent = 'B+ Platelets';
-        document.getElementById('hero-req-id').textContent = '#REQ-9042';
-        document.getElementById('hero-attendant-name').textContent = 'Rajesh Sharma';
-        document.getElementById('hero-handshake-pin').textContent = '7842';
+      if (window.PulseStore && typeof window.PulseStore.switchRecipientCase === 'function') {
+        const switched = window.PulseStore.switchRecipientCase(caseId);
+        if (switched) syncRecipientUI(switched);
       }
     }
 
@@ -1102,22 +1040,27 @@
 
       const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
         ? window.PulseStore.getRecipient()
-        : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets (Apheresis)', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', hospitalWard: 'ICU Ward 4B, Bed 12', requestId: 'REQ-9042', unitsRequired: 3, unitsArranged: 2, unitsFulfilled: 1, attendantName: 'Rajesh Sharma', attendantPhone: '+91 95280 33454', doctorName: 'Dr. Aravind Sharma' };
+        : null;
 
-      currentUpdateNeedBase = parseInt(recipient.unitsRequired || 3, 10);
+      if (!recipient) {
+        alert('No active emergency requisition found. Please raise a patient requisition first.');
+        return;
+      }
+
+      currentUpdateNeedBase = parseInt(recipient.unitsRequired || 2, 10);
 
       modal.querySelectorAll('.update-need-blood-badge').forEach(el => el.textContent = recipient.bloodGroup || 'B+');
-      modal.querySelectorAll('.update-need-patient-name').forEach(el => el.textContent = recipient.patientName || 'Devika Sharma');
-      modal.querySelectorAll('.update-need-req-id').forEach(el => el.textContent = '#' + (recipient.requestId || 'REQ-9042'));
+      modal.querySelectorAll('.update-need-patient-name').forEach(el => el.textContent = recipient.patientName || 'Emergency Patient');
+      modal.querySelectorAll('.update-need-req-id').forEach(el => el.textContent = '#' + (recipient.requestId || 'LIVE'));
       modal.querySelectorAll('.update-need-component-hospital').forEach(el => {
-        el.textContent = `${recipient.component || 'Platelets'} • ${recipient.hospitalName || 'Apollo Hospitals'} (${recipient.hospitalWard || 'ICU Ward 4B'})`;
+        el.textContent = `${recipient.component || 'Blood'} • ${recipient.hospitalName || 'Hospital'} (${recipient.hospitalWard || 'Ward'})`;
       });
       modal.querySelectorAll('.update-need-attendant-info').forEach(el => {
-        el.textContent = `Attendant: ${recipient.attendantName || 'Rajesh Sharma'} (${recipient.attendantPhone || '+91 95280 33454'}) • Doctor: ${recipient.doctorName || 'Dr. Aravind Sharma'}`;
+        el.textContent = `Attendant: ${recipient.attendantName || 'Attendant'} (${recipient.attendantPhone || '--'}) • Doctor: ${recipient.doctorName || 'Attending Physician'}`;
       });
       modal.querySelectorAll('.update-need-current-req').forEach(el => el.textContent = `${currentUpdateNeedBase} Units`);
-      modal.querySelectorAll('.update-need-arranged').forEach(el => el.textContent = `${recipient.unitsArranged || 2} Donors`);
-      modal.querySelectorAll('.update-need-fulfilled').forEach(el => el.textContent = `${recipient.unitsFulfilled || 1} Received`);
+      modal.querySelectorAll('.update-need-arranged').forEach(el => el.textContent = `${recipient.unitsArranged || 0} Donors`);
+      modal.querySelectorAll('.update-need-fulfilled').forEach(el => el.textContent = `${recipient.unitsFulfilled || 0} Received`);
 
       const input = document.getElementById('update-need-units-input');
       if (input) input.value = currentUpdateNeedBase;
@@ -1208,16 +1151,21 @@
 
       const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
         ? window.PulseStore.getRecipient()
-        : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets (Apheresis)', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', hospitalWard: 'ICU Ward 4B, Bed 12', requestId: 'REQ-9042', unitsRequired: 3, unitsArranged: 2, unitsFulfilled: 1, attendantName: 'Rajesh Sharma', attendantPhone: '+91 95280 33454', doctorName: 'Dr. Aravind Sharma' };
+        : null;
 
-      currentFulfilledUnits = Math.max(1, parseInt(recipient.unitsFulfilled || 1, 10));
+      if (!recipient) {
+        alert('No active emergency requisition found. Please raise a patient requisition first.');
+        return;
+      }
+
+      currentFulfilledUnits = Math.max(0, parseInt(recipient.unitsFulfilled || 0, 10));
 
       modal.querySelectorAll('.request-more-blood-badge, .update-modal-blood-badge').forEach(el => el.textContent = recipient.bloodGroup || 'B+');
-      modal.querySelectorAll('.request-more-patient-name, .update-modal-patient-name').forEach(el => el.textContent = recipient.patientName || 'Devika Sharma');
-      modal.querySelectorAll('.request-more-req-id, .update-modal-req-id').forEach(el => el.textContent = '#' + (recipient.requestId || 'REQ-9042'));
-      modal.querySelectorAll('.request-more-hospital-name').forEach(el => el.textContent = recipient.hospitalName || 'Apollo Hospitals');
+      modal.querySelectorAll('.request-more-patient-name, .update-modal-patient-name').forEach(el => el.textContent = recipient.patientName || 'Emergency Patient');
+      modal.querySelectorAll('.request-more-req-id, .update-modal-req-id').forEach(el => el.textContent = '#' + (recipient.requestId || 'LIVE'));
+      modal.querySelectorAll('.request-more-hospital-name').forEach(el => el.textContent = recipient.hospitalName || 'Hospital');
       modal.querySelectorAll('.request-more-comp-hosp, .update-modal-component-hospital').forEach(el => {
-        el.textContent = `${recipient.component || 'Platelets'} • ${recipient.hospitalName || 'Apollo Hospitals'} (${recipient.hospitalWard || 'ICU Ward 4B'})`;
+        el.textContent = `${recipient.component || 'Blood'} • ${recipient.hospitalName || 'Hospital'} (${recipient.hospitalWard || 'Ward'})`;
       });
       modal.querySelectorAll('.request-more-fulfilled-display, .update-modal-fulfilled').forEach(el => el.textContent = `${currentFulfilledUnits} Received`);
 
@@ -1308,21 +1256,21 @@
         if (el) el.value = val;
       };
 
-      setVal('patientName', 'Devika Sharma');
-      setVal('patientAge', '32');
+      setVal('patientName', 'Emergency Patient');
+      setVal('patientAge', '30');
       setVal('patientGender', 'Female');
-      setVal('hospitalName', 'Apollo Hospitals & Apex Trauma Centre');
-      setVal('ward', 'ICU Ward 4B, Bed 12');
-      setVal('component', 'Platelets (Apheresis)');
-      setVal('units', '3');
+      setVal('hospitalName', 'Metro Trauma Blood Centre');
+      setVal('ward', 'ICU Emergency Bed 4');
+      setVal('component', 'Whole Blood (Universal)');
+      setVal('units', '2');
       setVal('urgency', 'Stat Emergency (< 45 Mins)');
-      setVal('attendantName', 'Rajesh Sharma');
-      setVal('attendantRelation', 'Brother / Primary Attendant');
-      setVal('attendantPhone', '+91 95280 33454');
-      setVal('notes', 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.');
+      setVal('attendantName', 'Duty Attendant');
+      setVal('attendantRelation', 'Immediate Family');
+      setVal('attendantPhone', '+91 98000 12345');
+      setVal('notes', 'Acute hemorrhagic requirement. Immediate compatible donor transfusion needed.');
       setVal('proofDocType', 'Hospital Blood Requisition Slip (Form 27-C Stamped)');
-      setVal('doctorRegId', 'Dr. Aravind Sharma (NMC/KMC-48921)');
-      setVal('ipdCaseNo', 'IPD-9042-ICU');
+      setVal('doctorRegId', 'Duty Medical Officer (NMC-REG-2026)');
+      setVal('ipdCaseNo', 'IPD-EMERGENCY-ICU');
 
       const fileLabel = modal.querySelector('.proof-filename-display');
       if (fileLabel) fileLabel.textContent = 'apollo_blood_requisition_form27c_signed.pdf';
@@ -1401,17 +1349,17 @@
       const currentPatient = (customData) || (window.PulseStore && window.PulseStore.state && window.PulseStore.state.recipient) || {};
       const form = document.querySelector('.form-blood-request');
       
-      const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Devika Sharma';
-      const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 32;
-      const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Female';
-      const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'ICU Ward 4B, Bed 12';
+      const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Emergency Patient';
+      const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 30;
+      const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Other';
+      const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'General Ward';
       const blood = (form && form.querySelector('input[name="blood_type"]:checked')?.value) || currentPatient.bloodGroup || 'B+';
-      const component = (form && form.querySelector('[name="component"]')?.value) || currentPatient.component || 'Platelets (Apheresis)';
-      const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 3;
+      const component = (form && form.querySelector('[name="component"]')?.value) || currentPatient.component || 'Whole Blood';
+      const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 2;
       const urgency = (form && form.querySelector('[name="urgency"]')?.value) || currentPatient.urgency || 'Stat Emergency (< 45 Mins)';
-      const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.';
-      const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Dr. Aravind Sharma (NMC/KMC-48921)';
-      const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-9042-ICU';
+      const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Urgent clinical blood requisition.';
+      const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Attending Physician';
+      const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-RECORD';
 
       const setText = (id, txt) => {
         const el = document.getElementById(id);
@@ -1433,7 +1381,7 @@
       setText('doc-proof-urgency', urgency);
       setText('doc-proof-notes', notes);
       setText('doc-proof-doctor-reg', `${doctor} — Registered Practitioner`);
-      setText('doc-proof-sl-no', `REQ-9042 / ${ipd}`);
+      setText('doc-proof-sl-no', `${currentPatient.requestId || 'REQ-LIVE'} / ${ipd}`);
 
       modal.classList.remove('hidden');
       document.body.classList.add('overflow-hidden');
@@ -1457,32 +1405,14 @@
 
     // --- INCOMING EMERGENCY CALL & DONOR CONFIRMATION HANDLERS ---
     function openIncomingDonorCallModal(customDonorId) {
-      const modal = document.getElementById('modal-incoming-donor-call');
-      if (!modal) return;
-
-      const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
-        ? window.PulseStore.getRecipient()
-        : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets (Apheresis)', unitsRequired: 3, urgency: 'Stat Emergency (< 45 Mins)', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', hospitalWard: 'ICU Ward 4B, Bed 12', attendantName: 'Rajesh Sharma', attendantPhone: '+91 95280 33454', clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.' };
-
-      const reqId = recipient.requestId || 'REQ-9042';
-      const bloodGroup = recipient.bloodGroup || 'B+';
-
-      const donors = (window.PulseStore && typeof window.PulseStore.getAvailableDonors === 'function')
-        ? window.PulseStore.getAvailableDonors(reqId, bloodGroup)
-        : [];
-
-      let targetDonor = null;
-      if (customDonorId) targetDonor = donors.find(d => d.id === customDonorId);
-      if (!targetDonor) {
-        targetDonor = donors.find(d => !d.confirmed && d.callStatus !== 'declined') || donors[0] || {
-          id: 'D-102',
-          name: 'Ananya Sharma',
-          bloodGroup: bloodGroup,
-          phone: '+91 98452 33109',
-          distance: 1.8,
-          liveEta: '18 mins'
-        };
+      // Recipient dashboard must NEVER receive incoming calls or ringing
+      if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+        window.PulseAudio.stopPhoneRinging();
       }
+      const modal = document.getElementById('modal-incoming-donor-call');
+      if (modal) modal.classList.add('hidden');
+      return;
+    }
 
       const setTxt = (id, text) => {
         const el = document.getElementById(id);
@@ -1671,36 +1601,74 @@
       const container = document.getElementById('recipient-donors-list');
       if (!container || !window.PulseStore) return;
       const recipient = window.PulseStore.getRecipient();
-      const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
-      const reqId = recipient ? recipient.requestId : 'REQ-9042';
+
+      if (!recipient) {
+        container.innerHTML = `
+          <div class="p-6 rounded-2xl bg-surface-container-low border border-dashed border-outline-variant/60 text-center flex flex-col items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[32px] text-primary">cell_tower</span>
+            <h4 class="font-bold text-sm text-on-surface">No Active Emergency Requisition</h4>
+            <p class="text-xs text-on-surface-variant max-w-sm">When an emergency blood request is raised, matched volunteer donors in radius will appear here.</p>
+            <button type="button" onclick="openRaiseRequestModal()" class="mt-1 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer hover:bg-primary-container">
+              + Raise Emergency Request
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const bloodGroup = recipient.bloodGroup || 'B+';
+      const reqId = recipient.requestId || 'REQ-LIVE';
 
       const confirmed = window.PulseStore.getConfirmedDonors(reqId, bloodGroup);
       const available = window.PulseStore.getAvailableDonors(reqId, bloodGroup);
 
       if (confirmed.length === 0) {
-        container.innerHTML = `
-          <div class="p-5 rounded-2xl bg-amber-500/10 border-2 border-dashed border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-3.5">
-              <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-[28px]">cell_tower</span>
+        if (available.length === 0) {
+          container.innerHTML = `
+            <div class="p-5 rounded-2xl bg-surface-container-low border-2 border-dashed border-outline-variant/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[28px]">cell_tower</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-on-surface">Emergency Broadcast Active — ${escapeHtml(bloodGroup)} Requisition</h4>
+                  <p class="text-xs text-on-surface-variant mt-0.5">
+                    Requisition #${escapeHtml(reqId)} active. 0 registered donors matching ${escapeHtml(bloodGroup)} currently in radius. Standby beacon active for new registrations.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 class="font-bold text-sm text-on-surface">Emergency Call in Progress — Ringing Matched Donors</h4>
-                <p class="text-xs text-on-surface-variant mt-0.5">
-                  0 donors confirmed yet. Ringing ${available.length} compatible volunteer donors nearby. Once a donor confirms availability on their portal, they will appear here.
-                </p>
+              <div class="flex items-center gap-2 flex-wrap shrink-0">
+                <a href="index.html#/donor-dashboard" class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer">
+                  Register as Volunteer Donor
+                </a>
               </div>
             </div>
-            <div class="flex items-center gap-2 flex-wrap shrink-0">
-              <button type="button" onclick="window.simulateFirstDonorAnswer()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer">
-                Simulate Donor Confirmation
-              </button>
-              <a href="index.html#/donor-dashboard" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all border border-surface-container-high shrink-0 cursor-pointer">
-                Go to Donor Portal
-              </a>
+          `;
+        } else {
+          container.innerHTML = `
+            <div class="p-5 rounded-2xl bg-amber-500/10 border-2 border-dashed border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[28px]">cell_tower</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-on-surface">Emergency Call in Progress — Ringing Matched Donors</h4>
+                  <p class="text-xs text-on-surface-variant mt-0.5">
+                    0 donors confirmed yet. Ringing ${available.length} compatible volunteer donors nearby. Once a donor confirms availability on their portal, they will appear here.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap shrink-0">
+                <button type="button" onclick="window.simulateFirstDonorAnswer()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer">
+                  Simulate Donor Confirmation
+                </button>
+                <a href="index.html#/donor-dashboard" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all border border-surface-container-high shrink-0 cursor-pointer">
+                  Go to Donor Portal
+                </a>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        }
       } else {
         container.innerHTML = confirmed.map(d => `
           <div class="p-4 rounded-xl bg-surface-container-low border border-emerald-500/30 ring-2 ring-emerald-500/20 bg-emerald-500/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -1734,7 +1702,9 @@
     }
 
     if (window.PulseStore) {
+      window.PulseStore.subscribe(syncRecipientUI);
       window.PulseStore.subscribe(renderStandaloneRecipientDonors);
+      setTimeout(syncRecipientUI, 50);
       setTimeout(renderStandaloneRecipientDonors, 50);
     }
 
@@ -1776,23 +1746,23 @@
             submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Broadcasting to Verified Donors...</span>';
           }
 
-          const patientName = reqForm.querySelector('[name="patientName"]')?.value?.trim() || 'Devika Sharma';
-          const patientAge = parseInt(reqForm.querySelector('[name="patientAge"]')?.value || 32, 10);
-          const patientGender = reqForm.querySelector('[name="patientGender"]')?.value || 'Female';
+          const patientName = reqForm.querySelector('[name="patientName"]')?.value?.trim() || 'Emergency Patient';
+          const patientAge = parseInt(reqForm.querySelector('[name="patientAge"]')?.value || 30, 10);
+          const patientGender = reqForm.querySelector('[name="patientGender"]')?.value || 'Other';
           const bloodGroup = reqForm.querySelector('input[name="blood_type"]:checked')?.value || 'B+';
-          const component = reqForm.querySelector('[name="component"]')?.value || 'Platelets (Apheresis)';
-          const units = parseInt(reqForm.querySelector('[name="units"]')?.value || 3, 10);
-          const hospitalName = reqForm.querySelector('[name="hospitalName"]')?.value?.trim() || 'Apollo Hospitals & Apex Trauma Centre';
-          const ward = reqForm.querySelector('[name="ward"]')?.value?.trim() || 'ICU Ward 4B, Bed 12';
-          const attendantName = reqForm.querySelector('[name="attendantName"]')?.value?.trim() || 'Rajesh Sharma';
-          const attendantRelation = reqForm.querySelector('[name="attendantRelation"]')?.value?.trim() || 'Brother / Attendant';
-          const attendantPhone = reqForm.querySelector('[name="attendantPhone"]')?.value?.trim() || '+91 95280 33454';
+          const component = reqForm.querySelector('[name="component"]')?.value || 'Whole Blood';
+          const units = parseInt(reqForm.querySelector('[name="units"]')?.value || 1, 10);
+          const hospitalName = reqForm.querySelector('[name="hospitalName"]')?.value?.trim() || 'Hospital Facility';
+          const ward = reqForm.querySelector('[name="ward"]')?.value?.trim() || 'General Ward';
+          const attendantName = reqForm.querySelector('[name="attendantName"]')?.value?.trim() || 'Attendant';
+          const attendantRelation = reqForm.querySelector('[name="attendantRelation"]')?.value?.trim() || 'Family Attendant';
+          const attendantPhone = reqForm.querySelector('[name="attendantPhone"]')?.value?.trim() || '+91 98000 00000';
           const urgency = reqForm.querySelector('[name="urgency"]')?.value || 'Stat Emergency (< 45 Mins)';
-          const notes = reqForm.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood request for patient.';
+          const notes = reqForm.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood requisition.';
           const proofDocType = reqForm.querySelector('[name="proofDocType"]')?.value || 'Hospital Blood Requisition Slip (Form 27-C Stamped)';
-          const doctorRegId = reqForm.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Dr. Aravind Sharma (NMC/KMC-48921)';
-          const ipdCaseNo = reqForm.querySelector('[name="ipdCaseNo"]')?.value?.trim() || 'IPD-9042-ICU';
-          const proofFileName = reqForm.querySelector('.proof-filename-display')?.textContent?.trim() || 'apollo_blood_requisition_form27c_signed.pdf';
+          const doctorRegId = reqForm.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Attending Physician';
+          const ipdCaseNo = reqForm.querySelector('[name="ipdCaseNo"]')?.value?.trim() || '';
+          const proofFileName = reqForm.querySelector('.proof-filename-display')?.textContent?.trim() || 'blood_requisition_form27c_signed.pdf';
 
           if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
             window.PulseStore.createNewPatientRequest({

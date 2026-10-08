@@ -367,8 +367,8 @@
                       <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">emergency</span>
                     </div>
                     <div class="truncate">
-                      <p class="font-label-md text-xs font-bold text-on-surface truncate">REQ-9042: B+ Platelets (Apheresis)</p>
-                      <p class="font-body-sm text-[11px] text-on-surface-variant truncate">Apollo Hospitals Apex Trauma OR • 3 Donors En Route</p>
+                      <p class="font-label-md text-xs font-bold text-on-surface truncate">Emergency Transfusion Network</p>
+                      <p class="font-body-sm text-[11px] text-on-surface-variant truncate">Live 10-km Trauma Courier Matching • Active</p>
                     </div>
                   </div>
                   <a href="#/role-selection" class="shrink-0 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-xs font-bold transition-colors">
@@ -1126,7 +1126,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Full Name *</label>
-              <input required name="fullName" type="text" placeholder="e.g. Ananya Sharma" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input required name="fullName" type="text" placeholder="e.g. Full Name" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Age *</label>
@@ -1273,7 +1273,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-email">Email Address *</label>
-              <input required id="edit-donor-email" name="email" type="email" placeholder="ananya.sharma@donor-pulse.in" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input required id="edit-donor-email" name="email" type="email" placeholder="donor@donor-pulse.in" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-city">City / Metro District *</label>
@@ -1375,12 +1375,12 @@
               <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-tertiary-container shadow-sm"></span>
             </div>
             <div class="flex flex-col min-w-0">
-              <span class="donor-name-display font-title-md text-title-md text-on-surface truncate">Ananya Sharma</span>
+              <span class="donor-name-display font-title-md text-title-md text-on-surface truncate">Volunteer Donor</span>
               <div class="flex items-center gap-1.5 text-xs text-on-surface-variant mt-0.5">
-                <span class="donor-age-display font-medium text-on-surface">28 yrs</span> • <span class="donor-blood-display font-bold text-primary">O-</span>
+                <span class="donor-age-display font-medium text-on-surface">-- yrs</span> • <span class="donor-blood-display font-bold text-primary">--</span>
               </div>
-              <span class="donor-id-display font-label-badge text-label-badge uppercase tracking-wider text-secondary mt-0.5">ID #DP-8924-O</span>
-              <div class="text-[11px] text-secondary truncate donor-address-display mt-0.5">Indiranagar, Bengaluru</div>
+              <span class="donor-id-display font-label-badge text-label-badge uppercase tracking-wider text-secondary mt-0.5">ID #STANDBY</span>
+              <div class="text-[11px] text-secondary truncate donor-address-display mt-0.5">Location Not Set</div>
             </div>
           </div>
 
@@ -1446,7 +1446,7 @@
           <section id="donor-overview" class="scroll-mt-section bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col xl:flex-row xl:items-center justify-between gap-space-md">
             <div class="flex flex-col gap-space-2xs min-w-0">
               <div class="flex flex-wrap items-center gap-space-xs">
-                <h1 class="font-headline-md text-headline-md text-on-surface font-bold">Welcome back, <span class="donor-name-display">Ananya Sharma</span> (<span class="donor-age-display">28 yrs</span>)</h1>
+                <h1 class="font-headline-md text-headline-md text-on-surface font-bold">Welcome back, <span class="donor-name-display">Volunteer Donor</span> (<span class="donor-age-display">-- yrs</span>)</h1>
                 <span id="donor-avail-badge" class="inline-flex items-center gap-1.5 px-space-xs py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge uppercase tracking-wide">
                   <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Available to Donate
                 </span>
@@ -1454,15 +1454,15 @@
               <div class="flex flex-col gap-1 text-on-surface-variant font-body-sm text-body-sm pt-space-2xs">
                 <div class="flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[16px] text-tertiary">event_available</span>
-                  <span><strong class="font-medium text-on-surface">Eligible Now</strong> (Last donation: <span class="donor-last-date-display">Sep 18, 2026</span>)</span>
+                  <span><strong class="font-medium text-on-surface">Eligibility Status</strong> (<span class="donor-last-date-display">Ready to donate</span>)</span>
                 </div>
                 <div class="flex items-center gap-1.5 min-w-0">
                   <span class="material-symbols-outlined text-[16px] text-secondary shrink-0">location_on</span>
-                  <span class="donor-location-display font-medium text-on-surface">#482, 12th Main Road, Indiranagar, Bengaluru, Karnataka 560038</span>
+                  <span class="donor-location-display font-medium text-on-surface">Location will display upon registration</span>
                 </div>
                 <div class="flex items-center gap-1.5 text-on-surface-variant">
                   <span class="material-symbols-outlined text-[16px] text-secondary shrink-0">near_me</span>
-                  <span class="donor-distance-display">Within 10 km</span>
+                  <span class="donor-distance-display">Standby Zone</span>
                 </div>
               </div>
             </div>
@@ -1470,11 +1470,11 @@
             <!-- Blood Type Badge -->
             <div class="bg-primary-container text-on-primary rounded-xl p-space-md shadow-md flex items-center gap-space-md shrink-0">
               <div class="donor-blood-display w-12 h-12 rounded-xl bg-on-primary/15 flex items-center justify-center font-display-hero text-headline-md font-black text-on-primary tracking-tight">
-                O-
+                --
               </div>
               <div class="flex flex-col">
-                <span class="font-headline-sm text-headline-sm font-extrabold tracking-tight">Type <span class="donor-blood-display">O-</span></span>
-                <span class="donor-blood-subtitle font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed font-semibold">Universal Red Cell Donor</span>
+                <span class="font-headline-sm text-headline-sm font-extrabold tracking-tight">Type <span class="donor-blood-display">--</span></span>
+                <span class="donor-blood-subtitle font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed font-semibold">Registered Blood Donor</span>
               </div>
             </div>
           </section>
@@ -2141,7 +2141,7 @@
         </div>
         <div class="flex items-center gap-space-md text-on-surface-variant font-label-md text-label-md">
           <span class="flex items-center gap-space-2xs text-tertiary font-bold"><span class="material-symbols-outlined text-[16px]">verified</span> Hospital Blood Desk Synced</span>
-          <span class="case-id-display font-mono text-[11px] px-2 py-0.5 rounded bg-surface-container text-secondary font-semibold">Case: CASE-9042</span>
+          <span class="case-id-display font-mono text-[11px] px-2 py-0.5 rounded bg-surface-container text-secondary font-semibold">Case: Standby</span>
         </div>
       </div>
 
@@ -2157,47 +2157,47 @@
                 <span class="material-symbols-outlined text-[22px]">volunteer_activism</span>
               </div>
               <div class="flex flex-col min-w-0">
-                <span class="patient-name-display font-headline-sm text-base truncate text-on-surface font-extrabold whitespace-nowrap">Devika Sharma</span>
-                <span class="patient-blood-display font-label-badge text-label-badge text-primary font-bold uppercase tracking-wide whitespace-nowrap">B+ Platelets</span>
+                <span class="patient-name-display font-headline-sm text-base truncate text-on-surface font-extrabold whitespace-nowrap">No Active Case</span>
+                <span class="patient-blood-display font-label-badge text-label-badge text-primary font-bold uppercase tracking-wide whitespace-nowrap">Standby</span>
               </div>
             </div>
 
             <div class="p-2 rounded-xl bg-surface-container-low flex flex-col gap-1 text-xs">
               <div class="flex items-center justify-between gap-1 text-on-surface-variant whitespace-nowrap">
                 <span class="shrink-0 text-[11px]">Attendant:</span>
-                <span class="attendant-name-display font-semibold text-on-surface text-[11px] truncate text-right">Rajesh Sharma (Brother)</span>
+                <span class="attendant-name-display font-semibold text-on-surface text-[11px] truncate text-right">None</span>
               </div>
               <div class="flex items-center justify-between gap-1 text-on-surface-variant whitespace-nowrap">
                 <span class="shrink-0 text-[11px]">Hospital &amp; Ward:</span>
-                <span class="hospital-ward-display font-medium text-on-surface text-[11px] truncate text-right">Apollo Hospitals, ICU 4B</span>
+                <span class="hospital-ward-display font-medium text-on-surface text-[11px] truncate text-right">Not Admitted</span>
               </div>
               <div class="flex items-center justify-between gap-1 text-on-surface-variant pt-1 border-t border-surface-container whitespace-nowrap">
                 <span class="shrink-0 text-[11px]">Fulfillment:</span>
-                <span class="patient-units-summary font-bold text-primary text-[11px] truncate text-right">3 Units Req. • 1 Received</span>
+                <span class="patient-units-summary font-bold text-primary text-[11px] truncate text-right">0 Units Req.</span>
               </div>
             </div>
           </div>
 
           <!-- Live Earliest Arrival Telemetry Card (Active Case Feature after Login) -->
-          <div style="flex-shrink: 0 !important;" class="bg-surface-container-lowest rounded-2xl p-3.5 shadow-sm border border-primary/25 flex flex-col gap-2 relative shrink-0">
+          <div id="recipient-sidebar-telemetry" style="flex-shrink: 0 !important;" class="bg-surface-container-lowest rounded-2xl p-3.5 shadow-sm border border-primary/25 flex flex-col gap-2 relative shrink-0">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-error-container/70 flex items-center justify-center text-primary shrink-0 animate-pulse">
+                <div class="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant shrink-0">
                   <span class="material-symbols-outlined text-[18px]">timer</span>
                 </div>
                 <div class="flex flex-col">
-                  <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">~14 min Earliest Arrival</span>
-                  <span class="text-[11px] text-secondary leading-tight">3 Donors Responding • Case REQ-9042</span>
+                  <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">Standby Mode</span>
+                  <span class="text-[11px] text-secondary leading-tight">No active patient requisition</span>
                 </div>
               </div>
-              <span class="px-2 py-0.5 rounded bg-tertiary-container/30 font-label-badge text-[10px] text-tertiary font-bold shrink-0">Active Case</span>
+              <span class="px-2 py-0.5 rounded bg-surface-container-high font-label-badge text-[10px] text-on-surface-variant font-bold shrink-0">Standby</span>
             </div>
             <div class="p-2 rounded-xl bg-surface-container-low flex items-center justify-between text-[11px] text-on-surface-variant">
-              <span class="flex items-center gap-1 font-semibold text-primary">
-                <span class="material-symbols-outlined text-[14px]">directions_car</span>
-                <span>Deepak Kumar (En Route)</span>
+              <span class="flex items-center gap-1 font-semibold text-on-surface-variant">
+                <span class="material-symbols-outlined text-[14px]">sensors</span>
+                <span>Broadcast Standby</span>
               </span>
-              <span class="text-tertiary font-bold">ETA: ~14 mins</span>
+              <span class="text-secondary font-bold">Ready</span>
             </div>
           </div>
 
@@ -2227,21 +2227,21 @@
                 <span class="material-symbols-outlined text-[18px] shrink-0">two_wheeler</span>
                 <span class="whitespace-nowrap">Incoming Donors</span>
               </div>
-              <span class="recipient-donors-active-count px-2 py-0.5 rounded-full bg-error-container text-primary font-bold text-[11px] shrink-0">3</span>
+              <span class="recipient-donors-active-count px-2 py-0.5 rounded-full bg-error-container text-primary font-bold text-[11px] shrink-0">0</span>
             </button>
             <button type="button" data-recipient-nav="tracking" onclick="window.scrollToRecipientSection('recipient-tracking-section')" class="recipient-nav-btn flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all text-xs font-semibold text-left w-full cursor-pointer whitespace-nowrap">
               <div class="flex items-center gap-2 min-w-0">
                 <span class="material-symbols-outlined text-[18px] shrink-0">timeline</span>
                 <span class="whitespace-nowrap">Transfusion Timeline</span>
               </div>
-              <span class="text-[11px] font-bold text-tertiary shrink-0">Stage 4</span>
+              <span class="text-[11px] font-bold text-tertiary shrink-0">Stage 0</span>
             </button>
             <button type="button" data-recipient-nav="requests" onclick="window.scrollToRecipientSection('recipient-requests-section')" class="recipient-nav-btn flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all text-xs font-semibold text-left w-full cursor-pointer whitespace-nowrap">
               <div class="flex items-center gap-2 min-w-0">
                 <span class="material-symbols-outlined text-[18px] shrink-0">receipt_long</span>
                 <span class="whitespace-nowrap">Active Requisitions</span>
               </div>
-              <span class="recipient-req-id-display font-mono text-[11px] text-secondary shrink-0">REQ-9042</span>
+              <span class="recipient-req-id-display font-mono text-[11px] text-secondary shrink-0">NONE</span>
             </button>
             <div class="my-0.5 h-px bg-surface-container"></div>
             <button type="button" onclick="window.logoutUser('recipient')" class="flex items-center gap-2 px-3 py-2 rounded-lg text-error hover:bg-error-container/20 text-xs font-semibold transition-colors cursor-pointer w-full text-left whitespace-nowrap" title="Sign out of Recipient Portal">
@@ -2254,20 +2254,20 @@
           <div style="flex-shrink: 0 !important;" class="bg-surface-container-low shrink-0 p-2.5 rounded-xl flex flex-col gap-1 text-xs border border-surface-container-high/60">
             <div class="flex items-center justify-between whitespace-nowrap">
               <span class="font-label-badge text-label-badge uppercase tracking-wider text-secondary font-bold text-[10px]">Blood Bank Desk</span>
-              <a href="tel:+918026304050" class="hospital-phone-display text-tertiary font-bold text-[11px] hover:underline flex items-center gap-0.5" title="Hospital Desk Direct Call">
+              <a href="tel:+918000000000" class="hospital-phone-display text-tertiary font-bold text-[11px] hover:underline flex items-center gap-0.5" title="Hospital Desk Direct Call">
                 <span class="material-symbols-outlined text-[13px]">call</span>
-                <span>+91 (80) 2630-4050</span>
+                <span>--</span>
               </a>
             </div>
-            <span class="hospital-name-display font-bold text-on-surface text-xs truncate">Apollo Hospitals &amp; Apex Trauma Centre</span>
+            <span class="hospital-name-display font-bold text-on-surface text-xs truncate">Hospital Facility</span>
             <div class="pt-1 border-t border-surface-container text-[11px] text-on-surface-variant flex items-center justify-between whitespace-nowrap">
               <span>Attending Doctor:</span>
-              <strong class="doctor-name-display text-on-surface">Dr. Aravind Sharma, MD</strong>
+              <strong class="doctor-name-display text-on-surface">Duty Medical Officer</strong>
             </div>
             <div class="pt-1 border-t border-surface-container text-[11px] text-on-surface-variant flex items-center justify-between whitespace-nowrap">
               <span>Clinical Proof:</span>
               <button type="button" onclick="window.openMedicalProofViewer()" class="text-emerald-600 dark:text-emerald-400 hover:underline font-bold inline-flex items-center gap-0.5 cursor-pointer">
-                <span>Form 27-C Verified</span>
+                <span>Clinical Requisition Form</span>
                 <span class="material-symbols-outlined text-[12px]">open_in_new</span>
               </button>
             </div>
@@ -2288,7 +2288,7 @@
                 <span class="material-symbols-outlined text-primary text-[22px] shrink-0">personal_injury</span>
                 <span class="text-xs font-bold text-on-surface-variant shrink-0">Managing Emergency Case:</span>
                 <span class="text-xs font-bold bg-surface-container-low text-on-surface py-1.5 px-3 rounded-xl border border-outline-variant/40 shrink-0">
-                  <span class="patient-case-display">Devika Sharma (B+ Platelets) — Apollo Hospitals &amp; Apex Trauma Centre</span>
+                  <span class="patient-case-display">No Active Patient Case</span>
                 </span>
               </div>
               <div class="flex items-center gap-2 shrink-0">
@@ -2307,39 +2307,39 @@
                 <div class="flex flex-wrap items-center gap-2 mb-0.5">
                   <div class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-badge text-label-badge uppercase tracking-wider whitespace-nowrap shrink-0 font-bold">
                     <span class="material-symbols-outlined text-[14px] shrink-0">verified</span>
-                    <span>Verified Patient Requisition (#<span class="recipient-req-id-display">REQ-9042</span>)</span>
+                    <span>Patient Requisition (<span class="recipient-req-id-display">#NONE</span>)</span>
                   </div>
-                  <button type="button" onclick="window.openMedicalProofViewer()" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 font-label-badge text-label-badge font-bold uppercase tracking-wider whitespace-nowrap shrink-0 border border-emerald-500/30 transition-colors cursor-pointer" title="View official hospital requisition document & anti-fraud verification">
+                  <button type="button" onclick="window.openMedicalProofViewer()" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-badge text-label-badge font-bold uppercase tracking-wider whitespace-nowrap shrink-0 border border-outline-variant/30 transition-colors cursor-pointer" title="View official hospital requisition document">
                     <span class="material-symbols-outlined text-[13px]">description</span>
-                    <span>Proof: Form 27-C Verified</span>
+                    <span>Clinical Requisition Form</span>
                     <span class="material-symbols-outlined text-[12px]">open_in_new</span>
                   </button>
-                  <span class="recipient-urgency-display px-space-xs py-0.5 rounded-full bg-error-container text-primary font-label-badge text-label-badge font-bold animate-pulse whitespace-nowrap">Stat Emergency (&lt; 45 Mins)</span>
-                  <span class="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-badge text-label-badge font-bold whitespace-nowrap">Stage 4: Donors En Route</span>
-                  <span class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-error-container text-primary font-label-badge text-label-badge font-bold whitespace-nowrap shadow-xs">
+                  <span class="recipient-urgency-display px-space-xs py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-badge text-label-badge font-bold whitespace-nowrap">Standby</span>
+                  <span class="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-badge text-label-badge font-bold whitespace-nowrap">Stage 0: Awaiting Requisition</span>
+                  <span class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-badge text-label-badge font-bold whitespace-nowrap shadow-xs">
                     <span class="material-symbols-outlined text-[14px]">timer</span>
-                    <span>~14 min Earliest Arrival</span>
+                    <span>-- Mins ETA</span>
                   </span>
                 </div>
 
                 <h1 class="font-headline-lg text-2xl sm:text-3xl text-on-surface font-extrabold tracking-tight leading-tight">
-                  Emergency Blood Requisition for <span class="patient-name-display text-primary">Devika Sharma</span>
+                  Emergency Blood Requisition for <span class="patient-name-display text-primary">No Active Case</span>
                 </h1>
 
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-body-sm text-on-surface-variant mt-0.5 leading-snug">
                   <span class="inline-flex items-center gap-1">
                     <span class="material-symbols-outlined text-[16px] text-primary shrink-0">local_hospital</span>
-                    <span class="hospital-location-display break-words">ICU Ward 4B, Bed 12, Apollo Hospitals &amp; Apex Trauma Centre, Bengaluru</span>
+                    <span class="hospital-location-display break-words">Hospital &amp; Ward Standby</span>
                   </span>
                   <span class="hidden sm:inline text-outline-variant">•</span>
                   <span class="inline-flex items-center gap-1 whitespace-nowrap">
                     <span class="material-symbols-outlined text-[16px] text-secondary shrink-0">person</span>
-                    <span class="patient-meta-display">32 Yrs • Female • ICU Bed 12</span>
+                    <span class="patient-meta-display">-- Yrs • -- • Bed --</span>
                   </span>
                   <span class="hidden sm:inline text-outline-variant">•</span>
                   <span class="inline-flex items-center gap-1 whitespace-nowrap">
                     <span class="material-symbols-outlined text-[16px] text-tertiary shrink-0">contact_phone</span>
-                    <span>Attendant: <strong class="attendant-name-display text-on-surface font-semibold">Rajesh Sharma (Brother)</strong></span>
+                    <span>Attendant: <strong class="attendant-name-display text-on-surface font-semibold">None</strong></span>
                   </span>
                 </div>
               </div>
@@ -2349,7 +2349,7 @@
                 <!-- Donor Handshake OTP Token Widget -->
                 <div class="p-3 rounded-2xl bg-surface-container-low border-2 border-primary/30 flex flex-col items-center justify-center text-center shadow-xs shrink-0 w-[138px]">
                   <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Donor Arrival PIN</span>
-                  <span class="handshake-otp-display text-2xl font-black text-primary font-mono tracking-widest my-0.5 leading-none">7842</span>
+                  <span class="handshake-otp-display text-2xl font-black text-primary font-mono tracking-widest my-0.5 leading-none">----</span>
                   <span class="text-[10px] text-secondary font-medium leading-tight whitespace-nowrap">Verify at Counter</span>
                 </div>
 
@@ -2378,16 +2378,16 @@
                 </div>
                 <div>
                   <div class="flex items-baseline justify-between gap-1 flex-nowrap">
-                    <span class="text-lg sm:text-xl font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap patient-units-needed">3 Units</span>
-                    <span class="text-[10px] sm:text-[11px] font-bold text-primary bg-primary-fixed/50 px-1.5 py-0.5 rounded-md whitespace-nowrap shrink-0 recipient-progress-pct">67% Arranged</span>
+                    <span class="text-lg sm:text-xl font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap patient-units-needed">0 Units</span>
+                    <span class="text-[10px] sm:text-[11px] font-bold text-primary bg-primary-fixed/50 px-1.5 py-0.5 rounded-md whitespace-nowrap shrink-0 recipient-progress-pct">0% Arranged</span>
                   </div>
                   <!-- Progress Bar -->
                   <div class="w-full bg-surface-container h-2 rounded-full overflow-hidden mt-3">
-                    <div class="recipient-progress-bar h-full bg-gradient-to-r from-primary to-rose-500 rounded-full transition-all duration-500" style="width: 66%;"></div>
+                    <div class="recipient-progress-bar h-full bg-gradient-to-r from-primary to-rose-500 rounded-full transition-all duration-500" style="width: 0%;"></div>
                   </div>
                   <p class="text-xs text-on-surface-variant mt-2 font-medium flex items-center justify-between">
-                    <span class="patient-units-fulfilled text-tertiary font-bold">1 Received</span>
-                    <span class="patient-units-enroute text-primary font-bold">2 En Route</span>
+                    <span class="patient-units-fulfilled text-tertiary font-bold">0 Received</span>
+                    <span class="patient-units-enroute text-primary font-bold">0 En Route</span>
                   </p>
                 </div>
               </div>
@@ -2402,12 +2402,12 @@
                 </div>
                 <div>
                   <div class="text-lg sm:text-xl font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
-                    <span class="recipient-donors-active-count">3</span>
+                    <span class="recipient-donors-active-count">0</span>
                     <span class="text-sm sm:text-base font-semibold text-secondary ml-0.5">Pledged</span>
                   </div>
                   <p class="text-[11px] text-on-surface-variant mt-2 flex items-center gap-1 font-medium whitespace-nowrap truncate">
-                    <span class="material-symbols-outlined text-[14px] text-tertiary shrink-0">check_circle</span>
-                    <span class="truncate">Deepak Kumar &amp; Kavita Rao en route</span>
+                    <span class="material-symbols-outlined text-[14px] text-tertiary shrink-0">hourglass_empty</span>
+                    <span class="truncate recipient-donors-summary-subtext">Awaiting active donor match</span>
                   </p>
                 </div>
               </div>
@@ -2422,11 +2422,11 @@
                 </div>
                 <div>
                   <div class="text-lg sm:text-xl font-extrabold text-on-surface tracking-tight leading-none whitespace-nowrap">
-                    ~14 <span class="text-sm sm:text-base font-bold text-tertiary ml-0.5">Mins</span>
+                    <span class="recipient-eta-summary-text">-- Mins</span>
                   </div>
                   <p class="text-[11px] sm:text-xs text-on-surface-variant mt-2 flex items-center gap-1 font-medium whitespace-nowrap truncate">
-                    <span class="material-symbols-outlined text-[14px] text-primary shrink-0">directions_car</span>
-                    <span class="truncate">Deepak Kumar (0.5 km away)</span>
+                    <span class="material-symbols-outlined text-[14px] text-secondary shrink-0">sensors</span>
+                    <span class="truncate recipient-eta-subtext">Live GPS beacon standby</span>
                   </p>
                 </div>
               </div>
@@ -2441,12 +2441,12 @@
                 </div>
                 <div>
                   <div class="flex items-center gap-1.5 flex-nowrap whitespace-nowrap">
-                    <span class="text-lg sm:text-xl font-extrabold text-primary tracking-tight leading-none whitespace-nowrap">Stage 4 / 6</span>
-                    <span class="text-[10px] font-bold text-primary uppercase bg-primary/10 px-1.5 py-0.5 rounded-full shrink-0">En Route</span>
+                    <span class="text-lg sm:text-xl font-extrabold text-primary tracking-tight leading-none whitespace-nowrap recipient-stage-summary-text">Stage 0 / 6</span>
+                    <span class="text-[10px] font-bold text-secondary uppercase bg-surface-container px-1.5 py-0.5 rounded-full shrink-0">Standby</span>
                   </div>
                   <p class="text-[11px] sm:text-xs text-on-surface-variant mt-2 flex items-center gap-1 font-medium whitespace-nowrap truncate">
                     <span class="material-symbols-outlined text-[14px] text-tertiary shrink-0">arrow_forward</span>
-                    <span class="truncate">Next: Blood Bank Screening</span>
+                    <span class="truncate recipient-stage-subtext">Raise requisition to activate</span>
                   </p>
                 </div>
               </div>
@@ -2580,37 +2580,18 @@
 
             <!-- Requests List Container -->
             <div id="recipient-requests-container" class="flex flex-col gap-space-sm pt-space-xs">
-              <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-13 h-13 rounded-2xl bg-error-container text-primary flex items-center justify-center font-bold text-2xl shrink-0 shadow-xs">
-                    B+
-                  </div>
-                  <div>
-                    <div class="flex flex-wrap items-center gap-2">
-                      <span class="font-mono font-bold text-xs text-primary bg-primary-fixed/30 px-2 py-0.5 rounded">REQ-9042</span>
-                      <h4 class="font-title-md font-bold text-on-surface">Platelets (Apheresis)</h4>
-                      <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[11px] font-bold animate-pulse">
-                        Stat Emergency (&lt; 45 Mins)
-                      </span>
-                    </div>
-                    <p class="text-xs text-on-surface-variant mt-1">
-                      <strong>3 Units Required</strong> (2 Arranged, 1 Received) • Admitted: ICU Ward 4B, Bed 12
-                    </p>
-                    <p class="text-xs text-secondary mt-0.5 italic">
-                      Clinical note: "Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required."
-                    </p>
-                  </div>
+              <div class="p-8 text-center bg-surface-container-low rounded-2xl border border-surface-container-high flex flex-col items-center justify-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+                  <span class="material-symbols-outlined text-[24px]">receipt_long</span>
                 </div>
-                <div class="flex items-center gap-2 shrink-0">
-                  <button type="button" onclick="window.copySOSAppealLink()" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
-                    <span class="material-symbols-outlined text-[16px]">share</span>
-                    <span>Share Case</span>
-                  </button>
-                  <button type="button" onclick="window.openUpdateNeedModal()" class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
-                    <span class="material-symbols-outlined text-[16px]">edit_note</span>
-                    <span>Update Need</span>
-                  </button>
+                <div class="flex flex-col gap-1">
+                  <p class="font-title-md font-bold text-on-surface">No Active Emergency Requisitions</p>
+                  <p class="font-body-sm text-on-surface-variant max-w-md">Raise a verified requisition to mobilize compatible volunteer blood couriers within minutes.</p>
                 </div>
+                <button type="button" onclick="window.openRaiseRequestModal()" class="mt-1 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                  <span>Raise Emergency Requisition</span>
+                </button>
               </div>
             </div>
           </section>
@@ -2917,14 +2898,14 @@
         </div>
 
         <!-- Inbound Couriers & ETA Telemetry -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+        <div id="tracking-inbound-telemetry-container" class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
           <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm border border-surface-container-high flex flex-col gap-2">
             <span class="font-label-badge text-label-badge text-secondary uppercase">Inbound Donor Telemetry</span>
             <div class="flex items-center gap-3 pt-1">
-              <div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold">DK</div>
+              <div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold">--</div>
               <div class="flex flex-col">
-                <span class="font-title-md text-title-md font-bold text-on-surface">David K. (B+)</span>
-                <span class="text-body-sm text-tertiary font-semibold">En Route • GPS ETA: 18 mins (Transit Van #04)</span>
+                <span class="font-title-md text-title-md font-bold text-on-surface">No Donor En Route</span>
+                <span class="text-body-sm text-secondary font-semibold">Standby • Awaiting donor acceptance</span>
               </div>
             </div>
           </div>
@@ -2935,8 +2916,8 @@
                 <span class="material-symbols-outlined text-[20px]">local_hospital</span>
               </div>
               <div class="flex flex-col">
-                <span class="font-title-md text-title-md font-bold text-on-surface">Trauma OR - Suite 3</span>
-                <span class="text-body-sm text-on-surface-variant">Attending Surgeon: Dr. Vance • Standby Ready</span>
+                <span class="font-title-md text-title-md font-bold text-on-surface">Trauma OR / Ward Standby</span>
+                <span class="text-body-sm text-on-surface-variant">Attending Medical Desk: Standby</span>
               </div>
             </div>
           </div>
@@ -3199,11 +3180,11 @@
             </div>
             <div class="min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="font-bold text-sm text-on-surface update-need-patient-name leading-none">Devika Sharma</span>
-                <span class="font-mono text-[11px] text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded update-need-req-id">#REQ-9042</span>
+                <span class="font-bold text-sm text-on-surface update-need-patient-name leading-none">Emergency Patient</span>
+                <span class="font-mono text-[11px] text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded update-need-req-id">#NONE</span>
               </div>
               <p class="text-xs text-on-surface-variant mt-1 leading-tight update-need-component-hospital">
-                Platelets (Apheresis) • Apollo Hospitals (ICU Ward 4B, Bed 12)
+                Hospital Facility (Standby)
               </p>
             </div>
           </div>
@@ -3351,11 +3332,11 @@
             </div>
             <div class="min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="font-bold text-sm text-on-surface request-more-patient-name leading-none">Devika Sharma</span>
-                <span class="font-mono text-[11px] text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded request-more-req-id">#REQ-9042</span>
+                <span class="font-bold text-sm text-on-surface request-more-patient-name leading-none">Emergency Patient</span>
+                <span class="font-mono text-[11px] text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded request-more-req-id">#NONE</span>
               </div>
               <p class="text-xs text-on-surface-variant mt-1 leading-tight request-more-comp-hosp">
-                Platelets (Apheresis) • Apollo Hospitals (ICU Ward 4B, Bed 12)
+                Hospital Facility (Standby)
               </p>
             </div>
           </div>
@@ -3503,7 +3484,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
             <div class="sm:col-span-6 flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Patient Full Name *</label>
-              <input required name="patientName" type="text" placeholder="e.g. Devika Sharma" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <input required name="patientName" type="text" placeholder="e.g. Patient Full Name" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
             <div class="sm:col-span-3 flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Age *</label>
@@ -3857,7 +3838,7 @@
           </div>
           <div class="text-left sm:text-right text-[10px] text-slate-600 flex flex-col shrink-0">
             <span class="font-bold uppercase tracking-wider text-red-700 text-[11px]">Form 27-C Requisition</span>
-            <span>Sl No: <strong id="doc-proof-sl-no" class="font-mono text-slate-900 font-bold">REQ-9042 / IPD-9042-ICU</strong></span>
+            <span>Sl No: <strong id="doc-proof-sl-no" class="font-mono text-slate-900 font-bold">REQ-NONE / IPD-NONE</strong></span>
             <span>Date: <span id="doc-proof-date" class="font-semibold text-slate-800">Today, Emergency Transfusion</span></span>
           </div>
         </div>
@@ -3871,11 +3852,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 text-xs">
           <div class="p-1.5 sm:p-2 rounded-lg bg-white border border-slate-200 shadow-2xs flex flex-col">
             <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Patient Full Name</span>
-            <span id="doc-proof-patient-name" class="font-bold text-slate-900 text-xs sm:text-[13px] mt-0.5">Devika Sharma</span>
+            <span id="doc-proof-patient-name" class="font-bold text-slate-900 text-xs sm:text-[13px] mt-0.5">Emergency Patient</span>
           </div>
           <div class="p-1.5 sm:p-2 rounded-lg bg-white border border-slate-200 shadow-2xs flex flex-col">
             <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Age / Gender / IPD No.</span>
-            <span id="doc-proof-patient-meta" class="font-bold text-slate-900 text-xs sm:text-[13px] mt-0.5">32 Yrs / Female • IPD-9042-ICU</span>
+            <span id="doc-proof-patient-meta" class="font-bold text-slate-900 text-xs sm:text-[13px] mt-0.5">-- Yrs / -- • IPD-NONE</span>
           </div>
           <div class="p-1.5 sm:p-2 rounded-lg bg-white border border-slate-200 shadow-2xs flex flex-col">
             <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Ward &amp; Bed Location</span>
@@ -4178,7 +4159,7 @@
               </span>
             </div>
             <p id="pass-modal-donor-meta" class="font-body-sm text-xs sm:text-sm text-on-surface-variant mt-0.5">
-              Verified Donor: Ananya Sharma • Blood Group: O- (Universal)
+              Verified Volunteer Donor • Digital Medical Pass
             </p>
           </div>
         </div>
@@ -5050,13 +5031,13 @@
               <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
               <span id="call-status-heading">Ringing Registered Volunteer Donor...</span>
             </span>
-            <h2 id="call-donor-name" class="text-xl sm:text-2xl font-black text-on-surface mt-0.5">Ananya Sharma</h2>
+            <h2 id="call-donor-name" class="text-xl sm:text-2xl font-black text-on-surface mt-0.5">Emergency Volunteer Donor</h2>
             <div class="flex items-center justify-center gap-2 mt-1 flex-wrap text-xs text-on-surface-variant font-medium">
-              <span id="call-donor-blood" class="px-2 py-0.5 rounded-full bg-primary text-white font-bold text-xs">O- Donor</span>
+              <span id="call-donor-blood" class="px-2 py-0.5 rounded-full bg-primary text-white font-bold text-xs">-- Donor</span>
               <span>•</span>
-              <span id="call-donor-phone" class="font-mono font-bold text-on-surface">+91 98452 33109</span>
+              <span id="call-donor-phone" class="font-mono font-bold text-on-surface">--</span>
               <span>•</span>
-              <span id="call-donor-distance" class="text-primary font-bold">1.8 km away</span>
+              <span id="call-donor-distance" class="text-primary font-bold">-- km away</span>
             </div>
           </div>
 
@@ -5074,8 +5055,8 @@
           <div class="flex items-start justify-between gap-3 border-b border-surface-container pb-2.5">
             <div>
               <span class="text-[10px] font-bold text-secondary uppercase tracking-wider block">Calling Hospital Blood Desk</span>
-              <h4 id="call-hospital-name" class="font-bold text-sm sm:text-base text-on-surface">Apollo Hospitals &amp; Apex Trauma Centre</h4>
-              <p id="call-hospital-ward" class="text-xs text-on-surface-variant mt-0.5">ICU Ward 4B, Bed 12 • Trauma Critical Care</p>
+              <h4 id="call-hospital-name" class="font-bold text-sm sm:text-base text-on-surface">Emergency Blood Center</h4>
+              <p id="call-hospital-ward" class="text-xs text-on-surface-variant mt-0.5">Trauma Center / Ward</p>
             </div>
             <span id="call-urgency-badge" class="px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-bold text-[10px] uppercase tracking-wider shrink-0 animate-pulse">
               Stat Emergency (&lt; 45 Mins)
@@ -5086,12 +5067,12 @@
           <div class="grid grid-cols-2 gap-2 text-xs">
             <div class="p-2.5 rounded-xl bg-surface-container-lowest border border-surface-container">
               <span class="text-[10px] text-on-surface-variant block uppercase font-bold">Patient in Need</span>
-              <span id="call-patient-name" class="font-extrabold text-on-surface text-sm">Devika Sharma</span>
-              <span id="call-patient-meta" class="text-[10.5px] text-secondary block mt-0.5">32 Yrs / Female</span>
+              <span id="call-patient-name" class="font-extrabold text-on-surface text-sm">Emergency Patient</span>
+              <span id="call-patient-meta" class="text-[10.5px] text-secondary block mt-0.5">-- Yrs / --</span>
             </div>
             <div class="p-2.5 rounded-xl bg-surface-container-lowest border border-surface-container">
               <span class="text-[10px] text-on-surface-variant block uppercase font-bold">Required Blood Unit</span>
-              <span id="call-blood-units-needed" class="font-extrabold text-primary text-sm">B+ Platelets (3 Units)</span>
+              <span id="call-blood-units-needed" class="font-extrabold text-primary text-sm">-- (0 Units)</span>
               <span id="call-eta-needed" class="text-[10.5px] text-emerald-700 font-bold block mt-0.5">Match: 100% Compatible</span>
             </div>
           </div>
@@ -5100,10 +5081,10 @@
           <div class="p-2.5 rounded-xl bg-surface-container-lowest border border-surface-container text-xs flex flex-col gap-1">
             <div class="flex items-center justify-between text-[10px] text-on-surface-variant">
               <span class="font-bold uppercase">Attendant Contact</span>
-              <span id="call-attendant-info" class="font-semibold text-on-surface">Rajesh Sharma (+91 95280 33454)</span>
+              <span id="call-attendant-info" class="font-semibold text-on-surface">Emergency Hospital Desk</span>
             </div>
             <p id="call-clinical-reason" class="text-[11px] text-on-surface-variant italic leading-relaxed">
-              "Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required."
+              "Immediate donor-matched transfusion required."
             </p>
           </div>
         </div>
@@ -5139,18 +5120,18 @@
       </div>
       <div class="flex flex-col text-left">
         <span class="text-[10px] font-extrabold tracking-wider uppercase text-white/90">Incoming Emergency Call</span>
-        <span id="docked-donor-text" class="text-xs font-bold text-white">Ringing Ananya Sharma (O-)</span>
+        <span id="docked-donor-text" class="text-xs font-bold text-white">Ringing Volunteer Donor</span>
       </div>
       <span class="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110">open_in_full</span>
     </button>
   </div>
 
   <!-- Core Scripts with Cache-Busting -->
-  <script src="js/audio.js?v=20261004d"></script>
-  <script src="js/store.js?v=20261004d"></script>
-  <script src="js/router.js?v=20261004d"></script>
-  <script src="js/app.js?v=20261004d"></script>
-  <script src="js/blood-cells.js?v=20261004d"></script>
+  <script src="js/audio.js?v=20261008_live_final"></script>
+  <script src="js/store.js?v=20261008_live_final"></script>
+  <script src="js/router.js?v=20261008_live_final"></script>
+  <script src="js/app.js?v=20261008_live_final"></script>
+  <script src="js/blood-cells.js?v=20261008_live_final"></script>
 
   <!-- Global Direct Action Handler for "Update Need" and "Request More Blood" -->
   <script>

@@ -248,7 +248,7 @@
       <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between text-xs text-on-surface-variant">
         <span class="flex items-center gap-1.5">
           <span class="material-symbols-outlined text-[15px] text-primary">key</span>
-          <span>Demo ID: <strong class="text-on-surface font-mono">DNR-4821</strong></span>
+          <span>Registered Donor: <strong id="quick-donor-id-label" class="text-on-surface font-mono">Active Profile</strong></span>
         </span>
         <button type="button" onclick="fillDemoDonorCredentials()" class="text-primary font-bold hover:underline cursor-pointer">Auto-Fill</button>
       </div>
@@ -295,7 +295,7 @@
         <label for="hospital-input-id" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">Patient Case ID / Requisition ID</label>
         <div class="relative">
           <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">patient_list</span>
-          <input type="text" id="hospital-input-id" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="e.g. CASE-9042 or REQ-9042" autocomplete="username"/>
+          <input type="text" id="hospital-input-id" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="e.g. Registered Patient Case ID" autocomplete="username"/>
         </div>
       </div>
 
@@ -306,7 +306,7 @@
         </div>
         <div class="relative">
           <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-on-surface-variant">contact_phone</span>
-          <input type="text" id="hospital-input-pwd" required class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="e.g. +91 95280 33454" autocomplete="current-password"/>
+          <input type="text" id="hospital-input-pwd" required class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-surface-container-high bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="e.g. Attendant Mobile Number" autocomplete="current-password"/>
           <button type="button" onclick="toggleHospitalPasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface cursor-pointer p-0.5" title="Toggle visibility">
             <span id="hospital-pwd-toggle-icon" class="material-symbols-outlined text-[18px]">visibility</span>
           </button>
@@ -316,7 +316,7 @@
       <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between text-xs text-on-surface-variant">
         <span class="flex items-center gap-1.5">
           <span class="material-symbols-outlined text-[15px] text-primary">key</span>
-          <span>Demo Case: <strong class="text-on-surface font-mono">CASE-9042</strong></span>
+          <span>Registered Case: <strong id="quick-hospital-id-label" class="text-on-surface font-mono">Active Case</strong></span>
         </span>
         <button type="button" onclick="fillDemoHospitalCredentials()" class="text-primary font-bold hover:underline cursor-pointer">Auto-Fill</button>
       </div>
@@ -1120,10 +1120,19 @@ function fillDemoDonorCredentials() {
   const idInput = document.getElementById('donor-input-id');
   const pwdInput = document.getElementById('donor-input-pwd');
   if (!idInput || !pwdInput) return;
-  idInput.value = 'DNR-4821';
-  pwdInput.value = 'donor@2024';
-  const errorBox = document.getElementById('donor-login-error');
-  if (errorBox) errorBox.classList.add('hidden');
+
+  const currentDonor = (window.PulseStore && typeof window.PulseStore.getDonor === 'function')
+    ? window.PulseStore.getDonor()
+    : null;
+
+  if (currentDonor) {
+    idInput.value = currentDonor.id;
+    pwdInput.value = currentDonor.phone || 'donor@2026';
+    const errorBox = document.getElementById('donor-login-error');
+    if (errorBox) errorBox.classList.add('hidden');
+  } else {
+    alert('No donor profile registered yet! Please click "Register as Volunteer Donor" or create an account to start.');
+  }
 }
 
 function handleDonorLoginSubmit(e) {
@@ -1147,14 +1156,23 @@ function handleDonorLoginSubmit(e) {
     return false;
   }
 
+  // Switch to this donor if registered in pool
+  if (window.PulseStore) {
+    const pool = window.PulseStore.getAllDonorsPool ? window.PulseStore.getAllDonorsPool() : [];
+    const matched = pool.find(d => d.id === idVal || d.phone === idVal);
+    if (matched && typeof window.PulseStore.switchActiveDonor === 'function') {
+      window.PulseStore.switchActiveDonor(matched.id);
+    }
+  }
+
   if (btnSubmit) btnSubmit.disabled = true;
-  if (btnText) btnText.textContent = 'Verifying CDSCO Credentials...';
+  if (btnText) btnText.textContent = 'Authenticating Credentials...';
   if (btnIcon) { btnIcon.textContent = 'sync'; btnIcon.classList.add('animate-spin'); }
 
   setTimeout(() => {
     closeDonorLoginModal();
     window.location.href = 'index.html#/donor-dashboard';
-  }, 600);
+  }, 400);
 
   return false;
 }
@@ -1198,10 +1216,19 @@ function fillDemoHospitalCredentials() {
   const idInput = document.getElementById('hospital-input-id');
   const pwdInput = document.getElementById('hospital-input-pwd');
   if (!idInput || !pwdInput) return;
-  idInput.value = 'CASE-9042';
-  pwdInput.value = '+91 95280 33454';
-  const errorBox = document.getElementById('hospital-login-error');
-  if (errorBox) errorBox.classList.add('hidden');
+
+  const currentRecipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+
+  if (currentRecipient) {
+    idInput.value = currentRecipient.id;
+    pwdInput.value = currentRecipient.attendantPhone || '+91 Emergency';
+    const errorBox = document.getElementById('hospital-login-error');
+    if (errorBox) errorBox.classList.add('hidden');
+  } else {
+    alert('No patient requisition raised yet! Click "Raise Patient Blood Request" to broadcast a requisition first.');
+  }
 }
 
 function handleHospitalLoginSubmit(e) {
@@ -1225,6 +1252,15 @@ function handleHospitalLoginSubmit(e) {
     return false;
   }
 
+  // Switch to this case if registered
+  if (window.PulseStore) {
+    const cases = window.PulseStore.getRecipientCases ? window.PulseStore.getRecipientCases() : [];
+    const matched = cases.find(c => c.id === idVal || c.requestId === idVal || c.attendantPhone === idVal);
+    if (matched && typeof window.PulseStore.switchRecipientCase === 'function') {
+      window.PulseStore.switchRecipientCase(matched.id);
+    }
+  }
+
   if (btnSubmit) btnSubmit.disabled = true;
   if (btnText) btnText.textContent = 'Verifying Patient Case Record...';
   if (btnIcon) { btnIcon.textContent = 'sync'; btnIcon.classList.add('animate-spin'); }
@@ -1232,7 +1268,7 @@ function handleHospitalLoginSubmit(e) {
   setTimeout(() => {
     closeHospitalLoginModal();
     window.location.href = 'index.html#/recipient-dashboard';
-  }, 600);
+  }, 400);
 
   return false;
 }
@@ -1329,21 +1365,21 @@ function fillDemoRaiseRequest() {
     if (el) el.value = val;
   };
 
-  setVal('patientName', 'Devika Sharma');
-  setVal('patientAge', '32');
+  setVal('patientName', 'Emergency Patient');
+  setVal('patientAge', '30');
   setVal('patientGender', 'Female');
-  setVal('hospitalName', 'Apollo Hospitals & Apex Trauma Centre');
-  setVal('ward', 'ICU Ward 4B, Bed 12');
-  setVal('component', 'Platelets (Apheresis)');
-  setVal('units', '3');
+  setVal('hospitalName', 'Metro Trauma Blood Centre');
+  setVal('ward', 'ICU Emergency Bed 4');
+  setVal('component', 'Whole Blood (Universal)');
+  setVal('units', '2');
   setVal('urgency', 'Stat Emergency (< 45 Mins)');
-  setVal('attendantName', 'Rajesh Sharma');
-  setVal('attendantRelation', 'Brother / Primary Attendant');
-  setVal('attendantPhone', '+91 95280 33454');
-  setVal('notes', 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.');
+  setVal('attendantName', 'Duty Attendant');
+  setVal('attendantRelation', 'Immediate Family');
+  setVal('attendantPhone', '+91 98000 12345');
+  setVal('notes', 'Acute hemorrhagic requirement. Immediate compatible donor transfusion needed.');
   setVal('proofDocType', 'Hospital Blood Requisition Slip (Form 27-C Stamped)');
-  setVal('doctorRegId', 'Dr. Aravind Sharma (NMC/KMC-48921)');
-  setVal('ipdCaseNo', 'IPD-9042-ICU');
+  setVal('doctorRegId', 'Duty Medical Officer (NMC-REG-2026)');
+  setVal('ipdCaseNo', 'IPD-EMERGENCY-ICU');
 
   const fileLabel = modal.querySelector('.proof-filename-display');
   if (fileLabel) fileLabel.textContent = 'apollo_blood_requisition_form27c_signed.pdf';
@@ -1422,17 +1458,17 @@ function openMedicalProofViewer(customData) {
   const currentPatient = (customData) || (window.PulseStore && window.PulseStore.state && window.PulseStore.state.recipient) || {};
   const form = document.querySelector('.form-blood-request');
   
-  const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Devika Sharma';
-  const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 32;
-  const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Female';
-  const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'ICU Ward 4B, Bed 12';
+  const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Emergency Patient';
+  const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 30;
+  const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Other';
+  const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'General Ward';
   const blood = (form && form.querySelector('input[name="blood_type"]:checked')?.value) || currentPatient.bloodGroup || 'B+';
-  const component = (form && form.querySelector('[name="component"]')?.value) || currentPatient.component || 'Platelets (Apheresis)';
-  const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 3;
+  const component = (form && form.querySelector('[name="component"]')?.value) || currentPatient.component || 'Whole Blood';
+  const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 2;
   const urgency = (form && form.querySelector('[name="urgency"]')?.value) || currentPatient.urgency || 'Stat Emergency (< 45 Mins)';
-  const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.';
-  const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Dr. Aravind Sharma (NMC/KMC-48921)';
-  const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-9042-ICU';
+  const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Urgent clinical blood requisition.';
+  const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Attending Physician';
+  const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-RECORD';
 
   const setText = (id, txt) => {
     const el = document.getElementById(id);
@@ -1454,7 +1490,7 @@ function openMedicalProofViewer(customData) {
   setText('doc-proof-urgency', urgency);
   setText('doc-proof-notes', notes);
   setText('doc-proof-doctor-reg', `${doctor} — Registered Practitioner`);
-  setText('doc-proof-sl-no', `REQ-9042 / ${ipd}`);
+  setText('doc-proof-sl-no', `${currentPatient.requestId || 'REQ-LIVE'} / ${ipd}`);
 
   modal.classList.remove('hidden');
   document.body.classList.add('overflow-hidden');
@@ -1512,23 +1548,23 @@ if (roleModalReq) {
         submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Broadcasting to Verified Donors...</span>';
       }
 
-      const patientName = reqForm.querySelector('[name="patientName"]')?.value?.trim() || 'Devika Sharma';
-      const patientAge = parseInt(reqForm.querySelector('[name="patientAge"]')?.value || 32, 10);
-      const patientGender = reqForm.querySelector('[name="patientGender"]')?.value || 'Female';
+      const patientName = reqForm.querySelector('[name="patientName"]')?.value?.trim() || 'Emergency Patient';
+      const patientAge = parseInt(reqForm.querySelector('[name="patientAge"]')?.value || 30, 10);
+      const patientGender = reqForm.querySelector('[name="patientGender"]')?.value || 'Other';
       const bloodGroup = reqForm.querySelector('input[name="blood_type"]:checked')?.value || 'B+';
-      const component = reqForm.querySelector('[name="component"]')?.value || 'Platelets (Apheresis)';
-      const units = parseInt(reqForm.querySelector('[name="units"]')?.value || 3, 10);
-      const hospitalName = reqForm.querySelector('[name="hospitalName"]')?.value?.trim() || 'Apollo Hospitals & Apex Trauma Centre';
-      const ward = reqForm.querySelector('[name="ward"]')?.value?.trim() || 'ICU Ward 4B, Bed 12';
-      const attendantName = reqForm.querySelector('[name="attendantName"]')?.value?.trim() || 'Rajesh Sharma';
-      const attendantRelation = reqForm.querySelector('[name="attendantRelation"]')?.value?.trim() || 'Brother / Attendant';
-      const attendantPhone = reqForm.querySelector('[name="attendantPhone"]')?.value?.trim() || '+91 95280 33454';
+      const component = reqForm.querySelector('[name="component"]')?.value || 'Whole Blood';
+      const units = parseInt(reqForm.querySelector('[name="units"]')?.value || 1, 10);
+      const hospitalName = reqForm.querySelector('[name="hospitalName"]')?.value?.trim() || 'Hospital Facility';
+      const ward = reqForm.querySelector('[name="ward"]')?.value?.trim() || 'General Ward';
+      const attendantName = reqForm.querySelector('[name="attendantName"]')?.value?.trim() || 'Attendant';
+      const attendantRelation = reqForm.querySelector('[name="attendantRelation"]')?.value?.trim() || 'Family Attendant';
+      const attendantPhone = reqForm.querySelector('[name="attendantPhone"]')?.value?.trim() || '+91 98000 00000';
       const urgency = reqForm.querySelector('[name="urgency"]')?.value || 'Stat Emergency (< 45 Mins)';
-      const notes = reqForm.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood request for patient.';
+      const notes = reqForm.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood requisition.';
       const proofDocType = reqForm.querySelector('[name="proofDocType"]')?.value || 'Hospital Blood Requisition Slip (Form 27-C Stamped)';
-      const doctorRegId = reqForm.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Dr. Aravind Sharma (NMC/KMC-48921)';
-      const ipdCaseNo = reqForm.querySelector('[name="ipdCaseNo"]')?.value?.trim() || 'IPD-9042-ICU';
-      const proofFileName = reqForm.querySelector('.proof-filename-display')?.textContent?.trim() || 'apollo_blood_requisition_form27c_signed.pdf';
+      const doctorRegId = reqForm.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Attending Physician';
+      const ipdCaseNo = reqForm.querySelector('[name="ipdCaseNo"]')?.value?.trim() || '';
+      const proofFileName = reqForm.querySelector('.proof-filename-display')?.textContent?.trim() || 'blood_requisition_form27c_signed.pdf';
 
       if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
         window.PulseStore.createNewPatientRequest({

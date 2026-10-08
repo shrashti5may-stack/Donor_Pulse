@@ -3,44 +3,19 @@
  * Manages persistent local mock data for Donors, Hospitals, Verification, Requests, and Tracking.
  */
 
-const STORAGE_KEY = 'donorpulse_state_in_v3';
+const STORAGE_KEY = 'donorpulse_state_v5_live';
 
 const DEFAULT_STATE = {
-  // Active incoming emergency donor call
+  // Active incoming emergency donor call (null when no live call is ringing)
   activeIncomingCall: null,
 
-  // Active role session: 'guest' | 'donor' | 'hospital'
-  currentRole: 'donor',
+  // Active role session: 'guest' | 'donor' | 'recipient' | 'hospital'
+  currentRole: 'guest',
 
-  // Current Donor Profile (Adapted for India - Bengaluru, Karnataka)
-  donor: {
-    id: 'DP-8924-O',
-    fullName: 'Ananya Sharma',
-    age: 28,
-    bloodGroup: 'O-',
-    phone: '+91 98452 33109',
-    email: 'ananya.sharma@donor-pulse.in',
-    address: '#482, 12th Main Road, HAL 2nd Stage, Indiranagar',
-    city: 'Bengaluru, Karnataka',
-    medicalHistory: 'Hemoglobin 14.8 g/dL (Normal). Regular whole blood & apheresis donor. Pre-screened verified volunteer. Blood pressure optimal at 118/76 mmHg. No high-altitude or malaria endemic travel in past 3 months.',
-    lastDonationDate: '2026-09-18',
-    nextEligibleDate: 'Eligible Now',
-    availability: true, // true = Active / On Call, false = Temporarily Unavailable
-    radiusMiles: 10, // 10 km radius active
-    totalDonations: 8,
-    livesSaved: 24,
-    rewardPoints: 2450,
-    rewardTier: 'Gold Tier Donor Milestone',
-    nextTierPointsLeft: 50,
-    vitals: {
-      hemoglobin: '14.8 g/dL',
-      bp: '118/76 mmHg',
-      pulse: '72 bpm',
-      weight: '64 kg'
-    }
-  },
+  // Current Donor Profile (null initially until donor creates account/registers)
+  donor: null,
 
-  // Current Hospital Profile (Apollo Hospitals & Apex Trauma Centre, Bengaluru)
+  // Current Hospital Profile
   hospital: {
     id: 'HSP-88219-BLR',
     name: 'Apollo Hospitals & Apex Trauma Centre',
@@ -53,329 +28,41 @@ const DEFAULT_STATE = {
     phone: '+91 (80) 2630-4050',
     email: 'triage@apollohospitals-bengaluru.org',
     licenseNumber: 'NABH-BB-KA-88219',
-    authorizedPerson: 'Dr. Aravind Sharma, MD',
+    authorizedPerson: 'Medical Superintendent',
     roleTitle: 'Chief Medical Superintendent',
     bedCapacity: 650,
     traumaLevel: 'Trauma Level 1 Apex Centre',
     verificationProof: {
       documentType: 'NABH Blood Bank Operating License & CDSCO Clearance Form 28-C',
       documentNumber: 'NABH-BB-KA-90428-2026',
-      fileName: 'apollo_bengaluru_nabh_accreditation.pdf',
+      fileName: 'hospital_nabh_accreditation.pdf',
       fileSize: '2.4 MB',
       uploadedAt: 'Sep 12, 2026'
     },
-    // Verification state: 'verified' | 'pending' | 'rejected'
     verificationStatus: 'verified',
-    rejectionReason: 'State blood transfusion council documentation mismatch on primary accreditation license certificate.'
+    rejectionReason: ''
   },
 
-  // Current Recipient & Patient Profile (Dedicated to Recipient / Family & Friends)
-  recipient: {
-    id: 'CASE-9042',
-    requestId: 'REQ-9042',
-    patientName: 'Devika Sharma',
-    patientAge: 32,
-    patientGender: 'Female',
-    bloodGroup: 'B+',
-    component: 'Platelets (Apheresis)',
-    unitsRequired: 3,
-    unitsArranged: 2,
-    unitsFulfilled: 1,
-    urgency: 'Stat Emergency (< 45 Mins)',
-    hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
-    hospitalWard: 'ICU Ward 4B, Bed 12',
-    hospitalAddress: '154/11 Bannerghatta Main Road, Opposite IIMB, Bengaluru, Karnataka 560076',
-    attendantName: 'Rajesh Sharma',
-    attendantRelation: 'Brother / Primary Attendant',
-    attendantPhone: '+91 95280 33454',
-    attendantEmail: 'rajesh.sharma@familycare.org.in',
-    doctorName: 'Dr. Aravind Sharma, MD',
-    doctorDepartment: 'Trauma & Critical Care',
-    doctorPhone: '+91 (80) 2630-4050 Ext 4429',
-    hospitalBloodDesk: '+91 (80) 2630-4050',
-    clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
-    handshakeOTP: '7842',
-    trackingStage: 4,
-    broadcastDate: 'Today, 14:10 IST',
-    appealActive: true,
-    verificationProof: {
-      documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
-      doctorRegId: 'Dr. Aravind Sharma (NMC/KMC-48921)',
-      ipdCaseNo: 'IPD-9042-ICU',
-      fileName: 'apollo_blood_requisition_form27c_signed.pdf',
-      fileSize: '1.4 MB',
-      status: 'VERIFIED_GENUINE',
-      verificationScore: '100% Genuine Requisition',
-      doctorVerified: true,
-      hospitalSealDetected: true,
-      fraudRiskScore: '0.0%',
-      verifiedAt: 'Today, 14:05 IST',
-      issuer: 'Apollo Hospitals & Apex Trauma Centre'
-    }
-  },
+  // Current Recipient & Patient Profile (null initially until request is raised)
+  recipient: null,
 
-  // Multiple Recipient / Patient Cases available for management
-  recipientCases: [
-    {
-      id: 'CASE-9042',
-      requestId: 'REQ-9042',
-      patientName: 'Devika Sharma',
-      patientAge: 32,
-      patientGender: 'Female',
-      bloodGroup: 'B+',
-      component: 'Platelets (Apheresis)',
-      unitsRequired: 3,
-      unitsArranged: 2,
-      unitsFulfilled: 1,
-      urgency: 'Stat Emergency (< 45 Mins)',
-      hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
-      hospitalWard: 'ICU Ward 4B, Bed 12',
-      hospitalAddress: '154/11 Bannerghatta Main Road, Opposite IIMB, Bengaluru, Karnataka 560076',
-      attendantName: 'Rajesh Sharma',
-      attendantRelation: 'Brother / Primary Attendant',
-      attendantPhone: '+91 95280 33454',
-      attendantEmail: 'rajesh.sharma@familycare.org.in',
-      doctorName: 'Dr. Aravind Sharma, MD',
-      doctorDepartment: 'Trauma & Critical Care',
-      doctorPhone: '+91 (80) 2630-4050 Ext 4429',
-      hospitalBloodDesk: '+91 (80) 2630-4050',
-      clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
-      handshakeOTP: '7842',
-      trackingStage: 4,
-      broadcastDate: 'Today, 14:10 IST',
-      appealActive: true,
-      verificationProof: {
-        documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
-        doctorRegId: 'Dr. Aravind Sharma (NMC/KMC-48921)',
-        ipdCaseNo: 'IPD-9042-ICU',
-        fileName: 'apollo_blood_requisition_form27c_signed.pdf',
-        fileSize: '1.4 MB',
-        status: 'VERIFIED_GENUINE',
-        verificationScore: '100% Genuine Requisition',
-        doctorVerified: true,
-        hospitalSealDetected: true,
-        fraudRiskScore: '0.0%',
-        verifiedAt: 'Today, 14:05 IST',
-        issuer: 'Apollo Hospitals & Apex Trauma Centre'
-      }
-    },
-    {
-      id: 'CASE-8991',
-      requestId: 'REQ-8991',
-      patientName: 'Rohan Verma',
-      patientAge: 46,
-      patientGender: 'Male',
-      bloodGroup: 'O-',
-      component: 'Whole Blood',
-      unitsRequired: 2,
-      unitsArranged: 1,
-      unitsFulfilled: 0,
-      urgency: 'Urgent (< 2 Hours)',
-      hospitalName: 'Manipal Hospital Comprehensive Trauma Center',
-      hospitalWard: 'ICU Triage Bay 2',
-      hospitalAddress: '98 HAL Old Airport Road, Kodihalli, Bengaluru, Karnataka 560017',
-      attendantName: 'Pooja Verma',
-      attendantRelation: 'Spouse / Family Attendant',
-      attendantPhone: '+91 98110 52391',
-      attendantEmail: 'pooja.verma@netcare.org.in',
-      doctorName: 'Dr. Harish Vance, MS (MCh Trauma)',
-      doctorDepartment: 'General Surgery & Trauma',
-      doctorPhone: '+91 (80) 2502-4444 Ext 104',
-      hospitalBloodDesk: '+91 (80) 2502-4444',
-      clinicalReason: 'Post-operative severe anemia stabilization following trauma resuscitation.',
-      handshakeOTP: '4190',
-      trackingStage: 2,
-      broadcastDate: 'Today, 12:45 IST',
-      appealActive: true
-    }
-  ],
+  // Multiple Recipient / Patient Cases available for management (empty initially)
+  recipientCases: [],
 
   // Registered Hospital Registry
-  registeredHospitals: [
-    {
-      id: 'HSP-88219-BLR',
-      name: 'Apollo Hospitals & Apex Trauma Centre',
-      category: 'Apex Multi-Specialty & Trauma Care (NABH Accredited)',
-      location: 'ICU Ward 4B, Emergency Wing',
-      address: '154/11 Bannerghatta Main Road, Opposite IIMB',
-      city: 'Bengaluru',
-      state: 'Karnataka',
-      zip: '560076',
-      phone: '+91 (80) 2630-4050',
-      email: 'triage@apollohospitals-bengaluru.org',
-      licenseNumber: 'NABH-BB-KA-88219',
-      authorizedPerson: 'Dr. Aravind Sharma, MD',
-      roleTitle: 'Chief Medical Superintendent',
-      bedCapacity: 650,
-      traumaLevel: 'Trauma Level 1 Apex Centre',
-      verificationProof: {
-        documentType: 'NABH Blood Bank Operating License & CDSCO Clearance Form 28-C',
-        documentNumber: 'NABH-BB-KA-90428-2026',
-        fileName: 'apollo_bengaluru_nabh_accreditation.pdf',
-        fileSize: '2.4 MB',
-        uploadedAt: 'Sep 12, 2026'
-      },
-      verificationStatus: 'verified',
-      rejectionReason: ''
-    }
-  ],
+  registeredHospitals: [],
 
-  // Active Requests
-  requests: [
-    {
-      id: 'REQ-9042',
-      bloodGroup: 'B+',
-      component: 'Platelets (Apheresis)',
-      units: 3,
-      urgency: 'Stat Emergency (< 45 Mins)',
-      hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
-      ward: 'Trauma OR - Suite 3',
-      location: '154/11 Bannerghatta Main Road, Bengaluru',
-      notes: 'Acute arterial hemorrhage from multi-vehicle accident, cross-match in progress.',
-      createdAt: 'Today, 14:10 IST',
-      status: 'Donors Accepted',
-      trackingStage: 4, // 1 to 6
-      matchedCount: 16,
-      acceptedCount: 3,
-      enRouteCount: 2
-    },
-    {
-      id: 'REQ-8991',
-      bloodGroup: 'O-',
-      component: 'Whole Blood',
-      units: 2,
-      urgency: 'Urgent (< 2 Hours)',
-      hospitalName: 'Manipal Hospital Comprehensive Trauma Center',
-      ward: 'ICU Triage Bay 2',
-      location: '98 HAL Old Airport Road, Kodihalli, Bengaluru',
-      notes: 'Post-operative severe anemia stabilization.',
-      createdAt: 'Today, 12:45 IST',
-      status: 'Finding Donors',
-      trackingStage: 2,
-      matchedCount: 8,
-      acceptedCount: 1,
-      enRouteCount: 0
-    }
-  ],
+  // Active Requests pool (empty initially)
+  requests: [],
 
   // Currently active request selected for confirmation & tracking
-  selectedRequestId: 'REQ-9042',
+  selectedRequestId: null,
 
-  // Registered Donors Pool (Strict Registered User Model)
-  matchedDonorsPool: [
-    {
-      id: 'user_donor_001',
-      _id: 'user_donor_001',
-      name: 'Ananya Sharma',
-      initials: 'AS',
-      phone: '+91 98452 33109',
-      isPhoneVerified: true,
-      bloodGroup: 'O-',
-      role: 'DONOR',
-      coordinates: { type: 'Point', coordinates: [77.6412, 12.9716] },
-      isAvailable: true,
-      lastDonationDate: '2026-06-18',
-      distance: 1.8,
-      matchScore: 98,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: true,
-      accepted: false,
-      eta: '18 mins'
-    },
-    {
-      id: 'user_donor_002',
-      _id: 'user_donor_002',
-      name: 'Deepak Kumar',
-      initials: 'DK',
-      phone: '+91 98201 44521',
-      isPhoneVerified: true,
-      bloodGroup: 'B+',
-      role: 'DONOR',
-      coordinates: { type: 'Point', coordinates: [77.6010, 12.9050] },
-      isAvailable: true,
-      lastDonationDate: null,
-      distance: 2.5,
-      matchScore: 100,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: true,
-      accepted: true,
-      eta: '25 mins'
-    },
-    {
-      id: 'user_donor_003',
-      _id: 'user_donor_003',
-      name: 'Kavita Rao',
-      initials: 'KR',
-      phone: '+91 97112 88764',
-      isPhoneVerified: true,
-      bloodGroup: 'O+',
-      role: 'DONOR',
-      coordinates: { type: 'Point', coordinates: [77.5900, 12.9100] },
-      isAvailable: true,
-      lastDonationDate: '2026-05-10',
-      distance: 4.1,
-      matchScore: 95,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: false,
-      accepted: false,
-      eta: '32 mins'
-    }
-  ],
+  // Registered Donors Pool (empty initially - saved dynamically as new donors register)
+  matchedDonorsPool: [],
 
-  // Donation history logs for donor spanning 2024 to 2026 across Indian healthcare institutions
-  donationHistory: [
-    {
-      date: 'Sep 18, 2026',
-      center: 'AIIMS Transfusion Medicine Centre, New Delhi',
-      subtext: 'Apheresis Bay #02 • Dr. Rajesh Sharma, MD',
-      type: 'Platelets (Single Donor Platelet)',
-      units: '2 Units (Apheresis)',
-      status: 'Completed (Verified)',
-      badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed'
-    },
-    {
-      date: 'Feb 12, 2026',
-      center: 'Manipal Hospital Comprehensive Blood Centre, Bengaluru',
-      subtext: 'Blood Bank Resuscitation Wing • Dr. Ananya Sen, MD',
-      type: 'Whole Blood',
-      units: '1 Unit (450 mL)',
-      status: 'Completed (Verified)',
-      badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed'
-    },
-    {
-      date: 'Aug 24, 2025',
-      center: 'Tata Memorial Centre Transfusion Unit, Mumbai',
-      subtext: 'Onco-Haematology Bay #05 • Dr. V. K. Murthy',
-      type: 'Packed Red Blood Cells (PRBC)',
-      units: '1 Unit (350 mL)',
-      status: 'Completed (Verified)',
-      badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed'
-    },
-    {
-      date: 'Jan 15, 2025',
-      center: 'Apollo Hospitals Blood Bank, Chennai',
-      subtext: 'Transfusion Bay #01 • Dr. Sunita Rao',
-      type: 'Whole Blood',
-      units: '1 Unit (450 mL)',
-      status: 'Completed (Verified)',
-      badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed'
-    },
-    {
-      date: 'May 10, 2024',
-      center: 'Fortis Memorial Research Institute Blood Bank, Gurugram',
-      subtext: 'Mobile Transfusion Unit 02 • Dr. Priya Nair',
-      type: 'Whole Blood',
-      units: '1 Unit (450 mL)',
-      status: 'Completed (Verified)',
-      badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed'
-    }
-  ]
+  // Donation history logs for donor (empty initially)
+  donationHistory: []
 };
 
 class Store {
@@ -416,17 +103,20 @@ class Store {
 
   loadState() {
     try {
+      // Purge legacy storage items with old mock data
+      ['donorpulse_state_in_v3', 'donorpulse_state_v2', 'donorpulse_state_v1', 'donorpulse_state_v4_live', 'blood_bank_state'].forEach(k => {
+        try { localStorage.removeItem(k); } catch(e) {}
+      });
+
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         const merged = { ...DEFAULT_STATE, ...parsed };
-        if (!Array.isArray(merged.registeredHospitals) || merged.registeredHospitals.length === 0) {
-          merged.registeredHospitals = [merged.hospital || DEFAULT_STATE.hospital];
-        }
-        // Upgrade matchedDonorsPool if missing phones or outdated
-        if (!Array.isArray(merged.matchedDonorsPool) || merged.matchedDonorsPool.length < DEFAULT_STATE.matchedDonorsPool.length || !merged.matchedDonorsPool[0]?.phone) {
-          merged.matchedDonorsPool = JSON.parse(JSON.stringify(DEFAULT_STATE.matchedDonorsPool));
-        }
+        if (!Array.isArray(merged.registeredHospitals)) merged.registeredHospitals = [];
+        if (!Array.isArray(merged.matchedDonorsPool)) merged.matchedDonorsPool = [];
+        if (!Array.isArray(merged.recipientCases)) merged.recipientCases = [];
+        if (!Array.isArray(merged.requests)) merged.requests = [];
+        if (!Array.isArray(merged.donationHistory)) merged.donationHistory = [];
         return merged;
       }
     } catch (e) {
@@ -459,11 +149,17 @@ class Store {
 
   // --- Donor methods ---
   getDonor() {
-    return this.state.donor;
+    return this.state.donor || null;
   }
 
   setDonor(donorData) {
     this.state.donor = { ...this.state.donor, ...donorData };
+    if (this.state.donor && Array.isArray(this.state.matchedDonorsPool)) {
+      const idx = this.state.matchedDonorsPool.findIndex(d => d.id === this.state.donor.id);
+      if (idx >= 0) {
+        this.state.matchedDonorsPool[idx] = { ...this.state.matchedDonorsPool[idx], ...donorData };
+      }
+    }
     this.saveState();
   }
 
@@ -473,10 +169,14 @@ class Store {
     const randomId = Math.floor(1000 + Math.random() * 9000);
     const newId = `DP-${randomId}-${cleanBloodCode}`;
 
-    this.state.donor = {
+    const newDonor = {
       id: newId,
+      _id: newId,
+      name: donorData.fullName || 'Registered Volunteer Donor',
       fullName: donorData.fullName || 'Registered Volunteer Donor',
+      initials: (donorData.fullName || 'VD').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
       age: parseInt(donorData.age || 25, 10),
+      gender: donorData.gender || 'Not specified',
       bloodGroup: rawBlood,
       phone: donorData.phone || '+91 98000 00000',
       email: donorData.email || 'donor@donor-pulse.in',
@@ -492,6 +192,11 @@ class Store {
       rewardPoints: 100,
       rewardTier: 'Active Registered Donor',
       nextTierPointsLeft: 400,
+      distance: 1.5,
+      isAvailable: true,
+      verified: true,
+      coordinates: { type: 'Point', coordinates: [77.6000, 12.9500] },
+      donationHistory: [],
       vitals: {
         hemoglobin: '14.2 g/dL',
         bp: '120/80 mmHg',
@@ -499,7 +204,47 @@ class Store {
         weight: '68 kg'
       }
     };
+
+    this.state.donor = newDonor;
+
+    // Persist registered donor to matchedDonorsPool so they can be matched across the grid
+    if (!Array.isArray(this.state.matchedDonorsPool)) {
+      this.state.matchedDonorsPool = [];
+    }
+    this.state.matchedDonorsPool = this.state.matchedDonorsPool.filter(d => d.id !== newId && d.phone !== newDonor.phone);
+    this.state.matchedDonorsPool.unshift(newDonor);
+
+    // If an active recipient request matches this donor's blood group, add to request donors
+    if (this.state.recipient && this.isBloodCompatible(newDonor.bloodGroup, this.state.recipient.bloodGroup)) {
+      if (!Array.isArray(this.state.recipient.donors)) {
+        this.state.recipient.donors = [];
+      }
+      const alreadyIn = this.state.recipient.donors.some(d => d.id === newDonor.id);
+      if (!alreadyIn) {
+        this.state.recipient.donors.push({
+          ...newDonor,
+          confirmed: false,
+          callStatus: 'ringing',
+          transitStatus: '📞 Ringing / Awaiting Confirmation',
+          statusClass: 'bg-amber-500/20 text-amber-800 font-semibold border border-amber-400/30',
+          notified: true,
+          liveEta: '15 mins',
+          transitMode: '🚗 Personal Vehicle',
+          progressPct: 15,
+          landmark: `${newDonor.distance} km away • Active in network`
+        });
+      }
+      if (!this.state.activeIncomingCall) {
+        this.ringDonor(this.state.recipient.requestId, newDonor.id);
+      }
+    }
+
     this.saveState();
+    this.notify();
+    this.broadcastSync({
+      type: 'NEW_DONOR_REGISTERED',
+      donor: newDonor
+    });
     return this.state.donor;
   }
 
@@ -671,17 +416,11 @@ class Store {
 
   // --- Recipient / Family & Friends methods ---
   getRecipient() {
-    if (!this.state.recipient) {
-      this.state.recipient = JSON.parse(JSON.stringify(DEFAULT_STATE.recipient));
-    }
-    return this.state.recipient;
+    return this.state.recipient || null;
   }
 
   getRecipientCases() {
-    if (!Array.isArray(this.state.recipientCases) || this.state.recipientCases.length === 0) {
-      this.state.recipientCases = JSON.parse(JSON.stringify(DEFAULT_STATE.recipientCases));
-    }
-    return this.state.recipientCases;
+    return Array.isArray(this.state.recipientCases) ? this.state.recipientCases : [];
   }
 
   switchRecipientCase(caseId) {
@@ -689,7 +428,9 @@ class Store {
     const found = cases.find(c => c.id === caseId || c.requestId === caseId);
     if (found) {
       this.state.recipient = found;
+      this.state.selectedRequestId = found.requestId;
       this.saveState();
+      this.notify();
       return found;
     }
     return this.state.recipient;
@@ -782,15 +523,6 @@ class Store {
     return { success: false, message: 'Invalid donor verification OTP code.' };
   }
 
-  // --- Recipient & Patient Case methods ---
-  getRecipient() {
-    return this.state.recipient || DEFAULT_STATE.recipient;
-  }
-
-  getRecipientCases() {
-    return this.state.recipientCases || DEFAULT_STATE.recipientCases;
-  }
-
   setRecipient(recipientData) {
     this.state.recipient = { ...this.state.recipient, ...recipientData };
     this.saveState();
@@ -803,21 +535,21 @@ class Store {
     const reqId = 'REQ-' + randomCaseNum;
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-    const patientName = (data.patientName && data.patientName.trim()) ? data.patientName.trim() : 'Emergency Patient';
+    const patientName = (data.patientName && data.patientName.trim()) ? data.patientName.trim() : 'Patient Case ' + randomCaseNum;
     const patientAge = parseInt(data.patientAge || 30, 10);
-    const patientGender = data.patientGender || 'Female';
-    const bloodGroup = data.bloodGroup || 'O-';
+    const patientGender = data.patientGender || 'Other';
+    const bloodGroup = (data.bloodGroup || 'O-').trim();
     const component = data.component || 'Platelets (Apheresis)';
     const units = parseInt(data.unitsRequired || data.units || 2, 10);
     const urgency = data.urgency || 'Stat Emergency (< 45 Mins)';
-    const hospitalName = (data.hospitalName && data.hospitalName.trim()) ? data.hospitalName.trim() : 'Apollo Hospitals & Apex Trauma Centre';
+    const hospitalName = (data.hospitalName && data.hospitalName.trim()) ? data.hospitalName.trim() : 'Emergency Trauma Center';
     const hospitalWard = (data.ward || data.hospitalWard || 'ICU Ward 4B, Bed 12').trim();
     const attendantName = (data.attendantName && data.attendantName.trim()) ? data.attendantName.trim() : 'Immediate Family';
     const attendantRelation = (data.attendantRelation && data.attendantRelation.trim()) ? data.attendantRelation.trim() : 'Family Attendant';
-    const attendantPhone = (data.attendantPhone && data.attendantPhone.trim()) ? data.attendantPhone.trim() : '+91 95280 33454';
+    const attendantPhone = (data.attendantPhone && data.attendantPhone.trim()) ? data.attendantPhone.trim() : '';
     const clinicalReason = (data.notes || data.clinicalReason || 'Acute clinical blood requirement, emergency broadcast.').trim();
 
-    // MATCH COMPATIBLE DONORS AND INITIALIZE IN RINGING STATE (0 CONFIRMED YET)
+    // MATCH COMPATIBLE DONORS ONLY FROM ACTUAL REGISTERED DONORS IN matchedDonorsPool!
     const compatDonors = this.getMatchedDonors(bloodGroup);
     const requestDonors = compatDonors.map((d, index) => ({
       ...d,
@@ -826,13 +558,13 @@ class Store {
       transitStatus: '📞 Ringing / Awaiting Confirmation',
       statusClass: 'bg-amber-500/20 text-amber-800 font-semibold border border-amber-400/30',
       notified: true,
-      liveEta: d.eta || `${Math.round(d.distance * 7 + 8)} mins`,
+      liveEta: d.eta || `${Math.round((d.distance || 2) * 7 + 8)} mins`,
       transitMode: index === 0 ? '🚗 Emergency Vehicle Corridor' : (index === 1 ? '🚊 Metro Rapid Line' : '🚗 Personal Vehicle'),
       progressPct: 15,
-      landmark: `${d.distance} km away • Within clinical radius`
+      landmark: `${d.distance || 2} km away • Within clinical radius`
     }));
 
-    const primaryDonor = requestDonors[0] || this.state.matchedDonorsPool[0];
+    const primaryDonor = requestDonors[0] || null;
 
     const newPatient = {
       id: caseId,
@@ -849,26 +581,26 @@ class Store {
       urgency,
       hospitalName,
       hospitalWard,
-      hospitalAddress: `${hospitalName}, Bengaluru`,
+      hospitalAddress: `${hospitalName}`,
       attendantName,
       attendantRelation,
       attendantPhone,
       attendantEmail: data.attendantEmail || 'attendant@donor-pulse.in',
-      doctorName: data.doctorRegId || data.doctorName || 'Dr. Aravind Sharma, MD',
+      doctorName: data.doctorRegId || data.doctorName || 'Attending Physician',
       doctorDepartment: 'Trauma & Critical Care',
-      doctorPhone: '+91 (80) 2630-4050 Ext 4429',
-      hospitalBloodDesk: '+91 (80) 2630-4050',
+      doctorPhone: attendantPhone || '+91 Emergency',
+      hospitalBloodDesk: attendantPhone || '+91 Emergency Desk',
       clinicalReason,
       handshakeOTP: otp,
-      trackingStage: 2, // Stage 2: Donors Alerted & Ringing
+      trackingStage: requestDonors.length > 0 ? 2 : 1, // Stage 2: Donors Alerted & Ringing; 1: Broadcast active
       broadcastDate: 'Just now',
       appealActive: true,
       donors: requestDonors,
       verificationProof: {
         documentType: data.proofDocType || data.documentType || 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
-        doctorRegId: data.doctorRegId || data.doctorName || 'Dr. Aravind Sharma (NMC/KMC-48921)',
-        ipdCaseNo: data.ipdCaseNo || 'IPD-9042-ICU',
-        fileName: data.proofFileName || data.fileName || 'apollo_blood_requisition_form27c_signed.pdf',
+        doctorRegId: data.doctorRegId || data.doctorName || 'Attending Physician',
+        ipdCaseNo: data.ipdCaseNo || `IPD-${randomCaseNum}-ICU`,
+        fileName: data.proofFileName || data.fileName || 'hospital_blood_requisition_signed.pdf',
         fileSize: data.proofFileSize || '1.4 MB',
         status: 'VERIFIED_GENUINE',
         verificationScore: '100% Genuine Requisition',
@@ -881,7 +613,7 @@ class Store {
     };
 
     this.state.recipient = newPatient;
-    if (!this.state.recipientCases) this.state.recipientCases = [];
+    if (!Array.isArray(this.state.recipientCases)) this.state.recipientCases = [];
     this.state.recipientCases.unshift(newPatient);
 
     // Also push to active requisitions pool
@@ -896,42 +628,46 @@ class Store {
       location: newPatient.hospitalAddress,
       notes: clinicalReason,
       createdAt: 'Just now',
-      status: 'Ringing Donors / Awaiting Confirmation',
-      trackingStage: 2,
+      status: requestDonors.length > 0 ? 'Ringing Donors / Awaiting Confirmation' : 'Broadcasting / Awaiting Donors',
+      trackingStage: requestDonors.length > 0 ? 2 : 1,
       matchedCount: requestDonors.length,
       acceptedCount: 0,
       enRouteCount: 0,
       donors: requestDonors
     };
-    if (!this.state.requests) this.state.requests = [];
+    if (!Array.isArray(this.state.requests)) this.state.requests = [];
     this.state.requests.unshift(newReq);
     this.state.selectedRequestId = reqId;
 
-    // Set active ringing call details
-    this.state.activeIncomingCall = {
-      requestId: reqId,
-      caseId: caseId,
-      patientName,
-      patientAge,
-      patientGender,
-      bloodGroup,
-      component,
-      unitsRequired: units,
-      urgency,
-      hospitalName,
-      hospitalWard,
-      attendantName,
-      attendantPhone,
-      clinicalReason,
-      donorId: primaryDonor ? primaryDonor.id : 'user_donor_001',
-      donorName: primaryDonor ? primaryDonor.name : 'Ananya Sharma',
-      donorPhone: primaryDonor ? primaryDonor.phone : '+91 98452 33109',
-      donorBloodGroup: primaryDonor ? primaryDonor.bloodGroup : 'O-',
-      donorDistance: primaryDonor ? primaryDonor.distance : 1.8,
-      donorEta: primaryDonor ? (primaryDonor.liveEta || primaryDonor.eta || '18 mins') : '18 mins',
-      status: 'ringing',
-      timestamp: Date.now()
-    };
+    // Set active ringing call details ONLY if a matched registered donor exists!
+    if (primaryDonor) {
+      this.state.activeIncomingCall = {
+        requestId: reqId,
+        caseId: caseId,
+        patientName,
+        patientAge,
+        patientGender,
+        bloodGroup,
+        component,
+        unitsRequired: units,
+        urgency,
+        hospitalName,
+        hospitalWard,
+        attendantName,
+        attendantPhone,
+        clinicalReason,
+        donorId: primaryDonor.id,
+        donorName: primaryDonor.name,
+        donorPhone: primaryDonor.phone,
+        donorBloodGroup: primaryDonor.bloodGroup,
+        donorDistance: primaryDonor.distance || 1.8,
+        donorEta: primaryDonor.liveEta || primaryDonor.eta || '18 mins',
+        status: 'ringing',
+        timestamp: Date.now()
+      };
+    } else {
+      this.state.activeIncomingCall = null;
+    }
 
     // Asynchronously sync with backend API pipeline (/api/requests)
     if (typeof fetch !== 'undefined') {
@@ -960,23 +696,27 @@ class Store {
     }
 
     this.saveState();
+    this.notify();
 
     // Broadcast sync event for cross-tab ringing
-    this.broadcastSync({
-      type: 'NEW_REQUEST_RINGING',
-      requestId: reqId,
-      activeIncomingCall: this.state.activeIncomingCall
-    });
+    if (this.state.activeIncomingCall) {
+      this.broadcastSync({
+        type: 'NEW_REQUEST_RINGING',
+        requestId: reqId,
+        activeIncomingCall: this.state.activeIncomingCall
+      });
+    }
 
     return newPatient;
   }
 
   // --- Requests methods ---
   getRequests() {
-    return this.state.requests;
+    return Array.isArray(this.state.requests) ? this.state.requests : [];
   }
 
   getSelectedRequest() {
+    if (!Array.isArray(this.state.requests) || this.state.requests.length === 0) return null;
     const req = this.state.requests.find(r => r.id === this.state.selectedRequestId);
     return req || this.state.requests[0];
   }
@@ -994,18 +734,19 @@ class Store {
       component: newReq.component || 'Whole Blood',
       units: parseInt(newReq.units || 1, 10),
       urgency: newReq.urgency || 'Urgent (< 2 Hours)',
-      hospitalName: this.state.hospital.name,
-      ward: newReq.ward || this.state.hospital.location,
-      location: newReq.location || this.state.hospital.city,
-      notes: newReq.notes || 'Emergency hospital requisition.',
+      hospitalName: (this.state.hospital && this.state.hospital.name) || 'City Blood Centre',
+      ward: newReq.ward || 'General Triage',
+      location: newReq.location || 'Bengaluru',
+      notes: newReq.notes || 'Emergency requisition.',
       createdAt: new Date().toLocaleString(),
-      status: 'Finding Donors',
-      trackingStage: 1, // Start at 1 (Raised)
-      matchedCount: Math.floor(6 + Math.random() * 10),
+      status: 'Broadcasting to Donors',
+      trackingStage: 1,
+      matchedCount: 0,
       acceptedCount: 0,
       enRouteCount: 0
     };
 
+    if (!Array.isArray(this.state.requests)) this.state.requests = [];
     this.state.requests.unshift(request);
     this.state.selectedRequestId = id;
     this.saveState();
@@ -1014,6 +755,7 @@ class Store {
 
   // --- Request Tracking methods ---
   advanceTrackingStage(requestId) {
+    if (!Array.isArray(this.state.requests)) return 1;
     const req = this.state.requests.find(r => r.id === (requestId || this.state.selectedRequestId));
     if (req) {
       if (req.trackingStage < 6) {
@@ -1031,7 +773,7 @@ class Store {
         req.status = statusMap[req.trackingStage];
 
         if (req.trackingStage >= 4 && req.acceptedCount === 0) {
-          req.acceptedCount = 2;
+          req.acceptedCount = 1;
           req.enRouteCount = 1;
         }
 
@@ -1043,6 +785,7 @@ class Store {
   }
 
   setTrackingStage(requestId, stage) {
+    if (!Array.isArray(this.state.requests)) return;
     const req = this.state.requests.find(r => r.id === (requestId || this.state.selectedRequestId));
     if (req && stage >= 1 && stage <= 6) {
       req.trackingStage = stage;
@@ -1072,15 +815,20 @@ class Store {
       'AB+': ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+']
     };
 
+    if (!Array.isArray(this.state.matchedDonorsPool)) {
+      return [];
+    }
+
     if (!targetBloodGroup) {
       return this.state.matchedDonorsPool;
     }
 
-    const allowedDonors = compatMap[targetBloodGroup] || ['O-'];
+    const allowedDonors = compatMap[targetBloodGroup] || [targetBloodGroup];
     return this.state.matchedDonorsPool.filter(d => allowedDonors.includes(d.bloodGroup));
   }
 
   notifyDonor(donorId) {
+    if (!Array.isArray(this.state.matchedDonorsPool)) return false;
     const donor = this.state.matchedDonorsPool.find(d => d.id === donorId);
     if (donor) {
       donor.notified = true;
@@ -1100,37 +848,29 @@ class Store {
     let storedDonors = (req && req.donors) || (recipient && recipient.requestId === reqId && recipient.donors);
 
     if (!storedDonors || !storedDonors.length) {
-      // STRICT MEDICAL ACCURACY: Only return compatible donors strictly mapped via getMatchedDonors.
+      // Return compatible registered donors from matchedDonorsPool ONLY!
       const compatible = this.getMatchedDonors(cleanBlood);
-      // For default initial demo state CASE-9042, keep first 2 as confirmed for baseline display
-      const isDefaultPrepopulated = (reqId === 'REQ-9042' && (!recipient || !recipient.isNewRequest));
+      if (!compatible || compatible.length === 0) {
+        return [];
+      }
 
-      storedDonors = compatible.map((d, index) => {
-        const isConfirmed = isDefaultPrepopulated ? (index < 2) : false;
-        return {
-          ...d,
-          confirmed: isConfirmed,
-          callStatus: isConfirmed ? 'confirmed' : 'ringing',
-          transitStatus: isConfirmed 
-            ? (index === 0 ? 'En Route' : 'In Transit')
-            : '📞 Ringing / Awaiting Confirmation',
-          statusClass: isConfirmed 
-            ? (index === 0 ? 'bg-primary-fixed text-primary font-bold' : 'bg-tertiary-fixed text-on-tertiary-fixed font-bold')
-            : 'bg-amber-500/20 text-amber-800 font-semibold border border-amber-400/30',
-          transitMode: index === 0 ? '🚗 Emergency Vehicle Corridor' : (index === 1 ? '🚊 Metro Rapid Line' : '🚗 Personal Vehicle'),
-          progressPct: isConfirmed ? (index === 0 ? 80 : 55) : 15,
-          landmark: isConfirmed 
-            ? (index === 0 ? 'Approaching hospital perimeter (0.5 km away)' : 'At Medical Plaza Station (2 stops away)')
-            : `Standby radius • ${d.distance} km away`,
-          liveEta: d.eta || `${Math.round(d.distance * 7 + 6)} mins`
-        };
-      });
+      storedDonors = compatible.map((d, index) => ({
+        ...d,
+        confirmed: false,
+        callStatus: 'ringing',
+        transitStatus: '📞 Ringing / Awaiting Confirmation',
+        statusClass: 'bg-amber-500/20 text-amber-800 font-semibold border border-amber-400/30',
+        transitMode: index === 0 ? '🚗 Emergency Vehicle Corridor' : (index === 1 ? '🚊 Metro Rapid Line' : '🚗 Personal Vehicle'),
+        progressPct: 15,
+        landmark: `Standby radius • ${d.distance || 2} km away`,
+        liveEta: d.eta || `${Math.round((d.distance || 2) * 7 + 6)} mins`
+      }));
 
       if (req) req.donors = storedDonors;
       if (recipient && recipient.requestId === reqId) recipient.donors = storedDonors;
     }
 
-    return storedDonors;
+    return storedDonors || [];
   }
 
   // Get only donors who confirmed availability for this request
@@ -1332,8 +1072,10 @@ class Store {
       recipient.donors = donorList;
     }
 
-    const firstDonor = donorList[0] || this.state.matchedDonorsPool[0];
-    this.ringDonor(effectiveReqId, firstDonor.id);
+    const firstDonor = donorList[0] || (this.state.matchedDonorsPool && this.state.matchedDonorsPool[0]);
+    if (firstDonor) {
+      this.ringDonor(effectiveReqId, firstDonor.id);
+    }
     return donorList;
   }
 

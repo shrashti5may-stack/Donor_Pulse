@@ -225,10 +225,10 @@ function initFormControllers() {
         fullName: formData.get('fullName')?.toString().trim() || 'New Registered Donor',
         age: parseInt(formData.get('age') || 25, 10),
         bloodGroup: formData.get('bloodGroup')?.toString().trim() || 'O-',
-        phone: formData.get('phone')?.toString().trim() || '+91 98452 33109',
-        email: formData.get('email')?.toString().trim() || 'ananya.sharma@donor-pulse.in',
-        address: formData.get('address')?.toString().trim() || '#482, 12th Main Road, HAL 2nd Stage, Indiranagar',
-        city: formData.get('city')?.toString().trim() || 'Bengaluru, Karnataka',
+        phone: formData.get('phone')?.toString().trim() || '+91 98000 00000',
+        email: formData.get('email')?.toString().trim() || 'donor@donor-pulse.in',
+        address: formData.get('address')?.toString().trim() || 'Address on file',
+        city: formData.get('city')?.toString().trim() || 'Local Area',
         medicalHistory: formData.get('medicalHistory')?.toString().trim() || 'Pre-screened verified donor. Clinical vitals within healthy standard range.',
         lastDonationDate: formData.get('lastDonationDate') || 'First-time Donor',
         availability: formData.get('availability') === 'on' || formData.get('availability') === 'true',
@@ -421,23 +421,23 @@ function initFormControllers() {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      const patientName = form.querySelector('[name="patientName"]')?.value?.trim() || 'Devika Sharma';
-      const patientAge = parseInt(form.querySelector('[name="patientAge"]')?.value || 32, 10);
-      const patientGender = form.querySelector('[name="patientGender"]')?.value || 'Female';
+      const patientName = form.querySelector('[name="patientName"]')?.value?.trim() || 'Emergency Patient';
+      const patientAge = parseInt(form.querySelector('[name="patientAge"]')?.value || 30, 10);
+      const patientGender = form.querySelector('[name="patientGender"]')?.value || 'Other';
       const bloodGroup = form.querySelector('input[name="blood_type"]:checked')?.value || 'B+';
-      const component = form.querySelector('[name="component"]')?.value || 'Platelets (Apheresis)';
-      const units = parseInt(form.querySelector('[name="units"]')?.value || 3, 10);
-      const hospitalName = form.querySelector('[name="hospitalName"]')?.value?.trim() || 'Apollo Hospitals & Apex Trauma Centre';
-      const ward = form.querySelector('[name="ward"]')?.value?.trim() || 'ICU Ward 4B, Bed 12';
-      const attendantName = form.querySelector('[name="attendantName"]')?.value?.trim() || 'Rajesh Sharma';
-      const attendantRelation = form.querySelector('[name="attendantRelation"]')?.value?.trim() || 'Brother / Attendant';
-      const attendantPhone = form.querySelector('[name="attendantPhone"]')?.value?.trim() || '+91 95280 33454';
+      const component = form.querySelector('[name="component"]')?.value || 'Whole Blood';
+      const units = parseInt(form.querySelector('[name="units"]')?.value || 2, 10);
+      const hospitalName = form.querySelector('[name="hospitalName"]')?.value?.trim() || 'Hospital Facility';
+      const ward = form.querySelector('[name="ward"]')?.value?.trim() || 'ICU Ward';
+      const attendantName = form.querySelector('[name="attendantName"]')?.value?.trim() || 'Family Attendant';
+      const attendantRelation = form.querySelector('[name="attendantRelation"]')?.value?.trim() || 'Immediate Relative';
+      const attendantPhone = form.querySelector('[name="attendantPhone"]')?.value?.trim() || '+91 98000 00000';
       const urgency = form.querySelector('[name="urgency"]')?.value || 'Stat Emergency (< 45 Mins)';
       const notes = form.querySelector('[name="notes"]')?.value?.trim() || 'Urgent clinical blood request for patient.';
       const proofDocType = form.querySelector('[name="proofDocType"]')?.value || 'Hospital Blood Requisition Slip (Form 27-C Stamped)';
-      const doctorRegId = form.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Dr. Aravind Sharma (NMC/KMC-48921)';
-      const ipdCaseNo = form.querySelector('[name="ipdCaseNo"]')?.value?.trim() || 'IPD-9042-ICU';
-      const proofFileName = form.querySelector('.proof-filename-display')?.textContent?.trim() || 'apollo_blood_requisition_form27c_signed.pdf';
+      const doctorRegId = form.querySelector('[name="doctorRegId"]')?.value?.trim() || 'Attending Physician';
+      const ipdCaseNo = form.querySelector('[name="ipdCaseNo"]')?.value?.trim() || '';
+      const proofFileName = form.querySelector('.proof-filename-display')?.textContent?.trim() || 'blood_requisition_form27c_signed.pdf';
 
       let newPatient = null;
       if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
@@ -475,7 +475,7 @@ function initFormControllers() {
       closeRequestModal();
       showToast(
         '🚨 Emergency Requisition Broadcasted!',
-        `Patient ${patientName} (${bloodGroup} ${component}) requisition #${newPatient ? newPatient.requestId : 'REQ-9042'} dispatched! Alerting & dialing proximate donors in radius. Donors will appear below as they confirm availability.`,
+        `Patient ${patientName} (${bloodGroup} ${component}) requisition #${newPatient ? newPatient.requestId : 'LIVE'} dispatched! Alerting & dialing proximate donors in radius. Donors will appear below as they confirm availability.`,
         'success'
       );
 
@@ -774,7 +774,7 @@ function initInteractiveWidgets() {
 
       closeUpdateNeedModal();
 
-      const patientName = (updatedRecipient && updatedRecipient.patientName) || 'Devika Sharma';
+      const patientName = (updatedRecipient && updatedRecipient.patientName) || 'Emergency Patient';
       const bloodGroup = (updatedRecipient && updatedRecipient.bloodGroup) || 'B+';
       const comp = (updatedRecipient && updatedRecipient.component) || 'Platelets';
 
@@ -821,7 +821,7 @@ function initInteractiveWidgets() {
 
       closeRequestMoreBloodModal();
 
-      const patientName = (updatedRecipient && updatedRecipient.patientName) || 'Devika Sharma';
+      const patientName = (updatedRecipient && updatedRecipient.patientName) || 'Emergency Patient';
       const bloodGroup = (updatedRecipient && updatedRecipient.bloodGroup) || 'B+';
       const comp = (updatedRecipient && updatedRecipient.component) || 'Platelets';
 
@@ -869,7 +869,7 @@ function initInteractiveWidgets() {
       closeRequestMoreBloodModal();
       closeUpdateNeedModal();
 
-      const patientName = (updatedRecipient && updatedRecipient.patientName) || 'Devika Sharma';
+      const patientName = (updatedRecipient && updatedRecipient.patientName) || 'Emergency Patient';
       const bloodGroup = (updatedRecipient && updatedRecipient.bloodGroup) || 'B+';
       const comp = (updatedRecipient && updatedRecipient.component) || 'Platelets';
 
@@ -1428,21 +1428,21 @@ function fillDemoRaiseRequest() {
     if (el) el.value = val;
   };
 
-  setVal('patientName', 'Devika Sharma');
-  setVal('patientAge', '32');
+  setVal('patientName', 'Emergency Patient');
+  setVal('patientAge', '30');
   setVal('patientGender', 'Female');
-  setVal('hospitalName', 'Apollo Hospitals & Apex Trauma Centre');
-  setVal('ward', 'ICU Ward 4B, Bed 12');
-  setVal('component', 'Platelets (Apheresis)');
-  setVal('units', '3');
+  setVal('hospitalName', 'Metro Trauma Blood Centre');
+  setVal('ward', 'ICU Emergency Bed 4');
+  setVal('component', 'Whole Blood (Universal)');
+  setVal('units', '2');
   setVal('urgency', 'Stat Emergency (< 45 Mins)');
-  setVal('attendantName', 'Rajesh Sharma');
-  setVal('attendantRelation', 'Brother / Primary Attendant');
-  setVal('attendantPhone', '+91 95280 33454');
-  setVal('notes', 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.');
+  setVal('attendantName', 'Duty Attendant');
+  setVal('attendantRelation', 'Immediate Family');
+  setVal('attendantPhone', '+91 98000 12345');
+  setVal('notes', 'Acute hemorrhagic requirement. Immediate compatible donor transfusion needed.');
   setVal('proofDocType', 'Hospital Blood Requisition Slip (Form 27-C Stamped)');
-  setVal('doctorRegId', 'Dr. Aravind Sharma (NMC/KMC-48921)');
-  setVal('ipdCaseNo', 'IPD-9042-ICU');
+  setVal('doctorRegId', 'Duty Medical Officer (NMC-REG-2026)');
+  setVal('ipdCaseNo', 'IPD-EMERGENCY-ICU');
 
   const fileLabel = modal.querySelector('.proof-filename-display');
   if (fileLabel) fileLabel.textContent = 'apollo_blood_requisition_form27c_signed.pdf';
@@ -1524,17 +1524,17 @@ function openMedicalProofViewer(customData) {
   const currentPatient = (customData) || (window.PulseStore && window.PulseStore.state && window.PulseStore.state.recipient) || {};
   const form = document.querySelector('.form-blood-request');
   
-  const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Devika Sharma';
-  const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 32;
-  const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Female';
-  const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'ICU Ward 4B, Bed 12';
+  const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Emergency Patient';
+  const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 30;
+  const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Other';
+  const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'General Ward';
   const blood = (form && form.querySelector('input[name="blood_type"]:checked')?.value) || currentPatient.bloodGroup || 'B+';
-  const component = (form && form.querySelector('[name="component"]')?.value) || currentPatient.component || 'Platelets (Apheresis)';
-  const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 3;
+  const component = (form && form.querySelector('[name="component"]')?.value) || currentPatient.component || 'Whole Blood';
+  const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 2;
   const urgency = (form && form.querySelector('[name="urgency"]')?.value) || currentPatient.urgency || 'Stat Emergency (< 45 Mins)';
-  const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.';
-  const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Dr. Aravind Sharma (NMC/KMC-48921)';
-  const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-9042-ICU';
+  const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Urgent clinical blood requisition.';
+  const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Attending Physician';
+  const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-RECORD';
 
   const setText = (id, txt) => {
     const el = document.getElementById(id);
@@ -1556,7 +1556,7 @@ function openMedicalProofViewer(customData) {
   setText('doc-proof-urgency', urgency);
   setText('doc-proof-notes', notes);
   setText('doc-proof-doctor-reg', `${doctor} — Registered Practitioner`);
-  setText('doc-proof-sl-no', `REQ-9042 / ${ipd}`);
+  setText('doc-proof-sl-no', `${currentPatient.requestId || 'REQ-LIVE'} / ${ipd}`);
 
   modal.classList.remove('hidden');
   document.body.classList.add('overflow-hidden');
@@ -1587,22 +1587,29 @@ function openUpdateNeedModal() {
 
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
-    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets (Apheresis)', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', hospitalWard: 'ICU Ward 4B, Bed 12', requestId: 'REQ-9042', unitsRequired: 3, unitsArranged: 2, unitsFulfilled: 1, attendantName: 'Rajesh Sharma', attendantPhone: '+91 95280 33454', doctorName: 'Dr. Aravind Sharma' };
+    : null;
 
-  currentUpdateNeedBase = parseInt(recipient.unitsRequired || 3, 10);
+  if (!recipient) {
+    if (typeof showToast === 'function') {
+      showToast('No Active Case', 'Please raise an emergency blood requisition first before updating requirements.', 'warning');
+    }
+    return;
+  }
+
+  currentUpdateNeedBase = parseInt(recipient.unitsRequired || 2, 10);
 
   // Populate context elements
   modal.querySelectorAll('.update-need-blood-badge').forEach(el => el.textContent = recipient.bloodGroup || 'B+');
-  modal.querySelectorAll('.update-need-patient-name').forEach(el => el.textContent = recipient.patientName || 'Devika Sharma');
-  modal.querySelectorAll('.update-need-req-id').forEach(el => el.textContent = '#' + (recipient.requestId || 'REQ-9042'));
+  modal.querySelectorAll('.update-need-patient-name').forEach(el => el.textContent = recipient.patientName || 'Emergency Patient');
+  modal.querySelectorAll('.update-need-req-id').forEach(el => el.textContent = '#' + (recipient.requestId || 'LIVE'));
   modal.querySelectorAll('.update-need-component-hospital').forEach(el => {
-    el.textContent = `${recipient.component || 'Platelets (Apheresis)'} • ${recipient.hospitalName || 'Apollo Hospitals & Apex Trauma Centre'} (${recipient.hospitalWard || 'ICU Ward 4B, Bed 12'})`;
+    el.textContent = `${recipient.component || 'Blood'} • ${recipient.hospitalName || 'Hospital'} (${recipient.hospitalWard || 'Ward'})`;
   });
   modal.querySelectorAll('.update-need-attendant-info').forEach(el => {
-    el.textContent = `Attendant: ${recipient.attendantName || 'Rajesh Sharma'} (${recipient.attendantPhone || '+91 95280 33454'}) • Doctor: ${recipient.doctorName || 'Dr. Aravind Sharma'} (Form 27-C Verified)`;
+    el.textContent = `Attendant: ${recipient.attendantName || 'Attendant'} (${recipient.attendantPhone || '--'}) • Doctor: ${recipient.doctorName || 'Attending Physician'} (Form 27-C Verified)`;
   });
   modal.querySelectorAll('.update-need-current-req').forEach(el => el.textContent = `${currentUpdateNeedBase} Units`);
-  modal.querySelectorAll('.update-need-arranged').forEach(el => el.textContent = `${recipient.unitsArranged || 2} Donors`);
+  modal.querySelectorAll('.update-need-arranged').forEach(el => el.textContent = `${recipient.unitsArranged || 0} Donors`);
   modal.querySelectorAll('.update-need-fulfilled').forEach(el => el.textContent = `${recipient.unitsFulfilled || 1} Received`);
 
   const input = document.getElementById('update-need-units-input');
@@ -1687,19 +1694,26 @@ function openRequestMoreBloodModal() {
 
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
-    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets (Apheresis)', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', hospitalWard: 'ICU Ward 4B, Bed 12', requestId: 'REQ-9042', unitsRequired: 3, unitsArranged: 2, unitsFulfilled: 1, attendantName: 'Rajesh Sharma', attendantPhone: '+91 95280 33454', doctorName: 'Dr. Aravind Sharma' };
+    : null;
 
-  currentFulfilledUnits = Math.max(1, parseInt(recipient.unitsFulfilled || 1, 10));
+  if (!recipient) {
+    if (typeof showToast === 'function') {
+      showToast('No Active Case', 'Please raise an emergency blood requisition first to request additional units.', 'warning');
+    }
+    return;
+  }
+
+  currentFulfilledUnits = Math.max(0, parseInt(recipient.unitsFulfilled || 0, 10));
 
   modal.querySelectorAll('.request-more-blood-badge, .update-modal-blood-badge').forEach(el => el.textContent = recipient.bloodGroup || 'B+');
-  modal.querySelectorAll('.request-more-patient-name, .update-modal-patient-name').forEach(el => el.textContent = recipient.patientName || 'Devika Sharma');
-  modal.querySelectorAll('.request-more-req-id, .update-modal-req-id').forEach(el => el.textContent = '#' + (recipient.requestId || 'REQ-9042'));
-  modal.querySelectorAll('.request-more-hospital-name').forEach(el => el.textContent = recipient.hospitalName || 'Apollo Hospitals & Apex Trauma Centre');
+  modal.querySelectorAll('.request-more-patient-name, .update-modal-patient-name').forEach(el => el.textContent = recipient.patientName || 'Emergency Patient');
+  modal.querySelectorAll('.request-more-req-id, .update-modal-req-id').forEach(el => el.textContent = '#' + (recipient.requestId || 'LIVE'));
+  modal.querySelectorAll('.request-more-hospital-name').forEach(el => el.textContent = recipient.hospitalName || 'Hospital');
   modal.querySelectorAll('.request-more-comp-hosp, .update-modal-component-hospital').forEach(el => {
-    el.textContent = `${recipient.component || 'Platelets (Apheresis)'} • ${recipient.hospitalName || 'Apollo Hospitals & Apex Trauma Centre'} (${recipient.hospitalWard || 'ICU Ward 4B, Bed 12'})`;
+    el.textContent = `${recipient.component || 'Blood'} • ${recipient.hospitalName || 'Hospital'} (${recipient.hospitalWard || 'Ward'})`;
   });
   modal.querySelectorAll('.request-more-attendant-info, .update-modal-attendant-info').forEach(el => {
-    el.textContent = `Attendant: ${recipient.attendantName || 'Rajesh Sharma'} (${recipient.attendantPhone || '+91 95280 33454'}) • Doctor: ${recipient.doctorName || 'Dr. Aravind Sharma'} (Form 27-C Verified)`;
+    el.textContent = `Attendant: ${recipient.attendantName || 'Attendant'} (${recipient.attendantPhone || '--'}) • Doctor: ${recipient.doctorName || 'Attending Physician'} (Form 27-C Verified)`;
   });
   modal.querySelectorAll('.request-more-fulfilled-display, .update-modal-fulfilled').forEach(el => el.textContent = `${currentFulfilledUnits} Received`);
 
@@ -2010,8 +2024,80 @@ function renderAllViews() {
  * Render Donor Dashboard
  */
 function renderDonorDashboard() {
-  const donor = window.PulseStore.getDonor();
-  if (!donor) return;
+  const donor = window.PulseStore ? window.PulseStore.getDonor() : null;
+  
+  if (!donor) {
+    // Show empty / unauthenticated state on Donor Dashboard
+    setTextContentAll('.donor-name-display', 'Volunteer Donor');
+    setTextContentAll('.donor-id-display', 'Unregistered Volunteer');
+    setTextContentAll('.donor-blood-display', '--');
+    setTextContentAll('.donor-age-display', '--');
+    setTextContentAll('.donor-address-display', 'No registered address');
+    setTextContentAll('.donor-location-display', 'Register to set location');
+    setTextContentAll('.donor-distance-display', '--');
+    setTextContentAll('.donor-last-date-display', 'None');
+    setTextContentAll('.donor-donations-display', '0 Units');
+    setTextContentAll('.donor-lives-display', '0 Lives Saved');
+    setTextContentAll('.donor-points-display', '0');
+    setTextContentAll('.donor-tier-display', 'Volunteer Network');
+    setTextContentAll('.donor-next-tier-display', 'Register to join');
+
+    const switcherContainer = document.getElementById('donor-profile-switcher-container');
+    if (switcherContainer) switcherContainer.innerHTML = '';
+
+    const missionBanner = document.getElementById('donor-emergency-mission-banner');
+    if (missionBanner) {
+      missionBanner.classList.remove('hidden');
+      missionBanner.innerHTML = `
+        <div class="p-4 sm:p-5 rounded-2xl bg-primary/10 border-2 border-dashed border-primary/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-xl bg-primary text-white flex items-center justify-center shrink-0 shadow-sm">
+              <span class="material-symbols-outlined text-[26px]">how_to_reg</span>
+            </div>
+            <div>
+              <h4 class="font-bold text-sm sm:text-base text-on-surface">No Registered Donor Profile Found</h4>
+              <p class="text-xs text-on-surface-variant mt-0.5">Register your donor profile to join our emergency national network and receive real-time alerts for patients in need.</p>
+            </div>
+          </div>
+          <button type="button" onclick="openDonorRegisterModal()" class="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all shadow-sm shrink-0 flex items-center gap-1.5 cursor-pointer self-start sm:self-center">
+            <span class="material-symbols-outlined text-[16px]">add_circle</span>
+            <span>Register as Donor Now</span>
+          </button>
+        </div>
+      `;
+    }
+
+    const codeRedSec = document.getElementById('donor-code-red-title')?.closest('section');
+    if (codeRedSec) codeRedSec.classList.add('hidden');
+
+    const reqGrid = document.querySelector('#donor-requests-section .grid');
+    if (reqGrid) {
+      reqGrid.innerHTML = `
+        <div class="col-span-full p-8 rounded-2xl bg-surface-container-lowest border border-dashed border-outline-variant/60 text-center flex flex-col items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[36px] text-primary">volunteer_activism</span>
+          <h3 class="font-headline-sm text-base font-bold text-on-surface">Register to View &amp; Answer Nearby Blood Requests</h3>
+          <p class="text-xs text-on-surface-variant max-w-md">Once registered, clinical blood demands matching your blood type will appear here in real time.</p>
+          <button type="button" onclick="openDonorRegisterModal()" class="mt-2 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer hover:bg-primary-container">Register as Donor</button>
+        </div>
+      `;
+    }
+
+    const historyTbody = document.querySelector('#donor-history-section tbody');
+    if (historyTbody) {
+      historyTbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="py-8 text-center text-on-surface-variant">
+            <div class="flex flex-col items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[32px] text-secondary/60">history</span>
+              <span class="font-medium text-sm text-on-surface">No Completed Donations Yet</span>
+              <span class="text-xs text-on-surface-variant max-w-sm">When you complete verified blood donations, your digitally attested certificates and logs will appear here.</span>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+    return;
+  }
 
   // Name, ID, Age, Address, Blood Group
   setTextContentAll('.donor-name-display', donor.fullName);
@@ -2023,8 +2109,8 @@ function renderDonorDashboard() {
   setTextContentAll('.donor-location-display', locStr);
   setTextContentAll('.donor-distance-display', `Within ${donor.radiusMiles || 10} km`);
   setTextContentAll('.donor-last-date-display', donor.lastDonationDate || 'First-time Donor');
-  setTextContentAll('.donor-donations-display', `${donor.totalDonations} Units`);
-  setTextContentAll('.donor-lives-display', `${donor.livesSaved} Lives Saved to Date`);
+  setTextContentAll('.donor-donations-display', `${donor.totalDonations || 0} Units`);
+  setTextContentAll('.donor-lives-display', `${donor.livesSaved || 0} Lives Saved to Date`);
   setTextContentAll('.donor-points-display', (donor.rewardPoints || 0).toLocaleString());
   setTextContentAll('.donor-tier-display', donor.rewardTier || 'Active Registered Donor');
   setTextContentAll('.donor-next-tier-display', `Next: Platinum (${donor.nextTierPointsLeft || 400} pts left)`);
@@ -2050,12 +2136,6 @@ function renderDonorDashboard() {
   setTextContentAll('.donor-blood-receive-note', traits.note);
   setTextContentAll('.donor-blood-reserve-tag', traits.reserve);
 
-  // Dynamic Urgent Notification Banner on Donor Dashboard
-  const codeRedTitle = document.getElementById('donor-code-red-title');
-  if (codeRedTitle) {
-    codeRedTitle.innerHTML = `CRITICAL: Urgent ${donor.bloodGroup} units needed at Manipal Hospital Trauma Center`;
-  }
-
   // Availability Toggle & Badge
   if (window.updateDonorAvailabilityUI) {
     window.updateDonorAvailabilityUI(donor.availability);
@@ -2064,7 +2144,7 @@ function renderDonorDashboard() {
   // Update vitals pass text if present
   const vitalsPassText = document.getElementById('donor-vitals-pass-text');
   if (vitalsPassText && donor.vitals) {
-    vitalsPassText.textContent = `Instant clinical check-in QR code active. Verified vitals: Hemoglobin ${donor.vitals.hemoglobin || '14.8 g/dL'} (Normal) • BP ${donor.vitals.bp || '118/76 mmHg'}.`;
+    vitalsPassText.textContent = `Instant clinical check-in QR code active. Verified vitals: Hemoglobin ${donor.vitals.hemoglobin || '14.2 g/dL'} (Normal) • BP ${donor.vitals.bp || '120/80 mmHg'}.`;
   }
 
   // 1. Populate Active Donor Profile Switcher Bar
@@ -2089,7 +2169,7 @@ function renderDonorDashboard() {
           <select id="donor-profile-select" onchange="window.switchActiveDonorProfile(this.value)" class="px-3 py-1.5 rounded-xl bg-surface-container-low border border-surface-container text-xs font-bold text-on-surface focus:ring-1 focus:ring-primary cursor-pointer shadow-2xs">
             ${pool.map(d => `
               <option value="${escapeHtml(d.id)}" ${(d.id === donor.id || d.name === donor.fullName) ? 'selected' : ''}>
-                ${escapeHtml(d.name)} (${escapeHtml(d.bloodGroup)} • ${d.distance} km) ${d.confirmed ? '✅ Confirmed' : ''}
+                ${escapeHtml(d.name)} (${escapeHtml(d.bloodGroup)} • ${d.distance || 1.5} km) ${d.confirmed ? '✅ Confirmed' : ''}
               </option>
             `).join('')}
           </select>
@@ -2137,7 +2217,7 @@ function renderDonorDashboard() {
         missionBanner.innerHTML = `
           <div class="p-3.5 rounded-2xl bg-surface-container-high border border-surface-container flex items-center justify-between gap-3">
             <span class="text-xs text-on-surface-variant font-medium">You marked unavailable / declined for ${escapeHtml(recipient.patientName)}'s requisition.</span>
-            <button type="button" onclick="window.checkAndRingMatchedDonor()" class="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-highest text-primary text-xs font-bold cursor-pointer">Reconsider & Ring</button>
+            <button type="button" onclick="window.checkAndRingMatchedDonor()" class="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-highest text-primary text-xs font-bold cursor-pointer">Reconsider &amp; Ring</button>
           </div>
         `;
       } else {
@@ -2184,10 +2264,125 @@ function renderDonorDashboard() {
       <div class="p-3 rounded-2xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3">
         <div class="flex items-center gap-2 text-xs text-on-surface-variant font-medium">
           <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
-          <span>No active requests matching your profile in your area.</span>
+          <span>No active requests currently pending. Your profile is on standby.</span>
         </div>
       </div>
     `;
+  }
+
+  // 3. Dynamic Nearby Blood Requests Interactive Grid
+  const allReqs = (window.PulseStore && typeof window.PulseStore.getRequests === 'function')
+    ? window.PulseStore.getRequests()
+    : [];
+  const reqGrid = document.querySelector('#donor-requests-section .grid');
+  const codeRedSec = document.getElementById('donor-code-red-title')?.closest('section');
+  const matchingReq = allReqs.find(r => window.PulseStore.isBloodCompatible(donor.bloodGroup, r.bloodGroup));
+
+  if (matchingReq && codeRedSec) {
+    codeRedSec.classList.remove('hidden');
+    const codeRedTitle = document.getElementById('donor-code-red-title');
+    if (codeRedTitle) {
+      codeRedTitle.innerHTML = `CRITICAL: Urgent ${escapeHtml(matchingReq.bloodGroup)} units needed at ${escapeHtml(matchingReq.hospitalName)}`;
+    }
+  } else if (codeRedSec) {
+    codeRedSec.classList.add('hidden');
+  }
+
+  if (reqGrid) {
+    if (allReqs.length === 0) {
+      reqGrid.innerHTML = `
+        <div class="col-span-full p-8 rounded-2xl bg-surface-container-lowest border border-dashed border-outline-variant/60 text-center flex flex-col items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[36px] text-emerald-600">verified</span>
+          <h3 class="font-headline-sm text-base font-bold text-on-surface">No Emergency Blood Requests Pending</h3>
+          <p class="text-xs text-on-surface-variant max-w-md">All current clinical demands are fulfilled. Your donor profile is active and on call. As soon as a patient needs ${escapeHtml(donor.bloodGroup)} blood, you will receive an emergency ring.</p>
+        </div>
+      `;
+    } else {
+      reqGrid.innerHTML = allReqs.map(r => {
+        const isCompat = window.PulseStore.isBloodCompatible(donor.bloodGroup, r.bloodGroup);
+        return `
+          <div class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-lg hover:border-primary/40 border ${isCompat ? 'border-primary ring-2 ring-primary/20' : 'border-surface-container-high'} transition-all p-space-md flex flex-col justify-between gap-space-md">
+            <div class="flex flex-col gap-space-sm">
+              <div class="flex items-start justify-between gap-space-xs">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${isCompat ? 'bg-error-container text-primary font-bold' : 'bg-surface-container text-on-surface'} text-xs font-label-badge uppercase tracking-wider">
+                  ${isCompat ? '<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> MATCHES YOUR TYPE' : escapeHtml(r.urgency || 'URGENT')}
+                </span>
+                <div class="w-9 h-9 rounded-full ${isCompat ? 'bg-error-container/60 text-primary' : 'bg-surface-container text-on-surface'} font-bold flex items-center justify-center text-label-lg">
+                  ${escapeHtml(r.bloodGroup)}
+                </div>
+              </div>
+              <div>
+                <h3 class="font-title-md text-title-md font-bold text-on-surface">${escapeHtml(r.hospitalName)}</h3>
+                <span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+                  <span class="material-symbols-outlined text-[16px] text-primary">pin_drop</span>
+                  ${escapeHtml(r.ward || r.location || 'Emergency Resuscitation Wing')}
+                </span>
+              </div>
+              <div class="bg-surface-container-low p-space-xs rounded-lg flex items-center justify-between font-body-sm text-body-sm">
+                <span class="text-on-surface-variant">Demand:</span>
+                <span class="font-bold text-on-surface">${escapeHtml(r.units)} Unit(s) • ${escapeHtml(r.component || 'Whole Blood')}</span>
+              </div>
+              <div class="bg-surface-container-low p-space-xs rounded-lg flex items-center justify-between font-body-sm text-body-sm">
+                <span class="text-on-surface-variant">Status:</span>
+                <span class="font-semibold text-primary">${escapeHtml(r.status || 'Active Broadcast')}</span>
+              </div>
+            </div>
+            ${isCompat ? `
+              <button type="button" onclick="window.openIncomingDonorCallModal('${donor.id}')" class="w-full py-2.5 px-space-md rounded-xl bg-primary text-white font-label-lg text-xs font-bold hover:bg-primary-container transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+                <span class="material-symbols-outlined text-[18px]">ring_volume</span>
+                <span>Answer Emergency Requisition</span>
+              </button>
+            ` : `
+              <div class="p-2 rounded-xl bg-surface-container text-center text-[11px] text-on-surface-variant font-medium">
+                Incompatible (${escapeHtml(donor.bloodGroup)} donor vs ${escapeHtml(r.bloodGroup)} needed)
+              </div>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // 4. Dynamic Donation History Table
+  const historyTbody = document.querySelector('#donor-history-section tbody');
+  const dHistory = donor.donationHistory || [];
+  if (historyTbody) {
+    if (dHistory.length === 0) {
+      historyTbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="py-8 text-center text-on-surface-variant">
+            <div class="flex flex-col items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[32px] text-secondary/60">history</span>
+              <span class="font-medium text-sm text-on-surface">No Completed Donations Yet</span>
+              <span class="text-xs text-on-surface-variant max-w-sm">When you complete verified blood donations, your digitally attested certificates and logs will appear here.</span>
+            </div>
+          </td>
+        </tr>
+      `;
+    } else {
+      historyTbody.innerHTML = dHistory.map(rec => `
+        <tr class="hover:bg-surface transition-colors">
+          <td class="py-3.5 px-space-sm font-semibold text-on-surface whitespace-nowrap">${escapeHtml(rec.date)}</td>
+          <td class="py-3.5 px-space-sm">
+            <div class="flex flex-col">
+              <span class="font-medium text-on-surface">${escapeHtml(rec.center)}</span>
+              <span class="text-[12px] text-on-surface-variant">${escapeHtml(rec.subtext || '')}</span>
+            </div>
+          </td>
+          <td class="py-3.5 px-space-sm"><span class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-medium whitespace-nowrap">${escapeHtml(rec.type)}</span></td>
+          <td class="py-3.5 px-space-sm whitespace-nowrap"><span class="font-semibold text-on-surface">${escapeHtml(rec.units)}</span></td>
+          <td class="py-3.5 px-space-sm whitespace-nowrap">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed font-bold leading-tight">
+              <span class="material-symbols-outlined text-[16px] text-primary shrink-0">verified</span>
+              <span>Completed</span>
+            </span>
+          </td>
+          <td class="py-3.5 px-space-sm text-right whitespace-nowrap">
+            <span class="text-xs font-mono text-secondary">Attested</span>
+          </td>
+        </tr>
+      `).join('');
+    }
   }
 
   // Check and ring if user is active donor and matched!
@@ -2262,82 +2457,165 @@ function populateDonorProfileForm() {
  * Dedicated to blood recipients, their relatives, or friends coordinating emergency blood.
  * ============================================================================
  */
+function renderEmptyRecipientDashboard() {
+  setTextContentAll('.patient-name-display', 'No Active Requisition');
+  setTextContentAll('.patient-blood-display', 'Standby');
+  setTextContentAll('.patient-blood-group-badge', '--');
+  setTextContentAll('.patient-component-display', 'Standby');
+  setTextContentAll('.patient-meta-display', 'Portal on standby • Raise an emergency requisition below');
+  setTextContentAll('.attendant-name-display', 'No Active Attendant');
+  setTextContentAll('.attendant-phone-display', '--');
+  setTextContentAll('.hospital-name-display', 'National Blood Network');
+  setTextContentAll('.hospital-location-display', 'Standby for patient requisition');
+  setTextContentAll('.hospital-phone-display', '--');
+  setTextContentAll('.hospital-ward-display', 'Standby Ward');
+  setTextContentAll('.doctor-name-display', 'Standby Triage');
+  setTextContentAll('.doctor-meta-display', 'National Haemovigilance Grid');
+  setTextContentAll('.case-id-display', 'Case: None');
+  setTextContentAll('.patient-case-display', 'No Active Patient Case — Requisition Standby');
+  setTextContentAll('.recipient-req-id-display', 'NONE');
+  setTextContentAll('.handshake-otp-display', '----');
+  setTextContentAll('.recipient-urgency-display', 'Standby');
+  setTextContentAll('.patient-units-summary', '0 Units Required');
+  setTextContentAll('.patient-units-needed', '0 Units');
+  setTextContentAll('.patient-units-enroute', '0 En Route');
+  setTextContentAll('.patient-units-fulfilled', '0 Received');
+  setTextContentAll('.recipient-donors-count-badge', '0 Donors');
+  setTextContentAll('.recipient-donors-active-count', '0');
+
+  document.querySelectorAll('.recipient-progress-bar').forEach(bar => {
+    bar.style.width = '0%';
+  });
+  setTextContentAll('.recipient-progress-pct', '0% Arranged');
+
+  const donorsContainer = document.getElementById('recipient-donors-container');
+  if (donorsContainer) {
+    donorsContainer.innerHTML = `
+      <div class="p-8 rounded-2xl bg-surface-container-lowest border-2 border-dashed border-outline-variant/60 text-center flex flex-col items-center justify-center gap-3">
+        <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-[32px]">cell_tower</span>
+        </div>
+        <h4 class="font-headline-sm text-base font-bold text-on-surface">No Active Emergency Blood Requisition</h4>
+        <p class="text-xs text-on-surface-variant max-w-md">There are currently no active patient requisitions in the network. Raise an emergency requisition below to broadcast immediately to verified matching donors.</p>
+        <button type="button" onclick="window.openRaiseRequestModal()" class="mt-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold shadow-md transition-all flex items-center gap-2 cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>+ Raise Emergency Blood Requisition</span>
+        </button>
+      </div>
+    `;
+  }
+
+  const stepperContainer = document.getElementById('recipient-stepper-container');
+  if (stepperContainer) {
+    const stages = [
+      { num: 1, name: 'Requisition Raised', sub: 'Standby', icon: 'campaign' },
+      { num: 2, name: 'Donors Alerted', sub: 'Standby', icon: 'cell_tower' },
+      { num: 3, name: 'Donors Accepted', sub: 'Standby', icon: 'how_to_reg' },
+      { num: 4, name: 'En Route to Hospital', sub: 'Standby', icon: 'directions_car' },
+      { num: 5, name: 'Blood Bank Intake', sub: 'Standby', icon: 'science' },
+      { num: 6, name: 'Transfusion Ready', sub: 'Standby', icon: 'favorite' }
+    ];
+    stepperContainer.innerHTML = stages.map(s => `
+      <div class="flex flex-col items-center text-center p-2.5 rounded-xl opacity-60">
+        <div class="w-11 h-11 rounded-full flex items-center justify-center mb-2 bg-surface-container-high text-on-surface-variant">
+          <span class="material-symbols-outlined text-[20px]">${s.icon}</span>
+        </div>
+        <span class="text-xs font-bold text-on-surface leading-tight">${s.name}</span>
+        <span class="text-[10px] text-on-surface-variant mt-0.5">${s.sub}</span>
+        <span class="mt-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider text-secondary">Standby</span>
+      </div>
+    `).join('');
+  }
+
+  const teleCard = document.getElementById('recipient-sidebar-telemetry');
+  if (teleCard) {
+    teleCard.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant shrink-0">
+            <span class="material-symbols-outlined text-[18px]">cell_tower</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">Standby Telemetry</span>
+            <span class="text-[11px] text-secondary leading-tight">No Active Requisition</span>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded bg-surface-container font-label-badge text-[10px] text-on-surface-variant font-bold shrink-0">Standby</span>
+      </div>
+      <div class="p-2 rounded-xl bg-surface-container-low flex items-center justify-between text-[11px] text-on-surface-variant">
+        <span>Awaiting emergency case broadcast</span>
+        <span class="text-secondary font-bold">ETA: --</span>
+      </div>
+    `;
+  }
+
+  setTextContentAll('.recipient-donors-summary-subtext', 'No donors contacted yet');
+  setTextContentAll('.recipient-eta-summary-text', '-- Mins');
+  setTextContentAll('.recipient-eta-subtext', 'Standby for donor response');
+  setTextContentAll('.recipient-stage-summary-text', 'Stage 0 / 6');
+  setTextContentAll('.recipient-stage-subtext', 'Portal on standby');
+
+  const requestsContainer = document.getElementById('recipient-requests-container');
+  if (requestsContainer) {
+    requestsContainer.innerHTML = `
+      <div class="p-8 rounded-xl bg-surface-container-lowest border border-dashed border-outline-variant/60 text-center flex flex-col items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[32px] text-secondary/60">receipt_long</span>
+        <span class="font-medium text-sm text-on-surface">No Patient Requisitions Found</span>
+        <span class="text-xs text-on-surface-variant max-w-sm">When an emergency blood or platelet requisition is raised, it will appear here with live verification logs.</span>
+        <button type="button" onclick="window.openRaiseRequestModal()" class="mt-2 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer hover:bg-primary-container">
+          + Raise Patient Blood Request
+        </button>
+      </div>
+    `;
+  }
+}
+
 function renderRecipientDashboard() {
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
-    : {
-        id: 'CASE-9042',
-        requestId: 'REQ-9042',
-        patientName: 'Devika Sharma',
-        patientAge: 32,
-        patientGender: 'Female',
-        bloodGroup: 'B+',
-        component: 'Platelets (Apheresis)',
-        unitsRequired: 3,
-        unitsArranged: 2,
-        unitsFulfilled: 1,
-        urgency: 'Stat Emergency (< 45 Mins)',
-        hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
-        hospitalWard: 'ICU Ward 4B, Bed 12',
-        hospitalAddress: '154/11 Bannerghatta Main Road, Bengaluru, Karnataka 560076',
-        attendantName: 'Rajesh Sharma',
-        attendantRelation: 'Brother / Primary Attendant',
-        attendantPhone: '+91 95280 33454',
-        attendantEmail: 'rajesh.sharma@familycare.in',
-        doctorName: 'Dr. Aravind Sharma, MD',
-        doctorDepartment: 'Trauma & Critical Care',
-        doctorPhone: '+91 (80) 2630-4050 Ext 4429',
-        hospitalBloodDesk: '+91 (80) 2630-4050',
-        clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
-        handshakeOTP: '7842',
-        trackingStage: 4,
-        broadcastDate: 'Today, 14:10 IST',
-        appealActive: true,
-        verificationProof: {
-          documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped)',
-          doctorRegId: 'Dr. Aravind Sharma (NMC/KMC-48921)',
-          ipdCaseNo: 'IPD-9042-ICU',
-          fileName: 'apollo_blood_requisition_form27c_signed.pdf',
-          fileSize: '1.4 MB',
-          status: 'VERIFIED_GENUINE',
-          verificationScore: '100% Genuine Requisition'
-        }
-      };
+    : null;
+
+  if (!recipient) {
+    renderEmptyRecipientDashboard();
+    return;
+  }
 
   // Recipient / Patient Identity & Attributes
   const sidebar = document.querySelector('#view-recipient-dashboard aside');
   if (sidebar) sidebar.scrollTop = 0;
 
   const cleanRelation = (recipient.attendantRelation || '').split('/')[0].trim();
-  const cleanHospital = recipient.hospitalName.split('&')[0].trim();
-  const cleanWard = recipient.hospitalWard.split(',')[0].trim();
+  const cleanHospital = (recipient.hospitalName || 'Hospital Facility').split('&')[0].trim();
+  const cleanWard = (recipient.hospitalWard || 'General Ward').split(',')[0].trim();
 
   setTextContentAll('.patient-name-display', recipient.patientName);
-  setTextContentAll('.patient-blood-display', `${recipient.bloodGroup} ${recipient.component.split(' ')[0]}`);
+  setTextContentAll('.patient-blood-display', `${recipient.bloodGroup} ${(recipient.component || 'Blood').split(' ')[0]}`);
   setTextContentAll('.patient-blood-group-badge', recipient.bloodGroup);
   setTextContentAll('.patient-component-display', recipient.component);
-  setTextContentAll('.patient-meta-display', `${recipient.patientAge} Yrs • ${recipient.patientGender} • ICU Ward 4B`);
+  setTextContentAll('.patient-meta-display', `${recipient.patientAge || 30} Yrs • ${recipient.patientGender || 'Other'} • ${cleanWard}`);
   setTextContentAll('.attendant-name-display', cleanRelation ? `${recipient.attendantName} (${cleanRelation})` : recipient.attendantName);
-  setTextContentAll('.attendant-phone-display', recipient.attendantPhone);
+  setTextContentAll('.attendant-phone-display', recipient.attendantPhone || '--');
   setTextContentAll('.hospital-name-display', recipient.hospitalName);
   setTextContentAll('.hospital-location-display', `${recipient.hospitalWard}, ${cleanHospital}`);
-  setTextContentAll('.hospital-phone-display', recipient.hospitalBloodDesk);
+  setTextContentAll('.hospital-phone-display', recipient.hospitalBloodDesk || recipient.attendantPhone || '--');
   const shortHospital = cleanHospital.replace(/\s+Hospital$/i, '');
   setTextContentAll('.hospital-ward-display', `${shortHospital}, ${cleanWard}`);
-  setTextContentAll('.doctor-name-display', recipient.doctorName);
-  setTextContentAll('.doctor-meta-display', `${recipient.doctorDepartment} • Ext 4429`);
+  setTextContentAll('.doctor-name-display', recipient.doctorName || 'Attending Physician');
+  setTextContentAll('.doctor-meta-display', `${recipient.doctorDepartment || 'Trauma & Critical Care'}`);
   setTextContentAll('.case-id-display', `Case: ${recipient.id}`);
-  setTextContentAll('.patient-case-display', `${recipient.patientName} (${recipient.bloodGroup} ${recipient.component.split(' ')[0]}) — ${cleanHospital}`);
+  setTextContentAll('.patient-case-display', `${recipient.patientName} (${recipient.bloodGroup} ${(recipient.component || 'Blood').split(' ')[0]}) — ${cleanHospital}`);
   setTextContentAll('.recipient-req-id-display', recipient.requestId);
   setTextContentAll('.handshake-otp-display', recipient.handshakeOTP);
   setTextContentAll('.recipient-urgency-display', recipient.urgency);
-  setTextContentAll('.patient-units-summary', `${recipient.unitsRequired} Units Req. • ${recipient.unitsFulfilled} Received`);
+  setTextContentAll('.patient-units-summary', `${recipient.unitsRequired} Units Req. • ${recipient.unitsFulfilled || 0} Received`);
   setTextContentAll('.patient-units-needed', `${recipient.unitsRequired} Units`);
-  setTextContentAll('.patient-units-enroute', `${Math.max(0, recipient.unitsArranged - recipient.unitsFulfilled)} En Route`);
-  setTextContentAll('.patient-units-fulfilled', `${recipient.unitsFulfilled} Received`);
+  setTextContentAll('.patient-units-enroute', `${Math.max(0, (recipient.unitsArranged || 0) - (recipient.unitsFulfilled || 0))} En Route`);
+  setTextContentAll('.patient-units-fulfilled', `${recipient.unitsFulfilled || 0} Received`);
 
   // Progress Bar for Units
-  const pct = Math.min(100, Math.round((recipient.unitsArranged / recipient.unitsRequired) * 100));
+  const arranged = recipient.unitsArranged || 0;
+  const needed = recipient.unitsRequired || 1;
+  const pct = Math.min(100, Math.round((arranged / needed) * 100));
   document.querySelectorAll('.recipient-progress-bar').forEach(bar => {
     bar.style.width = `${pct}%`;
   });
@@ -2349,7 +2627,7 @@ function renderRecipientDashboard() {
     const list = window.PulseStore.getRecipientCases();
     switcher.innerHTML = list.map(c => `
       <option value="${escapeHtml(c.id)}" ${c.id === recipient.id ? 'selected' : ''}>
-        ${escapeHtml(c.patientName)} (${escapeHtml(c.bloodGroup)} ${escapeHtml(c.component.split(' ')[0])}) — ${escapeHtml(c.hospitalName.split(' ')[0])}
+        ${escapeHtml(c.patientName)} (${escapeHtml(c.bloodGroup)} ${escapeHtml((c.component || '').split(' ')[0])}) — ${escapeHtml((c.hospitalName || '').split(' ')[0])}
       </option>
     `).join('');
 
@@ -2383,11 +2661,109 @@ Verified Case: #${recipient.requestId}
 
   // Backwards compatibility with legacy node selectors if present in DOM
   setTextContentAll('.hospital-license-display', `Verified Patient Case (Requisition #${recipient.requestId})`);
-  setTextContentAll('.hospital-triage-officer', recipient.doctorName);
+  setTextContentAll('.hospital-triage-officer', recipient.doctorName || 'Attending Physician');
   setTextContentAll('.hospital-beds-display', recipient.hospitalWard);
   setTextContentAll('.hospital-trauma-display', `Urgency: ${recipient.urgency}`);
   setTextContentAll('.hospital-category-badge', `${recipient.bloodGroup} ${recipient.component}`);
   setTextContentAll('.hospital-node-id', `Case: ${recipient.id}`);
+
+  const confirmedDonors = (window.PulseStore && typeof window.PulseStore.getConfirmedDonors === 'function')
+    ? window.PulseStore.getConfirmedDonors(recipient.requestId, recipient.bloodGroup)
+    : [];
+  const availableDonors = (window.PulseStore && typeof window.PulseStore.getAvailableDonors === 'function')
+    ? window.PulseStore.getAvailableDonors(recipient.requestId, recipient.bloodGroup)
+    : [];
+
+  // Update sidebar telemetry card
+  const teleCard = document.getElementById('recipient-sidebar-telemetry');
+  if (teleCard) {
+    if (confirmedDonors.length > 0) {
+      const first = confirmedDonors[0];
+      teleCard.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 animate-pulse">
+              <span class="material-symbols-outlined text-[18px]">two_wheeler</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">${first.liveEta || first.eta || '15 mins'} Earliest Arrival</span>
+              <span class="text-[11px] text-secondary leading-tight">${confirmedDonors.length} Donor(s) Confirmed En Route</span>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded bg-emerald-500/20 font-label-badge text-[10px] text-emerald-800 font-bold shrink-0">En Route</span>
+        </div>
+        <div class="p-2 rounded-xl bg-surface-container-low flex items-center justify-between text-[11px] text-on-surface-variant">
+          <span class="flex items-center gap-1 font-semibold text-primary">
+            <span class="material-symbols-outlined text-[14px]">directions_car</span>
+            <span>${escapeHtml(first.name)} (${escapeHtml(first.bloodGroup)})</span>
+          </span>
+          <span class="text-tertiary font-bold">ETA: ${first.liveEta || first.eta || '15 mins'}</span>
+        </div>
+      `;
+    } else if (availableDonors.length > 0) {
+      teleCard.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 animate-pulse">
+              <span class="material-symbols-outlined text-[18px]">ring_volume</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">Dialing In Progress</span>
+              <span class="text-[11px] text-secondary leading-tight">${availableDonors.length} Matched Donors Dialing</span>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded bg-amber-500/20 font-label-badge text-[10px] text-amber-800 font-bold shrink-0">Ringing</span>
+        </div>
+        <div class="p-2 rounded-xl bg-surface-container-low flex items-center justify-between text-[11px] text-on-surface-variant">
+          <span>Awaiting donor confirmation</span>
+          <span class="text-amber-800 font-bold">Ringing</span>
+        </div>
+      `;
+    } else {
+      teleCard.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-primary/20 text-primary flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px]">cell_tower</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-title-md text-xs sm:text-[13px] font-bold text-on-surface leading-tight">Emergency Beacon Active</span>
+              <span class="text-[11px] text-secondary leading-tight">Requisition #${recipient.requestId}</span>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded bg-primary-fixed/40 font-label-badge text-[10px] text-primary font-bold shrink-0">Active Beacon</span>
+        </div>
+        <div class="p-2 rounded-xl bg-surface-container-low flex items-center justify-between text-[11px] text-on-surface-variant">
+          <span>Broadcasting to new donor registrations</span>
+          <span class="text-primary font-bold">Standby</span>
+        </div>
+      `;
+    }
+  }
+
+  // Update 4 metric cards
+  if (confirmedDonors.length > 0) {
+    setTextContentAll('.recipient-donors-active-count', confirmedDonors.length.toString());
+    setTextContentAll('.recipient-donors-summary-subtext', `${confirmedDonors.map(d => d.name).join(', ')} en route`);
+    setTextContentAll('.recipient-eta-summary-text', `~${confirmedDonors[0].liveEta || confirmedDonors[0].eta || '15 mins'}`);
+    setTextContentAll('.recipient-eta-subtext', `${confirmedDonors[0].name} (${confirmedDonors[0].distance || 1.5} km away)`);
+    setTextContentAll('.recipient-stage-summary-text', 'Stage 4 / 6');
+    setTextContentAll('.recipient-stage-subtext', 'Donors En Route to Hospital');
+  } else if (availableDonors.length > 0) {
+    setTextContentAll('.recipient-donors-active-count', '0');
+    setTextContentAll('.recipient-donors-summary-subtext', `Ringing ${availableDonors.length} nearby donors`);
+    setTextContentAll('.recipient-eta-summary-text', 'Ringing...');
+    setTextContentAll('.recipient-eta-subtext', 'Awaiting first donor confirmation');
+    setTextContentAll('.recipient-stage-summary-text', 'Stage 3 / 6');
+    setTextContentAll('.recipient-stage-subtext', 'Donors Alerted & Dialing');
+  } else {
+    setTextContentAll('.recipient-donors-active-count', '0');
+    setTextContentAll('.recipient-donors-summary-subtext', '0 matching donors in radius');
+    setTextContentAll('.recipient-eta-summary-text', '-- Mins');
+    setTextContentAll('.recipient-eta-subtext', 'Standby for donor registrations');
+    setTextContentAll('.recipient-stage-summary-text', 'Stage 2 / 6');
+    setTextContentAll('.recipient-stage-subtext', 'Scanning Network Radius');
+  }
 
   // Render Sub-Sections
   renderRecipientDonorsSection(recipient);
@@ -2400,7 +2776,7 @@ function renderRecipientDonorsSection(recipient) {
   if (!container) return;
 
   const bloodGroup = recipient.bloodGroup || 'B+';
-  const reqId = recipient.requestId || 'REQ-9042';
+  const reqId = recipient.requestId || 'REQ-LIVE';
 
   // Get confirmed donors (only those who answered the call and confirmed availability)
   const confirmedDonors = (window.PulseStore && typeof window.PulseStore.getConfirmedDonors === 'function')
@@ -2414,8 +2790,13 @@ function renderRecipientDonorsSection(recipient) {
 
   // Update header badges accurately
   if (confirmedDonors.length === 0) {
-    setTextContentAll('.recipient-donors-count-badge', `0 Confirmed • Ringing ${availableDonors.length} Donors`);
-    setTextContentAll('.recipient-donors-active-count', '0');
+    if (availableDonors.length === 0) {
+      setTextContentAll('.recipient-donors-count-badge', `0 Confirmed • Beacon Broadcasting`);
+      setTextContentAll('.recipient-donors-active-count', '0');
+    } else {
+      setTextContentAll('.recipient-donors-count-badge', `0 Confirmed • Ringing ${availableDonors.length} Donors`);
+      setTextContentAll('.recipient-donors-active-count', '0');
+    }
   } else {
     setTextContentAll('.recipient-donors-count-badge', `${confirmedDonors.length} Confirmed Donor${confirmedDonors.length > 1 ? 's' : ''} Responding`);
     setTextContentAll('.recipient-donors-active-count', confirmedDonors.length);
@@ -2427,41 +2808,74 @@ function renderRecipientDonorsSection(recipient) {
   // 1. CONFIRMED DONORS (ONLY SHOWN WHEN DONOR CONFIRMS AVAILABILITY)
   // =========================================================================
   if (confirmedDonors.length === 0) {
-    html += `
-      <div class="p-5 sm:p-6 rounded-2xl bg-amber-500/10 border-2 border-dashed border-amber-500/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex items-center gap-3.5">
-          <div class="w-13 h-13 rounded-2xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-[32px] animate-phone-vibrate">ring_volume</span>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-600 animate-ping"></span>
-              <h4 class="font-title-md font-bold text-on-surface">Emergency Call in Progress — Ringing Proximate Donors</h4>
+    if (availableDonors.length === 0) {
+      html += `
+        <div class="p-5 sm:p-6 rounded-2xl bg-surface-container-low border-2 border-dashed border-outline-variant/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-13 h-13 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[32px]">cell_tower</span>
             </div>
-            <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
-              <strong>0 donors confirmed yet.</strong> The emergency grid is actively ringing <strong>${availableDonors.length} compatible volunteer donors</strong> within clinical radius.
-              Once a donor confirms their availability, they will immediately appear here with real-time transit telemetry and arrival verification.
-            </p>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>
+                <h4 class="font-title-md font-bold text-on-surface">Emergency Broadcast Active — ${escapeHtml(bloodGroup)} Requisition</h4>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                Emergency requisition <strong>#${escapeHtml(reqId)}</strong> is actively broadcasting.
+                Currently <strong>0 registered donors of blood group ${escapeHtml(bloodGroup)}</strong> in network radius.
+                Standby beacon is active: as soon as a new volunteer donor registers or logs in with this blood group, our auto-dialer will ring them immediately.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0 self-end md:self-center flex-wrap">
+            <button type="button" onclick="openDonorRegisterModal()" class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">how_to_reg</span>
+              <span>Register Volunteer Donor</span>
+            </button>
+            <button type="button" onclick="window.shareSOSOnWhatsApp()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">share</span>
+              <span>WhatsApp SOS Appeal</span>
+            </button>
           </div>
         </div>
-        <div class="flex items-center gap-2 shrink-0 self-end md:self-center flex-wrap">
-          <button type="button" onclick="window.simulateFirstDonorAnswer()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-98" title="Simulate first available matched donor answering and confirming">
-            <span class="material-symbols-outlined text-[16px]">check_circle</span>
-            <span>Simulate 1st Donor Confirming</span>
-          </button>
-          <a href="#/donor-dashboard" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-surface-container-high" title="Go to Donor Portal to view the incoming call screen as a donor">
-            <span class="material-symbols-outlined text-[16px] text-primary">badge</span>
-            <span>Answer in Donor Portal</span>
-          </a>
+      `;
+    } else {
+      html += `
+        <div class="p-5 sm:p-6 rounded-2xl bg-amber-500/10 border-2 border-dashed border-amber-500/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-13 h-13 rounded-2xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[32px] animate-phone-vibrate">ring_volume</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-600 animate-ping"></span>
+                <h4 class="font-title-md font-bold text-on-surface">Emergency Call in Progress — Ringing Proximate Donors</h4>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                <strong>0 donors confirmed yet.</strong> The emergency grid is actively ringing <strong>${availableDonors.length} registered compatible donor${availableDonors.length > 1 ? 's' : ''}</strong> within clinical radius.
+                Once a donor confirms their availability, they will immediately appear here with real-time transit telemetry and arrival verification.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0 self-end md:self-center flex-wrap">
+            <button type="button" onclick="window.simulateFirstDonorAnswer()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-98" title="Simulate first available matched donor answering and confirming">
+              <span class="material-symbols-outlined text-[16px]">check_circle</span>
+              <span>Simulate 1st Donor Confirming</span>
+            </button>
+            <a href="#/donor-dashboard" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-surface-container-high" title="Go to Donor Portal to view the incoming call screen as a donor">
+              <span class="material-symbols-outlined text-[16px] text-primary">badge</span>
+              <span>Answer in Donor Portal</span>
+            </a>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    }
   } else {
     html += confirmedDonors.map((d, idx) => `
       <div class="p-4 rounded-xl bg-surface-container-low border border-emerald-500/30 ring-2 ring-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/50 hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-900 flex items-center justify-center font-bold text-headline-sm shrink-0 shadow-xs border border-emerald-300">
-            ${escapeHtml(d.initials || d.name.substring(0, 2).toUpperCase())}
+            ${escapeHtml(d.initials || (d.name || 'DN').substring(0, 2).toUpperCase())}
           </div>
           <div class="flex flex-col min-w-0">
             <div class="flex flex-wrap items-center gap-2">
@@ -2471,7 +2885,7 @@ function renderRecipientDonorsSection(recipient) {
               </span>
               <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[11px] font-bold flex items-center gap-1 shadow-2xs">
                 <span class="material-symbols-outlined text-[13px]">check_circle</span>
-                <span>Confirmed &amp; ${escapeHtml(d.transitStatus.includes('Transit') ? 'In Transit' : 'En Route')}</span>
+                <span>Confirmed &amp; ${escapeHtml((d.transitStatus || 'En Route').includes('Transit') ? 'In Transit' : 'En Route')}</span>
               </span>
               ${d.confirmedAt ? `<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface text-[10px] font-mono">Confirmed: ${escapeHtml(d.confirmedAt)}</span>` : ''}
               ${idx === 0 ? '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">Fastest ETA</span>' : ''}
@@ -2511,79 +2925,81 @@ function renderRecipientDonorsSection(recipient) {
   // =========================================================================
   // 2. COMPATIBLE DONORS CONTACTED (RINGING / STANDBY POOL)
   // =========================================================================
-  html += `
-    <div class="mt-4 pt-4 border-t border-surface-container">
-      <div class="flex items-center justify-between pb-3 flex-wrap gap-2">
-        <div>
-          <span class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px] text-primary">cell_tower</span>
-            <span>Compatible Donors Contacted in Radius (${availableDonors.length} Verified Donors)</span>
-          </span>
-          <p class="text-[11px] text-on-surface-variant mt-0.5">Live status of proximate volunteer donors receiving this emergency requisition broadcast</p>
+  if (availableDonors.length > 0) {
+    html += `
+      <div class="mt-4 pt-4 border-t border-surface-container">
+        <div class="flex items-center justify-between pb-3 flex-wrap gap-2">
+          <div>
+            <span class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-primary">cell_tower</span>
+              <span>Compatible Donors Contacted in Radius (${availableDonors.length} Verified Donors)</span>
+            </span>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Live status of proximate volunteer donors receiving this emergency requisition broadcast</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="window.simulateFirstDonorAnswer()" class="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-800 text-xs font-bold transition-colors cursor-pointer border border-emerald-500/30">
+              <span class="material-symbols-outlined text-[14px]">check</span>
+              <span>Simulate Donor Confirmation</span>
+            </button>
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="window.simulateFirstDonorAnswer()" class="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-800 text-xs font-bold transition-colors cursor-pointer border border-emerald-500/30">
-            <span class="material-symbols-outlined text-[14px]">check</span>
-            <span>Simulate Donor Confirmation</span>
-          </button>
-        </div>
-      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-        ${availableDonors.map(d => {
-          const isConfirmed = d.confirmed === true;
-          return `
-            <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3 ${isConfirmed ? 'bg-emerald-500/5 border-emerald-500/30' : ''}">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-9 h-9 rounded-full ${isConfirmed ? 'bg-emerald-100 text-emerald-800' : 'bg-surface-container text-on-surface'} font-bold flex items-center justify-center text-xs shrink-0">
-                  ${escapeHtml(d.initials || 'DN')}
-                </div>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="text-xs font-bold text-on-surface truncate">${escapeHtml(d.name)}</span>
-                    <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-surface-container-high text-on-surface">${escapeHtml(d.bloodGroup)}</span>
-                    ${isConfirmed ? `
-                      <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-0.5">
-                        <span class="material-symbols-outlined text-[11px]">check</span> Confirmed
-                      </span>
-                    ` : `
-                      <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-800">
-                        <span class="flex items-center gap-0.5 h-2.5 text-amber-600">
-                          <span class="sound-bar" style="height: 6px;"></span>
-                          <span class="sound-bar" style="height: 10px;"></span>
-                          <span class="sound-bar" style="height: 4px;"></span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+          ${availableDonors.map(d => {
+            const isConfirmed = d.confirmed === true;
+            return `
+              <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3 ${isConfirmed ? 'bg-emerald-500/5 border-emerald-500/30' : ''}">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-9 h-9 rounded-full ${isConfirmed ? 'bg-emerald-100 text-emerald-800' : 'bg-surface-container text-on-surface'} font-bold flex items-center justify-center text-xs shrink-0">
+                    ${escapeHtml(d.initials || 'DN')}
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="text-xs font-bold text-on-surface truncate">${escapeHtml(d.name)}</span>
+                      <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-surface-container-high text-on-surface">${escapeHtml(d.bloodGroup)}</span>
+                      ${isConfirmed ? `
+                        <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-0.5">
+                          <span class="material-symbols-outlined text-[11px]">check</span> Confirmed
                         </span>
-                        <span>Ringing</span>
-                      </span>
-                    `}
+                      ` : `
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-800">
+                          <span class="flex items-center gap-0.5 h-2.5 text-amber-600">
+                            <span class="sound-bar" style="height: 6px;"></span>
+                            <span class="sound-bar" style="height: 10px;"></span>
+                            <span class="sound-bar" style="height: 4px;"></span>
+                          </span>
+                          <span>Ringing</span>
+                        </span>
+                      `}
+                    </div>
+                    <span class="text-[11px] text-on-surface-variant block truncate">${d.distance || 2} km away • ETA ${escapeHtml(d.liveEta || '15 mins')}</span>
                   </div>
-                  <span class="text-[11px] text-on-surface-variant block truncate">${d.distance} km away • ${d.matchScore}% Match • ETA ${escapeHtml(d.liveEta)}</span>
+                </div>
+                <div class="shrink-0">
+                  ${isConfirmed ? `
+                    <span class="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[15px]">check_circle</span>
+                      <span>En Route</span>
+                    </span>
+                  ` : `
+                    <div class="flex items-center gap-1.5">
+                      <button type="button" onclick="window.simulateDonorAnswerDirectly('${d.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer active:scale-95" title="Simulate answering directly">
+                        <span class="material-symbols-outlined text-[13px]">check</span>
+                        <span>Confirm as ${escapeHtml(d.name.split(' ')[0])}</span>
+                      </button>
+                      <button type="button" onclick="window.goToDonorPortal('${d.id}')" class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-semibold transition-all cursor-pointer" title="Switch to this donor in Donor Portal">
+                        <span class="material-symbols-outlined text-[14px] text-primary">open_in_new</span>
+                      </button>
+                    </div>
+                  `}
                 </div>
               </div>
-              <div class="shrink-0">
-                ${isConfirmed ? `
-                  <span class="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[15px]">check_circle</span>
-                    <span>En Route</span>
-                  </span>
-                ` : `
-                  <div class="flex items-center gap-1.5">
-                    <button type="button" onclick="window.simulateDonorAnswerDirectly('${d.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer active:scale-95" title="Simulate answering directly without opening modal on recipient dashboard">
-                      <span class="material-symbols-outlined text-[13px]">check</span>
-                      <span>Confirm as ${escapeHtml(d.name.split(' ')[0])}</span>
-                    </button>
-                    <button type="button" onclick="window.goToDonorPortal('${d.id}')" class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-semibold transition-all cursor-pointer" title="Switch to this donor's screen in Donor Portal to answer incoming call">
-                      <span class="material-symbols-outlined text-[14px] text-primary">open_in_new</span>
-                    </button>
-                  </div>
-                `}
-              </div>
-            </div>
-          `;
-        }).join('')}
+            `;
+          }).join('')}
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 
   container.innerHTML = html;
 }
@@ -2614,10 +3030,12 @@ window.openIncomingDonorCallModal = function(customDonorId) {
 
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
-    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets (Apheresis)', unitsRequired: 3, urgency: 'Stat Emergency (< 45 Mins)', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', hospitalWard: 'ICU Ward 4B, Bed 12', attendantName: 'Rajesh Sharma', attendantPhone: '+91 95280 33454', clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.' };
+    : null;
 
-  const reqId = recipient.requestId || 'REQ-9042';
-  const bloodGroup = recipient.bloodGroup || 'B+';
+  if (!recipient) return;
+
+  const reqId = recipient.requestId;
+  const bloodGroup = recipient.bloodGroup;
 
   // Get available compatible donors
   const donors = (window.PulseStore && typeof window.PulseStore.getAvailableDonors === 'function')
@@ -2629,15 +3047,9 @@ window.openIncomingDonorCallModal = function(customDonorId) {
     targetDonor = donors.find(d => d.id === customDonorId);
   }
   if (!targetDonor) {
-    targetDonor = donors.find(d => !d.confirmed && d.callStatus !== 'declined') || donors[0] || {
-      id: 'D-102',
-      name: 'Ananya Sharma',
-      bloodGroup: bloodGroup,
-      phone: '+91 98452 33109',
-      distance: 1.8,
-      liveEta: '18 mins'
-    };
+    targetDonor = donors.find(d => !d.confirmed && d.callStatus !== 'declined') || donors[0];
   }
+  if (!targetDonor) return;
 
   // Update store active incoming call
   if (window.PulseStore && typeof window.PulseStore.setActiveIncomingCall === 'function') {
@@ -2757,11 +3169,15 @@ window.confirmActiveDonorAvailability = function(explicitDonorId) {
   const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
     ? window.PulseStore.getActiveIncomingCall()
     : null;
-  const donorId = explicitDonorId || (activeCall ? activeCall.donorId : 'D-102');
+  const donorId = explicitDonorId || (activeCall ? activeCall.donorId : null);
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
     : null;
-  const reqId = recipient ? recipient.requestId : 'REQ-9042';
+  const reqId = recipient ? recipient.requestId : null;
+  if (!donorId || !reqId) {
+    window.closeIncomingDonorCallModal();
+    return;
+  }
 
   // 1. Stop Ringing Audio
   if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
@@ -2810,11 +3226,15 @@ window.declineActiveDonorCall = function(explicitDonorId) {
   const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
     ? window.PulseStore.getActiveIncomingCall()
     : null;
-  const donorId = explicitDonorId || (activeCall ? activeCall.donorId : 'D-102');
+  const donorId = explicitDonorId || (activeCall ? activeCall.donorId : null);
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
     : null;
-  const reqId = recipient ? recipient.requestId : 'REQ-9042';
+  const reqId = recipient ? recipient.requestId : null;
+  if (!donorId || !reqId) {
+    window.closeIncomingDonorCallModal();
+    return;
+  }
 
   // Stop Ringing Audio
   if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
@@ -2854,8 +3274,13 @@ window.simulateFirstDonorAnswer = function() {
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
     : null;
+
   const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
-  const reqId = recipient ? recipient.requestId : 'REQ-9042';
+  const reqId = recipient ? recipient.requestId : null;
+  if (!recipient || !reqId) {
+    if (window.showToast) window.showToast('No Active Case', 'Please raise an emergency blood requisition first.', 'warning');
+    return;
+  }
   const available = (window.PulseStore && typeof window.PulseStore.getAvailableDonors === 'function')
     ? window.PulseStore.getAvailableDonors(reqId, bloodGroup)
     : [];
@@ -2872,7 +3297,8 @@ window.simulateDonorAnswerDirectly = function(donorId) {
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
     : null;
-  const reqId = recipient ? recipient.requestId : 'REQ-9042';
+  if (!recipient || !recipient.requestId) return;
+  const reqId = recipient.requestId;
 
   if (window.PulseStore && typeof window.PulseStore.confirmDonorAvailability === 'function') {
     const res = window.PulseStore.confirmDonorAvailability(reqId, donorId);
@@ -2954,7 +3380,7 @@ window.checkAndRingMatchedDonor = function() {
   const recipient = window.PulseStore ? window.PulseStore.getRecipient() : null;
   if (!recipient) return;
 
-  const reqId = recipient.requestId || 'REQ-9042';
+  const reqId = recipient.requestId;
 
   // 1. Check blood compatibility
   const isCompat = window.PulseStore.isBloodCompatible(donor.bloodGroup, recipient.bloodGroup);
@@ -3089,13 +3515,18 @@ window.renderHospitalDashboard = renderRecipientDashboard; // alias for backward
 window.copySOSAppealLink = function() {
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
-    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', requestId: 'REQ-9042', attendantPhone: '+91 95280 33454' };
+    : null;
+
+  if (!recipient) {
+    if (window.showToast) window.showToast('No Active Case', 'Please raise an emergency blood requisition first to share an appeal.', 'warning');
+    return;
+  }
 
   const originUrl = window.location.origin + window.location.pathname;
   const text = `🚨 URGENT BLOOD NEEDED!
 Patient: ${recipient.patientName} (${recipient.bloodGroup})
-Requirement: ${recipient.unitsRequired || 3} Units of ${recipient.component}
-Hospital: ${recipient.hospitalName}, ${recipient.hospitalWard || 'Ward 4B'}
+Requirement: ${recipient.unitsRequired || 2} Units of ${recipient.component}
+Hospital: ${recipient.hospitalName}, ${recipient.hospitalWard || 'Emergency Ward'}
 Verified Case ID: #${recipient.requestId}
 Attendant Contact: ${recipient.attendantPhone}
 Please donate or share: ${originUrl}#/emergency-request`;
@@ -3114,13 +3545,18 @@ Please donate or share: ${originUrl}#/emergency-request`;
 window.shareSOSOnWhatsApp = function() {
   const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
-    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', requestId: 'REQ-9042', attendantPhone: '+91 95280 33454' };
+    : null;
+
+  if (!recipient) {
+    if (window.showToast) window.showToast('No Active Case', 'Please raise an emergency blood requisition first to share on WhatsApp.', 'warning');
+    return;
+  }
 
   const originUrl = window.location.origin + window.location.pathname;
   const msg = `🚨 URGENT BLOOD NEEDED!
 Patient: ${recipient.patientName} (${recipient.bloodGroup})
-Requirement: ${recipient.unitsRequired || 3} Units of ${recipient.component}
-Hospital: ${recipient.hospitalName}, ${recipient.hospitalWard || 'Ward 4B'}
+Requirement: ${recipient.unitsRequired || 2} Units of ${recipient.component}
+Hospital: ${recipient.hospitalName}, ${recipient.hospitalWard || 'Emergency Ward'}
 Verified Request: #${recipient.requestId}
 Attendant Contact: ${recipient.attendantPhone}
 👉 If you can donate or know someone who can, please click: ${originUrl}#/emergency-request`;
@@ -3562,7 +3998,7 @@ function renderMatchedDonors() {
   const bloodGroup = req ? req.bloodGroup : 'O-';
   const matchedDonors = window.PulseStore.getMatchedDonors(bloodGroup);
 
-  setTextContentAll('.matched-req-id', req ? req.id : 'REQ-9042');
+  setTextContentAll('.matched-req-id', req ? req.id : 'NONE');
   setTextContentAll('.matched-req-group', bloodGroup);
   setTextContentAll('.matched-count-display', `${matchedDonors.length} Potential Donors Found`);
 
@@ -3639,7 +4075,43 @@ function renderMatchedDonors() {
  */
 function renderRequestTracking() {
   const req = window.PulseStore.getSelectedRequest();
-  if (!req) return;
+  if (!req) {
+    setTextContentAll('.tracking-req-id', 'NONE');
+    setTextContentAll('.tracking-blood-group', '--');
+    setTextContentAll('.tracking-component', 'None');
+    setTextContentAll('.tracking-urgency', 'Standby');
+    setTextContentAll('.tracking-location', 'Standby for requisition');
+
+    const stepperContainer = document.getElementById('tracking-stepper');
+    if (stepperContainer) {
+      stepperContainer.innerHTML = `
+        <div class="col-span-full py-6 text-center text-on-surface-variant text-xs">
+          Pipeline on standby. Raise an emergency blood requisition to initiate tracking.
+        </div>
+      `;
+    }
+    const activeDetail = document.getElementById('tracking-stage-detail');
+    if (activeDetail) {
+      activeDetail.innerHTML = `
+        <div class="flex items-center gap-3 p-4">
+          <span class="material-symbols-outlined text-[28px] text-secondary/60">pending_actions</span>
+          <div>
+            <h4 class="font-bold text-sm text-on-surface">No Active Requisition Pipeline</h4>
+            <p class="text-xs text-on-surface-variant">Real-time telemetry and dispatch milestones will populate here when a requisition is active.</p>
+          </div>
+        </div>
+      `;
+    }
+    const inbContainer = document.getElementById('tracking-inbound-telemetry-container');
+    if (inbContainer) {
+      inbContainer.innerHTML = `
+        <div class="col-span-full p-4 rounded-xl bg-surface-container-low text-center text-xs text-on-surface-variant">
+          Inbound donor GPS telemetry on standby.
+        </div>
+      `;
+    }
+    return;
+  }
 
   const stage = req.trackingStage || 1;
 
@@ -3651,12 +4123,12 @@ function renderRequestTracking() {
 
   // Stepper UI
   const stages = [
-    { num: 1, name: 'Raised', time: '14:10 EST', desc: 'Requisition authenticated & signed cryptographically' },
-    { num: 2, name: 'Finding Donors', time: '14:11 EST', desc: 'Geo-radius scan active across 25-mile radius' },
-    { num: 3, name: 'Donor Notified', time: '14:14 EST', desc: 'Encrypted push broadcast sent to matching responders' },
-    { num: 4, name: 'Donor Accepted', time: '14:18 EST', desc: '3 Donors confirmed route ETA (David K. ETA 25m)' },
-    { num: 5, name: 'Connected', time: '14:26 EST', desc: 'Hospital triage check-in authenticated at Ward 4B' },
-    { num: 6, name: 'Completed', time: '14:45 EST', desc: 'Donation safe intake logged & impact certificate attested' }
+    { num: 1, name: 'Raised', time: 'Just now', desc: 'Requisition authenticated & signed cryptographically' },
+    { num: 2, name: 'Finding Donors', time: 'Active', desc: 'Geo-radius scan active across proximate radius' },
+    { num: 3, name: 'Donor Notified', time: 'Active', desc: 'Encrypted push broadcast sent to matching responders' },
+    { num: 4, name: 'Donor Accepted', time: 'Pending', desc: 'Donors confirmed availability & en route to hospital' },
+    { num: 5, name: 'Connected', time: 'Pending', desc: 'Hospital triage check-in authenticated at blood bank desk' },
+    { num: 6, name: 'Completed', time: 'Pending', desc: 'Donation safe intake logged & impact certificate attested' }
   ];
 
   const stepperContainer = document.getElementById('tracking-stepper');
@@ -3723,6 +4195,68 @@ function renderRequestTracking() {
         </div>
       </div>
     `;
+  }
+
+  // Update Inbound Telemetry Section
+  const inbContainer = document.getElementById('tracking-inbound-telemetry-container');
+  if (inbContainer) {
+    const confirmedDonors = (window.PulseStore && typeof window.PulseStore.getConfirmedDonors === 'function')
+      ? window.PulseStore.getConfirmedDonors(req.id, req.bloodGroup)
+      : [];
+    if (confirmedDonors.length > 0) {
+      inbContainer.innerHTML = confirmedDonors.map(d => `
+        <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm border border-emerald-500/30 flex flex-col gap-2">
+          <span class="font-label-badge text-label-badge text-emerald-800 font-bold uppercase">Confirmed Inbound Donor</span>
+          <div class="flex items-center gap-3 pt-1">
+            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-900 flex items-center justify-center font-bold">
+              ${escapeHtml(d.initials || d.name.substring(0, 2).toUpperCase())}
+            </div>
+            <div class="flex flex-col">
+              <span class="font-title-md text-title-md font-bold text-on-surface">${escapeHtml(d.name)} (${escapeHtml(d.bloodGroup)})</span>
+              <span class="text-body-sm text-tertiary font-semibold">En Route • GPS ETA: ${escapeHtml(d.liveEta || d.eta || '15 mins')} (${escapeHtml(d.transitMode || 'Personal Vehicle')})</span>
+            </div>
+          </div>
+        </div>
+      `).join('') + `
+        <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm border border-surface-container-high flex flex-col gap-2">
+          <span class="font-label-badge text-label-badge text-secondary uppercase">Clinical Destination Facility</span>
+          <div class="flex items-center gap-3 pt-1">
+            <div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-bold">
+              <span class="material-symbols-outlined text-[20px]">local_hospital</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-title-md text-title-md font-bold text-on-surface">${escapeHtml(req.hospitalName || req.location || 'Hospital Center')}</span>
+              <span class="text-body-sm text-on-surface-variant">${escapeHtml(req.ward || 'ICU Ward')} • Attending Physician</span>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      inbContainer.innerHTML = `
+        <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm border border-surface-container-high flex flex-col gap-2">
+          <span class="font-label-badge text-label-badge text-secondary uppercase">Inbound Donor Telemetry</span>
+          <div class="flex items-center gap-3 pt-1">
+            <div class="w-10 h-10 rounded-full bg-surface-container-high text-secondary flex items-center justify-center font-bold">--</div>
+            <div class="flex flex-col">
+              <span class="font-title-md text-title-md font-bold text-on-surface">Awaiting Donor Confirmation</span>
+              <span class="text-body-sm text-on-surface-variant">GPS tracking activates once matched donor accepts incoming call</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm border border-surface-container-high flex flex-col gap-2">
+          <span class="font-label-badge text-label-badge text-secondary uppercase">Clinical Destination Facility</span>
+          <div class="flex items-center gap-3 pt-1">
+            <div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-bold">
+              <span class="material-symbols-outlined text-[20px]">local_hospital</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-title-md text-title-md font-bold text-on-surface">${escapeHtml(req.hospitalName || req.location || 'Hospital Center')}</span>
+              <span class="text-body-sm text-on-surface-variant">${escapeHtml(req.ward || 'ICU Ward')} • Attending Physician</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
   }
 }
 
@@ -3892,8 +4426,8 @@ window.openDonorPassQRModal = function() {
   if (!modal) return;
 
   const donor = window.PulseStore ? window.PulseStore.getDonor() : null;
-  const donorName = (donor && donor.fullName) ? donor.fullName : 'Ananya Sharma';
-  const bloodGroup = (donor && donor.bloodGroup) ? donor.bloodGroup : 'O-';
+  const donorName = (donor && donor.fullName) ? donor.fullName : 'Volunteer Donor';
+  const bloodGroup = (donor && donor.bloodGroup) ? donor.bloodGroup : '--';
   const hb = (donor && donor.vitals && donor.vitals.hemoglobin) ? donor.vitals.hemoglobin : '14.8 g/dL';
   const bp = (donor && donor.vitals && donor.vitals.bp) ? donor.vitals.bp : '118/76 mmHg';
 
@@ -4243,23 +4777,14 @@ window.openHospitalRequestModal = function(requestId) {
 
   const targetReq = requests.find(r => r.id === requestId)
     || (window.PulseStore && typeof window.PulseStore.getSelectedRequest === 'function' ? window.PulseStore.getSelectedRequest() : null)
-    || {
-      id: 'REQ-9042',
-      bloodGroup: 'B+',
-      component: 'Platelets (Apheresis)',
-      units: 3,
-      urgency: 'Stat Emergency (< 45 Mins)',
-      hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
-      ward: 'Trauma OR - Suite 3',
-      location: 'Ward 4B, Emergency Wing, Bannerghatta Main Road, Bengaluru',
-      notes: 'Acute arterial hemorrhage from emergency trauma, cross-match in progress.',
-      createdAt: 'Today, 14:10 IST',
-      status: 'Donors Accepted',
-      trackingStage: 4,
-      matchedCount: 16,
-      acceptedCount: 3,
-      enRouteCount: 2
-    };
+    || (requests.length > 0 ? requests[0] : null);
+
+  if (!targetReq) {
+    if (typeof showToast === 'function') {
+      showToast('No Requisitions Active', 'No active emergency requisitions in grid. Raise a requisition to track dispatch.', 'info');
+    }
+    return;
+  }
 
   activeHospitalReq = targetReq;
 
@@ -4539,8 +5064,14 @@ function renderModalHospitalTracking(req) {
 // 12. LIVE TELEMETRY TRIGGER HELPER
 // ============================================================================
 window.openHospitalTelemetry = function() {
+  const req = window.PulseStore?.getSelectedRequest() || (window.PulseStore?.getRequests() || [])[0];
+  const reqId = req ? req.id : null;
+  if (!reqId) {
+    if (window.showToast) window.showToast('Standby Mode', 'No active emergency blood requisition found.', 'info');
+    return;
+  }
   if (window.openHospitalRequestModal) {
-    window.openHospitalRequestModal('REQ-9042');
+    window.openHospitalRequestModal(reqId);
     setTimeout(() => {
       const stepper = document.getElementById('modal-hosp-stepper') || document.getElementById('modal-hosp-tracking-container');
       if (stepper) {
@@ -4548,7 +5079,7 @@ window.openHospitalTelemetry = function() {
       }
     }, 150);
   } else if (window.PulseRouter) {
-    window.PulseRouter.navigate('request-tracking', { id: 'REQ-9042' });
+    window.PulseRouter.navigate('request-tracking', { id: reqId });
   }
 };
 
@@ -4823,8 +5354,17 @@ window.fillDemoRecipientCredentials = function() {
   const idInput = document.getElementById('hospital-input-id');
   const pwdInput = document.getElementById('hospital-input-pwd');
   if (!idInput || !pwdInput) return;
-  idInput.value = 'CASE-9042';
-  pwdInput.value = '+91 95280 33454';
+  const activeRecipient = window.PulseStore?.getRecipient();
+  const cases = window.PulseStore?.getRecipientCases() || [];
+  const rec = activeRecipient || cases[0];
+  if (rec) {
+    idInput.value = rec.caseId || rec.requestId || 'CASE-LIVE';
+    pwdInput.value = rec.contactPhone || rec.phone || '+91 98000 00000';
+  } else {
+    idInput.value = '';
+    pwdInput.value = '';
+    if (window.showToast) window.showToast('No Active Case', 'Please raise a new emergency blood requisition first!', 'info');
+  }
   const errorBox = document.getElementById('hospital-login-error');
   if (errorBox) errorBox.classList.add('hidden');
 };
