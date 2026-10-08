@@ -275,6 +275,42 @@ class Store {
           }
         }
       }
+
+      // 3. Fetch shared donors from database
+      const donorRes = await fetch('/api/donors');
+      if (donorRes.ok) {
+        const donorData = await donorRes.json();
+        if (donorData && donorData.success && Array.isArray(donorData.donors)) {
+          this.state.matchedDonorsPool = donorData.donors;
+          if (!this.state.donor && donorData.donors.length > 0) {
+            this.state.donor = donorData.donors[0];
+          } else if (this.state.donor) {
+            const fresh = donorData.donors.find(d => d.id === this.state.donor.id);
+            if (fresh) {
+              this.state.donor = { ...this.state.donor, ...fresh };
+            }
+          }
+          this.saveState();
+        }
+      }
+
+      // 4. Fetch shared hospitals from database
+      const hospRes = await fetch('/api/hospitals');
+      if (hospRes.ok) {
+        const hospData = await hospRes.json();
+        if (hospData && hospData.success && Array.isArray(hospData.hospitals)) {
+          this.state.registeredHospitals = hospData.hospitals;
+          if (!this.state.hospital && hospData.hospitals.length > 0) {
+            this.state.hospital = hospData.hospitals[0];
+          } else if (this.state.hospital) {
+            const freshHosp = hospData.hospitals.find(h => h.id === this.state.hospital.id);
+            if (freshHosp) {
+              this.state.hospital = { ...this.state.hospital, ...freshHosp };
+            }
+          }
+          this.saveState();
+        }
+      }
     } catch (e) {
       console.warn('Sync with server failed:', e);
     }
@@ -356,52 +392,127 @@ class Store {
       const idx = this.state.matchedDonorsPool.findIndex(d => d.id === this.state.donor.id);
       if (idx >= 0) {
         this.state.matchedDonorsPool[idx] = { ...this.state.matchedDonorsPool[idx], ...donorData };
+      } else {
+        this.state.matchedDonorsPool.unshift(this.state.donor);
       }
     }
     this.saveState();
+    if (typeof fetch !== 'undefined' && this.state.donor) {
+      fetch('/api/donor/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.state.donor)
+      }).catch(err => console.warn('Donor profile server sync note:', err));
+    }
   }
 
-  registerNewDonor(donorData) {
-    const rawBlood = (donorData.bloodGroup || 'O-').trim();
-    const cleanBloodCode = rawBlood.replace(/[^a-zA-Z0-9]/g, '');
-    const randomId = Math.floor(1000 + Math.random() * 9000);
-    const newId = `DP-${randomId}-${cleanBloodCode}`;
-
-    const newDonor = {
-      id: newId,
-      _id: newId,
-      name: donorData.fullName || 'Registered Volunteer Donor',
-      fullName: donorData.fullName || 'Registered Volunteer Donor',
-      initials: (donorData.fullName || 'VD').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
-      age: parseInt(donorData.age || 25, 10),
-      gender: donorData.gender || 'Not specified',
-      bloodGroup: rawBlood,
-      phone: donorData.phone || '+91 98000 00000',
-      email: donorData.email || 'donor@donor-pulse.in',
-      address: donorData.address || 'HAL 2nd Stage, Indiranagar',
-      city: donorData.city || 'Bengaluru, Karnataka',
-      medicalHistory: donorData.medicalHistory || 'Pre-screened verified donor. Clinical vitals within healthy standard range.',
-      lastDonationDate: donorData.lastDonationDate || 'First-time Donor',
-      nextEligibleDate: 'Eligible Now',
-      availability: donorData.availability !== undefined ? donorData.availability : true,
-      radiusMiles: parseInt(donorData.radiusMiles || 10, 10),
-      totalDonations: 0,
-      livesSaved: 0,
-      rewardPoints: 100,
-      rewardTier: 'Active Registered Donor',
-      nextTierPointsLeft: 400,
-      distance: 1.5,
-      isAvailable: true,
-      verified: true,
-      coordinates: { type: 'Point', coordinates: [77.6000, 12.9500] },
-      donationHistory: [],
-      vitals: {
-        hemoglobin: '14.2 g/dL',
-        bp: '120/80 mmHg',
-        pulse: '72 bpm',
-        weight: '68 kg'
+  async loginDonor(id, password) {
+    try {
+      if (typeof fetch !== 'undefined') {
+        const res = await fetch('/api/donor/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, password })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success && data.donor) {
+            this.state.donor = data.donor;
+            if (!Array.isArray(this.state.matchedDonorsPool)) {
+              this.state.matchedDonorsPool = [];
+            }
+            const idx = this.state.matchedDonorsPool.findIndex(d => d.id === data.donor.id);
+            if (idx >= 0) this.state.matchedDonorsPool[idx] = data.donor;
+            else this.state.matchedDonorsPool.unshift(data.donor);
+            this.saveState();
+            this.notify();
+            return { success: true, donor: data.donor };
+          }
+        }
       }
-    };
+    } catch (e) {
+      console.warn('Network donor login error:', e);
+    }
+    // Fallback: check local pool
+    const pool = this.state.matchedDonorsPool || [];
+    const cleanId = String(id || '').trim().toLowerCase();
+    const matched = pool.find(d => {
+      const dId = String(d.id || '').toLowerCase();
+      const dPhone = String(d.phone || '').replace(/[\s-]/g, '');
+      return dId === cleanId || dPhone === cleanId.replace(/[\s-]/g, '');
+    });
+    if (matched) {
+      this.state.donor = matched;
+      this.saveState();
+      this.notify();
+      return { success: true, donor: matched };
+    }
+    return { success: false, error: 'Donor profile not found.' };
+  }
+
+  async registerNewDonor(donorData) {
+    let newDonor = null;
+    try {
+      if (typeof fetch !== 'undefined') {
+        const res = await fetch('/api/donor/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(donorData)
+        });
+        if (res.ok) {
+          const resData = await res.json();
+          if (resData && resData.success && resData.donor) {
+            newDonor = resData.donor;
+          }
+        }
+      }
+    } catch (netErr) {
+      console.warn('Network registration fallback:', netErr);
+    }
+
+    if (!newDonor) {
+      // Offline fallback
+      const rawBlood = (donorData.bloodGroup || 'O-').trim();
+      const cleanBloodCode = rawBlood.replace(/[^a-zA-Z0-9]/g, '');
+      const randomId = Math.floor(1000 + Math.random() * 9000);
+      const newId = `DP-${randomId}-${cleanBloodCode}`;
+
+      newDonor = {
+        id: newId,
+        _id: newId,
+        name: donorData.fullName || 'Registered Volunteer Donor',
+        fullName: donorData.fullName || 'Registered Volunteer Donor',
+        initials: (donorData.fullName || 'VD').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+        age: parseInt(donorData.age || 25, 10),
+        gender: donorData.gender || 'Not specified',
+        bloodGroup: rawBlood,
+        phone: donorData.phone || '+91 98000 00000',
+        email: donorData.email || 'donor@donor-pulse.in',
+        address: donorData.address || 'HAL 2nd Stage, Indiranagar',
+        city: donorData.city || 'Bengaluru, Karnataka',
+        medicalHistory: donorData.medicalHistory || 'Pre-screened verified donor. Clinical vitals within healthy standard range.',
+        lastDonationDate: donorData.lastDonationDate || 'First-time Donor',
+        nextEligibleDate: 'Eligible Now',
+        availability: donorData.availability !== undefined ? donorData.availability : true,
+        radiusMiles: parseInt(donorData.radiusMiles || 10, 10),
+        totalDonations: 0,
+        livesSaved: 0,
+        rewardPoints: 100,
+        rewardTier: 'Active Registered Donor',
+        nextTierPointsLeft: 400,
+        distance: 1.5,
+        isAvailable: true,
+        verified: true,
+        coordinates: { type: 'Point', coordinates: [77.6000, 12.9500] },
+        donationHistory: [],
+        vitals: {
+          hemoglobin: '14.2 g/dL',
+          bp: '120/80 mmHg',
+          pulse: '72 bpm',
+          weight: '68 kg'
+        }
+      };
+    }
 
     this.state.donor = newDonor;
 
@@ -409,7 +520,7 @@ class Store {
     if (!Array.isArray(this.state.matchedDonorsPool)) {
       this.state.matchedDonorsPool = [];
     }
-    this.state.matchedDonorsPool = this.state.matchedDonorsPool.filter(d => d.id !== newId && d.phone !== newDonor.phone);
+    this.state.matchedDonorsPool = this.state.matchedDonorsPool.filter(d => d.id !== newDonor.id && d.phone !== newDonor.phone);
     this.state.matchedDonorsPool.unshift(newDonor);
 
     // If an active recipient request matches this donor's blood group, add to request donors
@@ -539,7 +650,7 @@ class Store {
     const randomId = Math.floor(10000 + Math.random() * 90000);
     const stateRaw = data.state || data.city || 'KA';
     const stateCode = stateRaw.substring(0, 2).toUpperCase().replace(/[^A-Z]/g, 'KA');
-    const newId = `HSP-${randomId}-${stateCode}`;
+    const newId = data.id || `HSP-${randomId}-${stateCode}`;
 
     const newHospital = {
       id: newId,
@@ -573,10 +684,25 @@ class Store {
     }
 
     // Add to registry (newest first)
-    this.state.registeredHospitals.unshift(newHospital);
+    const existingIdx = this.state.registeredHospitals.findIndex(h => h.id === newId);
+    if (existingIdx >= 0) {
+      this.state.registeredHospitals[existingIdx] = newHospital;
+    } else {
+      this.state.registeredHospitals.unshift(newHospital);
+    }
+
     // Switch active hospital to the newly registered one
     this.state.hospital = newHospital;
     this.saveState();
+
+    if (typeof fetch !== 'undefined') {
+      fetch('/api/hospital/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newHospital)
+      }).catch(err => console.warn('Hospital register server sync note:', err));
+    }
+
     return newHospital;
   }
 
@@ -698,6 +824,43 @@ class Store {
     return this.state.recipient;
   }
 
+  async loginRecipient(id, password) {
+    try {
+      if (typeof fetch !== 'undefined') {
+        const res = await fetch('/api/recipient/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, password })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success && data.case) {
+            this.addOrUpdateRecipientCase(data.case, true);
+            return { success: true, case: data.case };
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Network recipient login error:', e);
+    }
+    // Fallback: check local cases
+    const cases = this.getRecipientCases();
+    const cleanId = String(id || '').trim().toLowerCase();
+    const cleanPwd = String(password || '').trim().replace(/[\s-]/g, '');
+    const matched = cases.find(c => {
+      const cId = String(c.id || '').toLowerCase();
+      const cCase = String(c.caseId || '').toLowerCase();
+      const cPhone = String(c.attendantPhone || '').replace(/[\s-]/g, '');
+      const cPin = String(c.handshakeOTP || '');
+      return cId === cleanId || cCase === cleanId || cleanId === cPhone || cleanId === cPin || cleanPwd === cPhone || cleanPwd === cPin;
+    });
+    if (matched) {
+      this.addOrUpdateRecipientCase(matched, true);
+      return { success: true, case: matched };
+    }
+    return { success: false, error: 'Recipient case record not found.' };
+  }
+
   updateRecipient(updates) {
     this.state.recipient = { ...this.getRecipient(), ...updates };
     const cases = this.getRecipientCases();
@@ -715,6 +878,15 @@ class Store {
       }
     }
     this.saveState();
+
+    if (typeof fetch !== 'undefined') {
+      fetch('/api/recipient/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.state.recipient)
+      }).catch(err => console.warn('Recipient update sync notice:', err));
+    }
+
     return this.state.recipient;
   }
 
@@ -791,7 +963,7 @@ class Store {
     return this.state.recipient;
   }
 
-  createNewPatientRequest(data) {
+  async createNewPatientRequest(data) {
     const randomCaseNum = Math.floor(1000 + Math.random() * 9000);
     const caseId = 'CASE-' + randomCaseNum;
     const reqId = 'REQ-' + randomCaseNum;
@@ -957,13 +1129,15 @@ class Store {
       });
 
       // Persist recipient case to shared database across all devices
-      fetch('/api/recipient-cases', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newPatient)
-      }).catch(err => {
+      try {
+        await fetch('/api/recipient-cases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newPatient)
+        });
+      } catch (err) {
         console.warn('API recipient case sync notice:', err);
-      });
+      }
     }
 
     this.saveState();

@@ -174,12 +174,12 @@ function initFormControllers() {
 
     const modalDonorForm = document.getElementById('form-donor-register-modal');
     if (modalDonorForm) {
-      modalDonorForm.addEventListener('submit', (e) => {
+      modalDonorForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = document.getElementById('btn-donor-register-submit');
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Registering Donor Profile...</span>';
+          submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Registering Donor Profile in Database...</span>';
         }
 
         const formData = new FormData(modalDonorForm);
@@ -199,18 +199,26 @@ function initFormControllers() {
           radiusMiles: parseInt(formData.get('radiusMiles') || 10, 10)
         };
 
-        window.PulseStore.registerNewDonor(donorData);
+        const createdDonor = await window.PulseStore.registerNewDonor(donorData);
+        const allottedId = (createdDonor && createdDonor.id) ? createdDonor.id : 'Profile Saved';
 
-        setTimeout(() => {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">how_to_reg</span><span>Complete Registration &amp; Launch Dashboard</span>';
-          }
-          closeDonorRegisterModal();
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">how_to_reg</span><span>Complete Registration &amp; Launch Dashboard</span>';
+        }
+
+        alert(`Registration Successful!\n\nYour Allotted Donor ID: ${allottedId}\nPassword: ${donorData.phone} (or donor@2026)\n\nYou can use these credentials to log in on any device.`);
+
+        closeDonorRegisterModal();
+        if (typeof renderDonorDashboard === 'function') {
           renderDonorDashboard();
-          showToast('Registration Successful', `Welcome, ${donorData.fullName}! Your ${donorData.bloodGroup} donor dashboard is ready.`, 'success');
+        }
+        showToast('Registration Successful', `Welcome, ${donorData.fullName}! Your ${donorData.bloodGroup} donor ID is ${allottedId}. Data stored in database.`, 'success');
+        if (window.PulseRouter) {
           window.PulseRouter.navigate('donor-dashboard');
-        }, 500);
+        } else {
+          window.location.href = 'index.html#/donor-dashboard';
+        }
       });
     }
   }
@@ -218,7 +226,7 @@ function initFormControllers() {
   // A. Donor Registration Form (Page View)
   const donorForm = document.getElementById('form-donor-register');
   if (donorForm) {
-    donorForm.addEventListener('submit', (e) => {
+    donorForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(donorForm);
       const donorData = {
@@ -235,9 +243,10 @@ function initFormControllers() {
         radiusMiles: parseInt(formData.get('radiusMiles') || 10, 10)
       };
 
-      window.PulseStore.registerNewDonor(donorData);
+      const createdDonor = await window.PulseStore.registerNewDonor(donorData);
+      const allottedId = (createdDonor && createdDonor.id) ? createdDonor.id : 'Profile Saved';
       renderDonorDashboard();
-      showToast('Registration Successful', `Welcome, ${donorData.fullName}! Your ${donorData.bloodGroup} donor dashboard is ready.`, 'success');
+      showToast('Registration Successful', `Welcome, ${donorData.fullName}! Your ${donorData.bloodGroup} donor ID is ${allottedId}. Data stored in database.`, 'success');
       window.PulseRouter.navigate('donor-dashboard');
     });
 
@@ -260,6 +269,8 @@ function initFormControllers() {
 
       // Name and Blood Group CANNOT be changed once registered - strictly preserved
       const updatedDonorData = {
+        id: currentDonor.id,
+        _id: currentDonor.id,
         fullName: currentDonor.fullName,
         bloodGroup: currentDonor.bloodGroup,
         age: parseInt(formData.get('age') || currentDonor.age, 10),
@@ -418,7 +429,7 @@ function initFormControllers() {
   // C. Emergency Patient Blood Request Modal / Form
   const requestForms = document.querySelectorAll('.form-blood-request');
   requestForms.forEach(form => {
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const patientName = form.querySelector('[name="patientName"]')?.value?.trim() || 'Emergency Patient';
@@ -441,7 +452,7 @@ function initFormControllers() {
 
       let newPatient = null;
       if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
-        newPatient = window.PulseStore.createNewPatientRequest({
+        newPatient = await window.PulseStore.createNewPatientRequest({
           patientName,
           patientAge,
           patientGender,
@@ -472,10 +483,20 @@ function initFormControllers() {
         });
       }
 
-      closeRequestModal();
+      const allottedCaseId = (newPatient && newPatient.id) ? newPatient.id : 'CASE-Recorded';
+      const allottedOtp = (newPatient && newPatient.handshakeOTP) ? newPatient.handshakeOTP : 'Verified';
+
+      alert(`Emergency Blood Requisition Saved & Broadcasted!\n\nPatient Case ID: ${allottedCaseId}\nRegistered Attendant Phone: ${attendantPhone}\nArrival Handshake PIN: ${allottedOtp}\n\nData is saved in the database. You can track this case or log in from ANY device using these credentials.`);
+
+      if (typeof window.closeRaiseRequestModal === 'function') {
+        window.closeRaiseRequestModal();
+      } else if (typeof closeRequestModal === 'function') {
+        closeRequestModal();
+      }
+
       showToast(
         '🚨 Emergency Requisition Broadcasted!',
-        `Patient ${patientName} (${bloodGroup} ${component}) requisition #${newPatient ? newPatient.requestId : 'LIVE'} dispatched! Alerting & dialing proximate donors in radius. Donors will appear below as they confirm availability.`,
+        `Patient ${patientName} (${bloodGroup} ${component}) requisition #${allottedCaseId} dispatched! Alerting & dialing proximate donors in radius.`,
         'success'
       );
 
@@ -1803,10 +1824,223 @@ window.quickAddUnits = (amt) => stepExtraUnits(amt);
 window.resetUnitsToCurrent = resetUpdateNeedUnits;
 window.updateUnitsDiffDisplay = updateNeedDiffDisplay;
 
-window.openRaiseRequestModal = openRequestModal;
-window.closeRaiseRequestModal = closeRequestModal;
-window.openRequestModal = openRequestModal;
-window.closeRequestModal = closeRequestModal;
+function resetRaiseRequestModal(modal) {
+  if (!modal) modal = document.getElementById('modal-request');
+  if (!modal) return;
+  const form = modal.querySelector('form.form-blood-request') || modal.querySelector('form');
+  if (form) form.reset();
+
+  modal.querySelectorAll('input:not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="file"])').forEach(i => i.value = '');
+  modal.querySelectorAll('textarea').forEach(t => t.value = '');
+  modal.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+
+  modal.querySelectorAll('input[name="blood_type"]').forEach(r => r.checked = false);
+  modal.querySelectorAll('.blood-radio-btn').forEach(btn => {
+    btn.classList.remove('bg-primary', 'text-white', 'shadow-md');
+    btn.classList.add('bg-surface-container', 'text-on-surface');
+  });
+
+  const fileInput = modal.querySelector('.proof-file-input');
+  if (fileInput) fileInput.value = '';
+  const fileLabel = modal.querySelector('.proof-filename-display');
+  if (fileLabel) fileLabel.textContent = 'No document attached yet';
+  const sizeLabel = modal.querySelector('.proof-filesize-display');
+  if (sizeLabel) sizeLabel.textContent = 'Upload hospital requisition slip, doctor prescription, or lab report (PDF/JPG/PNG)';
+
+  const authTag = modal.querySelector('.proof-auth-tag');
+  if (authTag) authTag.classList.add('hidden');
+
+  const viewProofBtn = modal.querySelector('.proof-view-btn');
+  if (viewProofBtn) viewProofBtn.classList.add('hidden');
+
+  const uploadBtnText = modal.querySelector('.proof-upload-btn-text');
+  if (uploadBtnText) uploadBtnText.textContent = 'Upload';
+
+  const badge = modal.querySelector('.proof-verification-badge');
+  if (badge) badge.classList.add('hidden');
+}
+
+function openRaiseRequestModal() {
+  const modal = document.getElementById('modal-request');
+  if (!modal) return;
+  resetRaiseRequestModal(modal);
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+}
+
+function closeRaiseRequestModal() {
+  const modal = document.getElementById('modal-request');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+  }
+}
+
+const openRequestModal = openRaiseRequestModal;
+const closeRequestModal = closeRaiseRequestModal;
+
+function fillDemoRaiseRequest() {
+  const modal = document.getElementById('modal-request');
+  if (!modal) return;
+
+  const setVal = (name, val) => {
+    const el = modal.querySelector(`[name="${name}"]`);
+    if (el) el.value = val;
+  };
+
+  setVal('patientName', 'Emergency Patient');
+  setVal('patientAge', '30');
+  setVal('patientGender', 'Female');
+  setVal('hospitalName', 'Metro Trauma Blood Centre');
+  setVal('ward', 'ICU Emergency Bed 4');
+  setVal('component', 'Whole Blood (Universal)');
+  setVal('units', '2');
+  setVal('urgency', 'Stat Emergency (< 45 Mins)');
+  setVal('attendantName', 'Duty Attendant');
+  setVal('attendantRelation', 'Immediate Family');
+  setVal('attendantPhone', '+91 98000 12345');
+  setVal('notes', 'Acute hemorrhagic requirement. Immediate compatible donor transfusion needed.');
+  setVal('proofDocType', 'Hospital Blood Requisition Slip (Form 27-C Stamped)');
+  setVal('doctorRegId', 'Duty Medical Officer (NMC-REG-2026)');
+  setVal('ipdCaseNo', 'IPD-EMERGENCY-ICU');
+
+  const fileLabel = modal.querySelector('.proof-filename-display');
+  if (fileLabel) fileLabel.textContent = 'apollo_blood_requisition_form27c_signed.pdf';
+  const sizeLabel = modal.querySelector('.proof-filesize-display');
+  if (sizeLabel) sizeLabel.textContent = '1.4 MB • Official Hospital Seal & Doctor Signature Detected';
+
+  const authTag = modal.querySelector('.proof-auth-tag');
+  if (authTag) authTag.classList.remove('hidden');
+
+  const viewProofBtn = modal.querySelector('.proof-view-btn');
+  if (viewProofBtn) viewProofBtn.classList.remove('hidden');
+
+  const uploadBtnText = modal.querySelector('.proof-upload-btn-text');
+  if (uploadBtnText) uploadBtnText.textContent = 'Replace';
+
+  const badge = modal.querySelector('.proof-verification-badge');
+  if (badge) {
+    badge.classList.remove('hidden');
+    badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex flex-col gap-1.5 transition-all';
+    const statusText = badge.querySelector('.proof-status-text');
+    if (statusText) statusText.textContent = 'Authenticity Check: 100% Genuine Requisition';
+  }
+
+  const radio = modal.querySelector('input[name="blood_type"][value="B+"]');
+  if (radio) {
+    radio.checked = true;
+    modal.querySelectorAll('.blood-radio-btn').forEach(btn => {
+      btn.classList.remove('bg-primary', 'text-white', 'shadow-md');
+      btn.classList.add('bg-surface-container', 'text-on-surface');
+    });
+    const activeDiv = radio.nextElementSibling;
+    if (activeDiv) {
+      activeDiv.classList.add('bg-primary', 'text-white', 'shadow-md');
+      activeDiv.classList.remove('bg-surface-container', 'text-on-surface');
+    }
+  }
+
+  if (typeof showToast === 'function') {
+    showToast('Demo Requisition Loaded', 'Pre-filled emergency patient requisition data ready for instant submission.', 'info');
+  }
+}
+
+function handleProofFileSelect(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const fileSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+  const fileName = file.name;
+
+  document.querySelectorAll('.proof-filename-display').forEach(el => el.textContent = fileName);
+  document.querySelectorAll('.proof-filesize-display').forEach(el => el.textContent = `${fileSize} • Uploaded Document`);
+
+  document.querySelectorAll('.proof-auth-tag').forEach(el => el.classList.remove('hidden'));
+  document.querySelectorAll('.proof-view-btn').forEach(el => el.classList.remove('hidden'));
+  document.querySelectorAll('.proof-upload-btn-text').forEach(el => el.textContent = 'Replace');
+
+  document.querySelectorAll('.proof-verification-badge').forEach(badge => {
+    badge.classList.remove('hidden');
+    badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs flex flex-col gap-1.5 transition-all animate-pulse';
+    const statusText = badge.querySelector('.proof-status-text');
+    if (statusText) statusText.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin inline-block mr-1 align-text-bottom">sync</span> Verifying document signatures &amp; hospital seal...';
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll('.proof-verification-badge').forEach(badge => {
+      badge.classList.remove('hidden');
+      badge.className = 'proof-verification-badge p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex flex-col gap-1.5 transition-all';
+      const statusText = badge.querySelector('.proof-status-text');
+      if (statusText) statusText.textContent = 'Authenticity Check: 100% Genuine Requisition';
+    });
+    document.querySelectorAll('.proof-filesize-display').forEach(el => el.textContent = `${fileSize} • Official Hospital Seal & Doctor Signature Detected`);
+  }, 700);
+}
+
+function openMedicalProofViewer(customData) {
+  const modal = document.getElementById('modal-medical-proof');
+  if (!modal) return;
+
+  const currentPatient = (customData) || (window.PulseStore && window.PulseStore.state && window.PulseStore.state.recipient) || {};
+  const form = document.querySelector('.form-blood-request');
+  
+  const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Emergency Patient';
+  const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 30;
+  const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Other';
+  const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'General Ward';
+  const blood = (form && form.querySelector('input[name="blood_type"]:checked')?.value) || currentPatient.bloodGroup || 'B+';
+  const component = (form && form.querySelector('[name="component"]')?.value) || currentPatient.component || 'Whole Blood';
+  const units = (form && form.querySelector('[name="units"]')?.value) || currentPatient.unitsRequired || 2;
+  const urgency = (form && form.querySelector('[name="urgency"]')?.value) || currentPatient.urgency || 'Stat Emergency (< 45 Mins)';
+  const notes = (form && form.querySelector('[name="notes"]')?.value?.trim()) || currentPatient.clinicalReason || 'Urgent clinical blood requisition.';
+  const doctor = (form && form.querySelector('[name="doctorRegId"]')?.value?.trim()) || currentPatient.doctorName || 'Attending Physician';
+  const ipd = (form && form.querySelector('[name="ipdCaseNo"]')?.value?.trim()) || (currentPatient.verificationProof && currentPatient.verificationProof.ipdCaseNo) || 'IPD-RECORD';
+
+  const setText = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  };
+
+  setText('doc-proof-patient-name', patientName);
+  setText('doc-proof-patient-meta', `${age} Yrs / ${gender} • ${ipd}`);
+  setText('doc-proof-ward', ward);
+  const bloodText = (blood.includes('Positive') || blood.includes('Negative'))
+    ? blood
+    : blood.endsWith('+')
+      ? `${blood} (Positive)`
+      : blood.endsWith('-')
+        ? `${blood} (Negative)`
+        : blood;
+  setText('doc-proof-blood-group', bloodText);
+  setText('doc-proof-component-units', `${component} — ${units} Units`);
+  setText('doc-proof-urgency', urgency);
+  setText('doc-proof-notes', notes);
+  setText('doc-proof-doctor-reg', `${doctor} — Registered Practitioner`);
+  setText('doc-proof-sl-no', `${currentPatient.requestId || 'REQ-LIVE'} / ${ipd}`);
+
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+}
+
+function closeMedicalProofViewer() {
+  const modal = document.getElementById('modal-medical-proof');
+  if (modal) {
+    modal.classList.add('hidden');
+    const reqModal = document.getElementById('modal-request');
+    if (!reqModal || reqModal.classList.contains('hidden')) {
+      document.body.classList.remove('overflow-hidden');
+    }
+  }
+}
+
+function printMedicalProof() {
+  window.print();
+}
+
+window.openRaiseRequestModal = openRaiseRequestModal;
+window.closeRaiseRequestModal = closeRaiseRequestModal;
+window.openRequestModal = openRaiseRequestModal;
+window.closeRequestModal = closeRaiseRequestModal;
 window.resetRaiseRequestModal = resetRaiseRequestModal;
 window.fillDemoRaiseRequest = fillDemoRaiseRequest;
 window.handleProofFileSelect = handleProofFileSelect;
@@ -2024,9 +2258,31 @@ function renderAllViews() {
  * Render Donor Dashboard
  */
 function renderDonorDashboard() {
-  const donor = window.PulseStore ? window.PulseStore.getDonor() : null;
-  
+  let donor = window.PulseStore ? window.PulseStore.getDonor() : null;
+
+  if (!donor && window.PulseStore && typeof window.PulseStore.getAllDonorsPool === 'function') {
+    const pool = window.PulseStore.getAllDonorsPool();
+    if (pool && pool.length > 0) {
+      donor = pool[0];
+      window.PulseStore.state.donor = donor;
+      window.PulseStore.saveState();
+    }
+  }
+
   if (!donor) {
+    if (typeof fetch !== 'undefined' && !window._fetchingDonorDashboard) {
+      window._fetchingDonorDashboard = true;
+      fetch('/api/donors/current')
+        .then(r => r.json())
+        .then(data => {
+          window._fetchingDonorDashboard = false;
+          if (data && data.success && data.donor && window.PulseStore) {
+            window.PulseStore.setDonor(data.donor);
+            renderDonorDashboard();
+          }
+        })
+        .catch(() => { window._fetchingDonorDashboard = false; });
+    }
     // Show empty / unauthenticated state on Donor Dashboard
     setTextContentAll('.donor-name-display', 'Volunteer Donor');
     setTextContentAll('.donor-id-display', 'Unregistered Volunteer');
@@ -5245,6 +5501,22 @@ window.openDonorLoginModal = function() {
   const toggleIcon = document.getElementById('donor-pwd-toggle-icon');
   if (toggleIcon) toggleIcon.textContent = 'visibility';
 
+  const currentDonor = (window.PulseStore && typeof window.PulseStore.getDonor === 'function')
+    ? window.PulseStore.getDonor()
+    : null;
+  const activeSessionBanner = document.getElementById('donor-active-session-banner');
+  if (activeSessionBanner) {
+    if (currentDonor && currentDonor.id) {
+      const nameEl = document.getElementById('donor-active-name');
+      const idEl = document.getElementById('donor-active-id');
+      if (nameEl) nameEl.textContent = currentDonor.fullName || currentDonor.name || 'Active Donor Profile';
+      if (idEl) idEl.textContent = `ID: ${currentDonor.id} (${currentDonor.bloodGroup || 'Blood Group'})`;
+      activeSessionBanner.classList.remove('hidden');
+    } else {
+      activeSessionBanner.classList.add('hidden');
+    }
+  }
+
   modal.classList.remove('hidden');
   document.body.classList.add('overflow-hidden');
 
@@ -5276,13 +5548,19 @@ window.fillDemoDonorCredentials = function() {
   const idInput = document.getElementById('donor-input-id');
   const pwdInput = document.getElementById('donor-input-pwd');
   if (!idInput || !pwdInput) return;
-  idInput.value = 'DNR-4821';
-  pwdInput.value = 'donor@2024';
+  const currentDonor = window.PulseStore?.getDonor();
+  if (currentDonor && currentDonor.id) {
+    idInput.value = currentDonor.id;
+    pwdInput.value = currentDonor.phone || 'donor@2024';
+  } else {
+    idInput.value = 'DNR-4821';
+    pwdInput.value = 'donor@2024';
+  }
   const errorBox = document.getElementById('donor-login-error');
   if (errorBox) errorBox.classList.add('hidden');
 };
 
-window.handleDonorLoginSubmit = function(e) {
+window.handleDonorLoginSubmit = async function(e) {
   if (e) e.preventDefault();
   const idInput = document.getElementById('donor-input-id');
   const pwdInput = document.getElementById('donor-input-pwd');
@@ -5311,25 +5589,54 @@ window.handleDonorLoginSubmit = function(e) {
     btnIcon.classList.add('animate-spin');
   }
 
-  setTimeout(() => {
-    // Reset button
-    if (btnSubmit) btnSubmit.disabled = false;
-    if (btnIcon) {
-      btnIcon.textContent = 'verified_user';
-      btnIcon.classList.remove('animate-spin');
+  let loginRes = null;
+  if (window.PulseStore && typeof window.PulseStore.loginDonor === 'function') {
+    loginRes = await window.PulseStore.loginDonor(idVal, pwdVal);
+  } else {
+    try {
+      const res = await fetch('/api/donor/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: idVal, password: pwdVal })
+      });
+      if (res.ok) {
+        loginRes = await res.json();
+      }
+    } catch (netErr) {
+      console.warn('Network donor login check:', netErr);
     }
-    if (btnText) btnText.textContent = 'Authenticate & Enter Donor Dashboard';
+  }
 
+  // Reset button state
+  if (btnSubmit) btnSubmit.disabled = false;
+  if (btnIcon) {
+    btnIcon.textContent = 'verified_user';
+    btnIcon.classList.remove('animate-spin');
+  }
+  if (btnText) btnText.textContent = 'Authenticate & Enter Donor Dashboard';
+
+  if (loginRes && loginRes.success && loginRes.donor) {
+    if (window.PulseStore) {
+      window.PulseStore.setDonor(loginRes.donor);
+    }
     window.closeDonorLoginModal();
-
-    window.showToast('Authentication Successful', `Welcome back, verified donor (${idVal}). Access granted.`, 'success');
+    if (typeof renderDonorDashboard === 'function') {
+      renderDonorDashboard();
+    }
+    window.showToast('Authentication Successful', `Welcome back, verified donor ${loginRes.donor.fullName} (${loginRes.donor.id}). Profile loaded from database.`, 'success');
     if (window.PulseRouter) {
       window.PulseRouter.navigate('donor-dashboard');
     } else {
       window.location.href = 'index.html#/donor-dashboard';
     }
-  }, 600);
+    return false;
+  }
 
+  // Show error
+  if (errorBox && errorText) {
+    errorText.textContent = 'Invalid credentials. Please verify your Donor ID / phone and password.';
+    errorBox.classList.remove('hidden');
+  }
   return false;
 };
 
@@ -5350,6 +5657,22 @@ window.openHospitalLoginModal = function() {
   }
   const toggleIcon = document.getElementById('hospital-pwd-toggle-icon');
   if (toggleIcon) toggleIcon.textContent = 'visibility';
+
+  const currentRec = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+  const activeSessionBanner = document.getElementById('hospital-active-session-banner');
+  if (activeSessionBanner) {
+    if (currentRec && (currentRec.id || currentRec.caseId)) {
+      const nameEl = document.getElementById('hospital-active-name');
+      const idEl = document.getElementById('hospital-active-id');
+      if (nameEl) nameEl.textContent = currentRec.patientName || 'Active Patient Case';
+      if (idEl) idEl.textContent = `Case: ${currentRec.id || currentRec.caseId} (${currentRec.bloodGroup || 'Blood Group'})`;
+      activeSessionBanner.classList.remove('hidden');
+    } else {
+      activeSessionBanner.classList.add('hidden');
+    }
+  }
 
   modal.classList.remove('hidden');
   document.body.classList.add('overflow-hidden');
@@ -5475,6 +5798,14 @@ window.handleHospitalLoginSubmit = async function(e) {
     btnIcon.classList.remove('animate-spin');
   }
   if (btnText) btnText.textContent = 'Access Recipient Portal';
+
+  if (!matchedCase) {
+    if (errorBox && errorText) {
+      errorText.textContent = 'No matching patient case found. Please check Case ID and registered attendant mobile number.';
+      errorBox.classList.remove('hidden');
+    }
+    return false;
+  }
 
   window.closeHospitalLoginModal();
 

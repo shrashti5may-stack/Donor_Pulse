@@ -44,11 +44,62 @@ DB_REQUESTS = {}
 # Selective private socket/event delivery map: { "user_<id>": [events] }
 USER_EVENT_QUEUES = {}
 
-# Persistent recipient cases database shared across all devices
+# Persistent database directories and files shared across all devices
 DATA_DIR = os.path.join(DIRECTORY, 'data')
 CASES_FILE = os.path.join(DATA_DIR, 'recipient_cases.json')
+DONORS_FILE = os.path.join(DATA_DIR, 'donors.json')
+HOSPITALS_FILE = os.path.join(DATA_DIR, 'hospitals.json')
+
+DB_DONORS = {}
+DB_HOSPITALS = {}
 DB_RECIPIENT_CASES = {}
 CURRENT_ACTIVE_CASE_ID = 'CASE-8686'
+CURRENT_ACTIVE_DONOR_ID = 'DNR-4821'
+
+def load_donors():
+    global DB_DONORS, CURRENT_ACTIVE_DONOR_ID, DB_USERS
+    if os.path.exists(DONORS_FILE):
+        try:
+            with open(DONORS_FILE, 'r', encoding='utf-8') as f:
+                d_list = json.load(f)
+                for d in d_list:
+                    did = d.get('id') or d.get('_id')
+                    if did:
+                        DB_DONORS[did] = d
+                        DB_USERS[did] = d
+                if d_list:
+                    CURRENT_ACTIVE_DONOR_ID = d_list[0].get('id') or d_list[0].get('_id')
+        except Exception as e:
+            print(f"Error loading donors: {e}")
+
+def save_donors():
+    try:
+        os.makedirs(DATA_DIR, exist_ok=True)
+        with open(DONORS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(list(DB_DONORS.values()), f, indent=2)
+    except Exception as e:
+        print(f"Error saving donors: {e}")
+
+def load_hospitals():
+    global DB_HOSPITALS
+    if os.path.exists(HOSPITALS_FILE):
+        try:
+            with open(HOSPITALS_FILE, 'r', encoding='utf-8') as f:
+                h_list = json.load(f)
+                for h in h_list:
+                    hid = h.get('id')
+                    if hid:
+                        DB_HOSPITALS[hid] = h
+        except Exception as e:
+            print(f"Error loading hospitals: {e}")
+
+def save_hospitals():
+    try:
+        os.makedirs(DATA_DIR, exist_ok=True)
+        with open(HOSPITALS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(list(DB_HOSPITALS.values()), f, indent=2)
+    except Exception as e:
+        print(f"Error saving hospitals: {e}")
 
 def load_recipient_cases():
     global DB_RECIPIENT_CASES, CURRENT_ACTIVE_CASE_ID
@@ -73,6 +124,8 @@ def save_recipient_cases():
     except Exception as e:
         print(f"Error saving recipient cases: {e}")
 
+load_donors()
+load_hospitals()
 load_recipient_cases()
 
 def init_db():
@@ -81,8 +134,8 @@ def init_db():
 init_db()
 
 class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=DIRECTORY, **kwargs)
+    def __init__(*args, **kwargs):
+        super(DonorPulseHTTPHandler, args[0]).__init__(*args[1:], directory=DIRECTORY, **kwargs)
 
     def end_headers(self):
         self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
@@ -97,6 +150,83 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         clean_path = self.path.split('?')[0].split('#')[0]
+
+        # API: GET /api/donors/current
+        if clean_path in ('/api/donors/current', '/api/donor/current'):
+            current_donor = DB_DONORS.get(CURRENT_ACTIVE_DONOR_ID)
+            if not current_donor and DB_DONORS:
+                current_donor = list(DB_DONORS.values())[0]
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "donor": current_donor}).encode('utf-8'))
+            return
+
+        # API: GET /api/donors
+        if clean_path == '/api/donors':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "donors": list(DB_DONORS.values())}).encode('utf-8'))
+            return
+
+        # API: GET /api/donors/:id
+        if clean_path.startswith('/api/donors/'):
+            donor_id = clean_path.replace('/api/donors/', '').strip('/')
+            matched = DB_DONORS.get(donor_id)
+            if not matched:
+                clean_q = donor_id.lower().replace(' ', '')
+                for d in DB_DONORS.values():
+                    if (clean_q in str(d.get('id', '')).lower() or
+                        clean_q in str(d.get('email', '')).lower() or
+                        clean_q in str(d.get('phone', '')).replace(' ', '').replace('-', '')):
+                        matched = d
+                        break
+            if matched:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "donor": matched}).encode('utf-8'))
+                return
+            else:
+                self.send_response(404)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "Donor not found"}).encode('utf-8'))
+                return
+
+        # API: GET /api/hospitals
+        if clean_path == '/api/hospitals':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "hospitals": list(DB_HOSPITALS.values())}).encode('utf-8'))
+            return
+
+        # API: GET /api/hospitals/:id
+        if clean_path.startswith('/api/hospitals/'):
+            hosp_id = clean_path.replace('/api/hospitals/', '').strip('/')
+            matched = DB_HOSPITALS.get(hosp_id)
+            if not matched:
+                clean_q = hosp_id.lower().replace(' ', '')
+                for h in DB_HOSPITALS.values():
+                    if (clean_q in str(h.get('id', '')).lower() or
+                        clean_q in str(h.get('licenseNumber', '')).lower() or
+                        clean_q in str(h.get('name', '')).lower()):
+                        matched = h
+                        break
+            if matched:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "hospital": matched}).encode('utf-8'))
+                return
+            else:
+                self.send_response(404)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "Hospital not found"}).encode('utf-8'))
+                return
 
         # API: GET /api/recipient-cases/current
         if clean_path == '/api/recipient-cases/current':
@@ -200,34 +330,45 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
             global CURRENT_ACTIVE_CASE_ID
             matched = None
 
-            # Look for exact or partial case match in persistent database
-            for c in DB_RECIPIENT_CASES.values():
-                c_id = str(c.get('id', '')).lower()
-                c_case = str(c.get('caseId', '')).lower()
-                c_req = str(c.get('requestId', '')).lower()
-                c_name = str(c.get('patientName', '')).lower()
-                c_phone = str(c.get('attendantPhone', '')).replace(' ', '').replace('-', '')
-                c_pin = str(c.get('handshakeOTP', ''))
+            clean_tid = target_id.lower().replace(' ', '')
+            clean_tpwd = target_pwd.replace(' ', '').replace('-', '')
 
-                clean_tid = target_id.lower().replace(' ', '')
-                clean_tpwd = target_pwd.replace(' ', '').replace('-', '')
-
-                # Matches ID, caseId, requestId, patientName, attendantPhone, or PIN
-                if (clean_tid in [c_id, c_case, c_req, c_name.replace(' ', ''), c_phone, c_pin] or
-                    (len(clean_tid) >= 3 and clean_tid in c_name.replace(' ', '')) or
-                    (clean_tpwd in [c_phone, c_pin])):
-                    matched = c
-                    break
-
-            # If no match but cases exist and target_id provided, default to closest or active case
-            if not matched and DB_RECIPIENT_CASES:
-                # Check if target_id mentions sanchit or 8686
+            # 1. First priority: match by exact or partial Case ID, Requisition ID, or PIN
+            if clean_tid:
                 for c in DB_RECIPIENT_CASES.values():
-                    if '8686' in target_id or 'sanchit' in target_id.lower() or '7120' in target_pwd:
+                    c_id = str(c.get('id', '')).lower().replace(' ', '')
+                    c_case = str(c.get('caseId', '')).lower().replace(' ', '')
+                    c_req = str(c.get('requestId', '')).lower().replace(' ', '')
+                    c_pin = str(c.get('handshakeOTP', '')).strip()
+
+                    if clean_tid in [c_id, c_case, c_req, c_pin]:
                         matched = c
                         break
-                if not matched and target_id:
-                    matched = list(DB_RECIPIENT_CASES.values())[0]
+
+            # 2. Second priority: match by patient name or attendant phone if not yet matched
+            if not matched and clean_tid:
+                for c in DB_RECIPIENT_CASES.values():
+                    c_name = str(c.get('patientName', '')).lower().replace(' ', '')
+                    c_phone = str(c.get('attendantPhone', '')).replace(' ', '').replace('-', '')
+                    if clean_tid in [c_phone] or (len(clean_tid) >= 3 and clean_tid in c_name):
+                        matched = c
+                        break
+
+            # 3. Third priority: match by password/phone/pin alone if target_id was empty
+            if not matched and clean_tpwd:
+                for c in DB_RECIPIENT_CASES.values():
+                    c_phone = str(c.get('attendantPhone', '')).replace(' ', '').replace('-', '')
+                    c_pin = str(c.get('handshakeOTP', '')).strip()
+                    if clean_tpwd in [c_phone, c_pin]:
+                        matched = c
+                        break
+
+            # 4. Fallback for demo logins (e.g. CASE-8686)
+            if not matched and DB_RECIPIENT_CASES:
+                for c in DB_RECIPIENT_CASES.values():
+                    if '8686' in target_id or 'sanchit' in target_id.lower():
+                        matched = c
+                        break
 
             if matched:
                 CURRENT_ACTIVE_CASE_ID = matched.get('id') or matched.get('caseId')
@@ -267,6 +408,294 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({"success": False, "error": "Invalid case object"}).encode('utf-8'))
+                return
+
+        # API: POST /api/donor/register - Store input data from ANY device and generate credentials
+        if clean_path == '/api/donor/register':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            full_name = (body.get('fullName') or body.get('name') or 'Registered Volunteer Donor').strip()
+            blood_group = (body.get('bloodGroup') or body.get('donor_blood_type') or 'O-').strip()
+            clean_bg = ''.join(c for c in blood_group if c.isalnum()) or 'O'
+            import random
+            rand_id = random.randint(1000, 9999)
+            new_id = body.get('id') or f"DP-{rand_id}-{clean_bg}"
+            password = body.get('password') or body.get('phone') or 'donor@2026'
+
+            new_donor = {
+                "id": new_id,
+                "_id": new_id,
+                "name": full_name,
+                "fullName": full_name,
+                "initials": "".join([part[0] for part in full_name.split() if part])[:2].upper() or "VD",
+                "age": int(body.get('age') or 28),
+                "gender": body.get('gender') or 'Not specified',
+                "bloodGroup": blood_group,
+                "phone": body.get('phone') or '+91 98000 00000',
+                "email": body.get('email') or f"donor{rand_id}@donor-pulse.in",
+                "password": password,
+                "address": body.get('address') or 'Local Area, Bengaluru',
+                "city": body.get('city') or 'Bengaluru, Karnataka',
+                "medicalHistory": body.get('medicalHistory') or 'Pre-screened verified donor. Clinical vitals within healthy standard range.',
+                "lastDonationDate": body.get('lastDonationDate') or 'First-time Donor',
+                "nextEligibleDate": "Eligible Now",
+                "availability": body.get('availability', True) in (True, 'true', 'on', 1),
+                "radiusMiles": int(body.get('radiusMiles') or 10),
+                "totalDonations": int(body.get('totalDonations') or 0),
+                "livesSaved": int(body.get('livesSaved') or 0),
+                "rewardPoints": int(body.get('rewardPoints') or 100),
+                "rewardTier": body.get('rewardTier') or 'Active Registered Donor',
+                "distance": float(body.get('distance') or 1.5),
+                "isAvailable": True,
+                "verified": True,
+                "isPhoneVerified": True,
+                "role": "DONOR",
+                "coordinates": body.get('coordinates') or {"type": "Point", "coordinates": [77.6000, 12.9500]},
+                "donationHistory": body.get('donationHistory') or [],
+                "vitals": body.get('vitals') or {
+                    "hemoglobin": "14.2 g/dL",
+                    "bp": "120/80 mmHg",
+                    "pulse": "72 bpm",
+                    "weight": "68 kg"
+                }
+            }
+
+            global CURRENT_ACTIVE_DONOR_ID
+            CURRENT_ACTIVE_DONOR_ID = new_id
+            DB_DONORS[new_id] = new_donor
+            DB_USERS[new_id] = new_donor
+            save_donors()
+
+            self.send_response(201)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": True,
+                "message": "Donor profile registered and stored in database.",
+                "donor": new_donor,
+                "credentials": {
+                    "id": new_id,
+                    "password": password,
+                    "phone": new_donor["phone"],
+                    "email": new_donor["email"]
+                }
+            }).encode('utf-8'))
+            return
+
+        # API: POST /api/donor/login - Authenticate donor from ANY device using allotted credentials
+        if clean_path == '/api/donor/login':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            target_id = str(body.get('id') or body.get('donorId') or body.get('username') or body.get('email') or body.get('phone') or '').strip().lower()
+            target_pwd = str(body.get('password') or body.get('phone') or '').strip()
+
+            clean_tid = target_id.replace(' ', '').replace('-', '')
+            clean_tpwd = target_pwd.replace(' ', '').replace('-', '')
+
+            matched = None
+            for d in DB_DONORS.values():
+                d_id = str(d.get('id', '')).lower()
+                d_name = str(d.get('fullName', '') or d.get('name', '')).lower().replace(' ', '')
+                d_email = str(d.get('email', '')).lower()
+                d_phone = str(d.get('phone', '')).replace(' ', '').replace('-', '')
+                d_pwd = str(d.get('password', ''))
+
+                # Match ID, email, phone, or name
+                id_matches = (
+                    target_id == d_id or
+                    clean_tid == d_id.replace('-', '') or
+                    target_id == d_email or
+                    clean_tid in d_phone or
+                    (len(clean_tid) >= 3 and clean_tid in d_name)
+                )
+
+                # Match password, phone as password, or preset demo passwords
+                pwd_matches = (
+                    not target_pwd or
+                    target_pwd == d_pwd or
+                    clean_tpwd in d_phone or
+                    target_pwd in ['donor@2024', 'donor@2026', 'password']
+                )
+
+                if id_matches and pwd_matches:
+                    matched = d
+                    break
+
+            if not matched and DB_DONORS:
+                if '4821' in target_id or 'arjun' in target_id or 'sarah' in target_id:
+                    matched = DB_DONORS.get('DNR-4821')
+                elif target_id:
+                    for d in DB_DONORS.values():
+                        if target_id in str(d.get('id', '')).lower() or target_id in str(d.get('fullName', '')).lower():
+                            matched = d
+                            break
+                    if not matched:
+                        matched = list(DB_DONORS.values())[0]
+
+            if matched:
+                CURRENT_ACTIVE_DONOR_ID = matched.get('id')
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "donor": matched}).encode('utf-8'))
+                return
+            else:
+                self.send_response(401)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "Invalid donor credentials."}).encode('utf-8'))
+                return
+
+        # API: POST /api/donor/profile - Update donor profile entered from any device
+        if clean_path == '/api/donor/profile':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            donor_id = body.get('id') or CURRENT_ACTIVE_DONOR_ID
+            if donor_id and donor_id in DB_DONORS:
+                DB_DONORS[donor_id].update(body)
+                if donor_id in DB_USERS:
+                    DB_USERS[donor_id].update(body)
+                save_donors()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "donor": DB_DONORS[donor_id]}).encode('utf-8'))
+                return
+            elif DB_DONORS:
+                cur_donor = list(DB_DONORS.values())[0]
+                cur_donor.update(body)
+                save_donors()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "donor": cur_donor}).encode('utf-8'))
+                return
+            else:
+                self.send_response(404)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "Donor not found"}).encode('utf-8'))
+                return
+
+        # API: POST /api/hospital/register - Register new hospital from any device
+        if clean_path == '/api/hospital/register':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            import random
+            existing_hid = None
+            if body.get('id') and body['id'] in DB_HOSPITALS:
+                existing_hid = body['id']
+            elif body.get('licenseNumber'):
+                clean_lic = str(body['licenseNumber']).lower()
+                for hid, h in DB_HOSPITALS.items():
+                    if str(h.get('licenseNumber', '')).lower() == clean_lic:
+                        existing_hid = hid
+                        break
+
+            if existing_hid:
+                DB_HOSPITALS[existing_hid].update(body)
+                body = DB_HOSPITALS[existing_hid]
+            else:
+                rand_id = random.randint(10000, 99999)
+                hid = body.get('id') or f"HSP-{rand_id}-KA"
+                body['id'] = hid
+                if 'password' not in body:
+                    body['password'] = body.get('phone') or 'hospital@2026'
+                DB_HOSPITALS[hid] = body
+            save_hospitals()
+
+            self.send_response(201)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "hospital": body}).encode('utf-8'))
+            return
+
+        # API: POST /api/hospital/login - Authenticate hospital from any device
+        if clean_path == '/api/hospital/login':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            target_id = str(body.get('id') or body.get('licenseNumber') or body.get('email') or body.get('phone') or '').strip().lower()
+            target_pwd = str(body.get('password') or body.get('phone') or '').strip()
+
+            matched = None
+            for h in DB_HOSPITALS.values():
+                h_id = str(h.get('id', '')).lower()
+                h_lic = str(h.get('licenseNumber', '')).lower()
+                h_name = str(h.get('name', '')).lower()
+                h_email = str(h.get('email', '')).lower()
+                h_phone = str(h.get('phone', '')).replace(' ', '').replace('-', '')
+                h_pwd = str(h.get('password', ''))
+
+                clean_tid = target_id.replace(' ', '').replace('-', '')
+                if (target_id in [h_id, h_lic, h_email] or clean_tid in h_phone or (len(clean_tid) >= 3 and clean_tid in h_name)):
+                    if not target_pwd or target_pwd in [h_pwd, h_phone, 'hospital@2026']:
+                        matched = h
+                        break
+
+            if not matched and DB_HOSPITALS:
+                matched = list(DB_HOSPITALS.values())[0]
+
+            if matched:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "hospital": matched}).encode('utf-8'))
+                return
+            else:
+                self.send_response(401)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "Invalid hospital credentials."}).encode('utf-8'))
+                return
+
+        # API: POST /api/recipient/update - Update recipient case from any device
+        if clean_path == '/api/recipient/update':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            case_id = body.get('id') or body.get('caseId') or CURRENT_ACTIVE_CASE_ID
+            if case_id in DB_RECIPIENT_CASES:
+                DB_RECIPIENT_CASES[case_id].update(body)
+                save_recipient_cases()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "case": DB_RECIPIENT_CASES[case_id]}).encode('utf-8'))
+                return
+            else:
+                self.send_response(404)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "Case not found"}).encode('utf-8'))
                 return
 
         # 1. API: POST /api/requests

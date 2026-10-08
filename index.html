@@ -4688,6 +4688,19 @@
           <span id="donor-login-error-text">Please enter both your allotted Donor ID and password.</span>
         </div>
 
+        <div id="donor-active-session-banner" class="hidden p-3 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[20px]">account_circle</span>
+            <div class="text-xs">
+              <span class="text-on-surface font-bold" id="donor-active-name">Active Donor</span>
+              <span class="text-on-surface-variant font-mono block text-[11px]" id="donor-active-id">ID: DNR-4821</span>
+            </div>
+          </div>
+          <button type="button" onclick="if(window.PulseRouter) window.PulseRouter.navigate('donor-dashboard'); window.closeDonorLoginModal();" class="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary-container cursor-pointer">
+            Go to Dashboard
+          </button>
+        </div>
+
         <div>
           <label for="donor-input-id" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">Allotted &amp; Verified Donor ID</label>
           <div class="relative">
@@ -4758,6 +4771,19 @@
         <div id="hospital-login-error" class="hidden p-3 rounded-xl bg-error-container/40 border border-error/30 text-on-error-container text-xs flex items-center gap-2">
           <span class="material-symbols-outlined text-[18px] text-error shrink-0">error</span>
           <span id="hospital-login-error-text">Please enter both your Patient Case ID / Requisition ID and attendant mobile number.</span>
+        </div>
+
+        <div id="hospital-active-session-banner" class="hidden p-3 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+            <div class="text-xs">
+              <span class="text-on-surface font-bold" id="hospital-active-name">Active Patient Case</span>
+              <span class="text-on-surface-variant font-mono block text-[11px]" id="hospital-active-id">Case: CASE-8686</span>
+            </div>
+          </div>
+          <button type="button" onclick="if(window.PulseRouter) window.PulseRouter.navigate('recipient-dashboard'); window.closeHospitalLoginModal();" class="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary-container cursor-pointer">
+            Go to Dashboard
+          </button>
         </div>
 
         <div>

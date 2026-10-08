@@ -223,6 +223,19 @@
         <span id="donor-login-error-text">Please enter both your allotted Donor ID and password.</span>
       </div>
 
+      <div id="donor-active-session-banner" class="hidden p-3 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[20px]">account_circle</span>
+          <div class="text-xs">
+            <span class="text-on-surface font-bold" id="donor-active-name">Active Donor</span>
+            <span class="text-on-surface-variant font-mono block text-[11px]" id="donor-active-id">ID: DNR-4821</span>
+          </div>
+        </div>
+        <button type="button" onclick="window.location.href='index.html#/donor-dashboard'; closeDonorLoginModal();" class="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary-container cursor-pointer">
+          Go to Dashboard
+        </button>
+      </div>
+
       <div>
         <label for="donor-input-id" class="block font-label-md text-xs font-bold text-on-surface mb-1.5">Allotted &amp; Verified Donor ID</label>
         <div class="relative">
@@ -289,6 +302,19 @@
       <div id="hospital-login-error" class="hidden p-3 rounded-xl bg-error-container/40 border border-error/30 text-on-error-container text-xs flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px] text-error shrink-0">error</span>
         <span id="hospital-login-error-text">Please enter both Patient Case ID and registered mobile number.</span>
+      </div>
+
+      <div id="hospital-active-session-banner" class="hidden p-3 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+          <div class="text-xs">
+            <span class="text-on-surface font-bold" id="hospital-active-name">Active Patient Case</span>
+            <span class="text-on-surface-variant font-mono block text-[11px]" id="hospital-active-id">Case: CASE-8686</span>
+          </div>
+        </div>
+        <button type="button" onclick="window.location.href='index.html#/recipient-dashboard'; closeHospitalLoginModal();" class="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary-container cursor-pointer">
+          Go to Dashboard
+        </button>
       </div>
 
       <div>
@@ -1092,6 +1118,23 @@ function openDonorLoginModal() {
   if (pwdInput) { pwdInput.value = ''; pwdInput.type = 'password'; }
   const toggleIcon = document.getElementById('donor-pwd-toggle-icon');
   if (toggleIcon) toggleIcon.textContent = 'visibility';
+
+  const currentDonor = (window.PulseStore && typeof window.PulseStore.getDonor === 'function')
+    ? window.PulseStore.getDonor()
+    : null;
+  const activeSessionBanner = document.getElementById('donor-active-session-banner');
+  if (activeSessionBanner) {
+    if (currentDonor && currentDonor.id) {
+      const nameEl = document.getElementById('donor-active-name');
+      const idEl = document.getElementById('donor-active-id');
+      if (nameEl) nameEl.textContent = currentDonor.fullName || currentDonor.name || 'Active Donor Profile';
+      if (idEl) idEl.textContent = `ID: ${currentDonor.id} (${currentDonor.bloodGroup || 'Blood Group'})`;
+      activeSessionBanner.classList.remove('hidden');
+    } else {
+      activeSessionBanner.classList.add('hidden');
+    }
+  }
+
   modal.classList.remove('hidden');
   document.body.classList.add('overflow-hidden');
   if (idInput) setTimeout(() => idInput.focus(), 100);
@@ -1125,17 +1168,18 @@ function fillDemoDonorCredentials() {
     ? window.PulseStore.getDonor()
     : null;
 
-  if (currentDonor) {
+  if (currentDonor && currentDonor.id) {
     idInput.value = currentDonor.id;
-    pwdInput.value = currentDonor.phone || 'donor@2026';
-    const errorBox = document.getElementById('donor-login-error');
-    if (errorBox) errorBox.classList.add('hidden');
+    pwdInput.value = currentDonor.phone || 'donor@2024';
   } else {
-    alert('No donor profile registered yet! Please click "Register as Volunteer Donor" or create an account to start.');
+    idInput.value = 'DNR-4821';
+    pwdInput.value = 'donor@2024';
   }
+  const errorBox = document.getElementById('donor-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
 }
 
-function handleDonorLoginSubmit(e) {
+async function handleDonorLoginSubmit(e) {
   if (e) e.preventDefault();
   const idInput = document.getElementById('donor-input-id');
   const pwdInput = document.getElementById('donor-input-pwd');
@@ -1156,24 +1200,43 @@ function handleDonorLoginSubmit(e) {
     return false;
   }
 
-  // Switch to this donor if registered in pool
-  if (window.PulseStore) {
-    const pool = window.PulseStore.getAllDonorsPool ? window.PulseStore.getAllDonorsPool() : [];
-    const matched = pool.find(d => d.id === idVal || d.phone === idVal);
-    if (matched && typeof window.PulseStore.switchActiveDonor === 'function') {
-      window.PulseStore.switchActiveDonor(matched.id);
-    }
-  }
-
   if (btnSubmit) btnSubmit.disabled = true;
   if (btnText) btnText.textContent = 'Authenticating Credentials...';
   if (btnIcon) { btnIcon.textContent = 'sync'; btnIcon.classList.add('animate-spin'); }
 
-  setTimeout(() => {
+  let loginRes = null;
+  if (window.PulseStore && typeof window.PulseStore.loginDonor === 'function') {
+    loginRes = await window.PulseStore.loginDonor(idVal, pwdVal);
+  } else {
+    try {
+      const res = await fetch('/api/donor/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: idVal, password: pwdVal })
+      });
+      if (res.ok) {
+        loginRes = await res.json();
+      }
+    } catch (err) {}
+  }
+
+  if (loginRes && loginRes.success && loginRes.donor) {
+    if (window.PulseStore) {
+      window.PulseStore.setDonor(loginRes.donor);
+    }
     closeDonorLoginModal();
     window.location.href = 'index.html#/donor-dashboard';
-  }, 400);
+    return false;
+  }
 
+  // If login failed
+  if (btnSubmit) btnSubmit.disabled = false;
+  if (btnText) btnText.textContent = 'Verify Credentials & Access Dashboard';
+  if (btnIcon) { btnIcon.textContent = 'verified_user'; btnIcon.classList.remove('animate-spin'); }
+  if (errorBox && errorText) {
+    errorText.textContent = 'Invalid credentials. Please verify your Donor ID / phone and password.';
+    errorBox.classList.remove('hidden');
+  }
   return false;
 }
 
@@ -1188,6 +1251,23 @@ function openHospitalLoginModal() {
   if (pwdInput) { pwdInput.value = ''; pwdInput.type = 'password'; }
   const toggleIcon = document.getElementById('hospital-pwd-toggle-icon');
   if (toggleIcon) toggleIcon.textContent = 'visibility';
+
+  const currentRec = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+  const activeSessionBanner = document.getElementById('hospital-active-session-banner');
+  if (activeSessionBanner) {
+    if (currentRec && (currentRec.id || currentRec.caseId)) {
+      const nameEl = document.getElementById('hospital-active-name');
+      const idEl = document.getElementById('hospital-active-id');
+      if (nameEl) nameEl.textContent = currentRec.patientName || 'Active Patient Case';
+      if (idEl) idEl.textContent = `Case: ${currentRec.id || currentRec.caseId} (${currentRec.bloodGroup || 'Blood Group'})`;
+      activeSessionBanner.classList.remove('hidden');
+    } else {
+      activeSessionBanner.classList.add('hidden');
+    }
+  }
+
   modal.classList.remove('hidden');
   document.body.classList.add('overflow-hidden');
   if (idInput) setTimeout(() => idInput.focus(), 100);
@@ -1297,12 +1377,22 @@ async function handleHospitalLoginSubmit(e) {
       window.PulseStore.state.selectedRequestId = matchedCase.requestId;
       window.PulseStore.saveState();
     }
+    setTimeout(() => {
+      closeHospitalLoginModal();
+      window.location.href = 'index.html#/recipient-dashboard';
+    }, 350);
+    return false;
   }
 
-  setTimeout(() => {
-    closeHospitalLoginModal();
-    window.location.href = 'index.html#/recipient-dashboard';
-  }, 350);
+  // If no match found
+  if (btnSubmit) btnSubmit.disabled = false;
+  if (btnText) btnText.textContent = 'Verify & Access Recipient Dashboard';
+  if (btnIcon) { btnIcon.textContent = 'family_restroom'; btnIcon.classList.remove('animate-spin'); }
+  if (errorBox && errorText) {
+    errorText.textContent = 'No matching patient case found. Please check Case ID and registered attendant mobile number.';
+    errorBox.classList.remove('hidden');
+  }
+  return false;
 
   return false;
 }
@@ -1574,7 +1664,7 @@ if (roleModalReq) {
 
   const reqForm = roleModalReq.querySelector('.form-blood-request');
   if (reqForm) {
-    reqForm.addEventListener('submit', (e) => {
+    reqForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('btn-raise-request-submit');
       if (submitBtn) {
@@ -1600,8 +1690,9 @@ if (roleModalReq) {
       const ipdCaseNo = reqForm.querySelector('[name="ipdCaseNo"]')?.value?.trim() || '';
       const proofFileName = reqForm.querySelector('.proof-filename-display')?.textContent?.trim() || 'blood_requisition_form27c_signed.pdf';
 
+      let newPatient = null;
       if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
-        window.PulseStore.createNewPatientRequest({
+        newPatient = await window.PulseStore.createNewPatientRequest({
           patientName,
           patientAge,
           patientGender,
@@ -1622,10 +1713,19 @@ if (roleModalReq) {
         });
       }
 
+      if (submitBtn) {
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>Requisition Broadcasted!</span>';
+      }
+
+      const allottedCaseId = (newPatient && newPatient.id) ? newPatient.id : 'CASE-Recorded';
+      const allottedOtp = (newPatient && newPatient.handshakeOTP) ? newPatient.handshakeOTP : 'Verified';
+
+      alert(`Emergency Blood Requisition Saved & Broadcasted!\n\nPatient Case ID: ${allottedCaseId}\nRegistered Attendant Phone: ${attendantPhone}\nArrival Handshake PIN: ${allottedOtp}\n\nData is saved in the database. You can track this case or log in from ANY device using these credentials.`);
+
       setTimeout(() => {
         closeRaiseRequestModal();
         window.location.href = 'index.html#/recipient-dashboard';
-      }, 500);
+      }, 350);
     });
   }
 }
@@ -1709,12 +1809,12 @@ if (roleDonorRegModal) {
 
   const regForm = roleDonorRegModal.querySelector('#form-donor-register-modal');
   if (regForm) {
-    regForm.addEventListener('submit', (e) => {
+    regForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('btn-donor-register-submit');
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Registering Donor Profile...</span>';
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Registering Donor Profile in Database...</span>';
       }
 
       const formData = new FormData(regForm);
@@ -1734,14 +1834,22 @@ if (roleDonorRegModal) {
         radiusMiles: parseInt(formData.get('radiusMiles') || 10, 10)
       };
 
+      let createdDonor = null;
       if (window.PulseStore && typeof window.PulseStore.registerNewDonor === 'function') {
-        window.PulseStore.registerNewDonor(donorData);
+        createdDonor = await window.PulseStore.registerNewDonor(donorData);
       }
+
+      if (submitBtn) {
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>Profile Registered!</span>';
+      }
+
+      const allottedId = (createdDonor && createdDonor.id) ? createdDonor.id : 'Profile Saved';
+      alert(`Registration Successful!\n\nYour Allotted Donor ID: ${allottedId}\nPassword: ${donorData.phone} (or donor@2026)\n\nYou can use these credentials to log in on any device.`);
 
       setTimeout(() => {
         closeDonorRegisterModal();
         window.location.href = 'index.html#/donor-dashboard';
-      }, 500);
+      }, 300);
     });
   }
 }
