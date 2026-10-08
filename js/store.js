@@ -5,6 +5,137 @@
 
 const STORAGE_KEY = 'donorpulse_state_v5_live';
 
+const DEFAULT_RECIPIENT_CASES = [
+  {
+    id: 'CASE-8686',
+    requestId: 'REQ-8686',
+    caseId: 'CASE-8686',
+    patientName: 'Sanchit',
+    patientAge: 30,
+    patientGender: 'Male',
+    bloodGroup: 'B+',
+    component: 'Packed Red Blood Cells (PRBC)',
+    unitsRequired: 2,
+    unitsArranged: 1,
+    unitsFulfilled: 0,
+    urgency: 'Standard Schedule (Today)',
+    hospitalName: 'Metro Trauma Blood Centre',
+    hospitalWard: 'ICU Emergency Bed 4',
+    hospitalAddress: 'Metro Trauma Blood Centre, ICU Emergency Bed 4',
+    attendantName: 'Duty Attendant',
+    attendantRelation: 'Immediate Family',
+    attendantPhone: '+91 98000 12345',
+    attendantEmail: 'attendant@donor-pulse.in',
+    doctorName: 'Duty Medical Officer (NMC-REG-2026)',
+    doctorDepartment: 'Trauma & Critical Care',
+    doctorPhone: '+91 98000 12345',
+    hospitalBloodDesk: '+91 98000 12345',
+    clinicalReason: 'Acute hemorrhagic requirement. Immediate compatible donor transfusion needed.',
+    handshakeOTP: '7120',
+    trackingStage: 4,
+    broadcastDate: 'Today',
+    appealActive: true,
+    donors: [
+      {
+        id: 'D-KM-01',
+        name: 'Karan Mehta',
+        initials: 'KM',
+        bloodGroup: 'O-',
+        phone: '+91 98452 33109',
+        distance: 1.5,
+        eta: '19 mins',
+        liveEta: '19 mins',
+        confirmed: true,
+        callStatus: 'confirmed',
+        transitStatus: '🚗 En Route to Hospital Blood Bank',
+        statusClass: 'bg-emerald-500/20 text-emerald-800 font-semibold border border-emerald-400/30',
+        notified: true,
+        transitMode: '🚗 Emergency Vehicle Corridor',
+        progressPct: 65,
+        landmark: '1.5 km away • Crossing Metro Junction'
+      }
+    ],
+    verificationProof: {
+      documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
+      doctorRegId: 'Duty Medical Officer (NMC-REG-2026)',
+      ipdCaseNo: 'IPD-EMERGENCY-ICU',
+      fileName: 'apollo_blood_requisition_form27c_signed.pdf',
+      fileSize: '1.4 MB',
+      status: 'VERIFIED_GENUINE',
+      verificationScore: '100% Genuine Requisition',
+      doctorVerified: true,
+      hospitalSealDetected: true,
+      fraudRiskScore: '0.0%',
+      verifiedAt: 'Today',
+      issuer: 'Metro Trauma Blood Centre'
+    }
+  },
+  {
+    id: 'CASE-9042',
+    requestId: 'REQ-9042',
+    caseId: 'CASE-9042',
+    patientName: 'Devika Sharma',
+    patientAge: 32,
+    patientGender: 'Female',
+    bloodGroup: 'B+',
+    component: 'Platelets (Apheresis)',
+    unitsRequired: 3,
+    unitsArranged: 2,
+    unitsFulfilled: 1,
+    urgency: 'Stat Emergency (< 45 Mins)',
+    hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
+    hospitalWard: 'ICU Ward 4B, Bed 12',
+    hospitalAddress: '154/11 Bannerghatta Main Road, Opposite IIMB, Bengaluru, Karnataka 560076',
+    attendantName: 'Rajesh Sharma',
+    attendantRelation: 'Brother / Primary Attendant',
+    attendantPhone: '+91 95280 33454',
+    attendantEmail: 'rajesh.sharma@familycare.org.in',
+    doctorName: 'Dr. Aravind Sharma, MD',
+    doctorDepartment: 'Trauma & Critical Care',
+    doctorPhone: '+91 (80) 2630-4050 Ext 4429',
+    hospitalBloodDesk: '+91 (80) 2630-4050',
+    clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.',
+    handshakeOTP: '7842',
+    trackingStage: 4,
+    broadcastDate: 'Today',
+    appealActive: true,
+    donors: [
+      {
+        id: 'D-AS-01',
+        name: 'Ananya Sharma',
+        initials: 'AS',
+        bloodGroup: 'O-',
+        phone: '+91 98452 33109',
+        distance: 1.8,
+        eta: '18 mins',
+        liveEta: '18 mins',
+        confirmed: true,
+        callStatus: 'confirmed',
+        transitStatus: '🚗 En Route to Hospital Blood Bank',
+        statusClass: 'bg-emerald-500/20 text-emerald-800 font-semibold border border-emerald-400/30',
+        notified: true,
+        transitMode: '🚗 Emergency Vehicle Corridor',
+        progressPct: 60,
+        landmark: '1.8 km away • Indiranagar Corridor'
+      }
+    ],
+    verificationProof: {
+      documentType: 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
+      doctorRegId: 'Dr. Aravind Sharma (NMC/KMC-48921)',
+      ipdCaseNo: 'IPD-9042-ICU',
+      fileName: 'apollo_blood_requisition_form27c_signed.pdf',
+      fileSize: '1.4 MB',
+      status: 'VERIFIED_GENUINE',
+      verificationScore: '100% Genuine Requisition',
+      doctorVerified: true,
+      hospitalSealDetected: true,
+      fraudRiskScore: '0.0%',
+      verifiedAt: 'Today',
+      issuer: 'Apollo Hospitals & Apex Trauma Centre'
+    }
+  }
+];
+
 const DEFAULT_STATE = {
   // Active incoming emergency donor call (null when no live call is ringing)
   activeIncomingCall: null,
@@ -43,20 +174,39 @@ const DEFAULT_STATE = {
     rejectionReason: ''
   },
 
-  // Current Recipient & Patient Profile (null initially until request is raised)
-  recipient: null,
+  // Current Recipient & Patient Profile (defaults to active case Sanchit CASE-8686)
+  recipient: DEFAULT_RECIPIENT_CASES[0],
 
-  // Multiple Recipient / Patient Cases available for management (empty initially)
-  recipientCases: [],
+  // Multiple Recipient / Patient Cases available for management across devices
+  recipientCases: DEFAULT_RECIPIENT_CASES,
 
   // Registered Hospital Registry
   registeredHospitals: [],
 
-  // Active Requests pool (empty initially)
-  requests: [],
+  // Active Requests pool
+  requests: [
+    {
+      id: DEFAULT_RECIPIENT_CASES[0].requestId,
+      bloodGroup: DEFAULT_RECIPIENT_CASES[0].bloodGroup,
+      component: DEFAULT_RECIPIENT_CASES[0].component,
+      units: DEFAULT_RECIPIENT_CASES[0].unitsRequired,
+      urgency: DEFAULT_RECIPIENT_CASES[0].urgency,
+      hospitalName: DEFAULT_RECIPIENT_CASES[0].hospitalName,
+      ward: DEFAULT_RECIPIENT_CASES[0].hospitalWard,
+      location: DEFAULT_RECIPIENT_CASES[0].hospitalAddress,
+      notes: DEFAULT_RECIPIENT_CASES[0].clinicalReason,
+      createdAt: 'Today',
+      status: 'En Route to Hospital Blood Bank',
+      trackingStage: 4,
+      matchedCount: 1,
+      acceptedCount: 1,
+      enRouteCount: 1,
+      donors: DEFAULT_RECIPIENT_CASES[0].donors
+    }
+  ],
 
   // Currently active request selected for confirmation & tracking
-  selectedRequestId: null,
+  selectedRequestId: DEFAULT_RECIPIENT_CASES[0].requestId,
 
   // Registered Donors Pool (empty initially - saved dynamically as new donors register)
   matchedDonorsPool: [],
@@ -70,6 +220,7 @@ class Store {
     this.state = this.loadState();
     this.listeners = [];
     this.initSyncListeners();
+    this.syncWithServer();
   }
 
   initSyncListeners() {
@@ -89,6 +240,43 @@ class Store {
           };
         } catch(e) {}
       }
+    }
+  }
+
+  async syncWithServer() {
+    try {
+      if (typeof fetch === 'undefined') return;
+      // 1. Fetch current active case from server
+      const curRes = await fetch('/api/recipient-cases/current');
+      if (curRes.ok) {
+        const curData = await curRes.json();
+        if (curData && curData.success && curData.case) {
+          this.addOrUpdateRecipientCase(curData.case, false);
+        }
+      }
+      // 2. Fetch all shared cases
+      const res = await fetch('/api/recipient-cases');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && Array.isArray(data.cases)) {
+          let updated = false;
+          data.cases.forEach(c => {
+            const idx = this.state.recipientCases.findIndex(rc => rc.id === c.id || rc.requestId === c.requestId);
+            if (idx < 0) {
+              this.state.recipientCases.push(c);
+              updated = true;
+            } else {
+              this.state.recipientCases[idx] = { ...this.state.recipientCases[idx], ...c };
+              updated = true;
+            }
+          });
+          if (updated) {
+            this.saveState();
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Sync with server failed:', e);
     }
   }
 
@@ -114,8 +302,18 @@ class Store {
         const merged = { ...DEFAULT_STATE, ...parsed };
         if (!Array.isArray(merged.registeredHospitals)) merged.registeredHospitals = [];
         if (!Array.isArray(merged.matchedDonorsPool)) merged.matchedDonorsPool = [];
-        if (!Array.isArray(merged.recipientCases)) merged.recipientCases = [];
-        if (!Array.isArray(merged.requests)) merged.requests = [];
+        if (!Array.isArray(merged.recipientCases) || merged.recipientCases.length === 0) {
+          merged.recipientCases = JSON.parse(JSON.stringify(DEFAULT_RECIPIENT_CASES));
+        }
+        if (!merged.recipient) {
+          merged.recipient = merged.recipientCases[0] || JSON.parse(JSON.stringify(DEFAULT_RECIPIENT_CASES[0]));
+        }
+        if (!Array.isArray(merged.requests) || merged.requests.length === 0) {
+          merged.requests = JSON.parse(JSON.stringify(DEFAULT_STATE.requests));
+        }
+        if (!merged.selectedRequestId && merged.recipient) {
+          merged.selectedRequestId = merged.recipient.requestId;
+        }
         if (!Array.isArray(merged.donationHistory)) merged.donationHistory = [];
         return merged;
       }
@@ -416,6 +614,10 @@ class Store {
 
   // --- Recipient / Family & Friends methods ---
   getRecipient() {
+    if (!this.state.recipient && Array.isArray(this.state.recipientCases) && this.state.recipientCases.length > 0) {
+      this.state.recipient = this.state.recipientCases[0];
+      this.state.selectedRequestId = this.state.recipient.requestId;
+    }
     return this.state.recipient || null;
   }
 
@@ -423,9 +625,69 @@ class Store {
     return Array.isArray(this.state.recipientCases) ? this.state.recipientCases : [];
   }
 
+  addOrUpdateRecipientCase(caseData, saveNow = true) {
+    if (!caseData || (!caseData.id && !caseData.caseId)) return null;
+    const cid = caseData.id || caseData.caseId;
+    if (!Array.isArray(this.state.recipientCases)) {
+      this.state.recipientCases = [];
+    }
+    const idx = this.state.recipientCases.findIndex(c => c.id === cid || c.requestId === caseData.requestId);
+    if (idx >= 0) {
+      this.state.recipientCases[idx] = { ...this.state.recipientCases[idx], ...caseData };
+    } else {
+      this.state.recipientCases.unshift(caseData);
+    }
+    this.state.recipient = caseData;
+    this.state.selectedRequestId = caseData.requestId;
+
+    // Synchronize request pool
+    if (Array.isArray(this.state.requests)) {
+      const rIdx = this.state.requests.findIndex(r => r.id === caseData.requestId);
+      const reqObj = {
+        id: caseData.requestId,
+        bloodGroup: caseData.bloodGroup,
+        component: caseData.component,
+        units: caseData.unitsRequired,
+        urgency: caseData.urgency,
+        hospitalName: caseData.hospitalName,
+        ward: caseData.hospitalWard,
+        location: caseData.hospitalAddress,
+        notes: caseData.clinicalReason,
+        createdAt: caseData.broadcastDate || 'Today',
+        status: (caseData.donors && caseData.donors.length > 0) ? 'En Route to Hospital Blood Bank' : 'Broadcasting',
+        trackingStage: caseData.trackingStage || 2,
+        matchedCount: (caseData.donors && caseData.donors.length) || 0,
+        acceptedCount: (caseData.donors && caseData.donors.filter(d => d.confirmed).length) || 0,
+        enRouteCount: (caseData.donors && caseData.donors.filter(d => d.confirmed).length) || 0,
+        donors: caseData.donors || []
+      };
+      if (rIdx >= 0) {
+        this.state.requests[rIdx] = { ...this.state.requests[rIdx], ...reqObj };
+      } else {
+        this.state.requests.unshift(reqObj);
+      }
+    }
+
+    if (saveNow) {
+      this.saveState();
+      this.notify();
+      this.broadcastSync({ type: 'RECIPIENT_CASE_UPDATED', caseId: cid });
+    }
+    return caseData;
+  }
+
   switchRecipientCase(caseId) {
     const cases = this.getRecipientCases();
-    const found = cases.find(c => c.id === caseId || c.requestId === caseId);
+    let found = cases.find(c => c.id === caseId || c.requestId === caseId);
+    if (!found && caseId) {
+      const q = String(caseId).trim().toLowerCase();
+      const numQ = q.replace(/\D/g, '');
+      found = cases.find(c =>
+        (c.patientName && c.patientName.toLowerCase() === q) ||
+        (c.handshakeOTP && c.handshakeOTP === q) ||
+        (numQ.length >= 4 && c.attendantPhone && c.attendantPhone.replace(/\D/g, '').includes(numQ))
+      );
+    }
     if (found) {
       this.state.recipient = found;
       this.state.selectedRequestId = found.requestId;
@@ -692,6 +954,15 @@ class Store {
         }
       }).catch(err => {
         console.warn('API pipeline sync notice:', err);
+      });
+
+      // Persist recipient case to shared database across all devices
+      fetch('/api/recipient-cases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newPatient)
+      }).catch(err => {
+        console.warn('API recipient case sync notice:', err);
       });
     }
 

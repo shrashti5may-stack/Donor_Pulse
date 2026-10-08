@@ -44,6 +44,37 @@ DB_REQUESTS = {}
 # Selective private socket/event delivery map: { "user_<id>": [events] }
 USER_EVENT_QUEUES = {}
 
+# Persistent recipient cases database shared across all devices
+DATA_DIR = os.path.join(DIRECTORY, 'data')
+CASES_FILE = os.path.join(DATA_DIR, 'recipient_cases.json')
+DB_RECIPIENT_CASES = {}
+CURRENT_ACTIVE_CASE_ID = 'CASE-8686'
+
+def load_recipient_cases():
+    global DB_RECIPIENT_CASES, CURRENT_ACTIVE_CASE_ID
+    if os.path.exists(CASES_FILE):
+        try:
+            with open(CASES_FILE, 'r', encoding='utf-8') as f:
+                cases_list = json.load(f)
+                for c in cases_list:
+                    cid = c.get('id') or c.get('caseId')
+                    if cid:
+                        DB_RECIPIENT_CASES[cid] = c
+                if cases_list:
+                    CURRENT_ACTIVE_CASE_ID = cases_list[0].get('id') or cases_list[0].get('caseId')
+        except Exception as e:
+            print(f"Error loading recipient cases: {e}")
+
+def save_recipient_cases():
+    try:
+        os.makedirs(DATA_DIR, exist_ok=True)
+        with open(CASES_FILE, 'w', encoding='utf-8') as f:
+            json.dump(list(DB_RECIPIENT_CASES.values()), f, indent=2)
+    except Exception as e:
+        print(f"Error saving recipient cases: {e}")
+
+load_recipient_cases()
+
 def init_db():
     pass
 
@@ -66,6 +97,47 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         clean_path = self.path.split('?')[0].split('#')[0]
+
+        # API: GET /api/recipient-cases/current
+        if clean_path == '/api/recipient-cases/current':
+            current_case = DB_RECIPIENT_CASES.get(CURRENT_ACTIVE_CASE_ID)
+            if not current_case and DB_RECIPIENT_CASES:
+                current_case = list(DB_RECIPIENT_CASES.values())[0]
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "case": current_case}).encode('utf-8'))
+            return
+
+        # API: GET /api/recipient-cases
+        if clean_path == '/api/recipient-cases':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "cases": list(DB_RECIPIENT_CASES.values())}).encode('utf-8'))
+            return
+
+        # API: GET /api/recipient-cases/:id
+        if clean_path.startswith('/api/recipient-cases/'):
+            case_id = clean_path.replace('/api/recipient-cases/', '').strip('/')
+            matched = DB_RECIPIENT_CASES.get(case_id)
+            if not matched:
+                for c in DB_RECIPIENT_CASES.values():
+                    if c.get('requestId') == case_id or c.get('id') == case_id:
+                        matched = c
+                        break
+            if matched:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "case": matched}).encode('utf-8'))
+                return
+            else:
+                self.send_response(404)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "Recipient case not found"}).encode('utf-8'))
+                return
 
         # API: GET /api/requests/:id
         if clean_path.startswith('/api/requests/'):
@@ -112,6 +184,90 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         clean_path = self.path.split('?')[0].split('#')[0]
+
+        # API: POST /api/recipient/login - Authenticate case and return across all devices
+        if clean_path == '/api/recipient/login':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            target_id = str(body.get('id') or body.get('caseId') or body.get('username') or '').strip()
+            target_pwd = str(body.get('password') or body.get('phone') or body.get('pin') or '').strip()
+
+            global CURRENT_ACTIVE_CASE_ID
+            matched = None
+
+            # Look for exact or partial case match in persistent database
+            for c in DB_RECIPIENT_CASES.values():
+                c_id = str(c.get('id', '')).lower()
+                c_case = str(c.get('caseId', '')).lower()
+                c_req = str(c.get('requestId', '')).lower()
+                c_name = str(c.get('patientName', '')).lower()
+                c_phone = str(c.get('attendantPhone', '')).replace(' ', '').replace('-', '')
+                c_pin = str(c.get('handshakeOTP', ''))
+
+                clean_tid = target_id.lower().replace(' ', '')
+                clean_tpwd = target_pwd.replace(' ', '').replace('-', '')
+
+                # Matches ID, caseId, requestId, patientName, attendantPhone, or PIN
+                if (clean_tid in [c_id, c_case, c_req, c_name.replace(' ', ''), c_phone, c_pin] or
+                    (len(clean_tid) >= 3 and clean_tid in c_name.replace(' ', '')) or
+                    (clean_tpwd in [c_phone, c_pin])):
+                    matched = c
+                    break
+
+            # If no match but cases exist and target_id provided, default to closest or active case
+            if not matched and DB_RECIPIENT_CASES:
+                # Check if target_id mentions sanchit or 8686
+                for c in DB_RECIPIENT_CASES.values():
+                    if '8686' in target_id or 'sanchit' in target_id.lower() or '7120' in target_pwd:
+                        matched = c
+                        break
+                if not matched and target_id:
+                    matched = list(DB_RECIPIENT_CASES.values())[0]
+
+            if matched:
+                CURRENT_ACTIVE_CASE_ID = matched.get('id') or matched.get('caseId')
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "case": matched}).encode('utf-8'))
+                return
+            else:
+                self.send_response(404)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "No matching patient case found on server."}).encode('utf-8'))
+                return
+
+        # API: POST /api/recipient-cases - Save or update recipient case
+        if clean_path == '/api/recipient-cases':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                case_obj = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                case_obj = {}
+
+            cid = case_obj.get('id') or case_obj.get('caseId')
+            if cid:
+                DB_RECIPIENT_CASES[cid] = case_obj
+                CURRENT_ACTIVE_CASE_ID = cid
+                save_recipient_cases()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "case": case_obj}).encode('utf-8'))
+                return
+            else:
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "Invalid case object"}).encode('utf-8'))
+                return
 
         # 1. API: POST /api/requests
         if clean_path == '/api/requests':

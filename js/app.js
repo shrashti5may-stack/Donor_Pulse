@@ -2571,11 +2571,39 @@ function renderEmptyRecipientDashboard() {
 }
 
 function renderRecipientDashboard() {
-  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+  let recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
     ? window.PulseStore.getRecipient()
     : null;
 
+  if (!recipient && window.PulseStore && typeof window.PulseStore.getRecipientCases === 'function') {
+    const cases = window.PulseStore.getRecipientCases();
+    if (cases && cases.length > 0) {
+      recipient = cases[0];
+      window.PulseStore.state.recipient = recipient;
+      window.PulseStore.saveState();
+    }
+  }
+
   if (!recipient) {
+    if (typeof fetch !== 'undefined' && !window._fetchingRecipientDashboard) {
+      window._fetchingRecipientDashboard = true;
+      fetch('/api/recipient-cases/current')
+        .then(r => r.json())
+        .then(data => {
+          window._fetchingRecipientDashboard = false;
+          if (data && data.success && data.case && window.PulseStore) {
+            window.PulseStore.addOrUpdateRecipientCase(data.case);
+            renderRecipientDashboard();
+          } else {
+            renderEmptyRecipientDashboard();
+          }
+        })
+        .catch(() => {
+          window._fetchingRecipientDashboard = false;
+          renderEmptyRecipientDashboard();
+        });
+      return;
+    }
     renderEmptyRecipientDashboard();
     return;
   }
@@ -5358,19 +5386,18 @@ window.fillDemoRecipientCredentials = function() {
   const cases = window.PulseStore?.getRecipientCases() || [];
   const rec = activeRecipient || cases[0];
   if (rec) {
-    idInput.value = rec.caseId || rec.requestId || 'CASE-LIVE';
-    pwdInput.value = rec.contactPhone || rec.phone || '+91 98000 00000';
+    idInput.value = rec.caseId || rec.id || rec.requestId || 'CASE-8686';
+    pwdInput.value = rec.attendantPhone || rec.contactPhone || rec.phone || '+91 98000 12345';
   } else {
-    idInput.value = '';
-    pwdInput.value = '';
-    if (window.showToast) window.showToast('No Active Case', 'Please raise a new emergency blood requisition first!', 'info');
+    idInput.value = 'CASE-8686';
+    pwdInput.value = '+91 98000 12345';
   }
   const errorBox = document.getElementById('hospital-login-error');
   if (errorBox) errorBox.classList.add('hidden');
 };
 window.fillDemoHospitalCredentials = window.fillDemoRecipientCredentials;
 
-window.handleHospitalLoginSubmit = function(e) {
+window.handleHospitalLoginSubmit = async function(e) {
   if (e) e.preventDefault();
   const idInput = document.getElementById('hospital-input-id');
   const pwdInput = document.getElementById('hospital-input-pwd');
@@ -5399,24 +5426,68 @@ window.handleHospitalLoginSubmit = function(e) {
     btnIcon.classList.add('animate-spin');
   }
 
-  setTimeout(() => {
-    // Reset button
-    if (btnSubmit) btnSubmit.disabled = false;
-    if (btnIcon) {
-      btnIcon.textContent = 'volunteer_activism';
-      btnIcon.classList.remove('animate-spin');
+  let matchedCase = null;
+  try {
+    const res = await fetch('/api/recipient/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: idVal, password: pwdVal })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.case) {
+        matchedCase = data.case;
+      }
     }
-    if (btnText) btnText.textContent = 'Access Recipient Portal';
+  } catch (netErr) {
+    console.warn('Server recipient login check:', netErr);
+  }
 
-    window.closeHospitalLoginModal();
+  // Fallback to local store if offline
+  if (!matchedCase && window.PulseStore) {
+    const cases = window.PulseStore.getRecipientCases ? window.PulseStore.getRecipientCases() : [];
+    matchedCase = cases.find(c => {
+      const cId = String(c.id || '').toLowerCase();
+      const cReq = String(c.requestId || '').toLowerCase();
+      const cName = String(c.patientName || '').toLowerCase();
+      const cPhone = String(c.attendantPhone || '').replace(/\D/g, '');
+      const cPin = String(c.handshakeOTP || '');
+      const q = idVal.toLowerCase();
+      const numQ = q.replace(/\D/g, '');
+      return q === cId || q === cReq || q === cName || (numQ.length >= 4 && cPhone.includes(numQ)) || q === cPin;
+    });
+  }
 
-    window.showToast('Patient Case Authenticated', `Welcome back. Access granted for Case ${idVal}.`, 'success');
-    if (window.PulseRouter) {
-      window.PulseRouter.navigate('recipient-dashboard');
+  if (matchedCase && window.PulseStore) {
+    if (typeof window.PulseStore.addOrUpdateRecipientCase === 'function') {
+      window.PulseStore.addOrUpdateRecipientCase(matchedCase);
     } else {
-      window.location.href = 'index.html#/recipient-dashboard';
+      window.PulseStore.state.recipient = matchedCase;
+      window.PulseStore.state.selectedRequestId = matchedCase.requestId;
+      window.PulseStore.saveState();
     }
-  }, 500);
+  }
+
+  // Reset button
+  if (btnSubmit) btnSubmit.disabled = false;
+  if (btnIcon) {
+    btnIcon.textContent = 'volunteer_activism';
+    btnIcon.classList.remove('animate-spin');
+  }
+  if (btnText) btnText.textContent = 'Access Recipient Portal';
+
+  window.closeHospitalLoginModal();
+
+  const displayName = matchedCase ? matchedCase.patientName : idVal;
+  if (window.showToast) window.showToast('Patient Case Authenticated', `Welcome back. Access granted for ${displayName}.`, 'success');
+  if (window.PulseRouter) {
+    window.PulseRouter.navigate('recipient-dashboard');
+  } else {
+    window.location.href = 'index.html#/recipient-dashboard';
+  }
+  if (typeof window.renderRecipientDashboard === 'function') {
+    window.renderRecipientDashboard();
+  }
 
   return false;
 };

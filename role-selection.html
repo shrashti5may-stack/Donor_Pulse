@@ -1222,16 +1222,17 @@ function fillDemoHospitalCredentials() {
     : null;
 
   if (currentRecipient) {
-    idInput.value = currentRecipient.id;
-    pwdInput.value = currentRecipient.attendantPhone || '+91 Emergency';
-    const errorBox = document.getElementById('hospital-login-error');
-    if (errorBox) errorBox.classList.add('hidden');
+    idInput.value = currentRecipient.id || 'CASE-8686';
+    pwdInput.value = currentRecipient.attendantPhone || '+91 98000 12345';
   } else {
-    alert('No patient requisition raised yet! Click "Raise Patient Blood Request" to broadcast a requisition first.');
+    idInput.value = 'CASE-8686';
+    pwdInput.value = '+91 98000 12345';
   }
+  const errorBox = document.getElementById('hospital-login-error');
+  if (errorBox) errorBox.classList.add('hidden');
 }
 
-function handleHospitalLoginSubmit(e) {
+async function handleHospitalLoginSubmit(e) {
   if (e) e.preventDefault();
   const idInput = document.getElementById('hospital-input-id');
   const pwdInput = document.getElementById('hospital-input-pwd');
@@ -1252,23 +1253,56 @@ function handleHospitalLoginSubmit(e) {
     return false;
   }
 
-  // Switch to this case if registered
-  if (window.PulseStore) {
-    const cases = window.PulseStore.getRecipientCases ? window.PulseStore.getRecipientCases() : [];
-    const matched = cases.find(c => c.id === idVal || c.requestId === idVal || c.attendantPhone === idVal);
-    if (matched && typeof window.PulseStore.switchRecipientCase === 'function') {
-      window.PulseStore.switchRecipientCase(matched.id);
-    }
-  }
-
   if (btnSubmit) btnSubmit.disabled = true;
   if (btnText) btnText.textContent = 'Verifying Patient Case Record...';
   if (btnIcon) { btnIcon.textContent = 'sync'; btnIcon.classList.add('animate-spin'); }
 
+  let matchedCase = null;
+  try {
+    const res = await fetch('/api/recipient/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: idVal, password: pwdVal })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.case) {
+        matchedCase = data.case;
+      }
+    }
+  } catch (netErr) {
+    console.warn('Network recipient login check:', netErr);
+  }
+
+  // Fallback to local store if offline
+  if (!matchedCase && window.PulseStore) {
+    const cases = window.PulseStore.getRecipientCases ? window.PulseStore.getRecipientCases() : [];
+    matchedCase = cases.find(c => {
+      const cId = String(c.id || '').toLowerCase();
+      const cReq = String(c.requestId || '').toLowerCase();
+      const cName = String(c.patientName || '').toLowerCase();
+      const cPhone = String(c.attendantPhone || '').replace(/\D/g, '');
+      const cPin = String(c.handshakeOTP || '');
+      const q = idVal.toLowerCase();
+      const numQ = q.replace(/\D/g, '');
+      return q === cId || q === cReq || q === cName || (numQ.length >= 4 && cPhone.includes(numQ)) || q === cPin;
+    });
+  }
+
+  if (matchedCase && window.PulseStore) {
+    if (typeof window.PulseStore.addOrUpdateRecipientCase === 'function') {
+      window.PulseStore.addOrUpdateRecipientCase(matchedCase);
+    } else {
+      window.PulseStore.state.recipient = matchedCase;
+      window.PulseStore.state.selectedRequestId = matchedCase.requestId;
+      window.PulseStore.saveState();
+    }
+  }
+
   setTimeout(() => {
     closeHospitalLoginModal();
     window.location.href = 'index.html#/recipient-dashboard';
-  }, 400);
+  }, 350);
 
   return false;
 }
