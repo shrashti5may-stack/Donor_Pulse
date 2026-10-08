@@ -568,16 +568,26 @@
               </p>
             </div>
 
-            <!-- Handshake PIN Quick Verification Box -->
-            <div class="flex items-center gap-2 bg-surface-container-low p-2 rounded-xl border border-surface-container">
-              <div class="flex flex-col text-right">
-                <span class="text-[11px] font-bold text-secondary uppercase">Quick Handshake</span>
-                <span class="text-xs text-on-surface">Verify Donor arrival:</span>
-              </div>
-              <input type="text" id="donor-handshake-input" placeholder="Enter PIN" maxlength="4" class="w-24 px-2.5 py-1.5 rounded-lg border border-surface-container-high bg-white text-center font-mono font-bold text-sm focus:border-primary focus:ring-1 focus:ring-primary"/>
-              <button type="button" onclick="verifyDonorHandshake()" class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all cursor-pointer">
-                Verify
+            <!-- Handshake PIN Quick Verification Box & Test Ring -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="window.simulateFirstDonorAnswer ? window.simulateFirstDonorAnswer() : (window.location.href='index.html#/donor-dashboard')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-800 text-xs font-bold transition-all cursor-pointer border border-emerald-500/30 shadow-2xs active:scale-95" title="Simulate a matched donor answering and confirming availability">
+                <span class="material-symbols-outlined text-[15px]">check_circle</span>
+                <span>Simulate Donor Confirmation</span>
               </button>
+              <a href="index.html#/donor-dashboard" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all cursor-pointer border border-surface-container-high shadow-2xs" title="Switch to Donor Portal to view the incoming call screen as a donor">
+                <span class="material-symbols-outlined text-[15px] text-primary">badge</span>
+                <span>Go to Donor Portal</span>
+              </a>
+              <div class="flex items-center gap-2 bg-surface-container-low p-2 rounded-xl border border-surface-container">
+                <div class="flex flex-col text-right">
+                  <span class="text-[11px] font-bold text-secondary uppercase">Quick Handshake</span>
+                  <span class="text-xs text-on-surface">Verify Donor arrival:</span>
+                </div>
+                <input type="text" id="donor-handshake-input" placeholder="Enter PIN" maxlength="4" class="w-24 px-2.5 py-1.5 rounded-lg border border-surface-container-high bg-white text-center font-mono font-bold text-sm focus:border-primary focus:ring-1 focus:ring-primary"/>
+                <button type="button" onclick="verifyDonorHandshake()" class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all cursor-pointer">
+                  Verify
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1445,18 +1455,294 @@
       window.print();
     }
 
-    window.openRaiseRequestModal = openRaiseRequestModal;
-    window.closeRaiseRequestModal = closeRaiseRequestModal;
-    window.fillDemoRaiseRequest = fillDemoRaiseRequest;
-    window.handleProofFileSelect = handleProofFileSelect;
-    window.openMedicalProofViewer = openMedicalProofViewer;
-    window.closeMedicalProofViewer = closeMedicalProofViewer;
-    window.printMedicalProof = printMedicalProof;
+    // --- INCOMING EMERGENCY CALL & DONOR CONFIRMATION HANDLERS ---
+    function openIncomingDonorCallModal(customDonorId) {
+      const modal = document.getElementById('modal-incoming-donor-call');
+      if (!modal) return;
+
+      const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+        ? window.PulseStore.getRecipient()
+        : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets (Apheresis)', unitsRequired: 3, urgency: 'Stat Emergency (< 45 Mins)', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', hospitalWard: 'ICU Ward 4B, Bed 12', attendantName: 'Rajesh Sharma', attendantPhone: '+91 95280 33454', clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.' };
+
+      const reqId = recipient.requestId || 'REQ-9042';
+      const bloodGroup = recipient.bloodGroup || 'B+';
+
+      const donors = (window.PulseStore && typeof window.PulseStore.getAvailableDonors === 'function')
+        ? window.PulseStore.getAvailableDonors(reqId, bloodGroup)
+        : [];
+
+      let targetDonor = null;
+      if (customDonorId) targetDonor = donors.find(d => d.id === customDonorId);
+      if (!targetDonor) {
+        targetDonor = donors.find(d => !d.confirmed && d.callStatus !== 'declined') || donors[0] || {
+          id: 'D-102',
+          name: 'Ananya Sharma',
+          bloodGroup: bloodGroup,
+          phone: '+91 98452 33109',
+          distance: 1.8,
+          liveEta: '18 mins'
+        };
+      }
+
+      const setTxt = (id, text) => {
+        const el = document.getElementById(id);
+        if (el && text !== undefined) el.textContent = text;
+      };
+
+      setTxt('call-donor-name', targetDonor.name);
+      setTxt('call-donor-blood', `${targetDonor.bloodGroup} Volunteer Donor`);
+      setTxt('call-donor-phone', targetDonor.phone || '+91 98452 33109');
+      setTxt('call-donor-distance', `${targetDonor.distance} km away`);
+      setTxt('call-hospital-name', recipient.hospitalName);
+      setTxt('call-hospital-ward', `${recipient.hospitalWard} • Emergency Wing`);
+      setTxt('call-urgency-badge', recipient.urgency || 'Stat Emergency (< 45 Mins)');
+      setTxt('call-patient-name', recipient.patientName);
+      setTxt('call-patient-meta', `${recipient.patientAge || 32} Yrs / ${recipient.patientGender || 'Female'}`);
+      setTxt('call-blood-units-needed', `${recipient.bloodGroup} ${recipient.component} (${recipient.unitsRequired} Units)`);
+      setTxt('call-attendant-info', `${recipient.attendantName} (${recipient.attendantPhone})`);
+      setTxt('call-clinical-reason', `"${recipient.clinicalReason || 'Urgent clinical blood request for patient.'}"`);
+      setTxt('docked-donor-text', `Ringing ${targetDonor.name} (${targetDonor.bloodGroup})`);
+
+      const select = document.getElementById('call-target-donor-select');
+      if (select) {
+        select.innerHTML = donors.map(d => `
+          <option value="${d.id}" ${d.id === targetDonor.id ? 'selected' : ''}>
+            ${d.name} (${d.bloodGroup} - ${d.distance} km) ${d.confirmed ? '✅ Confirmed' : ''}
+          </option>
+        `).join('');
+      }
+
+      if (window.PulseAudio && typeof window.PulseAudio.startPhoneRinging === 'function') {
+        window.PulseAudio.startPhoneRinging({ donorName: targetDonor.name });
+      }
+
+      const docked = document.getElementById('docked-ringing-call-indicator');
+      if (docked) docked.classList.add('hidden');
+
+      modal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeIncomingDonorCallModal() {
+      const modal = document.getElementById('modal-incoming-donor-call');
+      if (modal) modal.classList.add('hidden');
+      const docked = document.getElementById('docked-ringing-call-indicator');
+      if (docked) docked.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+
+      if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+        window.PulseAudio.stopPhoneRinging();
+      }
+    }
+
+    function minimizeIncomingCall() {
+      const modal = document.getElementById('modal-incoming-donor-call');
+      if (modal) modal.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+
+      const docked = document.getElementById('docked-ringing-call-indicator');
+      if (docked) docked.classList.remove('hidden');
+    }
+
+    function expandIncomingCall() {
+      const docked = document.getElementById('docked-ringing-call-indicator');
+      if (docked) docked.classList.add('hidden');
+      const modal = document.getElementById('modal-incoming-donor-call');
+      if (modal) {
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      }
+    }
+
+    function toggleCallRingtoneMute() {
+      if (window.PulseAudio && typeof window.PulseAudio.toggleMute === 'function') {
+        const isMuted = window.PulseAudio.toggleMute();
+        const icon = document.getElementById('icon-call-mute');
+        if (icon) icon.textContent = isMuted ? 'volume_off' : 'volume_up';
+      }
+    }
+
+    function switchCallTargetDonor(donorId) {
+      openIncomingDonorCallModal(donorId);
+    }
+
+    function confirmActiveDonorAvailability(explicitDonorId) {
+      const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
+        ? window.PulseStore.getActiveIncomingCall()
+        : null;
+      const donorId = explicitDonorId || (activeCall ? activeCall.donorId : 'D-102');
+      const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+        ? window.PulseStore.getRecipient()
+        : null;
+      const reqId = recipient ? recipient.requestId : 'REQ-9042';
+
+      if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+        window.PulseAudio.stopPhoneRinging();
+      }
+      if (window.PulseAudio && typeof window.PulseAudio.playConfirmationChime === 'function') {
+        window.PulseAudio.playConfirmationChime();
+      }
+
+      let confirmedDonorName = 'Volunteer Donor';
+      if (window.PulseStore && typeof window.PulseStore.confirmDonorAvailability === 'function') {
+        const res = window.PulseStore.confirmDonorAvailability(reqId, donorId);
+        if (res && res.donor) confirmedDonorName = res.donor.name;
+      }
+
+      closeIncomingDonorCallModal();
+      alert(`🎉 Availability Confirmed! ${confirmedDonorName} has confirmed availability and is en route.`);
+      window.location.href = 'index.html#/recipient-dashboard';
+    }
+
+    function declineActiveDonorCall(explicitDonorId) {
+      const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
+        ? window.PulseStore.getActiveIncomingCall()
+        : null;
+      const donorId = explicitDonorId || (activeCall ? activeCall.donorId : 'D-102');
+      const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+        ? window.PulseStore.getRecipient()
+        : null;
+      const reqId = recipient ? recipient.requestId : 'REQ-9042';
+
+      if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+        window.PulseAudio.stopPhoneRinging();
+      }
+      if (window.PulseAudio && typeof window.PulseAudio.playDeclineTone === 'function') {
+        window.PulseAudio.playDeclineTone();
+      }
+
+      let nextDonor = null;
+      if (window.PulseStore && typeof window.PulseStore.declineDonorCall === 'function') {
+        const res = window.PulseStore.declineDonorCall(reqId, donorId);
+        if (res && res.nextDonor) nextDonor = res.nextDonor;
+      }
+
+      if (nextDonor) {
+        setTimeout(() => openIncomingDonorCallModal(nextDonor.id), 400);
+      } else {
+        closeIncomingDonorCallModal();
+      }
+    }
+
+    function simulateFirstDonorAnswer() {
+      const recipient = window.PulseStore ? window.PulseStore.getRecipient() : null;
+      const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
+      const reqId = recipient ? recipient.requestId : 'REQ-9042';
+      const available = window.PulseStore ? window.PulseStore.getAvailableDonors(reqId, bloodGroup) : [];
+      const target = available.find(d => !d.confirmed) || available[0];
+      if (target && window.PulseStore) {
+        window.PulseStore.confirmDonorAvailability(reqId, target.id);
+        if (window.PulseAudio && typeof window.PulseAudio.playConfirmationChime === 'function') {
+          window.PulseAudio.playConfirmationChime();
+        }
+        renderStandaloneRecipientDonors();
+      }
+    }
+    window.simulateFirstDonorAnswer = simulateFirstDonorAnswer;
+
+    function triggerDemoReRing() {
+      const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+        ? window.PulseStore.getRecipient()
+        : null;
+      const reqId = recipient ? recipient.requestId : 'REQ-9042';
+
+      if (window.PulseStore && typeof window.PulseStore.triggerTestRingForCase === 'function') {
+        window.PulseStore.triggerTestRingForCase(reqId);
+      }
+      simulateFirstDonorAnswer();
+    }
+
+    window.openIncomingDonorCallModal = openIncomingDonorCallModal;
+    window.closeIncomingDonorCallModal = closeIncomingDonorCallModal;
+    window.minimizeIncomingCall = minimizeIncomingCall;
+    window.expandIncomingCall = expandIncomingCall;
+    window.toggleCallRingtoneMute = toggleCallRingtoneMute;
+    window.switchCallTargetDonor = switchCallTargetDonor;
+    window.confirmActiveDonorAvailability = confirmActiveDonorAvailability;
+    window.declineActiveDonorCall = declineActiveDonorCall;
+    window.triggerDemoReRing = triggerDemoReRing;
+
+    // Recipient dashboard must never ring
+    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+      window.PulseAudio.stopPhoneRinging();
+    }
+
+    function renderStandaloneRecipientDonors() {
+      const container = document.getElementById('recipient-donors-list');
+      if (!container || !window.PulseStore) return;
+      const recipient = window.PulseStore.getRecipient();
+      const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
+      const reqId = recipient ? recipient.requestId : 'REQ-9042';
+
+      const confirmed = window.PulseStore.getConfirmedDonors(reqId, bloodGroup);
+      const available = window.PulseStore.getAvailableDonors(reqId, bloodGroup);
+
+      if (confirmed.length === 0) {
+        container.innerHTML = `
+          <div class="p-5 rounded-2xl bg-amber-500/10 border-2 border-dashed border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[28px]">cell_tower</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-on-surface">Emergency Call in Progress — Ringing Matched Donors</h4>
+                <p class="text-xs text-on-surface-variant mt-0.5">
+                  0 donors confirmed yet. Ringing ${available.length} compatible volunteer donors nearby. Once a donor confirms availability on their portal, they will appear here.
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap shrink-0">
+              <button type="button" onclick="window.simulateFirstDonorAnswer()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer">
+                Simulate Donor Confirmation
+              </button>
+              <a href="index.html#/donor-dashboard" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all border border-surface-container-high shrink-0 cursor-pointer">
+                Go to Donor Portal
+              </a>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = confirmed.map(d => `
+          <div class="p-4 rounded-xl bg-surface-container-low border border-emerald-500/30 ring-2 ring-emerald-500/20 bg-emerald-500/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-900 font-bold text-lg flex items-center justify-center shrink-0 border border-emerald-300">
+                ${d.initials || d.name.substring(0, 2).toUpperCase()}
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="font-bold text-base text-on-surface">${d.name}</h4>
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-bold uppercase">Confirmed &amp; En Route</span>
+                  <span class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-[11px] font-bold">${d.bloodGroup} Donor</span>
+                </div>
+                <p class="text-xs text-on-surface-variant mt-0.5">
+                  Proximity: <strong>${d.distance} km away</strong> • ETA: <strong class="text-emerald-700">${d.liveEta}</strong> • Mode: ${d.transitMode || 'Emergency Corridor'}
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+              <button type="button" onclick="verifyDonorHandshake('${recipient.handshakeOTP}', '${d.name}')" class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all shadow-xs cursor-pointer">
+                Confirm Arrival PIN
+              </button>
+              <a href="tel:${d.phone || '+91 95280 33454'}" class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">call</span>
+                <span>Contact Donor</span>
+              </a>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    if (window.PulseStore) {
+      window.PulseStore.subscribe(renderStandaloneRecipientDonors);
+      setTimeout(renderStandaloneRecipientDonors, 50);
+    }
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeRaiseRequestModal();
         closeMedicalProofViewer();
+        closeIncomingDonorCallModal();
       }
     });
 
@@ -2448,30 +2734,154 @@
     </div>
   </div>
 
-  <footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-8 mt-auto border-t border-surface-container-high">
-    <div class="max-w-[1280px] mx-auto px-4 sm:px-6">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4 pb-6">
-        <div class="flex items-center gap-2">
-          <img alt="DonorPulse Logo" class="h-7 w-7 object-contain shrink-0" src="images/logo-icon.png"/>
-          <span class="font-headline-sm text-lg font-bold text-on-surface">DonorPulse</span>
-          <span class="font-body-sm text-xs sm:text-sm text-on-surface-variant ml-2">— National Real-time Haemovigilance Infrastructure</span>
+  <!-- =================================================================== -->
+  <!-- MODAL: INCOMING EMERGENCY BLOOD REQUEST CALL TO DONOR               -->
+  <!-- =================================================================== -->
+  <div id="modal-incoming-donor-call" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-md overflow-y-auto" style="z-index: 99999;">
+    <div class="relative w-full max-w-lg bg-surface-container-lowest rounded-3xl shadow-2xl border-2 border-primary/50 overflow-hidden incoming-call-box-glow">
+      
+      <!-- Top Alert Ribbon: Siren & Audio Equalizer -->
+      <div class="bg-gradient-to-r from-red-700 via-primary to-rose-700 px-5 py-3 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-3 h-3 rounded-full bg-white animate-ping"></span>
+          <span class="material-symbols-outlined text-[20px] animate-phone-vibrate">emergency</span>
+          <span class="font-black text-xs sm:text-sm tracking-wider uppercase">Incoming Emergency Blood Call</span>
         </div>
-        <div class="flex items-center gap-4 text-xs font-semibold">
-          <a class="text-on-surface-variant hover:text-on-surface transition-colors" href="https://eraktkosh.mohfw.gov.in/eraktkoshPortal/#/" target="_blank" rel="noopener noreferrer">Clinical Protocols</a>
-          <a class="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="hospital-register.html">Hospital Verification</a>
-          <a class="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="role-selection.html">Access Portal</a>
+        <div class="flex items-center gap-3">
+          <!-- Audio Bars Visualizer -->
+          <div class="flex items-center gap-1 h-4 text-white/90" title="Audio Ringing Active">
+            <span class="sound-bar" style="height: 6px;"></span>
+            <span class="sound-bar" style="height: 14px;"></span>
+            <span class="sound-bar" style="height: 8px;"></span>
+            <span class="sound-bar" style="height: 16px;"></span>
+            <span class="sound-bar" style="height: 10px;"></span>
+          </div>
+          <!-- Mute Toggle -->
+          <button type="button" onclick="window.toggleCallRingtoneMute()" id="btn-call-mute-toggle" class="p-1 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all cursor-pointer" title="Toggle Ringtone Mute">
+            <span class="material-symbols-outlined text-[17px]" id="icon-call-mute">volume_up</span>
+          </button>
+          <!-- Minimize Dock -->
+          <button type="button" onclick="window.minimizeIncomingCall()" class="p-1 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all cursor-pointer" title="Minimize / View Dashboard">
+            <span class="material-symbols-outlined text-[17px]">close_fullscreen</span>
+          </button>
         </div>
       </div>
-      <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-on-surface-variant border-t border-surface-container">
-        <p>© 2024 DonorPulse Emergency Blood Logistics. All rights reserved.</p>
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-tertiary"></span>
-          <span class="font-label-badge uppercase tracking-wider text-tertiary font-bold text-[10px]">Central Dispatch Active</span>
+
+      <!-- Main Ringing Body -->
+      <div class="p-5 sm:p-6 flex flex-col gap-4">
+        
+        <!-- Animated Ringing Phone Radar Header -->
+        <div class="flex flex-col items-center justify-center pt-2 pb-1 relative">
+          <!-- Sonar Rings -->
+          <div class="relative w-24 h-24 flex items-center justify-center">
+            <div class="absolute inset-0 rounded-full bg-primary/20 animate-sonar-1"></div>
+            <div class="absolute inset-0 rounded-full bg-primary/15 animate-sonar-2"></div>
+            <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-primary to-rose-600 text-white flex items-center justify-center shadow-lg relative z-10">
+              <span class="material-symbols-outlined text-[38px] animate-phone-vibrate">ring_volume</span>
+            </div>
+          </div>
+          
+          <div class="mt-3 text-center">
+            <span class="text-xs font-bold uppercase tracking-widest text-primary flex items-center justify-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+              <span id="call-status-heading">Ringing Registered Volunteer Donor...</span>
+            </span>
+            <h2 id="call-donor-name" class="text-xl sm:text-2xl font-black text-on-surface mt-0.5">Ananya Sharma</h2>
+            <div class="flex items-center justify-center gap-2 mt-1 flex-wrap text-xs text-on-surface-variant font-medium">
+              <span id="call-donor-blood" class="px-2 py-0.5 rounded-full bg-primary text-white font-bold text-xs">O- Donor</span>
+              <span>•</span>
+              <span id="call-donor-phone" class="font-mono font-bold text-on-surface">+91 98452 33109</span>
+              <span>•</span>
+              <span id="call-donor-distance" class="text-primary font-bold">1.8 km away</span>
+            </div>
+          </div>
+
+          <!-- Quick Selector to Switch Ringing Target for Testing -->
+          <div class="mt-2.5 flex items-center gap-1.5 text-[11px] text-on-surface-variant">
+            <span>Simulate ringing:</span>
+            <select id="call-target-donor-select" onchange="window.switchCallTargetDonor(this.value)" class="px-2 py-0.5 rounded-md bg-surface-container border border-surface-container-high text-on-surface text-[11px] font-bold focus:ring-1 focus:ring-primary cursor-pointer">
+              <!-- Dynamically populated with compatible donors -->
+            </select>
+          </div>
         </div>
+
+        <!-- Requisition Details Card -->
+        <div class="p-4 rounded-2xl bg-surface-container-low border border-surface-container-high flex flex-col gap-3">
+          <div class="flex items-start justify-between gap-3 border-b border-surface-container pb-2.5">
+            <div>
+              <span class="text-[10px] font-bold text-secondary uppercase tracking-wider block">Calling Hospital Blood Desk</span>
+              <h4 id="call-hospital-name" class="font-bold text-sm sm:text-base text-on-surface">Apollo Hospitals &amp; Apex Trauma Centre</h4>
+              <p id="call-hospital-ward" class="text-xs text-on-surface-variant mt-0.5">ICU Ward 4B, Bed 12 • Trauma Critical Care</p>
+            </div>
+            <span id="call-urgency-badge" class="px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-bold text-[10px] uppercase tracking-wider shrink-0 animate-pulse">
+              Stat Emergency (&lt; 45 Mins)
+            </span>
+          </div>
+
+          <!-- Patient & Blood Demand Row -->
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-surface-container-lowest border border-surface-container">
+              <span class="text-[10px] text-on-surface-variant block uppercase font-bold">Patient in Need</span>
+              <span id="call-patient-name" class="font-extrabold text-on-surface text-sm">Devika Sharma</span>
+              <span id="call-patient-meta" class="text-[10.5px] text-secondary block mt-0.5">32 Yrs / Female</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-surface-container-lowest border border-surface-container">
+              <span class="text-[10px] text-on-surface-variant block uppercase font-bold">Required Blood Unit</span>
+              <span id="call-blood-units-needed" class="font-extrabold text-primary text-sm">B+ Platelets (3 Units)</span>
+              <span id="call-eta-needed" class="text-[10.5px] text-emerald-700 font-bold block mt-0.5">Match: 100% Compatible</span>
+            </div>
+          </div>
+
+          <!-- Clinical Indication / Attendant -->
+          <div class="p-2.5 rounded-xl bg-surface-container-lowest border border-surface-container text-xs flex flex-col gap-1">
+            <div class="flex items-center justify-between text-[10px] text-on-surface-variant">
+              <span class="font-bold uppercase">Attendant Contact</span>
+              <span id="call-attendant-info" class="font-semibold text-on-surface">Rajesh Sharma (+91 95280 33454)</span>
+            </div>
+            <p id="call-clinical-reason" class="text-[11px] text-on-surface-variant italic leading-relaxed">
+              "Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required."
+            </p>
+          </div>
+        </div>
+
+        <!-- Big Decision Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
+          <!-- Decline Button -->
+          <button type="button" onclick="window.declineActiveDonorCall()" class="sm:flex-1 py-3 px-4 rounded-2xl bg-surface-container hover:bg-error-container hover:text-on-error-container text-on-surface font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer border border-surface-container-high active:scale-98">
+            <span class="material-symbols-outlined text-[20px] text-error">call_end</span>
+            <span>Decline / Busy</span>
+          </button>
+
+          <!-- Confirm Availability & Accept Button -->
+          <button type="button" onclick="window.confirmActiveDonorAvailability()" class="sm:flex-2 py-3 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+            <span class="material-symbols-outlined text-[22px]">phone_enabled</span>
+            <span>I Am Available — Confirm &amp; Accept</span>
+          </button>
+        </div>
+
+        <p class="text-[10.5px] text-center text-on-surface-variant">
+          Confirming availability immediately updates the patient dashboard and generates arrival tracking.
+        </p>
+
       </div>
     </div>
-  </footer>
+  </div>
 
+  <!-- FLOATING DOCKED RINGING CALL INDICATOR (When Minimized) -->
+  <div id="docked-ringing-call-indicator" class="hidden fixed bottom-6 right-6 z-50 transition-all duration-300 animate-bounce" style="z-index: 99999;">
+    <button type="button" onclick="window.expandIncomingCall()" class="px-4 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-2xl border-2 border-white/60 flex items-center gap-3 cursor-pointer group">
+      <div class="relative w-8 h-8 rounded-full bg-white text-primary flex items-center justify-center">
+        <span class="material-symbols-outlined text-[20px] animate-phone-vibrate">ring_volume</span>
+      </div>
+      <div class="flex flex-col text-left">
+        <span class="text-[10px] font-extrabold tracking-wider uppercase text-white/90">Incoming Emergency Call</span>
+        <span id="docked-donor-text" class="text-xs font-bold text-white">Ringing Ananya Sharma (O-)</span>
+      </div>
+      <span class="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110">open_in_full</span>
+    </button>
+  </div>
+
+  <script src="js/audio.js"></script>
   <script src="js/store.js"></script>
   <script src="js/blood-cells.js?v=2"></script>
 </body>

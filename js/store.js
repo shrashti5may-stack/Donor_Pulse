@@ -6,6 +6,9 @@
 const STORAGE_KEY = 'donorpulse_state_in_v3';
 
 const DEFAULT_STATE = {
+  // Active incoming emergency donor call
+  activeIncomingCall: null,
+
   // Active role session: 'guest' | 'donor' | 'hospital'
   currentRole: 'donor',
 
@@ -476,6 +479,36 @@ class Store {
   constructor() {
     this.state = this.loadState();
     this.listeners = [];
+    this.initSyncListeners();
+  }
+
+  initSyncListeners() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY || e.key === 'donorpulse_sync_event') {
+          this.state = this.loadState();
+          this.notify();
+        }
+      });
+      if (typeof BroadcastChannel !== 'undefined') {
+        try {
+          this.syncChannel = new BroadcastChannel('donorpulse_cross_tab_sync');
+          this.syncChannel.onmessage = (msg) => {
+            this.state = this.loadState();
+            this.notify();
+          };
+        } catch(e) {}
+      }
+    }
+  }
+
+  broadcastSync(payload) {
+    try {
+      if (this.syncChannel) {
+        this.syncChannel.postMessage(payload);
+      }
+      localStorage.setItem('donorpulse_sync_event', JSON.stringify({ ...payload, _t: Date.now() }));
+    } catch(e) {}
   }
 
   loadState() {
@@ -571,6 +604,64 @@ class Store {
     this.state.donor.availability = !this.state.donor.availability;
     this.saveState();
     return this.state.donor.availability;
+  }
+
+  switchActiveDonor(donorId) {
+    const pool = this.state.matchedDonorsPool || [];
+    const target = pool.find(d => d.id === donorId);
+    if (target) {
+      this.state.donor = {
+        ...this.state.donor,
+        id: target.id,
+        fullName: target.name,
+        bloodGroup: target.bloodGroup,
+        phone: target.phone,
+        availability: true,
+        age: target.age || 28,
+        radiusMiles: 10,
+        address: `${target.distance} km away, Bengaluru`,
+        city: 'Bengaluru, Karnataka'
+      };
+      this.saveState();
+      this.notify();
+      this.broadcastSync({
+        type: 'ACTIVE_DONOR_SWITCHED',
+        donorId: target.id
+      });
+      return this.state.donor;
+    }
+    return this.state.donor;
+  }
+
+  getAllDonorsPool() {
+    return this.state.matchedDonorsPool || [];
+  }
+
+  isBloodCompatible(donorBlood, targetBloodGroup) {
+    if (!donorBlood || !targetBloodGroup) return false;
+    const cleanDonor = donorBlood.trim();
+    const cleanTarget = targetBloodGroup.trim();
+    const compatMap = {
+      'O-': ['O-'],
+      'O+': ['O-', 'O+'],
+      'A-': ['O-', 'A-'],
+      'A+': ['O-', 'O+', 'A-', 'A+'],
+      'B-': ['O-', 'B-'],
+      'B+': ['O-', 'O+', 'B-', 'B+'],
+      'AB-': ['O-', 'A-', 'B-', 'AB-'],
+      'AB+': ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+']
+    };
+    const validDonors = compatMap[cleanTarget] || [cleanTarget];
+    return validDonors.includes(cleanDonor);
+  }
+
+  getDonorCallStatus(requestId, donorId) {
+    const recipient = this.getRecipient();
+    const effectiveReqId = requestId || (recipient && recipient.requestId) || this.state.selectedRequestId;
+    const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
+    const donorList = this.getRequestDonorTracking(effectiveReqId, bloodGroup);
+    const donor = donorList.find(d => d.id === donorId);
+    return donor ? (donor.confirmed ? 'confirmed' : (donor.callStatus || 'ringing')) : null;
   }
 
   // --- Hospital methods ---
@@ -823,16 +914,34 @@ class Store {
     const attendantPhone = (data.attendantPhone && data.attendantPhone.trim()) ? data.attendantPhone.trim() : '+91 95280 33454';
     const clinicalReason = (data.notes || data.clinicalReason || 'Acute clinical blood requirement, emergency broadcast.').trim();
 
+    // MATCH COMPATIBLE DONORS AND INITIALIZE IN RINGING STATE (0 CONFIRMED YET)
+    const compatDonors = this.getMatchedDonors(bloodGroup);
+    const requestDonors = compatDonors.map((d, index) => ({
+      ...d,
+      confirmed: false,
+      callStatus: 'ringing',
+      transitStatus: '📞 Ringing / Awaiting Confirmation',
+      statusClass: 'bg-amber-500/20 text-amber-800 font-semibold border border-amber-400/30',
+      notified: true,
+      liveEta: d.eta || `${Math.round(d.distance * 7 + 8)} mins`,
+      transitMode: index === 0 ? '🚗 Emergency Vehicle Corridor' : (index === 1 ? '🚊 Metro Rapid Line' : '🚗 Personal Vehicle'),
+      progressPct: 15,
+      landmark: `${d.distance} km away • Within clinical radius`
+    }));
+
+    const primaryDonor = requestDonors[0] || this.state.matchedDonorsPool[0];
+
     const newPatient = {
       id: caseId,
       requestId: reqId,
+      isNewRequest: true,
       patientName,
       patientAge,
       patientGender,
       bloodGroup,
       component,
       unitsRequired: units,
-      unitsArranged: 1,
+      unitsArranged: 0, // 0 Confirmed until donor answers and confirms availability!
       unitsFulfilled: 0,
       urgency,
       hospitalName,
@@ -848,9 +957,10 @@ class Store {
       hospitalBloodDesk: '+91 (80) 2630-4050',
       clinicalReason,
       handshakeOTP: otp,
-      trackingStage: 1,
+      trackingStage: 2, // Stage 2: Donors Alerted & Ringing
       broadcastDate: 'Just now',
       appealActive: true,
+      donors: requestDonors,
       verificationProof: {
         documentType: data.proofDocType || data.documentType || 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
         doctorRegId: data.doctorRegId || data.doctorName || 'Dr. Aravind Sharma (NMC/KMC-48921)',
@@ -883,17 +993,52 @@ class Store {
       location: newPatient.hospitalAddress,
       notes: clinicalReason,
       createdAt: 'Just now',
-      status: 'Finding Donors',
-      trackingStage: 1,
-      matchedCount: Math.floor(6 + Math.random() * 10),
+      status: 'Ringing Donors / Awaiting Confirmation',
+      trackingStage: 2,
+      matchedCount: requestDonors.length,
       acceptedCount: 0,
-      enRouteCount: 0
+      enRouteCount: 0,
+      donors: requestDonors
     };
     if (!this.state.requests) this.state.requests = [];
     this.state.requests.unshift(newReq);
     this.state.selectedRequestId = reqId;
 
+    // Set active ringing call details
+    this.state.activeIncomingCall = {
+      requestId: reqId,
+      caseId: caseId,
+      patientName,
+      patientAge,
+      patientGender,
+      bloodGroup,
+      component,
+      unitsRequired: units,
+      urgency,
+      hospitalName,
+      hospitalWard,
+      attendantName,
+      attendantPhone,
+      clinicalReason,
+      donorId: primaryDonor ? primaryDonor.id : 'D-102',
+      donorName: primaryDonor ? primaryDonor.name : 'Ananya Sharma',
+      donorPhone: primaryDonor ? primaryDonor.phone : '+91 98452 33109',
+      donorBloodGroup: primaryDonor ? primaryDonor.bloodGroup : 'O-',
+      donorDistance: primaryDonor ? primaryDonor.distance : 1.8,
+      donorEta: primaryDonor ? (primaryDonor.liveEta || primaryDonor.eta || '18 mins') : '18 mins',
+      status: 'ringing',
+      timestamp: Date.now()
+    };
+
     this.saveState();
+
+    // Broadcast sync event for cross-tab ringing
+    this.broadcastSync({
+      type: 'NEW_REQUEST_RINGING',
+      requestId: reqId,
+      activeIncomingCall: this.state.activeIncomingCall
+    });
+
     return newPatient;
   }
 
@@ -1016,57 +1161,251 @@ class Store {
     return false;
   }
 
-  // --- Live Donor Tracking for Requisitions ---
+  // --- Live Donor Tracking & Confirmation for Requisitions ---
   getRequestDonorTracking(reqId, bloodGroup) {
     const cleanBlood = (bloodGroup || 'O-').split('/')[0].trim();
-    // STRICT MEDICAL ACCURACY:
-    // Only return compatible donors strictly mapped via getMatchedDonors.
-    // O- recipients can ONLY receive blood from O- donors. Never pad with incompatible blood types!
-    const donors = this.getMatchedDonors(cleanBlood);
+    const recipient = this.getRecipient();
+    const req = this.state.requests ? this.state.requests.find(r => r.id === reqId) : null;
+    
+    // Check if donors array already exists on the request or recipient
+    let storedDonors = (req && req.donors) || (recipient && recipient.requestId === reqId && recipient.donors);
 
-    return donors.map((d, index) => {
-      let transitStatus = 'Available On Call';
-      let statusClass = 'bg-surface-container text-on-surface';
-      let transitMode = '🚶 Walking / Local';
-      let progressPct = 10;
-      let landmark = 'Within clinical travel radius';
+    if (!storedDonors || !storedDonors.length) {
+      // STRICT MEDICAL ACCURACY: Only return compatible donors strictly mapped via getMatchedDonors.
+      const compatible = this.getMatchedDonors(cleanBlood);
+      // For default initial demo state CASE-9042, keep first 2 as confirmed for baseline display
+      const isDefaultPrepopulated = (reqId === 'REQ-9042' && (!recipient || !recipient.isNewRequest));
 
-      if (index === 0) {
-        transitStatus = 'En Route';
-        statusClass = 'bg-primary-fixed text-primary font-bold';
-        transitMode = '🚗 Emergency Vehicle Corridor';
-        progressPct = 80;
-        landmark = 'Approaching hospital perimeter (0.5 km away)';
-      } else if (index === 1) {
-        transitStatus = 'In Transit';
-        statusClass = 'bg-tertiary-fixed text-on-tertiary-fixed font-bold';
-        transitMode = '🚊 Metro Rapid Line';
-        progressPct = 55;
-        landmark = 'At Medical Plaza Station (2 stops away)';
-      } else if (index === 2) {
-        transitStatus = 'Accepted / Preparing';
-        statusClass = 'bg-secondary-container text-on-secondary-container font-semibold';
-        transitMode = '🚗 Personal Vehicle';
-        progressPct = 25;
-        landmark = 'Departing departure point in 5 mins';
-      } else {
-        transitStatus = d.notified ? 'Notified / Awaiting Reply' : 'Available on Standby';
-        statusClass = d.notified ? 'bg-amber-500/20 text-amber-800' : 'bg-surface-container-high text-on-surface-variant';
-        transitMode = '📍 Standby Radius';
-        progressPct = 10;
-        landmark = `Pre-screened vitals verified • ${d.distance} km away`;
+      storedDonors = compatible.map((d, index) => {
+        const isConfirmed = isDefaultPrepopulated ? (index < 2) : false;
+        return {
+          ...d,
+          confirmed: isConfirmed,
+          callStatus: isConfirmed ? 'confirmed' : 'ringing',
+          transitStatus: isConfirmed 
+            ? (index === 0 ? 'En Route' : 'In Transit')
+            : '📞 Ringing / Awaiting Confirmation',
+          statusClass: isConfirmed 
+            ? (index === 0 ? 'bg-primary-fixed text-primary font-bold' : 'bg-tertiary-fixed text-on-tertiary-fixed font-bold')
+            : 'bg-amber-500/20 text-amber-800 font-semibold border border-amber-400/30',
+          transitMode: index === 0 ? '🚗 Emergency Vehicle Corridor' : (index === 1 ? '🚊 Metro Rapid Line' : '🚗 Personal Vehicle'),
+          progressPct: isConfirmed ? (index === 0 ? 80 : 55) : 15,
+          landmark: isConfirmed 
+            ? (index === 0 ? 'Approaching hospital perimeter (0.5 km away)' : 'At Medical Plaza Station (2 stops away)')
+            : `Standby radius • ${d.distance} km away`,
+          liveEta: d.eta || `${Math.round(d.distance * 7 + 6)} mins`
+        };
+      });
+
+      if (req) req.donors = storedDonors;
+      if (recipient && recipient.requestId === reqId) recipient.donors = storedDonors;
+    }
+
+    return storedDonors;
+  }
+
+  // Get only donors who confirmed availability for this request
+  getConfirmedDonors(reqId, bloodGroup) {
+    const list = this.getRequestDonorTracking(reqId, bloodGroup);
+    return list.filter(d => d.confirmed === true);
+  }
+
+  // Get all compatible donors available in network
+  getAvailableDonors(reqId, bloodGroup) {
+    return this.getRequestDonorTracking(reqId, bloodGroup);
+  }
+
+  getActiveIncomingCall() {
+    return this.state.activeIncomingCall;
+  }
+
+  setActiveIncomingCall(callData) {
+    this.state.activeIncomingCall = callData;
+    this.saveState();
+  }
+
+  // Confirm donor availability when donor accepts the emergency call
+  confirmDonorAvailability(requestId, donorId) {
+    const recipient = this.getRecipient();
+    const effectiveReqId = requestId || (recipient && recipient.requestId) || this.state.selectedRequestId;
+    const req = this.state.requests ? this.state.requests.find(r => r.id === effectiveReqId) : null;
+    const bloodGroup = recipient ? recipient.bloodGroup : (req ? req.bloodGroup : 'B+');
+
+    const donorList = this.getRequestDonorTracking(effectiveReqId, bloodGroup);
+    const donor = donorList.find(d => d.id === donorId);
+
+    if (donor) {
+      donor.confirmed = true;
+      donor.callStatus = 'confirmed';
+      donor.transitStatus = 'En Route (Confirmed)';
+      donor.statusClass = 'bg-emerald-500/15 text-emerald-800 font-bold border border-emerald-400/40';
+      donor.progressPct = Math.max(45, donor.progressPct || 45);
+      donor.confirmedAt = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST';
+      donor.landmark = 'Departed dispatch base • Fast-track transit corridor';
+
+      // Update recipient units arranged and tracking stage
+      if (recipient) {
+        recipient.unitsArranged = Math.min(recipient.unitsRequired, (recipient.unitsArranged || 0) + 1);
+        if (recipient.trackingStage < 4) {
+          recipient.trackingStage = 4; // Stage 4: En Route to Hospital
+        }
+        recipient.donors = donorList;
       }
 
-      return {
-        ...d,
-        transitStatus,
-        statusClass,
-        transitMode,
-        progressPct,
-        landmark,
-        liveEta: d.eta || `${Math.round(d.distance * 7 + 6)} mins`
+      // Update requests list
+      if (req) {
+        req.acceptedCount = (req.acceptedCount || 0) + 1;
+        req.enRouteCount = (req.enRouteCount || 0) + 1;
+        req.trackingStage = Math.max(req.trackingStage || 1, 4);
+        req.status = 'Donors Confirmed & Responding';
+        req.donors = donorList;
+      }
+
+      // If active call was for this donor, mark it accepted
+      if (this.state.activeIncomingCall && this.state.activeIncomingCall.donorId === donorId) {
+        this.state.activeIncomingCall.status = 'accepted';
+      }
+
+      this.saveState();
+
+      // Broadcast sync event for cross-tab and cross-view synchronization
+      this.broadcastSync({
+        type: 'DONOR_CONFIRMED',
+        requestId: effectiveReqId,
+        donorId: donor.id,
+        donorName: donor.name,
+        donorBloodGroup: donor.bloodGroup,
+        unitsArranged: recipient ? recipient.unitsArranged : 1
+      });
+
+      return { success: true, donor, recipient, req };
+    }
+
+    return { success: false, message: 'Donor not found' };
+  }
+
+  // Decline donor call (and optionally ring the next available donor)
+  declineDonorCall(requestId, donorId) {
+    const recipient = this.getRecipient();
+    const effectiveReqId = requestId || (recipient && recipient.requestId) || this.state.selectedRequestId;
+    const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
+    const donorList = this.getRequestDonorTracking(effectiveReqId, bloodGroup);
+
+    const donor = donorList.find(d => d.id === donorId);
+    if (donor) {
+      donor.callStatus = 'declined';
+      donor.transitStatus = 'Declined / Busy';
+      donor.statusClass = 'bg-surface-container-high text-on-surface-variant line-through opacity-60';
+    }
+
+    // Look for next unconfirmed donor to ring
+    const nextDonor = donorList.find(d => !d.confirmed && d.callStatus !== 'declined');
+    if (nextDonor && recipient) {
+      this.state.activeIncomingCall = {
+        requestId: effectiveReqId,
+        patientName: recipient.patientName,
+        bloodGroup: recipient.bloodGroup,
+        component: recipient.component,
+        unitsRequired: recipient.unitsRequired,
+        urgency: recipient.urgency,
+        hospitalName: recipient.hospitalName,
+        hospitalWard: recipient.hospitalWard,
+        attendantName: recipient.attendantName,
+        attendantPhone: recipient.attendantPhone,
+        clinicalReason: recipient.clinicalReason,
+        donorId: nextDonor.id,
+        donorName: nextDonor.name,
+        donorPhone: nextDonor.phone,
+        donorBloodGroup: nextDonor.bloodGroup,
+        donorDistance: nextDonor.distance,
+        donorEta: nextDonor.liveEta || nextDonor.eta || '20 mins',
+        status: 'ringing',
+        timestamp: Date.now()
       };
+    } else {
+      this.state.activeIncomingCall = null;
+    }
+
+    this.saveState();
+
+    this.broadcastSync({
+      type: 'DONOR_DECLINED',
+      requestId: effectiveReqId,
+      donorId,
+      nextDonorId: nextDonor ? nextDonor.id : null
     });
+
+    return { success: true, nextDonor };
+  }
+
+  // Trigger or switch active ringing call to a specific donor
+  ringDonor(requestId, donorId) {
+    const recipient = this.getRecipient();
+    const effectiveReqId = requestId || (recipient && recipient.requestId) || this.state.selectedRequestId;
+    const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
+    const donorList = this.getRequestDonorTracking(effectiveReqId, bloodGroup);
+
+    const donor = donorList.find(d => d.id === donorId);
+    if (donor && recipient) {
+      donor.callStatus = 'ringing';
+      this.state.activeIncomingCall = {
+        requestId: effectiveReqId,
+        patientName: recipient.patientName,
+        bloodGroup: recipient.bloodGroup,
+        component: recipient.component,
+        unitsRequired: recipient.unitsRequired,
+        urgency: recipient.urgency,
+        hospitalName: recipient.hospitalName,
+        hospitalWard: recipient.hospitalWard,
+        attendantName: recipient.attendantName,
+        attendantPhone: recipient.attendantPhone,
+        clinicalReason: recipient.clinicalReason,
+        donorId: donor.id,
+        donorName: donor.name,
+        donorPhone: donor.phone,
+        donorBloodGroup: donor.bloodGroup,
+        donorDistance: donor.distance,
+        donorEta: donor.liveEta || donor.eta || '18 mins',
+        status: 'ringing',
+        timestamp: Date.now()
+      };
+      this.saveState();
+
+      this.broadcastSync({
+        type: 'DONOR_RINGING',
+        requestId: effectiveReqId,
+        donorId: donor.id
+      });
+
+      return donor;
+    }
+    return null;
+  }
+
+  // Helper for quick testing/re-running the ringing simulation on the current active case
+  triggerTestRingForCase(requestId) {
+    const recipient = this.getRecipient();
+    const effectiveReqId = requestId || (recipient && recipient.requestId) || this.state.selectedRequestId;
+    const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
+    const donorList = this.getRequestDonorTracking(effectiveReqId, bloodGroup);
+
+    // Reset donors to unconfirmed ringing state
+    donorList.forEach(d => {
+      d.confirmed = false;
+      d.callStatus = 'ringing';
+      d.transitStatus = '📞 Ringing / Awaiting Confirmation';
+      d.statusClass = 'bg-amber-500/20 text-amber-800 font-semibold border border-amber-400/30';
+    });
+
+    if (recipient) {
+      recipient.unitsArranged = 0;
+      recipient.trackingStage = 2;
+      recipient.donors = donorList;
+    }
+
+    const firstDonor = donorList[0] || this.state.matchedDonorsPool[0];
+    this.ringDonor(effectiveReqId, firstDonor.id);
+    return donorList;
   }
 
   resetToDefault() {

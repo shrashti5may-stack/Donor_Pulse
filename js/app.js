@@ -21,6 +21,31 @@ function startApp() {
       renderAllViews();
     });
   }
+
+  // Cross-tab real-time sync event listener
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'donorpulse_sync_event') {
+        try {
+          const evt = JSON.parse(e.newValue);
+          const currentHash = window.location.hash || '';
+          if (evt.type === 'NEW_REQUEST_RINGING' || evt.type === 'DONOR_RINGING') {
+            if (currentHash.includes('donor')) {
+              setTimeout(() => {
+                if (typeof window.checkAndRingMatchedDonor === 'function') {
+                  window.checkAndRingMatchedDonor();
+                }
+              }, 200);
+            }
+          } else if (evt.type === 'DONOR_CONFIRMED') {
+            if (typeof window.renderRecipientDashboard === 'function') {
+              window.renderRecipientDashboard();
+            }
+          }
+        } catch(err) {}
+      }
+    });
+  }
 }
 
 if (document.readyState === 'loading') {
@@ -93,16 +118,33 @@ function initRouterHooks() {
       window.PulseStore.setSelectedRequestId(params.id);
     }
 
-    if (['donor-dashboard', 'nearby-requests', 'dashboard/requests', 'donor-dashboard/requests', 'donor-requests', 'donor-requests-section', 'donation-history', 'donor-history'].includes(route)) {
-      renderDonorDashboard();
-    } else if (route === 'donor-profile') {
-      populateDonorProfileForm();
-    } else if (['recipient-dashboard', 'recipient-overview', 'patient-dashboard', 'family-dashboard', 'recipient-requests', 'recipient-requests-section', 'recipient-donors', 'recipient-donors-section', 'recipient-tracking', 'recipient-tracking-section', 'sos-appeal', 'hospital-dashboard', 'hospital-overview', 'hospital-requests', 'hospital-requests-section', 'matched-donors', 'hospital-donors-section', 'request-tracking', 'hospital-tracking-section'].includes(route)) {
+    // STRICT USER REQUIREMENT: Recipient dashboard must NEVER ring or show incoming call modal!
+    const isRecipientRoute = ['recipient-dashboard', 'recipient-overview', 'patient-dashboard', 'family-dashboard', 'recipient-requests', 'recipient-requests-section', 'recipient-donors', 'recipient-donors-section', 'recipient-tracking', 'recipient-tracking-section', 'sos-appeal', 'hospital-dashboard', 'hospital-overview', 'hospital-requests', 'hospital-requests-section', 'matched-donors', 'hospital-donors-section', 'request-tracking', 'hospital-tracking-section'].includes(route);
+
+    if (isRecipientRoute) {
+      if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+        window.PulseAudio.stopPhoneRinging();
+      }
+      const modal = document.getElementById('modal-incoming-donor-call');
+      if (modal) modal.classList.add('hidden');
+      const docked = document.getElementById('docked-ringing-call-indicator');
+      if (docked) docked.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+
       if (typeof window.renderRecipientDashboard === 'function') {
         window.renderRecipientDashboard();
       } else if (typeof renderHospitalDashboard === 'function') {
         renderHospitalDashboard();
       }
+    } else if (['donor-dashboard', 'nearby-requests', 'dashboard/requests', 'donor-dashboard/requests', 'donor-requests', 'donor-requests-section', 'donation-history', 'donor-history'].includes(route)) {
+      renderDonorDashboard();
+      setTimeout(() => {
+        if (typeof window.checkAndRingMatchedDonor === 'function') {
+          window.checkAndRingMatchedDonor();
+        }
+      }, 200);
+    } else if (route === 'donor-profile') {
+      populateDonorProfileForm();
     } else if (route === 'request-confirmation') {
       renderRequestConfirmation();
     }
@@ -433,11 +475,11 @@ function initFormControllers() {
       closeRequestModal();
       showToast(
         '🚨 Emergency Requisition Broadcasted!',
-        `Patient ${patientName} (${bloodGroup} ${component}) requisition #${newPatient ? newPatient.requestId : 'REQ-9042'} dispatched to proximate verified donors!`,
+        `Patient ${patientName} (${bloodGroup} ${component}) requisition #${newPatient ? newPatient.requestId : 'REQ-9042'} dispatched! Alerting & dialing proximate donors in radius. Donors will appear below as they confirm availability.`,
         'success'
       );
 
-      // Transition to recipient dashboard so the family can immediately monitor live donors & PIN
+      // Transition to recipient dashboard so the attendant can monitor live status
       if (window.PulseRouter) {
         window.PulseRouter.navigate('recipient-dashboard');
       } else {
@@ -2024,6 +2066,126 @@ function renderDonorDashboard() {
   if (vitalsPassText && donor.vitals) {
     vitalsPassText.textContent = `Instant clinical check-in QR code active. Verified vitals: Hemoglobin ${donor.vitals.hemoglobin || '14.8 g/dL'} (Normal) • BP ${donor.vitals.bp || '118/76 mmHg'}.`;
   }
+
+  // 1. Populate Active Donor Profile Switcher Bar
+  const pool = (window.PulseStore && typeof window.PulseStore.getAllDonorsPool === 'function')
+    ? window.PulseStore.getAllDonorsPool()
+    : [];
+  const switcherContainer = document.getElementById('donor-profile-switcher-container');
+  if (switcherContainer && pool.length > 0) {
+    switcherContainer.innerHTML = `
+      <div class="p-3 rounded-2xl bg-surface-container-lowest border border-surface-container-high shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+            <span class="material-symbols-outlined text-[20px]">badge</span>
+          </div>
+          <div>
+            <span class="text-[11px] font-bold text-secondary uppercase tracking-wider block">Logged-In Volunteer Donor</span>
+            <span class="text-xs font-bold text-on-surface">Acting as: <span class="text-primary font-black">${escapeHtml(donor.fullName)}</span> (<span class="font-bold text-primary">${escapeHtml(donor.bloodGroup)}</span>)</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="donor-profile-select" class="text-xs text-on-surface-variant font-medium shrink-0">Switch Donor:</label>
+          <select id="donor-profile-select" onchange="window.switchActiveDonorProfile(this.value)" class="px-3 py-1.5 rounded-xl bg-surface-container-low border border-surface-container text-xs font-bold text-on-surface focus:ring-1 focus:ring-primary cursor-pointer shadow-2xs">
+            ${pool.map(d => `
+              <option value="${escapeHtml(d.id)}" ${(d.id === donor.id || d.name === donor.fullName) ? 'selected' : ''}>
+                ${escapeHtml(d.name)} (${escapeHtml(d.bloodGroup)} • ${d.distance} km) ${d.confirmed ? '✅ Confirmed' : ''}
+              </option>
+            `).join('')}
+          </select>
+        </div>
+      </div>
+    `;
+  }
+
+  // 2. Populate Emergency Mission Banner on Donor Dashboard
+  const missionBanner = document.getElementById('donor-emergency-mission-banner');
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+
+  if (missionBanner && recipient) {
+    const isCompat = window.PulseStore.isBloodCompatible(donor.bloodGroup, recipient.bloodGroup);
+    const donorStatus = window.PulseStore.getDonorCallStatus(recipient.requestId, donor.id);
+
+    if (isCompat) {
+      if (donorStatus === 'confirmed') {
+        missionBanner.classList.remove('hidden');
+        missionBanner.innerHTML = `
+          <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <span class="material-symbols-outlined text-[22px]">two_wheeler</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wide">Active Mission En Route</span>
+                  <span class="text-xs font-bold text-on-surface">Requisition #${escapeHtml(recipient.requestId)}</span>
+                </div>
+                <p class="text-xs text-on-surface-variant mt-0.5">
+                  You confirmed availability for <strong>${escapeHtml(recipient.patientName)}</strong> (${escapeHtml(recipient.bloodGroup)} ${escapeHtml(recipient.component)}). Heading to <strong>${escapeHtml(recipient.hospitalName)}</strong> (${escapeHtml(recipient.hospitalWard)}).
+                </p>
+              </div>
+            </div>
+            <a href="#/recipient-tracking" class="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs shrink-0 self-start sm:self-center">
+              View Hospital Transit Grid
+            </a>
+          </div>
+        `;
+      } else if (donorStatus === 'declined') {
+        missionBanner.classList.remove('hidden');
+        missionBanner.innerHTML = `
+          <div class="p-3.5 rounded-2xl bg-surface-container-high border border-surface-container flex items-center justify-between gap-3">
+            <span class="text-xs text-on-surface-variant font-medium">You marked unavailable / declined for ${escapeHtml(recipient.patientName)}'s requisition.</span>
+            <button type="button" onclick="window.checkAndRingMatchedDonor()" class="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-highest text-primary text-xs font-bold cursor-pointer">Reconsider & Ring</button>
+          </div>
+        `;
+      } else {
+        // Ringing or unconfirmed compatible donor!
+        missionBanner.classList.remove('hidden');
+        missionBanner.innerHTML = `
+          <div class="p-4 rounded-2xl bg-red-600/10 border-2 border-red-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm incoming-call-box-glow">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-2xs animate-phone-vibrate">
+                <span class="material-symbols-outlined text-[24px]">ring_volume</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
+                  <span class="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold uppercase tracking-wide">Stat Emergency Alert</span>
+                  <span class="text-xs font-bold text-red-900">Incoming Call For Your Blood Group (${escapeHtml(donor.bloodGroup)})</span>
+                </div>
+                <p class="text-xs text-on-surface mt-0.5">
+                  <strong>${escapeHtml(recipient.hospitalName)}</strong> requires ${escapeHtml(recipient.unitsRequired)} units of ${escapeHtml(recipient.bloodGroup)} for <strong>${escapeHtml(recipient.patientName)}</strong>.
+                </p>
+              </div>
+            </div>
+            <button type="button" onclick="window.openIncomingDonorCallModal('${donor.id}')" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5 shrink-0 self-start sm:self-center animate-pulse cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">phone_in_talk</span>
+              <span>Open Call Screen</span>
+            </button>
+          </div>
+        `;
+      }
+    } else {
+      missionBanner.classList.remove('hidden');
+      missionBanner.innerHTML = `
+        <div class="p-3 rounded-2xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2 text-xs text-on-surface-variant font-medium">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
+            <span>No emergency requests matching your blood type (<strong>${escapeHtml(donor.bloodGroup)}</strong>) right now. Active hospital case is for <strong>${escapeHtml(recipient.bloodGroup)}</strong>.</span>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Check and ring if user is active donor and matched!
+  setTimeout(() => {
+    if (typeof window.checkAndRingMatchedDonor === 'function') {
+      window.checkAndRingMatchedDonor();
+    }
+  }, 100);
 }
 
 /**
@@ -2228,71 +2390,601 @@ function renderRecipientDonorsSection(recipient) {
   if (!container) return;
 
   const bloodGroup = recipient.bloodGroup || 'B+';
-  const donors = (window.PulseStore && typeof window.PulseStore.getRequestDonorTracking === 'function')
-    ? window.PulseStore.getRequestDonorTracking(recipient.requestId, bloodGroup)
+  const reqId = recipient.requestId || 'REQ-9042';
+
+  // Get confirmed donors (only those who answered the call and confirmed availability)
+  const confirmedDonors = (window.PulseStore && typeof window.PulseStore.getConfirmedDonors === 'function')
+    ? window.PulseStore.getConfirmedDonors(reqId, bloodGroup)
     : [];
 
-  const arrivingDonors = donors.slice(0, 3);
-  setTextContentAll('.recipient-donors-count-badge', `${arrivingDonors.length} Donors Responding`);
-  setTextContentAll('.recipient-donors-active-count', arrivingDonors.length);
+  // Get all compatible donors available in network who were contacted
+  const availableDonors = (window.PulseStore && typeof window.PulseStore.getAvailableDonors === 'function')
+    ? window.PulseStore.getAvailableDonors(reqId, bloodGroup)
+    : [];
 
-  if (arrivingDonors.length === 0) {
-    container.innerHTML = `
-      <div class="p-6 text-center bg-surface-container-low rounded-xl">
-        <p class="font-body-md text-on-surface-variant">Searching for nearby volunteer donors...</p>
+  // Update header badges accurately
+  if (confirmedDonors.length === 0) {
+    setTextContentAll('.recipient-donors-count-badge', `0 Confirmed • Ringing ${availableDonors.length} Donors`);
+    setTextContentAll('.recipient-donors-active-count', '0');
+  } else {
+    setTextContentAll('.recipient-donors-count-badge', `${confirmedDonors.length} Confirmed Donor${confirmedDonors.length > 1 ? 's' : ''} Responding`);
+    setTextContentAll('.recipient-donors-active-count', confirmedDonors.length);
+  }
+
+  let html = '';
+
+  // =========================================================================
+  // 1. CONFIRMED DONORS (ONLY SHOWN WHEN DONOR CONFIRMS AVAILABILITY)
+  // =========================================================================
+  if (confirmedDonors.length === 0) {
+    html += `
+      <div class="p-5 sm:p-6 rounded-2xl bg-amber-500/10 border-2 border-dashed border-amber-500/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-13 h-13 rounded-2xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[32px] animate-phone-vibrate">ring_volume</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-600 animate-ping"></span>
+              <h4 class="font-title-md font-bold text-on-surface">Emergency Call in Progress — Ringing Proximate Donors</h4>
+            </div>
+            <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
+              <strong>0 donors confirmed yet.</strong> The emergency grid is actively ringing <strong>${availableDonors.length} compatible volunteer donors</strong> within clinical radius.
+              Once a donor confirms their availability, they will immediately appear here with real-time transit telemetry and arrival verification.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 self-end md:self-center flex-wrap">
+          <button type="button" onclick="window.simulateFirstDonorAnswer()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-98" title="Simulate first available matched donor answering and confirming">
+            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+            <span>Simulate 1st Donor Confirming</span>
+          </button>
+          <a href="#/donor-dashboard" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-surface-container-high" title="Go to Donor Portal to view the incoming call screen as a donor">
+            <span class="material-symbols-outlined text-[16px] text-primary">badge</span>
+            <span>Answer in Donor Portal</span>
+          </a>
+        </div>
       </div>
     `;
+  } else {
+    html += confirmedDonors.map((d, idx) => `
+      <div class="p-4 rounded-xl bg-surface-container-low border border-emerald-500/30 ring-2 ring-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/50 hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-900 flex items-center justify-center font-bold text-headline-sm shrink-0 shadow-xs border border-emerald-300">
+            ${escapeHtml(d.initials || d.name.substring(0, 2).toUpperCase())}
+          </div>
+          <div class="flex flex-col min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <h4 class="font-title-md font-bold text-on-surface">${escapeHtml(d.name)}</h4>
+              <span class="px-2 py-0.5 rounded-full ${d.bloodGroup === 'O-' ? 'bg-error-container text-primary font-bold' : 'bg-surface-container-high text-on-surface font-bold'} text-xs">
+                ${escapeHtml(d.bloodGroup)}
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[11px] font-bold flex items-center gap-1 shadow-2xs">
+                <span class="material-symbols-outlined text-[13px]">check_circle</span>
+                <span>Confirmed &amp; ${escapeHtml(d.transitStatus.includes('Transit') ? 'In Transit' : 'En Route')}</span>
+              </span>
+              ${d.confirmedAt ? `<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface text-[10px] font-mono">Confirmed: ${escapeHtml(d.confirmedAt)}</span>` : ''}
+              ${idx === 0 ? '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">Fastest ETA</span>' : ''}
+            </div>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-surface-variant mt-1">
+              <span class="flex items-center gap-1 font-semibold text-emerald-700">
+                <span class="material-symbols-outlined text-[15px]">timer</span>
+                ETA: ${escapeHtml(d.liveEta || '14 mins')}
+              </span>
+              <span>•</span>
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-tertiary">near_me</span>
+                ${escapeHtml(d.landmark || 'Approaching hospital')}
+              </span>
+              <span>•</span>
+              <span class="text-secondary font-medium">${escapeHtml(d.transitMode || '🚗 Emergency Corridor')}</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+          <button type="button" onclick="window.verifyDonorHandshake('${recipient.handshakeOTP}', '${escapeHtml(d.name)}')" class="px-3.5 py-2 rounded-xl bg-tertiary-container/30 hover:bg-tertiary-container/50 text-tertiary font-label-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95" title="Verify Donor at Blood Bank Counter">
+            <span class="material-symbols-outlined text-[16px]">pin</span>
+            <span>Confirm Arrival</span>
+          </button>
+          <a href="tel:${escapeHtml(d.phone || '+91 98201 44521')}" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs" title="Call Donor Directly">
+            <span class="material-symbols-outlined text-[16px] text-primary">call</span>
+            <span>Call Donor</span>
+          </a>
+          <button type="button" onclick="window.showToast('Donor Line Active', 'Opening direct messaging channel to ${escapeHtml(d.name)}', 'info')" class="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface transition-all cursor-pointer" title="Direct Message">
+            <span class="material-symbols-outlined text-[18px]">chat</span>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // =========================================================================
+  // 2. COMPATIBLE DONORS CONTACTED (RINGING / STANDBY POOL)
+  // =========================================================================
+  html += `
+    <div class="mt-4 pt-4 border-t border-surface-container">
+      <div class="flex items-center justify-between pb-3 flex-wrap gap-2">
+        <div>
+          <span class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-primary">cell_tower</span>
+            <span>Compatible Donors Contacted in Radius (${availableDonors.length} Verified Donors)</span>
+          </span>
+          <p class="text-[11px] text-on-surface-variant mt-0.5">Live status of proximate volunteer donors receiving this emergency requisition broadcast</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.simulateFirstDonorAnswer()" class="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-800 text-xs font-bold transition-colors cursor-pointer border border-emerald-500/30">
+            <span class="material-symbols-outlined text-[14px]">check</span>
+            <span>Simulate Donor Confirmation</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+        ${availableDonors.map(d => {
+          const isConfirmed = d.confirmed === true;
+          return `
+            <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3 ${isConfirmed ? 'bg-emerald-500/5 border-emerald-500/30' : ''}">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-9 h-9 rounded-full ${isConfirmed ? 'bg-emerald-100 text-emerald-800' : 'bg-surface-container text-on-surface'} font-bold flex items-center justify-center text-xs shrink-0">
+                  ${escapeHtml(d.initials || 'DN')}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-xs font-bold text-on-surface truncate">${escapeHtml(d.name)}</span>
+                    <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-surface-container-high text-on-surface">${escapeHtml(d.bloodGroup)}</span>
+                    ${isConfirmed ? `
+                      <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[11px]">check</span> Confirmed
+                      </span>
+                    ` : `
+                      <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-800">
+                        <span class="flex items-center gap-0.5 h-2.5 text-amber-600">
+                          <span class="sound-bar" style="height: 6px;"></span>
+                          <span class="sound-bar" style="height: 10px;"></span>
+                          <span class="sound-bar" style="height: 4px;"></span>
+                        </span>
+                        <span>Ringing</span>
+                      </span>
+                    `}
+                  </div>
+                  <span class="text-[11px] text-on-surface-variant block truncate">${d.distance} km away • ${d.matchScore}% Match • ETA ${escapeHtml(d.liveEta)}</span>
+                </div>
+              </div>
+              <div class="shrink-0">
+                ${isConfirmed ? `
+                  <span class="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[15px]">check_circle</span>
+                    <span>En Route</span>
+                  </span>
+                ` : `
+                  <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="window.simulateDonorAnswerDirectly('${d.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer active:scale-95" title="Simulate answering directly without opening modal on recipient dashboard">
+                      <span class="material-symbols-outlined text-[13px]">check</span>
+                      <span>Confirm as ${escapeHtml(d.name.split(' ')[0])}</span>
+                    </button>
+                    <button type="button" onclick="window.goToDonorPortal('${d.id}')" class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-semibold transition-all cursor-pointer" title="Switch to this donor's screen in Donor Portal to answer incoming call">
+                      <span class="material-symbols-outlined text-[14px] text-primary">open_in_new</span>
+                    </button>
+                  </div>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+// ============================================================================
+// INCOMING EMERGENCY CALL & DONOR RINGING CONTROLLER
+// ============================================================================
+
+window.openIncomingDonorCallModal = function(customDonorId) {
+  // STRICT USER CONSTRAINT: Recipient dashboard must NEVER receive incoming calls or ringing!
+  const currentHash = window.location.hash || '';
+  const isRecipientView = currentHash.includes('recipient') || 
+                          currentHash.includes('patient') || 
+                          currentHash.includes('family') ||
+                          currentHash.includes('hospital') ||
+                          window.location.pathname.includes('recipient-dashboard');
+  if (isRecipientView) {
+    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+      window.PulseAudio.stopPhoneRinging();
+    }
+    const modal = document.getElementById('modal-incoming-donor-call');
+    if (modal) modal.classList.add('hidden');
     return;
   }
 
-  container.innerHTML = arrivingDonors.map((d, idx) => `
-    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container-high hover:border-primary/40 hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${idx === 0 ? 'ring-2 ring-primary/20 bg-primary-fixed/5' : ''}">
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="w-12 h-12 rounded-2xl bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-headline-sm shrink-0 shadow-xs">
-          ${escapeHtml(d.initials || d.name.substring(0, 2).toUpperCase())}
-        </div>
-        <div class="flex flex-col min-w-0">
-          <div class="flex flex-wrap items-center gap-2">
-            <h4 class="font-title-md font-bold text-on-surface">${escapeHtml(d.name)}</h4>
-            <span class="px-2 py-0.5 rounded-full ${d.bloodGroup === 'O-' ? 'bg-error-container text-primary font-bold' : 'bg-surface-container-high text-on-surface font-bold'} text-xs">
-              ${escapeHtml(d.bloodGroup)}
-            </span>
-            <span class="px-2.5 py-0.5 rounded-full ${d.statusClass || 'bg-primary-fixed text-primary'} text-[11px] font-bold">
-              ${escapeHtml(d.transitStatus || 'En Route')}
-            </span>
-            ${idx === 0 ? '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">Fastest ETA</span>' : ''}
-          </div>
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-surface-variant mt-1">
-            <span class="flex items-center gap-1 font-semibold text-primary">
-              <span class="material-symbols-outlined text-[15px]">timer</span>
-              ETA: ${escapeHtml(d.liveEta || '14 mins')}
-            </span>
-            <span>•</span>
-            <span class="flex items-center gap-1">
-              <span class="material-symbols-outlined text-[15px] text-tertiary">near_me</span>
-              ${escapeHtml(d.landmark || 'Approaching hospital')}
-            </span>
-            <span>•</span>
-            <span>Match: 100% Compatible</span>
-          </div>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
-        <button type="button" onclick="window.verifyDonorHandshake('${recipient.handshakeOTP}', '${escapeHtml(d.name)}')" class="px-3.5 py-2 rounded-xl bg-tertiary-container/30 hover:bg-tertiary-container/50 text-tertiary font-label-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95" title="Verify Donor at Blood Bank Counter">
-          <span class="material-symbols-outlined text-[16px]">pin</span>
-          <span>Confirm Arrival</span>
-        </button>
-        <a href="tel:${escapeHtml(d.phone || '+91 98201 44521')}" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs" title="Call Donor Directly">
-          <span class="material-symbols-outlined text-[16px] text-primary">call</span>
-          <span>Call Donor</span>
-        </a>
-        <button type="button" onclick="window.showToast('Donor Line Active', 'Opening messaging link to ${escapeHtml(d.name)}', 'info')" class="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface transition-all cursor-pointer" title="Direct Message">
-          <span class="material-symbols-outlined text-[18px]">chat</span>
-        </button>
-      </div>
-    </div>
-  `).join('');
-}
+  const modal = document.getElementById('modal-incoming-donor-call');
+  if (!modal) return;
+
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : { patientName: 'Devika Sharma', bloodGroup: 'B+', component: 'Platelets (Apheresis)', unitsRequired: 3, urgency: 'Stat Emergency (< 45 Mins)', hospitalName: 'Apollo Hospitals & Apex Trauma Centre', hospitalWard: 'ICU Ward 4B, Bed 12', attendantName: 'Rajesh Sharma', attendantPhone: '+91 95280 33454', clinicalReason: 'Severe thrombocytopenia with acute hemorrhagic risk. Immediate donor-matched platelet transfusion required.' };
+
+  const reqId = recipient.requestId || 'REQ-9042';
+  const bloodGroup = recipient.bloodGroup || 'B+';
+
+  // Get available compatible donors
+  const donors = (window.PulseStore && typeof window.PulseStore.getAvailableDonors === 'function')
+    ? window.PulseStore.getAvailableDonors(reqId, bloodGroup)
+    : [];
+
+  let targetDonor = null;
+  if (customDonorId) {
+    targetDonor = donors.find(d => d.id === customDonorId);
+  }
+  if (!targetDonor) {
+    targetDonor = donors.find(d => !d.confirmed && d.callStatus !== 'declined') || donors[0] || {
+      id: 'D-102',
+      name: 'Ananya Sharma',
+      bloodGroup: bloodGroup,
+      phone: '+91 98452 33109',
+      distance: 1.8,
+      liveEta: '18 mins'
+    };
+  }
+
+  // Update store active incoming call
+  if (window.PulseStore && typeof window.PulseStore.setActiveIncomingCall === 'function') {
+    window.PulseStore.setActiveIncomingCall({
+      requestId: reqId,
+      patientName: recipient.patientName,
+      bloodGroup: recipient.bloodGroup,
+      component: recipient.component,
+      unitsRequired: recipient.unitsRequired,
+      urgency: recipient.urgency,
+      hospitalName: recipient.hospitalName,
+      hospitalWard: recipient.hospitalWard,
+      attendantName: recipient.attendantName,
+      attendantPhone: recipient.attendantPhone,
+      clinicalReason: recipient.clinicalReason,
+      donorId: targetDonor.id,
+      donorName: targetDonor.name,
+      donorPhone: targetDonor.phone,
+      donorBloodGroup: targetDonor.bloodGroup,
+      donorDistance: targetDonor.distance,
+      donorEta: targetDonor.liveEta || targetDonor.eta || '18 mins',
+      status: 'ringing',
+      timestamp: Date.now()
+    });
+  }
+
+  // Set Modal Field Contents
+  const setTxt = (id, text) => {
+    const el = document.getElementById(id);
+    if (el && text !== undefined) el.textContent = text;
+  };
+
+  setTxt('call-donor-name', targetDonor.name);
+  setTxt('call-donor-blood', `${targetDonor.bloodGroup} Volunteer Donor`);
+  setTxt('call-donor-phone', targetDonor.phone || '+91 98452 33109');
+  setTxt('call-donor-distance', `${targetDonor.distance} km away`);
+  setTxt('call-hospital-name', recipient.hospitalName);
+  setTxt('call-hospital-ward', `${recipient.hospitalWard} • Emergency Wing`);
+  setTxt('call-urgency-badge', recipient.urgency || 'Stat Emergency (< 45 Mins)');
+  setTxt('call-patient-name', recipient.patientName);
+  setTxt('call-patient-meta', `${recipient.patientAge || 32} Yrs / ${recipient.patientGender || 'Female'}`);
+  setTxt('call-blood-units-needed', `${recipient.bloodGroup} ${recipient.component} (${recipient.unitsRequired} Units)`);
+  setTxt('call-attendant-info', `${recipient.attendantName} (${recipient.attendantPhone})`);
+  setTxt('call-clinical-reason', `"${recipient.clinicalReason || 'Urgent clinical blood request for patient.'}"`);
+  setTxt('docked-donor-text', `Ringing ${targetDonor.name} (${targetDonor.bloodGroup})`);
+
+  // Populate Target Donor Dropdown
+  const select = document.getElementById('call-target-donor-select');
+  if (select) {
+    select.innerHTML = donors.map(d => `
+      <option value="${escapeHtml(d.id)}" ${d.id === targetDonor.id ? 'selected' : ''}>
+        ${escapeHtml(d.name)} (${escapeHtml(d.bloodGroup)} - ${d.distance} km) ${d.confirmed ? '✅ Confirmed' : ''}
+      </option>
+    `).join('');
+  }
+
+  // Start Phone Ringing Sound via Web Audio API!
+  if (window.PulseAudio && typeof window.PulseAudio.startPhoneRinging === 'function') {
+    window.PulseAudio.startPhoneRinging({ donorName: targetDonor.name });
+  }
+
+  // Hide docked bar if open
+  const docked = document.getElementById('docked-ringing-call-indicator');
+  if (docked) docked.classList.add('hidden');
+
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+};
+
+window.closeIncomingDonorCallModal = function() {
+  const modal = document.getElementById('modal-incoming-donor-call');
+  if (modal) modal.classList.add('hidden');
+  const docked = document.getElementById('docked-ringing-call-indicator');
+  if (docked) docked.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+
+  if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+    window.PulseAudio.stopPhoneRinging();
+  }
+};
+
+window.minimizeIncomingCall = function() {
+  const modal = document.getElementById('modal-incoming-donor-call');
+  if (modal) modal.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+
+  const docked = document.getElementById('docked-ringing-call-indicator');
+  if (docked) docked.classList.remove('hidden');
+};
+
+window.expandIncomingCall = function() {
+  const docked = document.getElementById('docked-ringing-call-indicator');
+  if (docked) docked.classList.add('hidden');
+  const modal = document.getElementById('modal-incoming-donor-call');
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+  }
+};
+
+window.toggleCallRingtoneMute = function() {
+  if (window.PulseAudio && typeof window.PulseAudio.toggleMute === 'function') {
+    const isMuted = window.PulseAudio.toggleMute();
+    const icon = document.getElementById('icon-call-mute');
+    if (icon) icon.textContent = isMuted ? 'volume_off' : 'volume_up';
+    if (window.showToast) {
+      window.showToast(isMuted ? 'Ringtone Muted' : 'Ringtone Unmuted', isMuted ? 'Sound muted while emergency call visual alert remains active.' : 'Ringtone sound restored.', 'info');
+    }
+  }
+};
+
+window.switchCallTargetDonor = function(donorId) {
+  window.openIncomingDonorCallModal(donorId);
+};
+
+window.confirmActiveDonorAvailability = function(explicitDonorId) {
+  const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
+    ? window.PulseStore.getActiveIncomingCall()
+    : null;
+  const donorId = explicitDonorId || (activeCall ? activeCall.donorId : 'D-102');
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+  const reqId = recipient ? recipient.requestId : 'REQ-9042';
+
+  // 1. Stop Ringing Audio
+  if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+    window.PulseAudio.stopPhoneRinging();
+  }
+
+  // 2. Play Uplifting Confirmation Chime
+  if (window.PulseAudio && typeof window.PulseAudio.playConfirmationChime === 'function') {
+    window.PulseAudio.playConfirmationChime();
+  }
+
+  // 3. Confirm in Store
+  let confirmedDonorName = 'Volunteer Donor';
+  if (window.PulseStore && typeof window.PulseStore.confirmDonorAvailability === 'function') {
+    const res = window.PulseStore.confirmDonorAvailability(reqId, donorId);
+    if (res && res.donor) {
+      confirmedDonorName = res.donor.name;
+    }
+  }
+
+  // 4. Close Modal
+  window.closeIncomingDonorCallModal();
+
+  // 5. Show Celebration Toast
+  if (window.showToast) {
+    window.showToast(
+      '🎉 Availability Confirmed!',
+      `${confirmedDonorName} confirmed availability for ${recipient ? recipient.patientName : 'patient'} and is now En Route to hospital!`,
+      'success'
+    );
+  }
+
+  // 6. Re-Render Recipient Dashboard
+  if (typeof window.renderRecipientDashboard === 'function') {
+    window.renderRecipientDashboard();
+  }
+
+  // 7. Scroll smoothly to confirmed donors section if visible
+  const sec = document.getElementById('recipient-donors-section');
+  if (sec) {
+    sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+};
+
+window.declineActiveDonorCall = function(explicitDonorId) {
+  const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
+    ? window.PulseStore.getActiveIncomingCall()
+    : null;
+  const donorId = explicitDonorId || (activeCall ? activeCall.donorId : 'D-102');
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+  const reqId = recipient ? recipient.requestId : 'REQ-9042';
+
+  // Stop Ringing Audio
+  if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+    window.PulseAudio.stopPhoneRinging();
+  }
+  // Play decline tone
+  if (window.PulseAudio && typeof window.PulseAudio.playDeclineTone === 'function') {
+    window.PulseAudio.playDeclineTone();
+  }
+
+  let nextDonor = null;
+  if (window.PulseStore && typeof window.PulseStore.declineDonorCall === 'function') {
+    const res = window.PulseStore.declineDonorCall(reqId, donorId);
+    if (res && res.nextDonor) nextDonor = res.nextDonor;
+  }
+
+  if (nextDonor) {
+    if (window.showToast) {
+      window.showToast('Donor Busy', `Donor declined. Now ringing next proximate volunteer: ${nextDonor.name} (${nextDonor.bloodGroup}).`, 'info');
+    }
+    // Switch call to next donor!
+    setTimeout(() => {
+      window.openIncomingDonorCallModal(nextDonor.id);
+    }, 400);
+  } else {
+    window.closeIncomingDonorCallModal();
+    if (window.showToast) {
+      window.showToast('Call Concluded', 'All contacted donors have responded. Requisition remains broadcasted on standby grid.', 'info');
+    }
+    if (typeof window.renderRecipientDashboard === 'function') {
+      window.renderRecipientDashboard();
+    }
+  }
+};
+
+window.simulateFirstDonorAnswer = function() {
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+  const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
+  const reqId = recipient ? recipient.requestId : 'REQ-9042';
+  const available = (window.PulseStore && typeof window.PulseStore.getAvailableDonors === 'function')
+    ? window.PulseStore.getAvailableDonors(reqId, bloodGroup)
+    : [];
+
+  const target = available.find(d => !d.confirmed) || available[0];
+  if (!target) {
+    if (window.showToast) window.showToast('No Donors Pending', 'All proximate volunteer donors have already responded.', 'info');
+    return;
+  }
+  window.simulateDonorAnswerDirectly(target.id);
+};
+
+window.simulateDonorAnswerDirectly = function(donorId) {
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+  const reqId = recipient ? recipient.requestId : 'REQ-9042';
+
+  if (window.PulseStore && typeof window.PulseStore.confirmDonorAvailability === 'function') {
+    const res = window.PulseStore.confirmDonorAvailability(reqId, donorId);
+    if (res && res.donor) {
+      if (window.PulseAudio && typeof window.PulseAudio.playConfirmationChime === 'function') {
+        window.PulseAudio.playConfirmationChime();
+      }
+      if (window.showToast) {
+        window.showToast(
+          '🎉 Donor Confirmed Availability!',
+          `${res.donor.name} (${res.donor.bloodGroup}) accepted the emergency requisition! Transit telemetry and arrival PIN verification are now active.`,
+          'success'
+        );
+      }
+      if (typeof window.renderRecipientDashboard === 'function') {
+        window.renderRecipientDashboard();
+      }
+    }
+  }
+};
+
+window.goToDonorPortal = function(donorId) {
+  if (donorId && window.PulseStore && typeof window.PulseStore.switchActiveDonor === 'function') {
+    window.PulseStore.switchActiveDonor(donorId);
+  }
+  if (window.PulseRouter) {
+    window.PulseRouter.navigate('donor-dashboard');
+  } else {
+    window.location.href = 'index.html#/donor-dashboard';
+  }
+};
+
+window.switchActiveDonorProfile = function(donorId) {
+  if (window.PulseStore && typeof window.PulseStore.switchActiveDonor === 'function') {
+    const updated = window.PulseStore.switchActiveDonor(donorId);
+    if (updated) {
+      if (window.showToast) {
+        window.showToast('Active Donor Switched', `Now logged in as ${updated.fullName} (${updated.bloodGroup}).`, 'info');
+      }
+      renderDonorDashboard();
+      setTimeout(() => {
+        if (typeof window.checkAndRingMatchedDonor === 'function') {
+          window.checkAndRingMatchedDonor();
+        }
+      }, 150);
+    }
+  }
+};
+
+window.checkAndRingMatchedDonor = function() {
+  const currentHash = window.location.hash || '';
+  const isRecipientView = currentHash.includes('recipient') || 
+                          currentHash.includes('patient') || 
+                          currentHash.includes('family') ||
+                          currentHash.includes('hospital') ||
+                          window.location.pathname.includes('recipient-dashboard');
+
+  if (isRecipientView) {
+    // RECIPIENT DASHBOARD: NEVER RING, NEVER POP UP!
+    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+      window.PulseAudio.stopPhoneRinging();
+    }
+    const modal = document.getElementById('modal-incoming-donor-call');
+    if (modal) modal.classList.add('hidden');
+    const docked = document.getElementById('docked-ringing-call-indicator');
+    if (docked) docked.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+    return;
+  }
+
+  // Only check and ring if user is on donor view
+  const isDonorView = currentHash.includes('donor') || 
+                      document.getElementById('view-donor-dashboard')?.classList.contains('active');
+  if (!isDonorView) return;
+
+  const donor = window.PulseStore ? window.PulseStore.getDonor() : null;
+  if (!donor) return;
+
+  const recipient = window.PulseStore ? window.PulseStore.getRecipient() : null;
+  if (!recipient) return;
+
+  const reqId = recipient.requestId || 'REQ-9042';
+
+  // 1. Check blood compatibility
+  const isCompat = window.PulseStore.isBloodCompatible(donor.bloodGroup, recipient.bloodGroup);
+  if (!isCompat) {
+    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+      window.PulseAudio.stopPhoneRinging();
+    }
+    const modal = document.getElementById('modal-incoming-donor-call');
+    if (modal) modal.classList.add('hidden');
+    return;
+  }
+
+  // 2. Check donor availability
+  if (donor.availability === false) {
+    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+      window.PulseAudio.stopPhoneRinging();
+    }
+    const modal = document.getElementById('modal-incoming-donor-call');
+    if (modal) modal.classList.add('hidden');
+    return;
+  }
+
+  // 3. Check status in current request
+  const donorStatus = window.PulseStore.getDonorCallStatus(reqId, donor.id);
+  if (donorStatus === 'confirmed' || donorStatus === 'declined') {
+    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+      window.PulseAudio.stopPhoneRinging();
+    }
+    const modal = document.getElementById('modal-incoming-donor-call');
+    if (modal) modal.classList.add('hidden');
+    return;
+  }
+
+  // Ring and pop up call specifically for THIS individual matched donor!
+  window.openIncomingDonorCallModal(donor.id);
+};
+
+window.triggerDemoReRing = function() {
+  window.simulateFirstDonorAnswer();
+};
 
 function renderRecipientTrackingSection(recipient) {
   const container = document.getElementById('recipient-stepper-container');
