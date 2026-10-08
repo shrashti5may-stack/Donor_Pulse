@@ -261,167 +261,70 @@ const DEFAULT_STATE = {
   // Currently active request selected for confirmation & tracking
   selectedRequestId: 'REQ-9042',
 
-  // Mock Pool of Registered Donors with Indian Phone Format & Metro Travel
+  // Registered Donors Pool (Strict Registered User Model)
   matchedDonorsPool: [
     {
-      id: 'D-101',
-      name: 'Deepak Kumar',
-      initials: 'DK',
-      bloodGroup: 'B+',
-      phone: '+91 98201 44521',
-      distance: 1.4,
-      matchScore: 100,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: true,
-      accepted: true,
-      eta: '25 mins',
-      lastDonation: 'Aug 12, 2026'
-    },
-    {
-      id: 'D-102',
+      id: 'user_donor_001',
+      _id: 'user_donor_001',
       name: 'Ananya Sharma',
       initials: 'AS',
-      bloodGroup: 'O-',
       phone: '+91 98452 33109',
+      isPhoneVerified: true,
+      bloodGroup: 'O-',
+      role: 'DONOR',
+      coordinates: { type: 'Point', coordinates: [77.6412, 12.9716] },
+      isAvailable: true,
+      lastDonationDate: '2026-06-18',
       distance: 1.8,
       matchScore: 98,
       availability: 'Active / On Call',
       eligibility: 'Eligible Now',
       verified: true,
       notified: true,
-      accepted: true,
-      eta: '18 mins',
-      lastDonation: 'Sep 18, 2026'
+      accepted: false,
+      eta: '18 mins'
     },
     {
-      id: 'D-103',
+      id: 'user_donor_002',
+      _id: 'user_donor_002',
+      name: 'Deepak Kumar',
+      initials: 'DK',
+      phone: '+91 98201 44521',
+      isPhoneVerified: true,
+      bloodGroup: 'B+',
+      role: 'DONOR',
+      coordinates: { type: 'Point', coordinates: [77.6010, 12.9050] },
+      isAvailable: true,
+      lastDonationDate: null,
+      distance: 2.5,
+      matchScore: 100,
+      availability: 'Active / On Call',
+      eligibility: 'Eligible Now',
+      verified: true,
+      notified: true,
+      accepted: true,
+      eta: '25 mins'
+    },
+    {
+      id: 'user_donor_003',
+      _id: 'user_donor_003',
       name: 'Kavita Rao',
       initials: 'KR',
-      bloodGroup: 'O-',
       phone: '+91 97112 88764',
-      distance: 2.8,
+      isPhoneVerified: true,
+      bloodGroup: 'O+',
+      role: 'DONOR',
+      coordinates: { type: 'Point', coordinates: [77.5900, 12.9100] },
+      isAvailable: true,
+      lastDonationDate: '2026-05-10',
+      distance: 4.1,
       matchScore: 95,
       availability: 'Active / On Call',
       eligibility: 'Eligible Now',
       verified: true,
-      notified: true,
-      accepted: false,
-      eta: '32 mins',
-      lastDonation: 'Jul 05, 2026'
-    },
-    {
-      id: 'D-104',
-      name: 'Manoj Tiwari',
-      initials: 'MT',
-      bloodGroup: 'B+',
-      phone: '+91 99341 22987',
-      distance: 3.5,
-      matchScore: 100,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: true,
-      accepted: true,
-      eta: 'Slot: 3:30 PM',
-      lastDonation: 'May 28, 2026'
-    },
-    {
-      id: 'D-105',
-      name: 'Chaitali Banerjee',
-      initials: 'CB',
-      bloodGroup: 'A-',
-      phone: '+91 98765 12043',
-      distance: 4.1,
-      matchScore: 85,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
       notified: false,
       accepted: false,
-      eta: '40 mins',
-      lastDonation: 'Mar 19, 2026'
-    },
-    {
-      id: 'D-106',
-      name: 'Lakshman Patel',
-      initials: 'LP',
-      bloodGroup: 'O+',
-      phone: '+91 98190 77621',
-      distance: 4.7,
-      matchScore: 90,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: false,
-      accepted: false,
-      eta: '35 mins',
-      lastDonation: 'Nov 30, 2025'
-    },
-    {
-      id: 'D-107',
-      name: 'Rohan Mehta',
-      initials: 'RM',
-      bloodGroup: 'O-',
-      phone: '+91 98334 55120',
-      distance: 3.2,
-      matchScore: 96,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: true,
-      accepted: true,
-      eta: '22 mins',
-      lastDonation: 'Aug 02, 2025'
-    },
-    {
-      id: 'D-108',
-      name: 'Aarav Sen',
-      initials: 'AS',
-      bloodGroup: 'O-',
-      phone: '+91 97690 11438',
-      distance: 4.5,
-      matchScore: 94,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: false,
-      accepted: false,
-      eta: '45 mins',
-      lastDonation: 'Apr 29, 2025'
-    },
-    {
-      id: 'D-109',
-      name: 'Vikram Singhania',
-      initials: 'VS',
-      bloodGroup: 'B+',
-      phone: '+91 98210 99823',
-      distance: 2.1,
-      matchScore: 100,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: true,
-      accepted: true,
-      eta: '15 mins',
-      lastDonation: 'Dec 01, 2024'
-    },
-    {
-      id: 'D-110',
-      name: 'Pooja Verma',
-      initials: 'PV',
-      bloodGroup: 'B-',
-      phone: '+91 99872 66341',
-      distance: 3.8,
-      matchScore: 92,
-      availability: 'Active / On Call',
-      eligibility: 'Eligible Now',
-      verified: true,
-      notified: false,
-      accepted: false,
-      eta: '28 mins',
-      lastDonation: 'Aug 18, 2024'
+      eta: '32 mins'
     }
   ],
 
@@ -1020,7 +923,7 @@ class Store {
       attendantName,
       attendantPhone,
       clinicalReason,
-      donorId: primaryDonor ? primaryDonor.id : 'D-102',
+      donorId: primaryDonor ? primaryDonor.id : 'user_donor_001',
       donorName: primaryDonor ? primaryDonor.name : 'Ananya Sharma',
       donorPhone: primaryDonor ? primaryDonor.phone : '+91 98452 33109',
       donorBloodGroup: primaryDonor ? primaryDonor.bloodGroup : 'O-',
@@ -1029,6 +932,32 @@ class Store {
       status: 'ringing',
       timestamp: Date.now()
     };
+
+    // Asynchronously sync with backend API pipeline (/api/requests)
+    if (typeof fetch !== 'undefined') {
+      fetch('/api/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientId: data.patientId || 'user_patient_001',
+          bloodGroupNeeded: bloodGroup,
+          unitsNeeded: units,
+          hospitalName: hospitalName,
+          hospitalAddress: newPatient.hospitalAddress,
+          doctorRegNumber: data.doctorRegId || 'NMC/KMC-48921',
+          prescriptionDocumentUrl: data.proofFileName || 'https://storage.donorpulse.in/prescriptions/req27c.pdf',
+          coordinates: [77.5983, 12.8958]
+        })
+      }).then(r => r.json()).then(res => {
+        if (res && res.success && res.matchedDonorsCount !== undefined) {
+          newReq.matchedCount = res.matchedDonorsCount;
+          this.saveState();
+          this.notify();
+        }
+      }).catch(err => {
+        console.warn('API pipeline sync notice:', err);
+      });
+    }
 
     this.saveState();
 

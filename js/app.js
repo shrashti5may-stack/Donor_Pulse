@@ -2173,11 +2173,21 @@ function renderDonorDashboard() {
         <div class="p-3 rounded-2xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3">
           <div class="flex items-center gap-2 text-xs text-on-surface-variant font-medium">
             <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
-            <span>No emergency requests matching your blood type (<strong>${escapeHtml(donor.bloodGroup)}</strong>) right now. Active hospital case is for <strong>${escapeHtml(recipient.bloodGroup)}</strong>.</span>
+            <span>No active requests matching your profile in your area.</span>
           </div>
         </div>
       `;
     }
+  } else if (missionBanner) {
+    missionBanner.classList.remove('hidden');
+    missionBanner.innerHTML = `
+      <div class="p-3 rounded-2xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 text-xs text-on-surface-variant font-medium">
+          <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
+          <span>No active requests matching your profile in your area.</span>
+        </div>
+      </div>
+    `;
   }
 
   // Check and ring if user is active donor and matched!

@@ -1,11 +1,87 @@
+const express = require('express');
 const http = require('http');
-const fs = require('fs');
 const path = require('path');
-const url = require('url');
+const cors = require('cors');
+const fs = require('fs');
+
+let mongoose;
+try {
+  mongoose = require('mongoose');
+} catch (e) {
+  mongoose = null;
+}
+
+let Server;
+try {
+  Server = require('socket.io').Server;
+} catch (e) {
+  Server = null;
+}
 
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
 const PUBLIC_DIR = __dirname;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/donorpulse';
 
+const app = express();
+const server = http.createServer(app);
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Setup Socket.io if available
+let io = null;
+if (Server) {
+  io = new Server(server, {
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST']
+    }
+  });
+
+  io.on('connection', (socket) => {
+    // 4. Selective Real-Time Event Routing:
+    // Do not broadcast globally to the 'donors' room.
+    // Each connected donor must join a private room identified by their database ID: `socket.join("user_" + donorUser._id)`
+    socket.on('join_room', (room) => {
+      if (typeof room === 'string' && room.startsWith('user_')) {
+        socket.join(room);
+      }
+    });
+
+    socket.on('authenticate', (data) => {
+      if (data && (data.userId || data._id || data.id)) {
+        const id = data.userId || data._id || data.id;
+        socket.join(`user_${id}`);
+      }
+    });
+
+    socket.on('disconnect', () => {
+      // Clean disconnect
+    });
+  });
+}
+
+// Connect to MongoDB
+if (mongoose) {
+  mongoose.connect(MONGODB_URI)
+    .then(() => {
+      console.log('Connected to MongoDB database (DonorPulse)');
+    })
+    .catch((err) => {
+      console.warn('MongoDB connection note: Running in database-ready mode (' + err.message + ')');
+    });
+}
+
+// Mount Request Routes
+try {
+  const createRequestRouter = require('./routes/requestRoutes');
+  app.use('/api/requests', createRequestRouter(io));
+} catch (err) {
+  console.warn('Request routes router initialization note:', err.message);
+}
+
+// MIME Types for static files
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -24,73 +100,51 @@ const MIME_TYPES = {
   '.otf': 'font/otf'
 };
 
-function serveFile(res, filePath, contentType) {
-  fs.readFile(filePath, (err, content) => {
-    if (err) {
-      res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-      res.end('500 - Internal Server Error');
-      return;
-    }
-    res.writeHead(200, {
-      'Content-Type': contentType,
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Access-Control-Allow-Origin': '*'
-    });
-    res.end(content);
-  });
-}
-
-const server = http.createServer((req, res) => {
-  const parsedUrl = url.parse(req.url);
-  let pathname = decodeURIComponent(parsedUrl.pathname);
-
-  // Normalize pathname to prevent directory traversal
-  let safePath = path.normalize(path.join(PUBLIC_DIR, pathname));
-
-  // Security check: ensure path stays within PUBLIC_DIR
-  if (!safePath.startsWith(PUBLIC_DIR)) {
-    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
-    res.end('403 - Forbidden');
-    return;
+// Static File Serving & Clean URLs
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return next();
   }
 
-  // Check if target is a directory or path ends with '/'
+  const cleanPath = req.path;
+  let safePath = path.normalize(path.join(PUBLIC_DIR, cleanPath));
+
+  if (!safePath.startsWith(PUBLIC_DIR)) {
+    return res.status(403).send('403 - Forbidden');
+  }
+
   if (fs.existsSync(safePath) && fs.statSync(safePath).isDirectory()) {
     safePath = path.join(safePath, 'index.html');
   }
 
-  // Check exact file existence
   if (fs.existsSync(safePath) && fs.statSync(safePath).isFile()) {
     const ext = path.extname(safePath).toLowerCase();
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-    serveFile(res, safePath, contentType);
-    return;
+    res.setHeader('Content-Type', MIME_TYPES[ext] || 'application/octet-stream');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    return res.sendFile(safePath);
   }
 
-  // Clean URLs support: try appending .html (e.g. /role-selection -> role-selection.html)
   const htmlPath = safePath + '.html';
   if (fs.existsSync(htmlPath) && fs.statSync(htmlPath).isFile()) {
-    serveFile(res, htmlPath, MIME_TYPES['.html']);
-    return;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.sendFile(htmlPath);
   }
 
-  // SPA fallback to index.html for unknown paths
   const indexPath = path.join(PUBLIC_DIR, 'index.html');
   if (fs.existsSync(indexPath)) {
-    serveFile(res, indexPath, MIME_TYPES['.html']);
-    return;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.sendFile(indexPath);
   }
 
-  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-  res.end('404 - Not Found');
+  return res.status(404).send('404 - Not Found');
 });
 
 function startServer(port) {
   server.listen(port, () => {
     console.log(`\n======================================================`);
-    console.log(`  DonorPulse Web Server is Running!`);
+    console.log(`  DonorPulse Server is Running!`);
     console.log(`  Local URL:   http://localhost:${port}`);
-    console.log(`  Directory:   ${PUBLIC_DIR}`);
+    console.log(`  Pipeline:    Strict Compatibility & Proximity Active`);
     console.log(`======================================================\n`);
   });
 
@@ -104,4 +158,8 @@ function startServer(port) {
   });
 }
 
-startServer(DEFAULT_PORT);
+if (require.main === module) {
+  startServer(DEFAULT_PORT);
+}
+
+module.exports = { app, server, io };

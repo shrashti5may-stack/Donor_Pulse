@@ -7,10 +7,19 @@
     "start": "node server.js",
     "dev": "node server.js"
   },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.3.4",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5"
+  },
   "keywords": [
     "blood-donation",
     "healthcare",
-    "haemovigilance"
+    "haemovigilance",
+    "socketio",
+    "realtime-matching"
   ],
   "author": "",
   "license": "ISC"
