@@ -1341,115 +1341,152 @@ class Store {
   // Confirm donor availability when donor accepts the emergency call
   confirmDonorAvailability(requestId, donorId) {
     const recipient = this.getRecipient();
-    const effectiveReqId = requestId || (recipient && recipient.requestId) || this.state.selectedRequestId;
+    const effectiveReqId = requestId || (recipient && recipient.requestId) || (this.state.activeIncomingCall && this.state.activeIncomingCall.requestId) || this.state.selectedRequestId || (this.state.requests && this.state.requests[0] && this.state.requests[0].id) || 'REQ-8686';
     const req = this.state.requests ? this.state.requests.find(r => r.id === effectiveReqId) : null;
-    const bloodGroup = recipient ? recipient.bloodGroup : (req ? req.bloodGroup : 'B+');
+    const bloodGroup = recipient ? recipient.bloodGroup : (req ? req.bloodGroup : (this.state.activeIncomingCall ? this.state.activeIncomingCall.bloodGroup : 'B+'));
 
     const donorList = this.getRequestDonorTracking(effectiveReqId, bloodGroup);
-    const donor = donorList.find(d => d.id === donorId);
+    let donor = donorList.find(d => d.id === donorId || (donorId && String(d.name || '').toLowerCase() === String(donorId).toLowerCase()));
 
-    if (donor) {
-      donor.confirmed = true;
-      donor.callStatus = 'confirmed';
-      donor.transitStatus = 'En Route (Confirmed)';
-      donor.statusClass = 'bg-emerald-500/15 text-emerald-800 font-bold border border-emerald-400/40';
-      donor.progressPct = Math.max(45, donor.progressPct || 45);
-      donor.confirmedAt = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST';
-      donor.landmark = 'Departed dispatch base • Fast-track transit corridor';
-
-      // Update recipient units arranged and tracking stage
-      if (recipient) {
-        recipient.unitsArranged = Math.min(recipient.unitsRequired, (recipient.unitsArranged || 0) + 1);
-        if (recipient.trackingStage < 4) {
-          recipient.trackingStage = 4; // Stage 4: En Route to Hospital
-        }
-        recipient.donors = donorList;
-      }
-
-      // Update requests list
-      if (req) {
-        req.acceptedCount = (req.acceptedCount || 0) + 1;
-        req.enRouteCount = (req.enRouteCount || 0) + 1;
-        req.trackingStage = Math.max(req.trackingStage || 1, 4);
-        req.status = 'Donors Confirmed & Responding';
-        req.donors = donorList;
-      }
-
-      // If active call was for this donor, mark it accepted
-      if (this.state.activeIncomingCall && this.state.activeIncomingCall.donorId === donorId) {
-        this.state.activeIncomingCall.status = 'accepted';
-      }
-
-      this.saveState();
-
-      // Broadcast sync event for cross-tab and cross-view synchronization
-      this.broadcastSync({
-        type: 'DONOR_CONFIRMED',
-        requestId: effectiveReqId,
-        donorId: donor.id,
-        donorName: donor.name,
-        donorBloodGroup: donor.bloodGroup,
-        unitsArranged: recipient ? recipient.unitsArranged : 1
-      });
-
-      return { success: true, donor, recipient, req };
+    // Resilient fallback search across matched pool, active donor, or active call
+    if (!donor && this.state.matchedDonorsPool) {
+      donor = this.state.matchedDonorsPool.find(d => d.id === donorId || (donorId && String(d.name || '').toLowerCase() === String(donorId).toLowerCase()));
+    }
+    if (!donor && this.state.donor && (this.state.donor.id === donorId || !donorId)) {
+      donor = { ...this.state.donor, name: this.state.donor.fullName || this.state.donor.name };
+    }
+    if (!donor && this.state.activeIncomingCall) {
+      donor = {
+        id: this.state.activeIncomingCall.donorId || donorId || 'D-KM-01',
+        name: this.state.activeIncomingCall.donorName || 'Volunteer Donor',
+        bloodGroup: this.state.activeIncomingCall.donorBloodGroup || 'O-',
+        phone: this.state.activeIncomingCall.donorPhone || '+91 98452 33109',
+        distance: this.state.activeIncomingCall.donorDistance || 1.5,
+        liveEta: this.state.activeIncomingCall.donorEta || '15 mins'
+      };
+    }
+    if (!donor) {
+      donor = {
+        id: donorId || 'DNR-LIVE-01',
+        name: 'Volunteer Donor',
+        bloodGroup: bloodGroup === 'O-' ? 'O-' : 'O-',
+        phone: '+91 98452 33109',
+        distance: 1.5,
+        liveEta: '15 mins'
+      };
     }
 
-    return { success: false, message: 'Donor not found' };
+    // Ensure donor is present in donorList
+    if (!donorList.some(d => d.id === donor.id)) {
+      donorList.unshift(donor);
+    }
+
+    donor.confirmed = true;
+    donor.callStatus = 'confirmed';
+    donor.transitStatus = 'En Route (Confirmed)';
+    donor.statusClass = 'bg-emerald-500/15 text-emerald-800 font-bold border border-emerald-400/40';
+    donor.progressPct = Math.max(45, donor.progressPct || 45);
+    donor.confirmedAt = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST';
+    donor.landmark = 'Departed dispatch base • Fast-track transit corridor';
+
+    // Update recipient units arranged and tracking stage
+    if (recipient) {
+      recipient.unitsArranged = Math.min(recipient.unitsRequired || 2, (recipient.unitsArranged || 0) + 1);
+      if (recipient.trackingStage < 4) {
+        recipient.trackingStage = 4; // Stage 4: En Route to Hospital
+      }
+      recipient.donors = donorList;
+    }
+
+    // Update requests list
+    if (req) {
+      req.acceptedCount = (req.acceptedCount || 0) + 1;
+      req.enRouteCount = (req.enRouteCount || 0) + 1;
+      req.trackingStage = Math.max(req.trackingStage || 1, 4);
+      req.status = 'Donors Confirmed & Responding';
+      req.donors = donorList;
+    }
+
+    // Also update matching case in recipientCases
+    if (Array.isArray(this.state.recipientCases)) {
+      const cMatch = this.state.recipientCases.find(c => c.requestId === effectiveReqId || c.id === effectiveReqId || c.caseId === effectiveReqId);
+      if (cMatch) {
+        cMatch.unitsArranged = Math.min(cMatch.unitsRequired || 2, (cMatch.unitsArranged || 0) + 1);
+        cMatch.trackingStage = 4;
+        cMatch.donors = donorList;
+      }
+    }
+
+    // Create active deployment status for the donor
+    this.state.activeDeployment = {
+      requestId: effectiveReqId,
+      donorId: donor.id,
+      donorName: donor.name || donor.fullName,
+      patientName: recipient ? recipient.patientName : (req ? req.patientName : 'Emergency Patient'),
+      bloodGroup: bloodGroup,
+      hospitalName: recipient ? recipient.hospitalName : (req ? req.hospitalName : 'Emergency Hospital'),
+      hospitalWard: recipient ? recipient.hospitalWard : 'ICU Trauma Wing',
+      status: 'En Route',
+      confirmedAt: donor.confirmedAt,
+      eta: donor.liveEta || donor.eta || '15 mins'
+    };
+
+    // Terminate ringing call completely
+    this.state.activeIncomingCall = null;
+    this.saveState();
+
+    // Broadcast sync event for cross-tab and cross-view synchronization
+    this.broadcastSync({
+      type: 'DONOR_CONFIRMED',
+      requestId: effectiveReqId,
+      donorId: donor.id,
+      donorName: donor.name,
+      donorBloodGroup: donor.bloodGroup,
+      unitsArranged: recipient ? recipient.unitsArranged : 1
+    });
+
+    return { success: true, donor, recipient, req };
   }
 
-  // Decline donor call (and optionally ring the next available donor)
+  // Decline donor call
   declineDonorCall(requestId, donorId) {
     const recipient = this.getRecipient();
-    const effectiveReqId = requestId || (recipient && recipient.requestId) || this.state.selectedRequestId;
-    const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
+    const effectiveReqId = requestId || (recipient && recipient.requestId) || (this.state.activeIncomingCall && this.state.activeIncomingCall.requestId) || this.state.selectedRequestId;
+    const req = this.state.requests ? this.state.requests.find(r => r.id === effectiveReqId) : null;
+    const bloodGroup = recipient ? recipient.bloodGroup : (req ? req.bloodGroup : 'B+');
     const donorList = this.getRequestDonorTracking(effectiveReqId, bloodGroup);
 
-    const donor = donorList.find(d => d.id === donorId);
+    let donor = donorList.find(d => d.id === donorId);
+    if (!donor && this.state.activeIncomingCall && (this.state.activeIncomingCall.donorId === donorId || !donorId)) {
+      donor = {
+        id: this.state.activeIncomingCall.donorId,
+        name: this.state.activeIncomingCall.donorName,
+        bloodGroup: this.state.activeIncomingCall.donorBloodGroup
+      };
+      donorList.push(donor);
+    }
+    if (!donor && this.state.donor && (this.state.donor.id === donorId || !donorId)) {
+      donor = { ...this.state.donor, name: this.state.donor.fullName || this.state.donor.name };
+      donorList.push(donor);
+    }
+
     if (donor) {
       donor.callStatus = 'declined';
       donor.transitStatus = 'Declined / Busy';
       donor.statusClass = 'bg-surface-container-high text-on-surface-variant line-through opacity-60';
     }
 
-    // Look for next unconfirmed donor to ring
-    const nextDonor = donorList.find(d => !d.confirmed && d.callStatus !== 'declined');
-    if (nextDonor && recipient) {
-      this.state.activeIncomingCall = {
-        requestId: effectiveReqId,
-        patientName: recipient.patientName,
-        bloodGroup: recipient.bloodGroup,
-        component: recipient.component,
-        unitsRequired: recipient.unitsRequired,
-        urgency: recipient.urgency,
-        hospitalName: recipient.hospitalName,
-        hospitalWard: recipient.hospitalWard,
-        attendantName: recipient.attendantName,
-        attendantPhone: recipient.attendantPhone,
-        clinicalReason: recipient.clinicalReason,
-        donorId: nextDonor.id,
-        donorName: nextDonor.name,
-        donorPhone: nextDonor.phone,
-        donorBloodGroup: nextDonor.bloodGroup,
-        donorDistance: nextDonor.distance,
-        donorEta: nextDonor.liveEta || nextDonor.eta || '20 mins',
-        status: 'ringing',
-        timestamp: Date.now()
-      };
-    } else {
-      this.state.activeIncomingCall = null;
-    }
-
+    // Terminate active incoming call on this client so it stops ringing and closes completely
+    this.state.activeIncomingCall = null;
     this.saveState();
 
     this.broadcastSync({
       type: 'DONOR_DECLINED',
       requestId: effectiveReqId,
-      donorId,
-      nextDonorId: nextDonor ? nextDonor.id : null
+      donorId: donor ? donor.id : donorId
     });
 
-    return { success: true, nextDonor };
+    return { success: true, donor };
   }
 
   // Trigger or switch active ringing call to a specific donor

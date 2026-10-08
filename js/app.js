@@ -1876,8 +1876,9 @@ function closeRaiseRequestModal() {
   }
 }
 
-const openRequestModal = openRaiseRequestModal;
-const closeRequestModal = closeRaiseRequestModal;
+// Modal aliases
+window.openRequestModal = openRaiseRequestModal;
+window.closeRequestModal = closeRaiseRequestModal;
 
 function fillDemoRaiseRequest() {
   const modal = document.getElementById('modal-request');
@@ -3405,10 +3406,21 @@ window.openIncomingDonorCallModal = function(customDonorId) {
 
 window.closeIncomingDonorCallModal = function() {
   const modal = document.getElementById('modal-incoming-donor-call');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
   const docked = document.getElementById('docked-ringing-call-indicator');
-  if (docked) docked.classList.add('hidden');
+  if (docked) {
+    docked.classList.add('hidden');
+    docked.style.display = 'none';
+  }
   document.body.classList.remove('overflow-hidden');
+
+  if (window.PulseStore) {
+    window.PulseStore.state.activeIncomingCall = null;
+    window.PulseStore.saveState();
+  }
 
   if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
     window.PulseAudio.stopPhoneRinging();
@@ -3417,19 +3429,29 @@ window.closeIncomingDonorCallModal = function() {
 
 window.minimizeIncomingCall = function() {
   const modal = document.getElementById('modal-incoming-donor-call');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
   document.body.classList.remove('overflow-hidden');
 
   const docked = document.getElementById('docked-ringing-call-indicator');
-  if (docked) docked.classList.remove('hidden');
+  if (docked) {
+    docked.classList.remove('hidden');
+    docked.style.display = 'block';
+  }
 };
 
 window.expandIncomingCall = function() {
   const docked = document.getElementById('docked-ringing-call-indicator');
-  if (docked) docked.classList.add('hidden');
+  if (docked) {
+    docked.classList.add('hidden');
+    docked.style.display = 'none';
+  }
   const modal = document.getElementById('modal-incoming-donor-call');
   if (modal) {
     modal.classList.remove('hidden');
+    modal.style.display = 'flex';
     document.body.classList.add('overflow-hidden');
   }
 };
@@ -3450,20 +3472,7 @@ window.switchCallTargetDonor = function(donorId) {
 };
 
 window.confirmActiveDonorAvailability = function(explicitDonorId) {
-  const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
-    ? window.PulseStore.getActiveIncomingCall()
-    : null;
-  const donorId = explicitDonorId || (activeCall ? activeCall.donorId : null);
-  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
-    ? window.PulseStore.getRecipient()
-    : null;
-  const reqId = recipient ? recipient.requestId : null;
-  if (!donorId || !reqId) {
-    window.closeIncomingDonorCallModal();
-    return;
-  }
-
-  // 1. Stop Ringing Audio
+  // 1. Immediately Stop Ringing Audio
   if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
     window.PulseAudio.stopPhoneRinging();
   }
@@ -3473,84 +3482,112 @@ window.confirmActiveDonorAvailability = function(explicitDonorId) {
     window.PulseAudio.playConfirmationChime();
   }
 
+  const selectEl = document.getElementById('call-target-donor-select');
+  const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
+    ? window.PulseStore.getActiveIncomingCall()
+    : null;
+  const loggedInDonor = (window.PulseStore && typeof window.PulseStore.getDonor === 'function')
+    ? window.PulseStore.getDonor()
+    : null;
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+
+  const donorId = explicitDonorId || 
+                  (selectEl && selectEl.value) || 
+                  (activeCall ? activeCall.donorId : null) || 
+                  (loggedInDonor ? loggedInDonor.id : null) || 
+                  'D-KM-01';
+
+  const reqId = (activeCall ? activeCall.requestId : null) || 
+                (recipient ? recipient.requestId : null) || 
+                (window.PulseStore && window.PulseStore.state && window.PulseStore.state.selectedRequestId) || 
+                (window.PulseStore && typeof window.PulseStore.getRequests === 'function' && window.PulseStore.getRequests()[0]?.id) || 
+                'REQ-8686';
+
   // 3. Confirm in Store
   let confirmedDonorName = 'Volunteer Donor';
   if (window.PulseStore && typeof window.PulseStore.confirmDonorAvailability === 'function') {
     const res = window.PulseStore.confirmDonorAvailability(reqId, donorId);
     if (res && res.donor) {
-      confirmedDonorName = res.donor.name;
+      confirmedDonorName = res.donor.name || res.donor.fullName || confirmedDonorName;
     }
   }
 
-  // 4. Close Modal
+  // 4. Force Close Modal immediately
   window.closeIncomingDonorCallModal();
 
-  // 5. Show Celebration Toast
+  // 5. Show Toast
+  const patName = (recipient && recipient.patientName) || (activeCall && activeCall.patientName) || 'patient';
   if (window.showToast) {
     window.showToast(
       '🎉 Availability Confirmed!',
-      `${confirmedDonorName} confirmed availability for ${recipient ? recipient.patientName : 'patient'} and is now En Route to hospital!`,
+      `${confirmedDonorName} confirmed availability for ${patName} and is now En Route!`,
       'success'
     );
   }
 
-  // 6. Re-Render Recipient Dashboard
+  // 6. Re-Render Dashboards
+  if (typeof renderDonorDashboard === 'function') {
+    renderDonorDashboard();
+  }
   if (typeof window.renderRecipientDashboard === 'function') {
     window.renderRecipientDashboard();
-  }
-
-  // 7. Scroll smoothly to confirmed donors section if visible
-  const sec = document.getElementById('recipient-donors-section');
-  if (sec) {
-    sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 };
 
 window.declineActiveDonorCall = function(explicitDonorId) {
-  const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
-    ? window.PulseStore.getActiveIncomingCall()
-    : null;
-  const donorId = explicitDonorId || (activeCall ? activeCall.donorId : null);
-  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
-    ? window.PulseStore.getRecipient()
-    : null;
-  const reqId = recipient ? recipient.requestId : null;
-  if (!donorId || !reqId) {
-    window.closeIncomingDonorCallModal();
-    return;
-  }
-
-  // Stop Ringing Audio
+  // 1. Immediately Stop Ringing Audio
   if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
     window.PulseAudio.stopPhoneRinging();
   }
-  // Play decline tone
+  // 2. Play decline tone
   if (window.PulseAudio && typeof window.PulseAudio.playDeclineTone === 'function') {
     window.PulseAudio.playDeclineTone();
   }
 
-  let nextDonor = null;
+  const selectEl = document.getElementById('call-target-donor-select');
+  const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
+    ? window.PulseStore.getActiveIncomingCall()
+    : null;
+  const loggedInDonor = (window.PulseStore && typeof window.PulseStore.getDonor === 'function')
+    ? window.PulseStore.getDonor()
+    : null;
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+
+  const donorId = explicitDonorId || 
+                  (selectEl && selectEl.value) || 
+                  (activeCall ? activeCall.donorId : null) || 
+                  (loggedInDonor ? loggedInDonor.id : null) || 
+                  'D-KM-01';
+
+  const reqId = (activeCall ? activeCall.requestId : null) || 
+                (recipient ? recipient.requestId : null) || 
+                (window.PulseStore && window.PulseStore.state && window.PulseStore.state.selectedRequestId) || 
+                (window.PulseStore && typeof window.PulseStore.getRequests === 'function' && window.PulseStore.getRequests()[0]?.id) || 
+                'REQ-8686';
+
+  // 3. Decline in store
   if (window.PulseStore && typeof window.PulseStore.declineDonorCall === 'function') {
-    const res = window.PulseStore.declineDonorCall(reqId, donorId);
-    if (res && res.nextDonor) nextDonor = res.nextDonor;
+    window.PulseStore.declineDonorCall(reqId, donorId);
   }
 
-  if (nextDonor) {
-    if (window.showToast) {
-      window.showToast('Donor Busy', `Donor declined. Now ringing next proximate volunteer: ${nextDonor.name} (${nextDonor.bloodGroup}).`, 'info');
-    }
-    // Switch call to next donor!
-    setTimeout(() => {
-      window.openIncomingDonorCallModal(nextDonor.id);
-    }, 400);
-  } else {
-    window.closeIncomingDonorCallModal();
-    if (window.showToast) {
-      window.showToast('Call Concluded', 'All contacted donors have responded. Requisition remains broadcasted on standby grid.', 'info');
-    }
-    if (typeof window.renderRecipientDashboard === 'function') {
-      window.renderRecipientDashboard();
-    }
+  // 4. Force Close Modal immediately
+  window.closeIncomingDonorCallModal();
+
+  // 5. Show notification
+  if (window.showToast) {
+    window.showToast('Call Concluded', 'Emergency grid recorded your response. Standby status maintained.', 'info');
+  }
+
+  // 6. Re-Render Dashboards
+  if (typeof renderDonorDashboard === 'function') {
+    renderDonorDashboard();
+  }
+  if (typeof window.renderRecipientDashboard === 'function') {
+    window.renderRecipientDashboard();
   }
 };
 

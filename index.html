@@ -5008,8 +5008,8 @@
   <!-- =================================================================== -->
   <!-- MODAL: INCOMING EMERGENCY BLOOD REQUEST CALL TO DONOR               -->
   <!-- =================================================================== -->
-  <div id="modal-incoming-donor-call" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-md overflow-y-auto" style="z-index: 99999;">
-    <div class="relative w-full max-w-lg bg-surface-container-lowest rounded-3xl shadow-2xl border-2 border-primary/50 overflow-hidden incoming-call-box-glow">
+  <div id="modal-incoming-donor-call" class="hidden fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 bg-black/75 backdrop-blur-md overflow-y-auto" style="z-index: 99999;">
+    <div class="relative w-full max-w-lg bg-surface-container-lowest rounded-3xl shadow-2xl border-2 border-primary/50 overflow-hidden incoming-call-box-glow my-auto">
       
       <!-- Top Alert Ribbon: Siren & Audio Equalizer -->
       <div class="bg-gradient-to-r from-red-700 via-primary to-rose-700 px-5 py-3 text-white flex items-center justify-between">
@@ -5118,13 +5118,13 @@
         <!-- Big Decision Action Buttons -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
           <!-- Decline Button -->
-          <button type="button" onclick="window.declineActiveDonorCall()" class="sm:flex-1 py-3 px-4 rounded-2xl bg-surface-container hover:bg-error-container hover:text-on-error-container text-on-surface font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer border border-surface-container-high active:scale-98">
+          <button type="button" id="btn-call-decline" onclick="window.declineActiveDonorCall()" class="sm:flex-1 py-3 px-4 rounded-2xl bg-surface-container hover:bg-error-container hover:text-on-error-container text-on-surface font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer border border-surface-container-high active:scale-98">
             <span class="material-symbols-outlined text-[20px] text-error">call_end</span>
             <span>Decline / Busy</span>
           </button>
 
           <!-- Confirm Availability & Accept Button -->
-          <button type="button" onclick="window.confirmActiveDonorAvailability()" class="sm:flex-2 py-3 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+          <button type="button" id="btn-call-confirm-accept" onclick="window.confirmActiveDonorAvailability()" class="sm:flex-2 py-3 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer active:scale-98">
             <span class="material-symbols-outlined text-[22px]">phone_enabled</span>
             <span>I Am Available — Confirm &amp; Accept</span>
           </button>
@@ -5153,16 +5153,16 @@
   </div>
 
   <!-- Core Scripts with Cache-Busting -->
-  <script src="js/audio.js?v=20261008_live_final"></script>
-  <script src="js/store.js?v=20261008_live_final"></script>
-  <script src="js/router.js?v=20261008_live_final"></script>
-  <script src="js/app.js?v=20261008_live_final"></script>
-  <script src="js/blood-cells.js?v=20261008_live_final"></script>
+  <script src="js/audio.js?v=20261009_call_fix"></script>
+  <script src="js/store.js?v=20261009_call_fix"></script>
+  <script src="js/router.js?v=20261009_call_fix"></script>
+  <script src="js/app.js?v=20261009_call_fix"></script>
+  <script src="js/blood-cells.js?v=20261009_call_fix"></script>
 
-  <!-- Global Direct Action Handler for "Update Need" and "Request More Blood" -->
+  <!-- Global Direct Action Handler for Critical UI Buttons -->
   <script>
     (function() {
-      // Capture-phase event delegation: guarantees Update Need and Request More Blood ALWAYS work
+      // Capture-phase event delegation: guarantees buttons ALWAYS work regardless of bubbling or propagation
       document.addEventListener('click', function(e) {
         var target = e.target;
         var btn = target.closest ? target.closest('button, a') : null;
@@ -5170,6 +5170,29 @@
         if (!btn) return;
 
         var text = (btn.innerText || btn.textContent || '').trim();
+        var id = btn.id || '';
+
+        // 1. Accept Incoming Call
+        if (id === 'btn-call-confirm-accept' || text.indexOf('I Am Available') !== -1 || text.indexOf('Confirm & Accept') !== -1) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window.confirmActiveDonorAvailability === 'function') {
+            window.confirmActiveDonorAvailability();
+          }
+          return;
+        }
+
+        // 2. Decline Incoming Call
+        if (id === 'btn-call-decline' || text.indexOf('Decline / Busy') !== -1) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window.declineActiveDonorCall === 'function') {
+            window.declineActiveDonorCall();
+          }
+          return;
+        }
+
+        // 3. Update Need
         if (text.indexOf('Update Need') !== -1) {
           e.preventDefault();
           e.stopPropagation();
@@ -5186,7 +5209,11 @@
               document.body.classList.add('overflow-hidden');
             }
           }
-        } else if (text.indexOf('Request More Blood') !== -1 || text.indexOf('Request Additional Blood') !== -1) {
+          return;
+        }
+
+        // 4. Request More Blood
+        if (text.indexOf('Request More Blood') !== -1 || text.indexOf('Request Additional Blood') !== -1) {
           e.preventDefault();
           e.stopPropagation();
           if (typeof window.openRequestMoreBloodModal === 'function') {
@@ -5202,6 +5229,7 @@
               document.body.classList.add('overflow-hidden');
             }
           }
+          return;
         }
       }, true);
     })();
