@@ -299,6 +299,19 @@ app.post('/api/donor/profile', (req, res) => {
   res.status(404).json({ success: false, error: 'Donor not found' });
 });
 
+app.post('/api/donors/:id/availability', (req, res) => {
+  const donorId = req.params.id;
+  const isAvail = req.body && req.body.isAvailable !== undefined ? Boolean(req.body.isAvailable) : true;
+  const idx = donorsList.findIndex(d => d.id === donorId || d._id === donorId);
+  if (idx >= 0) {
+    donorsList[idx].isAvailable = isAvail;
+    donorsList[idx].availability = isAvail;
+    saveDonors();
+    return res.json({ success: true, donorId, isAvailable: isAvail });
+  }
+  res.status(404).json({ success: false, error: 'Donor not found' });
+});
+
 // --- HOSPITAL ENDPOINTS ---
 app.get('/api/hospitals', (req, res) => {
   res.json({ success: true, hospitals: hospitalsList });

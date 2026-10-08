@@ -2,7 +2,9 @@ const express = require('express');
 const {
   createDonationRequest,
   acceptDonationRequest,
-  getDonationRequest
+  getDonationRequest,
+  cancelDonationRequest,
+  declineDonationRequest
 } = require('../controllers/requestController');
 
 function createRequestRouter(io) {
@@ -16,6 +18,13 @@ function createRequestRouter(io) {
 
   // POST /api/requests/:id/accept - Donor accepts request (locks request)
   router.post('/:id/accept', (req, res) => acceptDonationRequest(req, res, io));
+
+  // POST /api/requests/:id/cancel or DELETE /api/requests/:id - Cancel request
+  router.post('/:id/cancel', (req, res) => cancelDonationRequest(req, res, io));
+  router.delete('/:id', (req, res) => cancelDonationRequest(req, res, io));
+
+  // POST /api/requests/:id/decline - Donor declines request
+  router.post('/:id/decline', (req, res) => declineDonationRequest(req, res, io));
 
   return router;
 }

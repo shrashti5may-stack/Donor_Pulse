@@ -272,8 +272,65 @@ async function getDonationRequest(req, res) {
   }
 }
 
+/**
+ * Cancel a donation request (POST /api/requests/:id/cancel or DELETE /api/requests/:id)
+ */
+async function cancelDonationRequest(req, res, io) {
+  try {
+    const { id } = req.params;
+    const request = await DonationRequest.findById(id);
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        error: 'Donation request not found.'
+      });
+    }
+
+    request.status = 'CANCELLED';
+    await request.save();
+
+    if (io) {
+      io.to(`user_${request.patientId}`).emit('request_cancelled', { requestId: id, status: 'CANCELLED' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Donation request cancelled successfully.',
+      request
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+}
+
+/**
+ * Decline a donation request for donor (POST /api/requests/:id/decline)
+ */
+async function declineDonationRequest(req, res, io) {
+  try {
+    const { id } = req.params;
+    const { donorId } = req.body;
+    return res.status(200).json({
+      success: true,
+      message: 'Request declined by donor.',
+      requestId: id,
+      donorId
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+}
+
 module.exports = {
   createDonationRequest,
   acceptDonationRequest,
-  getDonationRequest
+  getDonationRequest,
+  cancelDonationRequest,
+  declineDonationRequest
 };

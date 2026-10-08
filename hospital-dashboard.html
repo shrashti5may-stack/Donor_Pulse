@@ -341,7 +341,7 @@
 </div>
 </div>
 </div>
-<button class="w-full py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center justify-center gap-1.5">
+<button type="button" onclick="window.triggerRegionalRebalancing ? window.triggerRegionalRebalancing() : alert('Regional blood bank inventory rebalancing initiated across networked trauma reserves.');" class="w-full py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-98">
 <span class="material-symbols-outlined text-[18px]">inventory</span>
 <span>Trigger Regional Bank Rebalancing</span>
 </button>
@@ -819,6 +819,14 @@
       container.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
     }
   }, { passive: true });
+
+  window.triggerRegionalRebalancing = function() {
+    if (window.PulseStore && typeof window.PulseStore.showToast === 'function') {
+      window.PulseStore.showToast('Regional blood bank inventory rebalancing initiated across networked trauma reserves.', 'success');
+    } else {
+      alert('Regional blood bank inventory rebalancing initiated across networked trauma reserves.');
+    }
+  };
 
   window.openHospitalTelemetry = function() {
     if (window.openHospitalRequestModal) {

@@ -1561,6 +1561,51 @@ class Store {
     return donorList;
   }
 
+  // Cancel active requisition / recipient case
+  cancelActiveRequisition(requestId) {
+    const recipient = this.getRecipient();
+    const effectiveReqId = requestId || (recipient && (recipient.requestId || recipient.id)) || this.state.selectedRequestId;
+    
+    if (recipient) {
+      recipient.status = 'CANCELLED';
+      recipient.urgency = 'Cancelled';
+      recipient.unitsArranged = 0;
+      recipient.trackingStage = 0;
+    }
+
+    if (Array.isArray(this.state.requests)) {
+      const req = this.state.requests.find(r => r.id === effectiveReqId || r.requestId === effectiveReqId);
+      if (req) {
+        req.status = 'CANCELLED';
+      }
+    }
+
+    if (Array.isArray(this.state.recipientCases)) {
+      const cMatch = this.state.recipientCases.find(c => c.requestId === effectiveReqId || c.id === effectiveReqId || c.caseId === effectiveReqId);
+      if (cMatch) {
+        cMatch.status = 'CANCELLED';
+        cMatch.unitsArranged = 0;
+      }
+    }
+
+    this.state.activeIncomingCall = null;
+    this.saveState();
+
+    try {
+      fetch(`/api/requests/${effectiveReqId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }).catch(() => {});
+    } catch (e) {}
+
+    this.broadcastSync({
+      type: 'REQUISITION_CANCELLED',
+      requestId: effectiveReqId
+    });
+
+    return { success: true, requestId: effectiveReqId };
+  }
+
   resetToDefault() {
     this.state = JSON.parse(JSON.stringify(DEFAULT_STATE));
     this.saveState();

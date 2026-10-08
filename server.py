@@ -937,6 +937,82 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
             }).encode('utf-8'))
             return
 
+        # 3. API: POST /api/requests/:id/cancel
+        if clean_path.startswith('/api/requests/') and clean_path.endswith('/cancel'):
+            parts = clean_path.split('/')
+            req_id = parts[3]
+            if req_id in DB_REQUESTS:
+                req_obj = DB_REQUESTS[req_id]
+                req_obj['status'] = 'CANCELLED'
+                patient_room = f"user_{req_obj.get('patientId')}"
+                if patient_room in USER_EVENT_QUEUES:
+                    USER_EVENT_QUEUES[patient_room].append({
+                        "event": "request_cancelled",
+                        "data": {"requestId": req_id, "status": "CANCELLED"}
+                    })
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "message": "Request cancelled successfully.", "request": req_obj}).encode('utf-8'))
+                return
+            else:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "message": "Request removed.", "requestId": req_id}).encode('utf-8'))
+                return
+
+        # 4. API: POST /api/requests/:id/decline
+        if clean_path.startswith('/api/requests/') and clean_path.endswith('/decline'):
+            parts = clean_path.split('/')
+            req_id = parts[3]
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+            donor_id = body.get('donorId')
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": True,
+                "message": "Request declined for donor.",
+                "requestId": req_id,
+                "donorId": donor_id
+            }).encode('utf-8'))
+            return
+
+        # 5. API: POST /api/donors/:id/availability
+        if clean_path.startswith('/api/donors/') and clean_path.endswith('/availability'):
+            parts = clean_path.split('/')
+            donor_id = parts[3]
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+            
+            is_avail = body.get('isAvailable', True)
+            matched_donor = DB_DONORS.get(donor_id) or DB_USERS.get(donor_id)
+            if matched_donor:
+                matched_donor['isAvailable'] = is_avail
+                matched_donor['availability'] = is_avail
+                save_donors()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "isAvailable": is_avail, "donor": matched_donor}).encode('utf-8'))
+                return
+            else:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "isAvailable": is_avail, "donorId": donor_id}).encode('utf-8'))
+                return
+
         self.send_error(404, "Endpoint not found")
 
 def start_server(port=PORT, max_tries=10):

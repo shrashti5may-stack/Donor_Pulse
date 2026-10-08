@@ -431,6 +431,11 @@
                 <span id="copy-btn-text">Copy SOS Appeal Link</span>
               </button>
 
+              <button type="button" id="btn-cancel-requisition" onclick="window.cancelActiveRequisition()" class="px-4 py-2.5 rounded-xl border border-rose-300 hover:bg-rose-50 text-rose-700 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-98">
+                <span class="material-symbols-outlined text-[18px] text-rose-600">cancel</span>
+                <span>Cancel Requisition</span>
+              </button>
+
               <a href="index.html#/matched-donors" class="px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ml-auto">
                 <span class="material-symbols-outlined text-[18px] text-primary">group</span>
                 <span>Proximity Matching Grid</span>
@@ -1591,6 +1596,21 @@
     window.confirmActiveDonorAvailability = confirmActiveDonorAvailability;
     window.declineActiveDonorCall = declineActiveDonorCall;
     window.triggerDemoReRing = triggerDemoReRing;
+    window.cancelActiveRequisition = function() {
+      if (!confirm('Are you sure you want to cancel this emergency requisition? This will release matched donors and mark the request cancelled.')) {
+        return;
+      }
+      const heroReqEl = document.getElementById('hero-req-id');
+      const reqId = heroReqEl ? heroReqEl.textContent.replace('#', '').trim() : '';
+      if (window.PulseStore && typeof window.PulseStore.cancelActiveRequisition === 'function') {
+        window.PulseStore.cancelActiveRequisition(reqId);
+      } else {
+        fetch(`/api/requests/${reqId}/cancel`, { method: 'POST' }).catch(() => {});
+      }
+      const bloodNeedEl = document.getElementById('hero-blood-need');
+      if (bloodNeedEl) bloodNeedEl.textContent = 'Requisition Cancelled';
+      alert('Emergency requisition has been cancelled.');
+    };
 
     // Recipient dashboard must never ring
     if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {

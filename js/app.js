@@ -2404,35 +2404,10 @@ function renderDonorDashboard() {
     vitalsPassText.textContent = `Instant clinical check-in QR code active. Verified vitals: Hemoglobin ${donor.vitals.hemoglobin || '14.2 g/dL'} (Normal) • BP ${donor.vitals.bp || '120/80 mmHg'}.`;
   }
 
-  // 1. Populate Active Donor Profile Switcher Bar
-  const pool = (window.PulseStore && typeof window.PulseStore.getAllDonorsPool === 'function')
-    ? window.PulseStore.getAllDonorsPool()
-    : [];
+  // 1. Active Donor Profile Switcher Bar removed per user request
   const switcherContainer = document.getElementById('donor-profile-switcher-container');
-  if (switcherContainer && pool.length > 0) {
-    switcherContainer.innerHTML = `
-      <div class="p-3 rounded-2xl bg-surface-container-lowest border border-surface-container-high shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-            <span class="material-symbols-outlined text-[20px]">badge</span>
-          </div>
-          <div>
-            <span class="text-[11px] font-bold text-secondary uppercase tracking-wider block">Logged-In Volunteer Donor</span>
-            <span class="text-xs font-bold text-on-surface">Acting as: <span class="text-primary font-black">${escapeHtml(donor.fullName)}</span> (<span class="font-bold text-primary">${escapeHtml(donor.bloodGroup)}</span>)</span>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <label for="donor-profile-select" class="text-xs text-on-surface-variant font-medium shrink-0">Switch Donor:</label>
-          <select id="donor-profile-select" onchange="window.switchActiveDonorProfile(this.value)" class="px-3 py-1.5 rounded-xl bg-surface-container-low border border-surface-container text-xs font-bold text-on-surface focus:ring-1 focus:ring-primary cursor-pointer shadow-2xs">
-            ${pool.map(d => `
-              <option value="${escapeHtml(d.id)}" ${(d.id === donor.id || d.name === donor.fullName) ? 'selected' : ''}>
-                ${escapeHtml(d.name)} (${escapeHtml(d.bloodGroup)} • ${d.distance || 1.5} km) ${d.confirmed ? '✅ Confirmed' : ''}
-              </option>
-            `).join('')}
-          </select>
-        </div>
-      </div>
-    `;
+  if (switcherContainer) {
+    switcherContainer.innerHTML = '';
   }
 
   // 2. Populate Emergency Mission Banner on Donor Dashboard
@@ -3886,6 +3861,37 @@ Attendant Contact: ${recipient.attendantPhone}
   window.open(waUrl, '_blank');
 };
 
+window.cancelActiveRequisition = function() {
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+
+  if (!confirm('Are you sure you want to cancel this emergency requisition? This will release matched donors and mark the request cancelled.')) {
+    return;
+  }
+
+  const reqId = recipient ? (recipient.requestId || recipient.id) : '';
+
+  if (window.PulseStore && typeof window.PulseStore.cancelActiveRequisition === 'function') {
+    window.PulseStore.cancelActiveRequisition(reqId);
+  } else if (reqId) {
+    fetch(`/api/requests/${reqId}/cancel`, { method: 'POST' }).catch(() => {});
+  }
+
+  if (typeof renderRecipientDashboard === 'function') {
+    renderRecipientDashboard();
+  }
+  if (typeof updateRequisitionBadges === 'function') {
+    updateRequisitionBadges();
+  }
+
+  if (window.showToast) {
+    window.showToast('Requisition Cancelled', 'Active emergency requisition has been marked cancelled.', 'info');
+  } else {
+    alert('Active emergency requisition has been cancelled.');
+  }
+};
+
 window.verifyDonorHandshake = function(otp, donorName = 'Volunteer Donor') {
   const entered = prompt(`Enter Donor Handshake OTP Code to verify arrival at hospital blood bank (Default code: ${otp}):`, otp);
   if (!entered) return;
@@ -5041,7 +5047,21 @@ window.closeDonorRequestModal = function() {
 
 window.approveDonorRequest = function() {
   const req = activeDonorRequest || { hospital: "Manipal Hospital Comprehensive Trauma Center" };
+  const cardBtn = req.cardId ? document.getElementById(req.cardId + '-btn') : document.getElementById('card-request-1-btn');
+  if (cardBtn && cardBtn.disabled) return; // Immediate double-click prevention
+  if (cardBtn) cardBtn.disabled = true;
+
   window.closeDonorRequestModal();
+
+  const reqId = req.id || req.requestId || 'REQ-9042';
+  const donorId = (window.PulseStore && window.PulseStore.state && window.PulseStore.state.donor) ? window.PulseStore.state.donor.id : 'DNR-4821';
+  try {
+    fetch(`/api/requests/${reqId}/accept`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ donorId })
+    }).catch(() => {});
+  } catch (e) {}
 
   if (window.showToast) {
     window.showToast(
@@ -5051,7 +5071,6 @@ window.approveDonorRequest = function() {
     );
   }
 
-  const cardBtn = req.cardId ? document.getElementById(req.cardId + '-btn') : document.getElementById('card-request-1-btn');
   if (cardBtn) {
     cardBtn.className = 'w-full py-2.5 px-space-md rounded-xl bg-tertiary text-on-tertiary font-label-lg text-label-lg font-semibold shadow-sm flex items-center justify-center gap-2 cursor-default';
     cardBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>Approved &amp; Confirmed</span>';
@@ -5063,10 +5082,32 @@ window.declineDonorRequest = function() {
   const req = activeDonorRequest || { hospital: "Manipal Hospital Comprehensive Trauma Center" };
   window.closeDonorRequestModal();
 
+  const reqId = req.id || req.requestId || 'REQ-9042';
+  const donorId = (window.PulseStore && window.PulseStore.state && window.PulseStore.state.donor) ? window.PulseStore.state.donor.id : 'DNR-4821';
+  try {
+    fetch(`/api/requests/${reqId}/decline`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ donorId })
+    }).catch(() => {});
+  } catch (e) {}
+
+  if (req.cardId) {
+    const cardEl = document.getElementById(req.cardId);
+    if (cardEl) {
+      cardEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      cardEl.style.opacity = '0';
+      cardEl.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        if (cardEl.parentNode) cardEl.remove();
+      }, 300);
+    }
+  }
+
   if (window.showToast) {
     window.showToast(
       'Request Declined',
-      `You have declined the requisition from ${req.hospital}. Other alerts remain active on your dashboard.`,
+      `You have declined the requisition from ${req.hospital}. Card dismissed cleanly from your feed.`,
       'info'
     );
   }

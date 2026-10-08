@@ -1436,9 +1436,6 @@
 
         <!-- MAIN DASHBOARD CONTENT AREA -->
         <div class="flex-1 flex flex-col gap-space-lg min-w-0 w-full max-w-full overflow-x-hidden">
-          <!-- Active Volunteer Donor Profile Switcher Bar -->
-          <div id="donor-profile-switcher-container" class="w-full"></div>
-
           <!-- Dynamic Emergency Mission Alert Banner (Displays when urgent call is active or confirmed for this donor) -->
           <div id="donor-emergency-mission-banner" class="w-full hidden"></div>
 
@@ -2362,6 +2359,10 @@
                     <span class="material-symbols-outlined text-[16px]">content_copy</span>
                     <span>Copy Appeal Text</span>
                   </button>
+                  <button type="button" onclick="window.cancelActiveRequisition()" class="w-full py-1.5 px-3 rounded-xl border border-rose-300 hover:bg-rose-50 text-rose-700 font-label-md text-xs font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-98 whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[15px] text-rose-600">cancel</span>
+                    <span>Cancel Request</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -2477,6 +2478,10 @@
                 <button type="button" onclick="window.copySOSAppealLink()" class="w-full sm:w-auto px-4 py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
                   <span class="material-symbols-outlined text-[18px]">content_copy</span>
                   <span>Copy Appeal</span>
+                </button>
+                <button type="button" onclick="window.cancelActiveRequisition()" class="w-full sm:w-auto px-4 py-3 rounded-xl border border-rose-300 hover:bg-rose-50 text-rose-700 font-label-md text-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-98">
+                  <span class="material-symbols-outlined text-[18px] text-rose-600">cancel</span>
+                  <span>Cancel Requisition</span>
                 </button>
               </div>
             </div>
@@ -3457,7 +3462,7 @@
             <p class="text-xs text-on-surface-variant">Live broadcast to registered proximate donors, blood bank dispatch &amp; SMS alerts</p>
           </div>
         </div>
-        <button type="button" data-close-modal-request class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" title="Close">
+        <button type="button" data-close-modal-request onclick="window.closeRaiseRequestModal()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" title="Close">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
@@ -5153,11 +5158,11 @@
   </div>
 
   <!-- Core Scripts with Cache-Busting -->
-  <script src="js/audio.js?v=20261009_call_fix"></script>
-  <script src="js/store.js?v=20261009_call_fix"></script>
-  <script src="js/router.js?v=20261009_call_fix"></script>
-  <script src="js/app.js?v=20261009_call_fix"></script>
-  <script src="js/blood-cells.js?v=20261009_call_fix"></script>
+  <script src="js/audio.js?v=20261009_no_switcher"></script>
+  <script src="js/store.js?v=20261009_no_switcher"></script>
+  <script src="js/router.js?v=20261009_no_switcher"></script>
+  <script src="js/app.js?v=20261009_no_switcher"></script>
+  <script src="js/blood-cells.js?v=20261009_no_switcher"></script>
 
   <!-- Global Direct Action Handler for Critical UI Buttons -->
   <script>

@@ -10,7 +10,9 @@ import { io } from 'socket.io-client';
 export default function PatientDashboard({ patientUser, socketUrl = 'http://localhost:3000' }) {
   const [socket, setSocket] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
   const [activeRequest, setActiveRequest] = useState(null);
   const [alertedDonorsCount, setAlertedDonorsCount] = useState(null);
   const [acceptedDonor, setAcceptedDonor] = useState(null);
@@ -20,10 +22,10 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
   const [formData, setFormData] = useState({
     bloodGroupNeeded: 'B+',
     unitsNeeded: 2,
-    hospitalName: 'Apollo Hospitals & Apex Trauma Centre',
-    hospitalAddress: '154/11 Bannerghatta Main Road, Opposite IIMB, Bengaluru',
+    hospitalName: 'Trauma Resuscitation Center',
+    hospitalAddress: 'Bangalore Metro Healthcare Corridor, Bengaluru',
     doctorRegNumber: 'NMC/KMC-48921',
-    prescriptionDocumentUrl: 'https://storage.donorpulse.in/prescriptions/apollo_req_form27c.pdf',
+    prescriptionDocumentUrl: 'https://storage.donorpulse.in/prescriptions/hospital_blood_req_form27c.pdf',
     lng: 77.5983,
     lat: 12.8958
   });
@@ -32,7 +34,7 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
   const currentPatient = patientUser || {
     _id: '65a8e1f0b9c2d3e4f5a6b7c8',
     id: '65a8e1f0b9c2d3e4f5a6b7c8',
-    name: 'Devika Sharma',
+    name: 'Verified Patient',
     phone: '+91 95280 33454',
     isPhoneVerified: true,
     bloodGroup: 'B+',
@@ -61,6 +63,16 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
       setAcceptedDonor(data.donor);
       setIsLocked(true);
       setActiveRequest((prev) => prev ? { ...prev, status: 'ACCEPTED', acceptedDonorId: data.donor.id } : null);
+      setStatusMessage(`Matched volunteer donor ${data.donor.name} has accepted and is en route!`);
+    });
+
+    // 4. Listen to `request_cancelled` event
+    newSocket.on('request_cancelled', () => {
+      setActiveRequest(null);
+      setAlertedDonorsCount(null);
+      setIsLocked(false);
+      setAcceptedDonor(null);
+      setStatusMessage('Active requisition has been cancelled.');
     });
 
     return () => {
@@ -76,6 +88,7 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+    setStatusMessage('');
     setIsSubmitting(true);
 
     try {
@@ -118,14 +131,45 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
       }
 
       setActiveRequest(data.request);
-      // Prompt requirement: "Show how many real matched donors were alerted within the radius."
       setAlertedDonorsCount(data.matchedDonorsCount);
       setIsLocked(false);
+      setStatusMessage(`Emergency requisition broadcasted successfully! ${data.matchedDonorsCount || 0} compatible donors alerted.`);
     } catch (err) {
       console.error('Submit request error:', err);
       setErrorMessage('Network error while connecting to hospital server. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Handle Cancel Request
+  const handleCancelRequest = async (requestId) => {
+    if (!requestId) return;
+    try {
+      setIsCancelling(true);
+      setErrorMessage('');
+      const res = await fetch(`${socketUrl}/api/requests/${requestId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (socket) {
+          socket.emit('cancel_request', { requestId });
+        }
+        setActiveRequest(null);
+        setAlertedDonorsCount(null);
+        setIsLocked(false);
+        setAcceptedDonor(null);
+        setStatusMessage('Requisition cancelled successfully.');
+      } else {
+        setErrorMessage(data.error || 'Failed to cancel request.');
+      }
+    } catch (err) {
+      console.error('Cancel request error:', err);
+      setErrorMessage('Network error while cancelling request.');
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -152,6 +196,23 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
         </div>
       </header>
 
+      {/* Status Success Alert */}
+      {statusMessage && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm font-medium flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-emerald-700">✓ Update:</span>
+            <span>{statusMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setStatusMessage('')}
+            className="text-emerald-700 hover:text-emerald-900 font-bold ml-3 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Error Alert */}
       {errorMessage && (
         <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-sm font-medium flex items-center justify-between">
@@ -160,6 +221,7 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
             <span>{errorMessage}</span>
           </div>
           <button
+            type="button"
             onClick={() => setErrorMessage('')}
             className="text-rose-700 hover:text-rose-900 font-bold ml-3 cursor-pointer"
           >
@@ -192,13 +254,21 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
               </p>
             </div>
           </div>
-          <div className="text-xs font-bold text-emerald-800 bg-emerald-100/80 px-3.5 py-2 rounded-xl border border-emerald-300 shrink-0">
-            🔒 Requisition Locked Against Duplicate Claims
+          <div className="flex items-center gap-2.5">
+            <a
+              href={`tel:${acceptedDonor.phone}`}
+              className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+            >
+              <span>📞 Contact Donor</span>
+            </a>
+            <div className="text-xs font-bold text-emerald-800 bg-emerald-100/80 px-3.5 py-2 rounded-xl border border-emerald-300 shrink-0">
+              🔒 Requisition Locked
+            </div>
           </div>
         </div>
       )}
 
-      {/* Active Broadcast Telemetry (Prompt Requirement: Show how many real matched donors were alerted) */}
+      {/* Active Broadcast Telemetry */}
       {activeRequest && (
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -224,14 +294,24 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
                 Real Matched Donors Alerted (Within 25 km)
               </span>
             </div>
-            <div className="text-xs font-bold">
-              Status: <span className={`uppercase font-black ${isLocked ? 'text-emerald-600' : 'text-amber-600'}`}>{activeRequest.status}</span>
+            <div className="flex items-center gap-2">
+              <div className="text-xs font-bold">
+                Status: <span className={`uppercase font-black ${isLocked ? 'text-emerald-600' : 'text-amber-600'}`}>{activeRequest.status}</span>
+              </div>
+              <button
+                type="button"
+                disabled={isCancelling}
+                onClick={() => handleCancelRequest(activeRequest._id || activeRequest.id)}
+                className="px-3 py-1.5 rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50 text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {isCancelling ? 'Cancelling...' : 'Cancel Request'}
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Requisition Form (Disabled/Locked if an active accepted request is locked) */}
+      {/* Requisition Form */}
       <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <h2 className="text-lg font-bold text-slate-900 mb-1">
           Raise Emergency Blood Request
@@ -244,10 +324,11 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Blood Group Needed */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
+              <label htmlFor="input-blood-group" className="text-xs font-bold text-slate-700 block mb-1">
                 Blood Group Needed *
               </label>
               <select
+                id="input-blood-group"
                 name="bloodGroupNeeded"
                 value={formData.bloodGroupNeeded}
                 onChange={handleChange}
@@ -262,10 +343,11 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
 
             {/* Units Needed */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
+              <label htmlFor="input-units-needed" className="text-xs font-bold text-slate-700 block mb-1">
                 Units Needed *
               </label>
               <input
+                id="input-units-needed"
                 type="number"
                 name="unitsNeeded"
                 min="1"
@@ -280,10 +362,11 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
 
             {/* Hospital Name */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
+              <label htmlFor="input-hospital-name" className="text-xs font-bold text-slate-700 block mb-1">
                 Hospital Name *
               </label>
               <input
+                id="input-hospital-name"
                 type="text"
                 name="hospitalName"
                 value={formData.hospitalName}
@@ -296,10 +379,11 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
 
             {/* Hospital Address */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
+              <label htmlFor="input-hospital-address" className="text-xs font-bold text-slate-700 block mb-1">
                 Hospital Address *
               </label>
               <input
+                id="input-hospital-address"
                 type="text"
                 name="hospitalAddress"
                 value={formData.hospitalAddress}
@@ -312,11 +396,12 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
 
             {/* Authenticity Verification: Doctor Reg Number */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
+              <label htmlFor="input-doctor-reg" className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
                 <span>Doctor Registration Number *</span>
                 <span className="text-[10px] text-emerald-700 font-bold">Authenticity Proof</span>
               </label>
               <input
+                id="input-doctor-reg"
                 type="text"
                 name="doctorRegNumber"
                 placeholder="e.g. NMC/KMC-48921"
@@ -329,11 +414,12 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
 
             {/* Authenticity Verification: Prescription URL */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
+              <label htmlFor="input-prescription-url" className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
                 <span>Prescription Document URL *</span>
                 <span className="text-[10px] text-emerald-700 font-bold">Tamper-Proof File</span>
               </label>
               <input
+                id="input-prescription-url"
                 type="text"
                 name="prescriptionDocumentUrl"
                 placeholder="https://..."
@@ -352,7 +438,7 @@ export default function PatientDashboard({ patientUser, socketUrl = 'http://loca
             <button
               type="submit"
               disabled={isSubmitting || isLocked}
-              className="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 active:scale-98"
             >
               {isSubmitting ? (
                 <>
