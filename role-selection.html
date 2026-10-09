@@ -312,7 +312,7 @@
             <span class="text-on-surface-variant font-mono block text-[11px]" id="hospital-active-id">Case: CASE-8686</span>
           </div>
         </div>
-        <button type="button" onclick="window.location.href='index.html#/recipient-dashboard'; closeHospitalLoginModal();" class="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary-container cursor-pointer">
+        <button type="button" onclick="sessionStorage.setItem('show_patient_enroute_popup', 'true'); window.location.href='index.html#/recipient-dashboard'; closeHospitalLoginModal();" class="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary-container cursor-pointer">
           Go to Dashboard
         </button>
       </div>
@@ -1369,14 +1369,19 @@ async function handleHospitalLoginSubmit(e) {
     });
   }
 
-  if (matchedCase && window.PulseStore) {
-    if (typeof window.PulseStore.addOrUpdateRecipientCase === 'function') {
-      window.PulseStore.addOrUpdateRecipientCase(matchedCase);
-    } else {
-      window.PulseStore.state.recipient = matchedCase;
-      window.PulseStore.state.selectedRequestId = matchedCase.requestId;
-      window.PulseStore.saveState();
+  if (matchedCase) {
+    if (window.PulseStore) {
+      if (typeof window.PulseStore.addOrUpdateRecipientCase === 'function') {
+        window.PulseStore.addOrUpdateRecipientCase(matchedCase);
+      } else {
+        window.PulseStore.state.recipient = matchedCase;
+        window.PulseStore.state.selectedRequestId = matchedCase.requestId;
+        window.PulseStore.saveState();
+      }
     }
+    // Set flag so telemetry popup is displayed upon entering recipient dashboard
+    sessionStorage.setItem('show_patient_enroute_popup', 'true');
+    sessionStorage.setItem('donorpulse_patient_authenticated', 'true');
     setTimeout(() => {
       closeHospitalLoginModal();
       window.location.href = 'index.html#/recipient-dashboard';

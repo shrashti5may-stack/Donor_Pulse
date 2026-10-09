@@ -85,27 +85,63 @@ main,
   animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Toast alert notification */
+/* Toast alert notification - strictly pinned to bottom right corner */
 #toast-container {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  pointer-events: none;
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 12px !important;
+  pointer-events: none !important;
+  max-width: 400px !important;
+  width: calc(100vw - 32px) !important;
 }
 
-.toast-message {
-  pointer-events: auto;
-  animation: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@media (max-width: 640px) {
+  #toast-container {
+    bottom: 16px !important;
+    right: 16px !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+}
+
+.toast-message,
+.toast-donor-response,
+.patient-enroute-popup {
+  pointer-events: auto !important;
+  animation: toast-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.toast-donor-response {
+  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
+  background-color: #ffffff !important;
+  border-radius: 16px !important;
+}
+
+.patient-enroute-popup {
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.16), 0 4px 12px -2px rgba(0, 0, 0, 0.08) !important;
+  background-color: #ffffff !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(220, 38, 38, 0.12) !important;
+}
+
+.toast-donor-response.accepted {
+  border-left: 5px solid #10B981 !important;
+}
+
+.toast-donor-response.denied {
+  border-left: 5px solid #BC0202 !important;
 }
 
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.95);
+    transform: translateY(24px) scale(0.96);
   }
   to {
     opacity: 1;

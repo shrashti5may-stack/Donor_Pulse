@@ -1143,14 +1143,19 @@ class Store {
     this.saveState();
     this.notify();
 
-    // Broadcast sync event for cross-tab ringing
-    if (this.state.activeIncomingCall) {
-      this.broadcastSync({
-        type: 'NEW_REQUEST_RINGING',
-        requestId: reqId,
-        activeIncomingCall: this.state.activeIncomingCall
-      });
-    }
+    // Broadcast sync event for cross-tab and cross-portal real-time donor dispatch
+    this.broadcastSync({
+      type: 'NEW_EMERGENCY_REQUEST',
+      caseId: caseId,
+      requestId: reqId,
+      request: newPatient,
+      case: newPatient,
+      bloodGroup: bloodGroup,
+      unitsRequired: units,
+      hospitalName: hospitalName,
+      patientName: patientName,
+      activeIncomingCall: this.state.activeIncomingCall
+    });
 
     return newPatient;
   }
@@ -1339,7 +1344,7 @@ class Store {
   }
 
   // Confirm donor availability when donor accepts the emergency call
-  confirmDonorAvailability(requestId, donorId) {
+  confirmDonorAvailability(requestId, donorId, shouldBroadcast = true) {
     const recipient = this.getRecipient();
     const effectiveReqId = requestId || (recipient && recipient.requestId) || (this.state.activeIncomingCall && this.state.activeIncomingCall.requestId) || this.state.selectedRequestId || (this.state.requests && this.state.requests[0] && this.state.requests[0].id) || 'REQ-8686';
     const req = this.state.requests ? this.state.requests.find(r => r.id === effectiveReqId) : null;
@@ -1434,22 +1439,28 @@ class Store {
     // Terminate ringing call completely
     this.state.activeIncomingCall = null;
     this.saveState();
+    this.notify();
 
     // Broadcast sync event for cross-tab and cross-view synchronization
-    this.broadcastSync({
-      type: 'DONOR_CONFIRMED',
-      requestId: effectiveReqId,
-      donorId: donor.id,
-      donorName: donor.name,
-      donorBloodGroup: donor.bloodGroup,
-      unitsArranged: recipient ? recipient.unitsArranged : 1
-    });
+    if (shouldBroadcast) {
+      this.broadcastSync({
+        type: 'DONOR_RESPONSE',
+        status: 'ACCEPTED',
+        caseId: (recipient && recipient.id) || effectiveReqId,
+        requestId: effectiveReqId,
+        donorId: donor.id,
+        donorName: donor.name || donor.fullName,
+        donorBloodGroup: donor.bloodGroup,
+        eta: donor.liveEta || donor.eta || '15 mins',
+        unitsArranged: recipient ? recipient.unitsArranged : 1
+      });
+    }
 
     return { success: true, donor, recipient, req };
   }
 
   // Decline donor call
-  declineDonorCall(requestId, donorId) {
+  declineDonorCall(requestId, donorId, shouldBroadcast = true) {
     const recipient = this.getRecipient();
     const effectiveReqId = requestId || (recipient && recipient.requestId) || (this.state.activeIncomingCall && this.state.activeIncomingCall.requestId) || this.state.selectedRequestId;
     const req = this.state.requests ? this.state.requests.find(r => r.id === effectiveReqId) : null;
@@ -1479,12 +1490,19 @@ class Store {
     // Terminate active incoming call on this client so it stops ringing and closes completely
     this.state.activeIncomingCall = null;
     this.saveState();
+    this.notify();
 
-    this.broadcastSync({
-      type: 'DONOR_DECLINED',
-      requestId: effectiveReqId,
-      donorId: donor ? donor.id : donorId
-    });
+    if (shouldBroadcast) {
+      this.broadcastSync({
+        type: 'DONOR_RESPONSE',
+        status: 'DECLINED',
+        caseId: (recipient && recipient.id) || effectiveReqId,
+        requestId: effectiveReqId,
+        donorId: donor ? donor.id : donorId,
+        donorName: donor ? (donor.name || donor.fullName) : 'Volunteer Donor',
+        donorBloodGroup: donor ? donor.bloodGroup : 'O+'
+      });
+    }
 
     return { success: true, donor };
   }

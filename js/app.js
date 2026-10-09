@@ -22,30 +22,252 @@ function startApp() {
     });
   }
 
-  // Cross-tab real-time sync event listener
+  // Initialize Real-Time Bidirectional Network Grid for Donors and Recipients
+  initRealtimeEmergencyGrid();
+}
+
+// ============================================================================
+// REAL-TIME BIDIRECTIONAL REQUISITION & DONOR GRID
+// ============================================================================
+function initRealtimeEmergencyGrid() {
+  const processedEventIds = new Set();
+  let lastServerTime = Date.now() - 5000;
+  let lastEventId = 0;
+
+  function handleGridEvent(evt) {
+    if (!evt || !evt.type) return;
+
+    const currentHash = window.location.hash || '';
+    const isRecipientActive = currentHash.includes('recipient') || 
+                              currentHash.includes('patient') || 
+                              currentHash.includes('family') || 
+                              currentHash.includes('hospital') ||
+                              window.location.pathname.includes('recipient-dashboard');
+
+    // -----------------------------------------------------------------
+    // 1. NEW EMERGENCY REQUEST (Raised by Patient / Family)
+    // -----------------------------------------------------------------
+    if (evt.type === 'NEW_EMERGENCY_REQUEST' || evt.type === 'NEW_REQUEST_RINGING') {
+      const req = evt.case || evt.request || evt;
+      const bloodNeeded = req.bloodGroup || 'B+';
+
+      // Update shared state in store
+      if (window.PulseStore) {
+        window.PulseStore.addOrUpdateRecipientCase(req, false);
+      }
+
+      // Check current donor eligibility & compatibility
+      const currentDonor = window.PulseStore ? window.PulseStore.getDonor() : null;
+      const donorBlood = currentDonor ? currentDonor.bloodGroup : null;
+      const isCompat = !donorBlood || (window.PulseStore && window.PulseStore.isBloodCompatible(donorBlood, bloodNeeded));
+
+      // Show emergency pop-up window on donor portal immediately without refreshing
+      if (isCompat && !isRecipientActive) {
+        setTimeout(() => {
+          const setTxt = (id, text) => {
+            const el = document.getElementById(id);
+            if (el && text !== undefined) el.textContent = text;
+          };
+
+          setTxt('call-patient-name', req.patientName || 'Emergency Patient');
+          setTxt('call-patient-meta', `${req.patientAge || 30} Yrs / ${req.patientGender || 'Female'}`);
+          setTxt('call-blood-units-needed', `${bloodNeeded} ${req.component || 'Whole Blood'} (${req.unitsRequired || req.units || 2} Units)`);
+          setTxt('call-hospital-name', req.hospitalName || 'Emergency Trauma Center');
+          setTxt('call-hospital-ward', `${req.hospitalWard || req.ward || 'ICU'} • Emergency Wing`);
+          setTxt('call-urgency-badge', req.urgency || 'Stat Emergency (< 45 Mins)');
+          setTxt('call-attendant-info', `${req.attendantName || 'Family Attendant'} (${req.attendantPhone || '--'})`);
+          setTxt('call-clinical-reason', `"${req.clinicalReason || req.notes || 'Acute clinical transfusion needed.'}"`);
+          setTxt('docked-donor-text', `Emergency Call: ${req.patientName || 'Patient'} (${bloodNeeded})`);
+
+          if (currentDonor) {
+            setTxt('call-donor-name', currentDonor.fullName || currentDonor.name || 'Volunteer Donor');
+            setTxt('call-donor-blood', `${currentDonor.bloodGroup || bloodNeeded} Volunteer Donor`);
+            setTxt('call-donor-phone', currentDonor.phone || '+91 98000 12345');
+            setTxt('call-donor-distance', `${currentDonor.distance || 1.8} km away`);
+          }
+
+          if (window.PulseStore) {
+            window.PulseStore.setActiveIncomingCall({
+              caseId: req.id || req.caseId,
+              requestId: req.requestId || req.id,
+              patientName: req.patientName || 'Emergency Patient',
+              bloodGroup: bloodNeeded,
+              component: req.component || 'Whole Blood',
+              unitsRequired: req.unitsRequired || req.units || 2,
+              urgency: req.urgency || 'Stat Emergency (< 45 Mins)',
+              hospitalName: req.hospitalName || 'Emergency Trauma Center',
+              hospitalWard: req.hospitalWard || req.ward || 'ICU',
+              attendantName: req.attendantName || 'Family Attendant',
+              attendantPhone: req.attendantPhone || '--',
+              clinicalReason: req.clinicalReason || req.notes || 'Acute emergency transfusion needed.',
+              donorId: currentDonor ? currentDonor.id : 'DNR-4821',
+              donorName: currentDonor ? (currentDonor.fullName || currentDonor.name) : 'Volunteer Hero',
+              donorPhone: currentDonor ? currentDonor.phone : '+91 98000 12345',
+              donorBloodGroup: currentDonor ? currentDonor.bloodGroup : bloodNeeded,
+              donorDistance: currentDonor ? (currentDonor.distance || 1.8) : 1.8,
+              donorEta: currentDonor ? (currentDonor.liveEta || '15 mins') : '15 mins',
+              status: 'ringing',
+              timestamp: Date.now()
+            });
+          }
+
+          // Start Phone Ringing Audio Siren
+          if (window.PulseAudio && typeof window.PulseAudio.startPhoneRinging === 'function') {
+            window.PulseAudio.startPhoneRinging({ donorName: currentDonor ? (currentDonor.name || currentDonor.fullName) : 'Donor' });
+          }
+
+          // Ensure modal is shown immediately
+          const modal = document.getElementById('modal-incoming-donor-call');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            modal.style.zIndex = '99999';
+            document.body.classList.add('overflow-hidden');
+          }
+
+          if (window.showToast) {
+            window.showToast(
+              '🚨 CRITICAL SOS REQUISITION',
+              `Urgent request for ${req.patientName || 'Patient'} (${bloodNeeded}) at ${req.hospitalName}! Please confirm availability now.`,
+              'error'
+            );
+          }
+        }, 120);
+      }
+    }
+
+    // -----------------------------------------------------------------
+    // 2. DONOR RESPONSE (Accepted or Declined)
+    // -----------------------------------------------------------------
+    else if (evt.type === 'DONOR_RESPONSE' || evt.type === 'DONOR_CONFIRMED' || evt.type === 'DONOR_DECLINED') {
+      const isAccepted = evt.type === 'DONOR_CONFIRMED' || (evt.status && evt.status.toUpperCase() === 'ACCEPTED');
+      const donorName = evt.donorName || 'Volunteer Donor';
+      const donorBlood = evt.donorBloodGroup || '';
+      const eta = evt.eta || '15 mins';
+
+      // Deduplication: prevent multiple popups for the exact same donor response across channels
+      if (!window._seenDonorResponseTimestamps) window._seenDonorResponseTimestamps = {};
+      const donorKey = (evt.donorId || donorName || 'donor').toLowerCase().replace(/\s+/g, '');
+      const statusKey = isAccepted ? 'YES' : 'NO';
+      const token1 = `${(evt.caseId || '').toLowerCase()}_${donorKey}_${statusKey}`;
+      const token2 = `${(evt.requestId || '').toLowerCase()}_${donorKey}_${statusKey}`;
+      const token3 = `${donorKey}_${statusKey}`;
+      const responseToken = `${evt.caseId || evt.requestId || 'req'}_${evt.donorId || donorName}_${isAccepted ? 'YES' : 'NO'}`;
+      const now = Date.now();
+      if (
+        (window._seenDonorResponseTimestamps[responseToken] && (now - window._seenDonorResponseTimestamps[responseToken]) < 6000) ||
+        (window._seenDonorResponseTimestamps[token1] && (now - window._seenDonorResponseTimestamps[token1]) < 6000) ||
+        (window._seenDonorResponseTimestamps[token2] && (now - window._seenDonorResponseTimestamps[token2]) < 6000) ||
+        (window._seenDonorResponseTimestamps[token3] && (now - window._seenDonorResponseTimestamps[token3]) < 6000)
+      ) {
+        return; // Already notified within 6s! Suppress duplicate popups!
+      }
+      window._seenDonorResponseTimestamps[responseToken] = now;
+      window._seenDonorResponseTimestamps[token1] = now;
+      window._seenDonorResponseTimestamps[token2] = now;
+      window._seenDonorResponseTimestamps[token3] = now;
+
+      // Update store state (shouldBroadcast = false so this event listener does not echo back)
+      if (window.PulseStore) {
+        if (evt.case) {
+          window.PulseStore.addOrUpdateRecipientCase(evt.case, false);
+        } else if (isAccepted) {
+          window.PulseStore.confirmDonorAvailability(evt.requestId || evt.caseId, evt.donorId, false);
+        } else {
+          window.PulseStore.declineDonorCall(evt.requestId || evt.caseId, evt.donorId, false);
+        }
+      }
+
+      // If user is on Recipient Portal, show SINGLE pop up at bottom right corner immediately without refreshing!
+      const isRecipientHash = ['recipient-dashboard', 'recipient-overview', 'patient-dashboard', 'family-dashboard', 'recipient-requests', 'recipient-donors', 'recipient-tracking', 'sos-appeal'].some(r => window.location.hash.includes(r));
+      const recipientViewEl = document.getElementById('view-recipient-dashboard');
+      const isRecipientSectionActive = recipientViewEl ? recipientViewEl.classList.contains('active') : false;
+      const isDonorActive = (window.location.hash.includes('donor') && !isRecipientHash) || 
+                            (document.getElementById('view-donor-dashboard') && 
+                             document.getElementById('view-donor-dashboard').classList.contains('active') &&
+                             !isRecipientSectionActive);
+      const showOnRecipient = isRecipientActive || isRecipientHash || isRecipientSectionActive || !isDonorActive;
+
+      if (showOnRecipient) {
+        if (isAccepted) {
+          if (window.PulseAudio && typeof window.PulseAudio.playConfirmationChime === 'function') {
+            window.PulseAudio.playConfirmationChime();
+          }
+          showDonorResponseToast({
+            title: 'Donor Accepted & En Route',
+            message: `Verified donor ${donorName} (${donorBlood}) confirmed availability and is EN ROUTE (ETA: ${eta})! Handshake code ready.`,
+            isAccepted: true
+          });
+        } else {
+          if (window.PulseAudio && typeof window.PulseAudio.playDeclineTone === 'function') {
+            window.PulseAudio.playDeclineTone();
+          }
+          showDonorResponseToast({
+            title: 'Donor Response: Unavailable',
+            message: `Donor ${donorName} is unavailable. System is contacting other proximate donors in network.`,
+            isAccepted: false
+          });
+        }
+
+        if (typeof window.renderRecipientDashboard === 'function') {
+          window.renderRecipientDashboard();
+        }
+      }
+
+      // If user is on Donor Portal, re-render donor view as well
+      if (!showOnRecipient && typeof window.renderDonorDashboard === 'function') {
+        window.renderDonorDashboard();
+      }
+    }
+  }
+
+  // 1. Same-device cross-tab instant synchronization
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      const channel = new BroadcastChannel('donorpulse_cross_tab_sync');
+      channel.onmessage = (msg) => {
+        if (msg && msg.data) {
+          handleGridEvent(msg.data);
+        }
+      };
+    } catch(e) {}
+  }
+
+  // Storage event listener fallback
   if (typeof window !== 'undefined') {
     window.addEventListener('storage', (e) => {
-      if (e.key === 'donorpulse_sync_event') {
+      if (e.key === 'donorpulse_sync_event' && e.newValue) {
         try {
-          const evt = JSON.parse(e.newValue);
-          const currentHash = window.location.hash || '';
-          if (evt.type === 'NEW_REQUEST_RINGING' || evt.type === 'DONOR_RINGING') {
-            if (currentHash.includes('donor')) {
-              setTimeout(() => {
-                if (typeof window.checkAndRingMatchedDonor === 'function') {
-                  window.checkAndRingMatchedDonor();
-                }
-              }, 200);
-            }
-          } else if (evt.type === 'DONOR_CONFIRMED') {
-            if (typeof window.renderRecipientDashboard === 'function') {
-              window.renderRecipientDashboard();
-            }
-          }
+          const parsed = JSON.parse(e.newValue);
+          handleGridEvent(parsed);
         } catch(err) {}
       }
     });
   }
+
+  // 2. Cross-device & cross-browser live polling via /api/live-events (Every 1.2s)
+  async function pollServerLiveEvents() {
+    try {
+      const res = await fetch(`/api/live-events?since=${lastServerTime}&lastId=${lastEventId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && Array.isArray(data.events)) {
+          data.events.forEach(ev => {
+            if (ev.eventId && !processedEventIds.has(ev.eventId)) {
+              processedEventIds.add(ev.eventId);
+              if (ev.eventId > lastEventId) lastEventId = ev.eventId;
+              handleGridEvent({ ...ev.payload, type: ev.type, _fromServer: true });
+            }
+          });
+          if (data.serverTime) {
+            lastServerTime = data.serverTime;
+          }
+        }
+      }
+    } catch (netErr) {}
+  }
+
+  setInterval(pollServerLiveEvents, 1200);
 }
 
 if (document.readyState === 'loading') {
@@ -55,15 +277,186 @@ if (document.readyState === 'loading') {
 }
 
 // ============================================================================
-// 1. TOAST NOTIFICATION SYSTEM
+// 1. TOAST NOTIFICATION SYSTEM (PINNED TO BOTTOM-RIGHT CORNER)
 // ============================================================================
-function showToast(title, message, type = 'info') {
+function getOrCreateToastContainer() {
   let container = document.getElementById('toast-container');
   if (!container) {
     container = document.createElement('div');
     container.id = 'toast-container';
     document.body.appendChild(container);
   }
+  container.className = 'fixed bottom-6 right-6 z-[999999] flex flex-col items-end gap-2.5 pointer-events-none max-w-sm w-full';
+  container.style.position = 'fixed';
+  container.style.bottom = '24px';
+  container.style.right = '24px';
+  container.style.left = 'auto';
+  container.style.top = 'auto';
+  container.style.zIndex = '999999';
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.alignItems = 'flex-end';
+  container.style.pointerEvents = 'none';
+  return container;
+}
+
+/**
+ * Displays a single pop up message at the bottom right corner of the recipient dashboard
+ * when an emergency request is accepted or denied by a donor.
+ * Automatically clears any previous donor response popup so only ONE message is shown.
+ */
+function showDonorResponseToast({ title, message, isAccepted }) {
+  const container = getOrCreateToastContainer();
+
+  // REMOVE all existing popups in container to guarantee ONLY ONE popup is visible at the bottom right corner!
+  container.innerHTML = '';
+
+  const toast = document.createElement('div');
+  const borderClass = isAccepted
+    ? 'border-l-4 border-l-emerald-500 bg-surface-container-lowest text-on-surface shadow-2xl ring-1 ring-emerald-500/30'
+    : 'border-l-4 border-l-error bg-surface-container-lowest text-on-surface shadow-2xl ring-1 ring-error/30';
+  const customClass = isAccepted ? 'toast-donor-response accepted' : 'toast-donor-response denied';
+  const icon = isAccepted ? 'check_circle' : 'info';
+  const iconColor = isAccepted ? 'text-emerald-600' : 'text-error';
+  const badgeText = isAccepted ? 'DONOR CONFIRMED' : 'DONOR UNAVAILABLE';
+  const badgeClass = isAccepted ? 'bg-emerald-500/10 text-emerald-700' : 'bg-error/10 text-error';
+
+  toast.className = `${customClass} pointer-events-auto flex items-start gap-3.5 p-4 rounded-2xl ${borderClass} max-w-sm w-full transition-all duration-300`;
+  toast.setAttribute('role', 'alert');
+  toast.innerHTML = `
+    <div class="w-9 h-9 rounded-xl ${badgeClass} flex items-center justify-center shrink-0 mt-0.5">
+      <span class="material-symbols-outlined text-[22px] ${iconColor}" style="font-variation-settings: 'FILL' 1;">${icon}</span>
+    </div>
+    <div class="flex-1 min-w-0 pr-1">
+      <div class="flex items-center justify-between gap-2 mb-1">
+        <span class="font-label-badge text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full ${badgeClass}">
+          ${badgeText}
+        </span>
+        <span class="text-[10px] text-on-surface-variant font-medium">Just now</span>
+      </div>
+      <h4 class="font-title-md text-xs sm:text-sm font-extrabold text-on-surface leading-tight">${escapeHtml(title)}</h4>
+      <p class="font-body-sm text-[11px] sm:text-xs text-on-surface-variant mt-1 leading-relaxed">${escapeHtml(message)}</p>
+    </div>
+    <button type="button" aria-label="Dismiss notification" class="text-on-surface-variant/70 hover:text-on-surface p-1 rounded-lg hover:bg-surface-container transition-colors cursor-pointer shrink-0" onclick="this.closest('.toast-donor-response').remove()">
+      <span class="material-symbols-outlined text-[17px]">close</span>
+    </button>
+  `;
+
+  container.appendChild(toast);
+
+  // Auto-dismiss smoothly after 5.5s
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(12px)';
+      toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      setTimeout(() => toast.remove(), 320);
+    }
+  }, 5500);
+}
+
+window.showDonorResponseToast = showDonorResponseToast;
+
+/**
+ * Displays the live Earliest Arrival & En Route Telemetry popup window
+ * in the bottom right corner of the screen after the patient logs in to the recipient dashboard.
+ * Strictly guarantees ONE popup at the bottom right corner.
+ */
+function showPatientEnRoutePopup(data) {
+  const container = getOrCreateToastContainer();
+  // Clear any existing popups to guarantee strictly ONE popup visible
+  container.innerHTML = '';
+
+  let eta = '19 mins';
+  let donorName = 'Arjun Nair';
+  let bloodGroup = 'O-';
+  let confirmedCount = 1;
+
+  if (data) {
+    if (data.eta || data.liveEta) eta = data.eta || data.liveEta;
+    if (data.donorName || data.name || data.fullName) donorName = data.donorName || data.name || data.fullName;
+    if (data.bloodGroup || data.donorBloodGroup) bloodGroup = data.bloodGroup || data.donorBloodGroup;
+    if (typeof data.count === 'number') confirmedCount = data.count;
+  } else if (window.PulseStore) {
+    const recipient = (typeof window.PulseStore.getRecipient === 'function') ? window.PulseStore.getRecipient() : null;
+    const reqId = recipient ? recipient.requestId : null;
+    const confirmedList = (reqId && typeof window.PulseStore.getConfirmedDonors === 'function') 
+      ? window.PulseStore.getConfirmedDonors(reqId) 
+      : [];
+    if (confirmedList.length > 0) {
+      const first = confirmedList[0];
+      eta = first.liveEta || first.eta || '19 mins';
+      donorName = first.name || first.fullName || 'Arjun Nair';
+      bloodGroup = first.bloodGroup || 'O-';
+      confirmedCount = confirmedList.length;
+    }
+  }
+
+  const popup = document.createElement('div');
+  popup.className = 'patient-enroute-popup pointer-events-auto bg-white rounded-3xl p-4 sm:p-4.5 shadow-2xl border border-rose-100 max-w-sm w-full transition-all duration-300 relative select-none animate-slide-up';
+  popup.style.boxShadow = '0 16px 36px -6px rgba(0, 0, 0, 0.16), 0 4px 12px -2px rgba(0, 0, 0, 0.08)';
+  popup.style.backgroundColor = '#FFFFFF';
+  popup.style.borderRadius = '24px';
+  popup.setAttribute('role', 'status');
+
+  popup.innerHTML = `
+    <div class="flex items-center justify-between gap-2.5">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm" style="background-color: #00875A;">
+          <span class="material-symbols-outlined text-[22px]">two_wheeler</span>
+        </div>
+        <div class="flex flex-col min-w-0">
+          <span class="font-bold text-[14px] sm:text-[15px] text-[#1F2937] leading-tight truncate">${escapeHtml(eta)} Earliest Arrival</span>
+          <span class="text-[12px] sm:text-[12.5px] font-semibold text-[#D45060] leading-tight mt-0.5 truncate">${confirmedCount} Donor(s) Confirmed En Route</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <span class="px-2.5 py-1 rounded-md bg-[#D1FADF]/80 text-[#027A48] text-[11px] font-bold tracking-tight shrink-0" style="background-color: #D1FADF; color: #027A48;">En Route</span>
+        <button type="button" aria-label="Dismiss notification" class="text-gray-400 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer shrink-0 ml-0.5" onclick="this.closest('.patient-enroute-popup').remove()">
+          <span class="material-symbols-outlined text-[16px]">close</span>
+        </button>
+      </div>
+    </div>
+    <div class="mt-3 p-2.5 sm:p-3 rounded-2xl bg-[#FDF4EB] flex items-center justify-between text-xs sm:text-[12.5px] border border-[#FBEAD2]/60" style="background-color: #FDF4EB;">
+      <span class="flex items-center gap-1.5 font-bold text-[#C8102E] truncate pr-2">
+        <span class="material-symbols-outlined text-[16px] shrink-0 font-bold" style="color: #C8102E;">directions_car</span>
+        <span class="truncate">${escapeHtml(donorName)} (${escapeHtml(bloodGroup)})</span>
+      </span>
+      <span class="font-bold text-[#D45060] shrink-0 whitespace-nowrap">ETA: ${escapeHtml(eta)}</span>
+    </div>
+  `;
+
+  container.appendChild(popup);
+
+  // Auto-dismiss smoothly after 10s if not manually dismissed
+  setTimeout(() => {
+    if (popup.parentElement) {
+      popup.style.opacity = '0';
+      popup.style.transform = 'translateY(12px)';
+      popup.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      setTimeout(() => popup.remove(), 320);
+    }
+  }, 10000);
+}
+
+window.showPatientEnRoutePopup = showPatientEnRoutePopup;
+
+function showToast(title, message, type = 'info') {
+  const container = getOrCreateToastContainer();
+
+  // If a donor response toast or patient enroute popup is currently active, preserve strictly ONE popup
+  if (container.querySelector('.toast-donor-response, .patient-enroute-popup')) {
+    return;
+  }
+
+  // Deduplication: prevent stacking identical toasts
+  const existing = Array.from(container.querySelectorAll('.toast-message, .toast-donor-response'));
+  const isDuplicate = existing.some(el => {
+    const t = el.querySelector('h4')?.textContent;
+    const m = el.querySelector('p')?.textContent;
+    return t === title && m === message;
+  });
+  if (isDuplicate) return;
 
   const toast = document.createElement('div');
   const iconMap = {
@@ -82,14 +475,14 @@ function showToast(title, message, type = 'info') {
   const icon = iconMap[type] || 'info';
   const color = colorMap[type] || 'border-primary text-primary';
 
-  toast.className = `toast-message flex items-start gap-3 bg-surface-container-lowest text-on-surface p-4 rounded-xl shadow-xl border-l-4 ${color} max-w-sm w-full`;
+  toast.className = `toast-message pointer-events-auto flex items-start gap-3 bg-surface-container-lowest text-on-surface p-4 rounded-xl shadow-xl border-l-4 ${color} max-w-sm w-full`;
   toast.innerHTML = `
     <span class="material-symbols-outlined shrink-0 text-[24px]">${icon}</span>
     <div class="flex-1 min-w-0">
       <h4 class="font-title-md text-title-md font-bold text-on-surface">${escapeHtml(title)}</h4>
       <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-snug">${escapeHtml(message)}</p>
     </div>
-    <button class="text-on-surface-variant hover:text-on-surface text-sm" onclick="this.parentElement.remove()">
+    <button class="text-on-surface-variant hover:text-on-surface text-sm cursor-pointer p-0.5" onclick="this.parentElement.remove()">
       <span class="material-symbols-outlined text-[18px]">close</span>
     </button>
   `;
@@ -97,15 +490,19 @@ function showToast(title, message, type = 'info') {
   container.appendChild(toast);
 
   setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(10px)';
-    toast.style.transition = 'all 0.3s ease';
-    setTimeout(() => toast.remove(), 300);
+    if (toast.parentElement) {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      toast.style.transition = 'all 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }
   }, 4500);
 }
 
 function initToasts() {
   window.showToast = showToast;
+  window.showDonorResponseToast = showDonorResponseToast;
+  window.showPatientEnRoutePopup = showPatientEnRoutePopup;
 }
 
 // ============================================================================
@@ -135,6 +532,16 @@ function initRouterHooks() {
         window.renderRecipientDashboard();
       } else if (typeof renderHospitalDashboard === 'function') {
         renderHospitalDashboard();
+      }
+
+      // Show the patient en route telemetry popup in bottom-right corner after patient logs in
+      if (sessionStorage.getItem('show_patient_enroute_popup') === 'true') {
+        sessionStorage.removeItem('show_patient_enroute_popup');
+        setTimeout(() => {
+          if (typeof window.showPatientEnRoutePopup === 'function') {
+            window.showPatientEnRoutePopup();
+          }
+        }, 400);
       }
     } else if (['donor-dashboard', 'nearby-requests', 'dashboard/requests', 'donor-dashboard/requests', 'donor-requests', 'donor-requests-section', 'donation-history', 'donor-history'].includes(route)) {
       renderDonorDashboard();
@@ -3489,17 +3896,52 @@ window.confirmActiveDonorAvailability = function(explicitDonorId) {
     }
   }
 
+  // 3b. Sync to server in real time so recipient on ANY device sees it immediately without refresh
+  const caseId = (recipient && (recipient.id || recipient.caseId)) || (activeCall && (activeCall.caseId || activeCall.id)) || reqId;
+  const donorBloodGroup = (loggedInDonor && loggedInDonor.bloodGroup) || (activeCall && activeCall.donorBloodGroup) || 'O+';
+  const donorPhone = (loggedInDonor && loggedInDonor.phone) || (activeCall && activeCall.donorPhone) || '+91 98000 00000';
+  const donorEta = (activeCall && (activeCall.donorEta || activeCall.liveEta)) || '15 mins';
+  const donorDistance = (activeCall && activeCall.donorDistance) || 1.8;
+
+  try {
+    fetch('/api/donor/respond', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        caseId: caseId,
+        requestId: reqId,
+        donorId: donorId,
+        donorName: confirmedDonorName,
+        donorBloodGroup: donorBloodGroup,
+        donorPhone: donorPhone,
+        status: 'ACCEPTED',
+        eta: donorEta,
+        distance: donorDistance
+      })
+    }).catch(err => console.warn('Donor accept API sync notice:', err));
+  } catch (e) {}
+
   // 4. Force Close Modal immediately
   window.closeIncomingDonorCallModal();
 
   // 5. Show Toast
-  const patName = (recipient && recipient.patientName) || (activeCall && activeCall.patientName) || 'patient';
-  if (window.showToast) {
-    window.showToast(
-      '🎉 Availability Confirmed!',
-      `${confirmedDonorName} confirmed availability for ${patName} and is now En Route!`,
-      'success'
-    );
+  const isDonorView = window.location.hash.includes('donor') || (document.getElementById('view-donor-dashboard') && document.getElementById('view-donor-dashboard').classList.contains('active'));
+  if (isDonorView) {
+    const patName = (recipient && recipient.patientName) || (activeCall && activeCall.patientName) || 'patient';
+    if (window.showToast) {
+      window.showToast(
+        '🎉 Availability Confirmed!',
+        `${confirmedDonorName} confirmed availability for ${patName} and is now En Route!`,
+        'success'
+      );
+    }
+  } else {
+    // If triggered from Recipient view perspective, show single bottom-right popup
+    showDonorResponseToast({
+      title: 'Donor Accepted & En Route',
+      message: `Verified donor ${confirmedDonorName} confirmed availability and is EN ROUTE (ETA: ${donorEta})! Handshake code ready.`,
+      isAccepted: true
+    });
   }
 
   // 6. Re-Render Dashboards
@@ -3549,12 +3991,42 @@ window.declineActiveDonorCall = function(explicitDonorId) {
     window.PulseStore.declineDonorCall(reqId, donorId);
   }
 
+  // 3b. Sync decline to server in real time
+  const caseId = (recipient && (recipient.id || recipient.caseId)) || (activeCall && (activeCall.caseId || activeCall.id)) || reqId;
+  const declinedDonorName = (loggedInDonor && (loggedInDonor.fullName || loggedInDonor.name)) || (activeCall && activeCall.donorName) || 'Volunteer Donor';
+  const donorBloodGroup = (loggedInDonor && loggedInDonor.bloodGroup) || (activeCall && activeCall.donorBloodGroup) || 'O+';
+
+  try {
+    fetch('/api/donor/respond', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        caseId: caseId,
+        requestId: reqId,
+        donorId: donorId,
+        donorName: declinedDonorName,
+        donorBloodGroup: donorBloodGroup,
+        status: 'DECLINED'
+      })
+    }).catch(err => console.warn('Donor decline API sync notice:', err));
+  } catch (e) {}
+
   // 4. Force Close Modal immediately
   window.closeIncomingDonorCallModal();
 
   // 5. Show notification
-  if (window.showToast) {
-    window.showToast('Call Concluded', 'Emergency grid recorded your response. Standby status maintained.', 'info');
+  const isDonorView = window.location.hash.includes('donor') || (document.getElementById('view-donor-dashboard') && document.getElementById('view-donor-dashboard').classList.contains('active'));
+  if (isDonorView) {
+    if (window.showToast) {
+      window.showToast('Call Concluded', 'Emergency grid recorded your response. Standby status maintained.', 'info');
+    }
+  } else {
+    // If triggered from Recipient view perspective, show single bottom-right popup
+    showDonorResponseToast({
+      title: 'Donor Response: Unavailable',
+      message: `Donor ${declinedDonorName} is unavailable. System is contacting other proximate donors in network.`,
+      isAccepted: false
+    });
   }
 
   // 6. Re-Render Dashboards
@@ -3602,16 +4074,38 @@ window.simulateDonorAnswerDirectly = function(donorId) {
       if (window.PulseAudio && typeof window.PulseAudio.playConfirmationChime === 'function') {
         window.PulseAudio.playConfirmationChime();
       }
-      if (window.showToast) {
-        window.showToast(
-          '🎉 Donor Confirmed Availability!',
-          `${res.donor.name} (${res.donor.bloodGroup}) accepted the emergency requisition! Transit telemetry and arrival PIN verification are now active.`,
-          'success'
-        );
-      }
+      showDonorResponseToast({
+        title: 'Donor Accepted & En Route',
+        message: `Verified donor ${res.donor.name} (${res.donor.bloodGroup}) confirmed availability and is EN ROUTE (ETA: ${res.donor.liveEta || '15 mins'})! Handshake code ready.`,
+        isAccepted: true
+      });
       if (typeof window.renderRecipientDashboard === 'function') {
         window.renderRecipientDashboard();
       }
+    }
+  }
+};
+
+window.simulateDonorDeclineDirectly = function(donorId) {
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
+    ? window.PulseStore.getRecipient()
+    : null;
+  if (!recipient || !recipient.requestId) return;
+  const reqId = recipient.requestId;
+
+  if (window.PulseStore && typeof window.PulseStore.declineDonorCall === 'function') {
+    const res = window.PulseStore.declineDonorCall(reqId, donorId);
+    const donorName = (res && res.donor && (res.donor.name || res.donor.fullName)) || 'Volunteer Donor';
+    if (window.PulseAudio && typeof window.PulseAudio.playDeclineTone === 'function') {
+      window.PulseAudio.playDeclineTone();
+    }
+    showDonorResponseToast({
+      title: 'Donor Response: Unavailable',
+      message: `Donor ${donorName} is unavailable. System is contacting other proximate donors in network.`,
+      isAccepted: false
+    });
+    if (typeof window.renderRecipientDashboard === 'function') {
+      window.renderRecipientDashboard();
     }
   }
 };
@@ -5054,7 +5548,31 @@ window.approveDonorRequest = function() {
   window.closeDonorRequestModal();
 
   const reqId = req.id || req.requestId || 'REQ-9042';
-  const donorId = (window.PulseStore && window.PulseStore.state && window.PulseStore.state.donor) ? window.PulseStore.state.donor.id : 'DNR-4821';
+  const donor = (window.PulseStore && window.PulseStore.state && window.PulseStore.state.donor) ? window.PulseStore.state.donor : { id: 'DNR-4821', fullName: 'Volunteer Donor', bloodGroup: 'O-' };
+  const donorId = donor.id || 'DNR-4821';
+  const donorName = donor.fullName || donor.name || 'Volunteer Donor';
+  const donorBlood = donor.bloodGroup || 'O-';
+
+  if (window.PulseStore && typeof window.PulseStore.confirmDonorAvailability === 'function') {
+    window.PulseStore.confirmDonorAvailability(reqId, donorId);
+  }
+
+  try {
+    fetch('/api/donor/respond', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        caseId: reqId,
+        requestId: reqId,
+        donorId: donorId,
+        donorName: donorName,
+        donorBloodGroup: donorBlood,
+        status: 'ACCEPTED',
+        eta: '15 mins'
+      })
+    }).catch(() => {});
+  } catch (e) {}
+
   try {
     fetch(`/api/requests/${reqId}/accept`, {
       method: 'POST',
@@ -5083,7 +5601,28 @@ window.declineDonorRequest = function() {
   window.closeDonorRequestModal();
 
   const reqId = req.id || req.requestId || 'REQ-9042';
-  const donorId = (window.PulseStore && window.PulseStore.state && window.PulseStore.state.donor) ? window.PulseStore.state.donor.id : 'DNR-4821';
+  const donor = (window.PulseStore && window.PulseStore.state && window.PulseStore.state.donor) ? window.PulseStore.state.donor : { id: 'DNR-4821', fullName: 'Volunteer Donor' };
+  const donorId = donor.id || 'DNR-4821';
+  const donorName = donor.fullName || donor.name || 'Volunteer Donor';
+
+  if (window.PulseStore && typeof window.PulseStore.declineDonorCall === 'function') {
+    window.PulseStore.declineDonorCall(reqId, donorId);
+  }
+
+  try {
+    fetch('/api/donor/respond', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        caseId: reqId,
+        requestId: reqId,
+        donorId: donorId,
+        donorName: donorName,
+        status: 'DECLINED'
+      })
+    }).catch(() => {});
+  } catch (e) {}
+
   try {
     fetch(`/api/requests/${reqId}/decline`, {
       method: 'POST',
@@ -5887,8 +6426,10 @@ window.handleHospitalLoginSubmit = async function(e) {
 
   window.closeHospitalLoginModal();
 
-  const displayName = matchedCase ? matchedCase.patientName : idVal;
-  if (window.showToast) window.showToast('Patient Case Authenticated', `Welcome back. Access granted for ${displayName}.`, 'success');
+  // Set flag so telemetry popup is displayed upon entering recipient dashboard
+  sessionStorage.setItem('show_patient_enroute_popup', 'true');
+  sessionStorage.setItem('donorpulse_patient_authenticated', 'true');
+
   if (window.PulseRouter) {
     window.PulseRouter.navigate('recipient-dashboard');
   } else {
@@ -5897,6 +6438,13 @@ window.handleHospitalLoginSubmit = async function(e) {
   if (typeof window.renderRecipientDashboard === 'function') {
     window.renderRecipientDashboard();
   }
+
+  // Display the live telemetry pop up window in bottom right corner
+  setTimeout(() => {
+    if (typeof window.showPatientEnRoutePopup === 'function') {
+      window.showPatientEnRoutePopup();
+    }
+  }, 400);
 
   return false;
 };
@@ -6086,6 +6634,31 @@ window.confirmImmediateDeclination = function() {
     btn.disabled = true;
   }
 
+  const donor = (window.PulseStore && typeof window.PulseStore.getDonor === 'function') ? window.PulseStore.getDonor() : null;
+  const donorId = (donor && donor.id) || 'DNR-4821';
+  const donorName = (donor && (donor.fullName || donor.name)) || 'Volunteer Donor';
+  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function') ? window.PulseStore.getRecipient() : null;
+  const reqId = (recipient && recipient.requestId) || 'REQ-MANIPAL-8921';
+  const caseId = (recipient && (recipient.id || recipient.caseId)) || 'CASE-8686';
+
+  if (window.PulseStore && typeof window.PulseStore.declineDonorCall === 'function') {
+    window.PulseStore.declineDonorCall(reqId, donorId);
+  }
+
+  try {
+    fetch('/api/donor/respond', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        caseId: caseId,
+        requestId: reqId,
+        donorId: donorId,
+        donorName: donorName,
+        status: 'DECLINED'
+      })
+    }).catch(() => {});
+  } catch (e) {}
+
   if (typeof window.showToast === 'function') {
     window.showToast('Response Logged', `Requisition declined (${reasonText.slice(0, 32)}...). System alerted next reserve donor.`, 'info');
   } else {
@@ -6141,6 +6714,34 @@ window.approveImmediateResponse = function() {
       btn.innerHTML = `<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span><span>Dispatched • ETA ${etaDisplay}</span>`;
       btn.disabled = true;
     }
+
+    const donor = (window.PulseStore && typeof window.PulseStore.getDonor === 'function') ? window.PulseStore.getDonor() : null;
+    const donorId = (donor && donor.id) || 'DNR-4821';
+    const donorName = (donor && (donor.fullName || donor.name)) || 'Volunteer Donor';
+    const donorBlood = (donor && donor.bloodGroup) || 'O-';
+    const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function') ? window.PulseStore.getRecipient() : null;
+    const reqId = (recipient && recipient.requestId) || 'REQ-MANIPAL-8921';
+    const caseId = (recipient && (recipient.id || recipient.caseId)) || 'CASE-8686';
+
+    if (window.PulseStore && typeof window.PulseStore.confirmDonorAvailability === 'function') {
+      window.PulseStore.confirmDonorAvailability(reqId, donorId);
+    }
+
+    try {
+      fetch('/api/donor/respond', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          caseId: caseId,
+          requestId: reqId,
+          donorId: donorId,
+          donorName: donorName,
+          donorBloodGroup: donorBlood,
+          status: 'ACCEPTED',
+          eta: etaDisplay
+        })
+      }).catch(() => {});
+    } catch (e) {}
 
     if (typeof window.showToast === 'function') {
       window.showToast('Immediate Response Confirmed', `Manipal Hospital Trauma Bay paged. Estimated arrival logged as ${etaDisplay}. Emergency transit pass active.`, 'success');

@@ -128,6 +128,25 @@ load_donors()
 load_hospitals()
 load_recipient_cases()
 
+# Real-time event bus across all devices & portals
+LIVE_EVENTS = []
+EVENT_ID_COUNTER = 0
+
+def record_live_event(event_type, payload):
+    global EVENT_ID_COUNTER, LIVE_EVENTS
+    EVENT_ID_COUNTER += 1
+    now_ms = int(datetime.now().timestamp() * 1000)
+    event_data = {
+        "eventId": EVENT_ID_COUNTER,
+        "type": event_type,
+        "payload": payload,
+        "timestamp": now_ms
+    }
+    LIVE_EVENTS.append(event_data)
+    if len(LIVE_EVENTS) > 300:
+        LIVE_EVENTS = LIVE_EVENTS[-300:]
+    return event_data
+
 def init_db():
     pass
 
@@ -297,6 +316,41 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({"success": True, "events": events}).encode('utf-8'))
             return
 
+        # API: GET /api/live-events?since=<ms>&lastId=<id> (Real-Time Emergency Bus for Donors & Recipients)
+        if clean_path == '/api/live-events':
+            since_ts = 0
+            last_id = 0
+            q_params = {}
+            if '?' in self.path:
+                try:
+                    import urllib.parse
+                    q_params = urllib.parse.parse_qs(self.path.split('?')[1])
+                    if 'since' in q_params:
+                        since_ts = int(q_params['since'][0])
+                    if 'lastId' in q_params:
+                        last_id = int(q_params['lastId'][0])
+                except Exception:
+                    pass
+
+            if last_id > 0:
+                new_events = [e for e in LIVE_EVENTS if e["eventId"] > last_id]
+            elif since_ts > 0:
+                new_events = [e for e in LIVE_EVENTS if e["timestamp"] > since_ts]
+            elif 'lastId' in q_params or 'since' in q_params:
+                new_events = [e for e in LIVE_EVENTS if e["eventId"] > last_id]
+            else:
+                new_events = []
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": True,
+                "events": new_events,
+                "serverTime": int(datetime.now().timestamp() * 1000),
+                "activeCaseId": CURRENT_ACTIVE_CASE_ID
+            }).encode('utf-8'))
+            return
+
         # Prevent directory traversal
         full_path = os.path.normpath(os.path.join(DIRECTORY, clean_path.lstrip('/\\')))
         if not full_path.startswith(DIRECTORY):
@@ -314,6 +368,7 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         clean_path = self.path.split('?')[0].split('#')[0]
+        global CURRENT_ACTIVE_CASE_ID, CURRENT_ACTIVE_DONOR_ID
 
         # API: POST /api/recipient/login - Authenticate case and return across all devices
         if clean_path == '/api/recipient/login':
@@ -327,7 +382,6 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
             target_id = str(body.get('id') or body.get('caseId') or body.get('username') or '').strip()
             target_pwd = str(body.get('password') or body.get('phone') or body.get('pin') or '').strip()
 
-            global CURRENT_ACTIVE_CASE_ID
             matched = None
 
             clean_tid = target_id.lower().replace(' ', '')
@@ -398,6 +452,26 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 DB_RECIPIENT_CASES[cid] = case_obj
                 CURRENT_ACTIVE_CASE_ID = cid
                 save_recipient_cases()
+
+                # Broadcast real-time emergency requisition to all matched donors
+                record_live_event("NEW_EMERGENCY_REQUEST", {
+                    "case": case_obj,
+                    "caseId": cid,
+                    "requestId": case_obj.get('requestId') or f"REQ-{cid.split('-')[-1] if '-' in cid else cid}",
+                    "patientName": case_obj.get('patientName', 'Emergency Patient'),
+                    "patientAge": case_obj.get('patientAge', 30),
+                    "patientGender": case_obj.get('patientGender', 'Other'),
+                    "bloodGroup": case_obj.get('bloodGroup', 'B+'),
+                    "component": case_obj.get('component', 'Whole Blood'),
+                    "unitsRequired": case_obj.get('unitsRequired', 2),
+                    "hospitalName": case_obj.get('hospitalName', 'Emergency Hospital Facility'),
+                    "hospitalWard": case_obj.get('hospitalWard') or case_obj.get('ward', 'ICU'),
+                    "attendantName": case_obj.get('attendantName', 'Family Attendant'),
+                    "attendantPhone": case_obj.get('attendantPhone', '+91 98000 00000'),
+                    "urgency": case_obj.get('urgency', 'Stat Emergency (< 45 Mins)'),
+                    "clinicalReason": case_obj.get('clinicalReason') or case_obj.get('notes', 'Acute clinical requirement')
+                })
+
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
@@ -409,6 +483,233 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps({"success": False, "error": "Invalid case object"}).encode('utf-8'))
                 return
+
+        # API: POST /api/donor/respond - Donor accepts or declines emergency requisition in real time
+        if clean_path == '/api/donor/respond':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            case_id = body.get('caseId') or body.get('id')
+            req_id = body.get('requestId')
+            donor_id = body.get('donorId')
+            donor_name = body.get('donorName') or 'Volunteer Donor'
+            donor_blood = body.get('donorBloodGroup') or 'O+'
+            donor_phone = body.get('donorPhone') or '+91 98000 00000'
+            status = (body.get('status') or 'ACCEPTED').upper()
+            eta = body.get('eta') or '15 mins'
+
+            # Find matching case in persistent database
+            target_case = None
+            if case_id and case_id in DB_RECIPIENT_CASES:
+                target_case = DB_RECIPIENT_CASES[case_id]
+            elif req_id:
+                for c in DB_RECIPIENT_CASES.values():
+                    if c.get('requestId') == req_id or c.get('id') == req_id or c.get('caseId') == req_id:
+                        target_case = c
+                        break
+            if not target_case and CURRENT_ACTIVE_CASE_ID in DB_RECIPIENT_CASES:
+                target_case = DB_RECIPIENT_CASES[CURRENT_ACTIVE_CASE_ID]
+            if not target_case and DB_RECIPIENT_CASES:
+                target_case = list(DB_RECIPIENT_CASES.values())[0]
+            if not target_case:
+                target_case = {
+                    "id": case_id or "CASE-8686",
+                    "requestId": req_id or "REQ-8686",
+                    "patientName": "Aarav Sharma",
+                    "hospitalName": "Manipal Hospital",
+                    "bloodGroup": donor_blood or "O+",
+                    "donors": [],
+                    "unitsArranged": 0,
+                    "unitsRequired": 2,
+                    "trackingStage": 3
+                }
+                DB_RECIPIENT_CASES[target_case["id"]] = target_case
+
+            if target_case:
+                if not isinstance(target_case.get('donors'), list):
+                    target_case['donors'] = []
+
+                donor_record = None
+                for d in target_case['donors']:
+                    if d.get('id') == donor_id or d.get('name') == donor_name:
+                        donor_record = d
+                        break
+
+                if not donor_record:
+                    donor_record = {
+                        "id": donor_id or f"DNR-{len(target_case['donors']) + 1}",
+                        "name": donor_name,
+                        "fullName": donor_name,
+                        "bloodGroup": donor_blood,
+                        "phone": donor_phone,
+                        "distance": body.get('distance', 1.8),
+                        "liveEta": eta,
+                        "transitMode": "🚗 Emergency Corridor"
+                    }
+                    target_case['donors'].append(donor_record)
+
+                if status == 'ACCEPTED':
+                    donor_record['confirmed'] = True
+                    donor_record['callStatus'] = 'confirmed'
+                    donor_record['transitStatus'] = '🚗 Confirmed & En Route'
+                    donor_record['statusClass'] = 'bg-emerald-500/20 text-emerald-800 font-bold border border-emerald-500/40'
+                    donor_record['confirmedAt'] = datetime.now(timezone.utc).isoformat()
+                    donor_record['liveEta'] = eta
+                    target_case['unitsArranged'] = min(
+                        int(target_case.get('unitsRequired', 2)),
+                        int(target_case.get('unitsArranged', 0)) + 1
+                    )
+                    target_case['trackingStage'] = 4
+                else:
+                    donor_record['confirmed'] = False
+                    donor_record['callStatus'] = 'declined'
+                    donor_record['transitStatus'] = '❌ Declined / Busy'
+                    donor_record['statusClass'] = 'bg-surface-container-high text-on-surface-variant line-through opacity-60'
+
+                save_recipient_cases()
+
+                event_payload = {
+                    "caseId": target_case.get('id') or case_id,
+                    "requestId": target_case.get('requestId') or req_id,
+                    "patientName": target_case.get('patientName'),
+                    "hospitalName": target_case.get('hospitalName'),
+                    "donorId": donor_id,
+                    "donorName": donor_name,
+                    "donorBloodGroup": donor_blood,
+                    "donorPhone": donor_phone,
+                    "status": status,
+                    "eta": eta,
+                    "unitsArranged": target_case.get('unitsArranged', 1),
+                    "unitsRequired": target_case.get('unitsRequired', 2),
+                    "case": target_case
+                }
+                record_live_event("DONOR_RESPONSE", event_payload)
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "success": True,
+                    "message": f"Donor response '{status}' registered and broadcasted in real time.",
+                    "case": target_case
+                }).encode('utf-8'))
+                return
+            else:
+                self.send_response(404)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+        # API: POST /api/requests/:id/accept or /api/requests/:id/decline
+        if clean_path.startswith('/api/requests/') and (clean_path.endswith('/accept') or clean_path.endswith('/decline')):
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            is_accept = clean_path.endswith('/accept')
+            status = 'ACCEPTED' if is_accept else 'DECLINED'
+            parts = clean_path.strip('/').split('/')
+            req_id = parts[2] if len(parts) >= 3 else 'REQ-8686'
+            donor_id = body.get('donorId') or CURRENT_ACTIVE_DONOR_ID or 'DNR-4821'
+            donor_record = DB_DONORS.get(donor_id) or {}
+            donor_name = donor_record.get('fullName') or donor_record.get('name') or 'Volunteer Donor'
+            donor_blood = donor_record.get('bloodGroup') or 'O+'
+
+            target_case = None
+            for c in DB_RECIPIENT_CASES.values():
+                if c.get('requestId') == req_id or c.get('id') == req_id:
+                    target_case = c
+                    break
+            if not target_case and CURRENT_ACTIVE_CASE_ID in DB_RECIPIENT_CASES:
+                target_case = DB_RECIPIENT_CASES[CURRENT_ACTIVE_CASE_ID]
+            if not target_case and DB_RECIPIENT_CASES:
+                target_case = list(DB_RECIPIENT_CASES.values())[0]
+            if not target_case:
+                target_case = {
+                    "id": req_id,
+                    "requestId": req_id,
+                    "patientName": "Aarav Sharma",
+                    "hospitalName": "Manipal Hospital",
+                    "bloodGroup": donor_blood,
+                    "donors": [],
+                    "unitsArranged": 0,
+                    "unitsRequired": 2,
+                    "trackingStage": 3
+                }
+                DB_RECIPIENT_CASES[target_case["id"]] = target_case
+
+            if not isinstance(target_case.get('donors'), list):
+                target_case['donors'] = []
+
+            d_rec = None
+            for d in target_case['donors']:
+                if d.get('id') == donor_id or d.get('name') == donor_name:
+                    d_rec = d
+                    break
+            if not d_rec:
+                d_rec = {
+                    "id": donor_id,
+                    "name": donor_name,
+                    "fullName": donor_name,
+                    "bloodGroup": donor_blood,
+                    "phone": donor_record.get('phone', '+91 98000 00000'),
+                    "distance": 1.8,
+                    "liveEta": "15 mins",
+                    "transitMode": "🚗 Emergency Corridor"
+                }
+                target_case['donors'].append(d_rec)
+
+            if is_accept:
+                d_rec['confirmed'] = True
+                d_rec['callStatus'] = 'confirmed'
+                d_rec['transitStatus'] = '🚗 Confirmed & En Route'
+                d_rec['statusClass'] = 'bg-emerald-500/20 text-emerald-800 font-bold border border-emerald-500/40'
+                d_rec['confirmedAt'] = datetime.now(timezone.utc).isoformat()
+                d_rec['liveEta'] = '15 mins'
+                target_case['unitsArranged'] = min(
+                    int(target_case.get('unitsRequired', 2)),
+                    int(target_case.get('unitsArranged', 0)) + 1
+                )
+                target_case['trackingStage'] = 4
+            else:
+                d_rec['confirmed'] = False
+                d_rec['callStatus'] = 'declined'
+                d_rec['transitStatus'] = '❌ Declined / Busy'
+                d_rec['statusClass'] = 'bg-surface-container-high text-on-surface-variant line-through opacity-60'
+
+            save_recipient_cases()
+
+            event_payload = {
+                "caseId": target_case.get('id') or req_id,
+                "requestId": target_case.get('requestId') or req_id,
+                "patientName": target_case.get('patientName'),
+                "hospitalName": target_case.get('hospitalName'),
+                "donorId": donor_id,
+                "donorName": donor_name,
+                "donorBloodGroup": donor_blood,
+                "donorPhone": donor_record.get('phone', '+91 98000 00000'),
+                "status": status,
+                "eta": "15 mins",
+                "unitsArranged": target_case.get('unitsArranged', 1),
+                "unitsRequired": target_case.get('unitsRequired', 2),
+                "case": target_case
+            }
+            record_live_event("DONOR_RESPONSE", event_payload)
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": True,
+                "message": f"Donor response '{status}' registered and broadcasted.",
+                "case": target_case
+            }).encode('utf-8'))
+            return
 
         # API: POST /api/donor/register - Store input data from ANY device and generate credentials
         if clean_path == '/api/donor/register':
@@ -465,7 +766,6 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 }
             }
 
-            global CURRENT_ACTIVE_DONOR_ID
             CURRENT_ACTIVE_DONOR_ID = new_id
             DB_DONORS[new_id] = new_donor
             DB_USERS[new_id] = new_donor

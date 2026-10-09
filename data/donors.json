@@ -449,5 +449,48 @@
       "pulse": "72 bpm",
       "weight": "68 kg"
     }
+  },
+  {
+    "id": "DP-1990-B",
+    "_id": "DP-1990-B",
+    "name": "Test Functional Donor",
+    "fullName": "Test Functional Donor",
+    "initials": "TF",
+    "age": 28,
+    "gender": "Not specified",
+    "bloodGroup": "B+",
+    "phone": "+91 98888 77777",
+    "email": "test.donor@pulse.in",
+    "password": "+91 98888 77777",
+    "address": "Koramangala 5th Block",
+    "city": "Bengaluru",
+    "medicalHistory": "Pre-screened verified donor. Clinical vitals within healthy standard range.",
+    "lastDonationDate": "First-time Donor",
+    "nextEligibleDate": "Eligible Now",
+    "availability": true,
+    "radiusMiles": 10,
+    "totalDonations": 0,
+    "livesSaved": 0,
+    "rewardPoints": 100,
+    "rewardTier": "Active Registered Donor",
+    "distance": 1.5,
+    "isAvailable": true,
+    "verified": true,
+    "isPhoneVerified": true,
+    "role": "DONOR",
+    "coordinates": {
+      "type": "Point",
+      "coordinates": [
+        77.6,
+        12.95
+      ]
+    },
+    "donationHistory": [],
+    "vitals": {
+      "hemoglobin": "14.2 g/dL",
+      "bp": "120/80 mmHg",
+      "pulse": "72 bpm",
+      "weight": "68 kg"
+    }
   }
 ]
