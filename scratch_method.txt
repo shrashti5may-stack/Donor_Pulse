@@ -1,0 +1,196 @@
+async createNewPatientRequest(data) {
+    const randomCaseNum = Math.floor(1000 + Math.random() * 9000);
+    const caseId = 'CASE-' + randomCaseNum;
+    const reqId = 'REQ-' + randomCaseNum;
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+    const patientName = (data.patientName && data.patientName.trim()) ? data.patientName.trim() : 'Patient Case ' + randomCaseNum;
+    const patientAge = parseInt(data.patientAge || 30, 10);
+    const patientGender = data.patientGender || 'Other';
+    const bloodGroup = (data.bloodGroup || 'O-').trim();
+    const component = data.component || 'Platelets (Apheresis)';
+    const units = parseInt(data.unitsRequired || data.units || 2, 10);
+    const urgency = data.urgency || 'Stat Emergency (< 45 Mins)';
+    const hospitalName = (data.hospitalName && data.hospitalName.trim()) ? data.hospitalName.trim() : 'Emergency Trauma Center';
+    const hospitalWard = (data.ward || data.hospitalWard || 'ICU Ward 4B, Bed 12').trim();
+    const attendantName = (data.attendantName && data.attendantName.trim()) ? data.attendantName.trim() : 'Immediate Family';
+    const attendantRelation = (data.attendantRelation && data.attendantRelation.trim()) ? data.attendantRelation.trim() : 'Family Attendant';
+    const attendantPhone = (data.attendantPhone && data.attendantPhone.trim()) ? data.attendantPhone.trim() : '';
+    const clinicalReason = (data.notes || data.clinicalReason || 'Acute clinical blood requirement, emergency broadcast.').trim();
+
+    // MATCH COMPATIBLE DONORS ONLY FROM ACTUAL REGISTERED DONORS IN matchedDonorsPool!
+    const compatDonors = this.getMatchedDonors(bloodGroup);
+    const requestDonors = compatDonors.map((d, index) => ({
+      ...d,
+      confirmed: false,
+      callStatus: 'ringing',
+      transitStatus: '📞 Ringing / Awaiting Confirmation',
+      statusClass: 'bg-amber-500/20 text-amber-800 font-semibold border border-amber-400/30',
+      notified: true,
+      liveEta: d.eta || `${Math.round((d.distance || 2) * 7 + 8)} mins`,
+      transitMode: index === 0 ? '🚗 Emergency Vehicle Corridor' : (index === 1 ? '🚊 Metro Rapid Line' : '🚗 Personal Vehicle'),
+      progressPct: 15,
+      landmark: `${d.distance || 2} km away • Within clinical radius`
+    }));
+
+    const primaryDonor = requestDonors[0] || null;
+
+    const newPatient = {
+      id: caseId,
+      requestId: reqId,
+      isNewRequest: true,
+      patientName,
+      patientAge,
+      patientGender,
+      bloodGroup,
+      component,
+      unitsRequired: units,
+      unitsArranged: 0, // 0 Confirmed until donor answers and confirms availability!
+      unitsFulfilled: 0,
+      urgency,
+      hospitalName,
+      hospitalWard,
+      hospitalAddress: `${hospitalName}`,
+      attendantName,
+      attendantRelation,
+      attendantPhone,
+      attendantEmail: data.attendantEmail || 'attendant@donor-pulse.in',
+      doctorName: data.doctorRegId || data.doctorName || 'Attending Physician',
+      doctorDepartment: 'Trauma & Critical Care',
+      doctorPhone: attendantPhone || '+91 Emergency',
+      hospitalBloodDesk: attendantPhone || '+91 Emergency Desk',
+      clinicalReason,
+      handshakeOTP: otp,
+      trackingStage: requestDonors.length > 0 ? 2 : 1, // Stage 2: Donors Alerted & Ringing; 1: Broadcast active
+      broadcastDate: 'Just now',
+      appealActive: true,
+      donors: requestDonors,
+      verificationProof: {
+        documentType: data.proofDocType || data.documentType || 'Hospital Blood Requisition Slip (Form 27-C Stamped / e-RaktKosh)',
+        doctorRegId: data.doctorRegId || data.doctorName || 'Attending Physician',
+        ipdCaseNo: data.ipdCaseNo || `IPD-${randomCaseNum}-ICU`,
+        fileName: data.proofFileName || data.fileName || 'hospital_blood_requisition_signed.pdf',
+        fileSize: data.proofFileSize || '1.4 MB',
+        status: 'VERIFIED_GENUINE',
+        verificationScore: '100% Genuine Requisition',
+        doctorVerified: true,
+        hospitalSealDetected: true,
+        fraudRiskScore: '0.0%',
+        verifiedAt: 'Just now',
+        issuer: hospitalName
+      }
+    };
+
+    this.state.recipient = newPatient;
+    if (!Array.isArray(this.state.recipientCases)) this.state.recipientCases = [];
+    this.state.recipientCases.unshift(newPatient);
+
+    // Also push to active requisitions pool
+    const newReq = {
+      id: reqId,
+      bloodGroup,
+      component,
+      units,
+      urgency,
+      hospitalName,
+      ward: hospitalWard,
+      location: newPatient.hospitalAddress,
+      notes: clinicalReason,
+      createdAt: 'Just now',
+      status: requestDonors.length > 0 ? 'Ringing Donors / Awaiting Confirmation' : 'Broadcasting / Awaiting Donors',
+      trackingStage: requestDonors.length > 0 ? 2 : 1,
+      matchedCount: requestDonors.length,
+      acceptedCount: 0,
+      enRouteCount: 0,
+      donors: requestDonors
+    };
+    if (!Array.isArray(this.state.requests)) this.state.requests = [];
+    this.state.requests.unshift(newReq);
+    this.state.selectedRequestId = reqId;
+
+    // Set active ringing call details ONLY if a matched registered donor exists!
+    if (primaryDonor) {
+      this.state.activeIncomingCall = {
+        requestId: reqId,
+        caseId: caseId,
+        patientName,
+        patientAge,
+        patientGender,
+        bloodGroup,
+        component,
+        unitsRequired: units,
+        urgency,
+        hospitalName,
+        hospitalWard,
+        attendantName,
+        attendantPhone,
+        clinicalReason,
+        donorId: primaryDonor.id,
+        donorName: primaryDonor.name,
+        donorPhone: primaryDonor.phone,
+        donorBloodGroup: primaryDonor.bloodGroup,
+        donorDistance: primaryDonor.distance || 1.8,
+        donorEta: primaryDonor.liveEta || primaryDonor.eta || '18 mins',
+        status: 'ringing',
+        timestamp: Date.now()
+      };
+    } else {
+      this.state.activeIncomingCall = null;
+    }
+
+    // Asynchronously sync with backend API pipeline (/api/requests)
+    if (typeof fetch !== 'undefined') {
+      fetch('/api/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientId: data.patientId || 'user_patient_001',
+          bloodGroupNeeded: bloodGroup,
+          unitsNeeded: units,
+          hospitalName: hospitalName,
+          hospitalAddress: newPatient.hospitalAddress,
+          doctorRegNumber: data.doctorRegId || 'NMC/KMC-48921',
+          prescriptionDocumentUrl: data.proofFileName || 'https://storage.donorpulse.in/prescriptions/req27c.pdf',
+          coordinates: [77.5983, 12.8958]
+        })
+      }).then(r => r.json()).then(res => {
+        if (res && res.success && res.matchedDonorsCount !== undefined) {
+          newReq.matchedCount = res.matchedDonorsCount;
+          this.saveState();
+          this.notify();
+        }
+      }).catch(err => {
+        console.warn('API pipeline sync notice:', err);
+      });
+
+      // Persist recipient case to shared database across all devices
+      try {
+        await fetch('/api/recipient-cases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newPatient)
+        });
+      } catch (err) {
+        console.warn('API recipient case sync notice:', err);
+      }
+    }
+
+    this.saveState();
+    this.notify();
+
+    // Broadcast sync event for cross-tab and cross-portal real-time donor dispatch
+    this.broadcastSync({
+      type: 'NEW_EMERGENCY_REQUEST',
+      caseId: caseId,
+      requestId: reqId,
+      request: newPatient,
+      case: newPatient,
+      bloodGroup: bloodGroup,
+      unitsRequired: units,
+      hospitalName: hospitalName,
+      patientName: patientName,
+      activeIncomingCall: this.state.activeIncomingCall
+    });
+
+    return newPatient;
+  }

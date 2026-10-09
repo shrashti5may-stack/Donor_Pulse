@@ -202,4 +202,19 @@
   }
 
   window.PulseAudio = new AudioManager();
+
+  // Warm up and unlock Web Audio API on first user interaction on any device
+  const warmAudio = () => {
+    try {
+      if (window.PulseAudio && typeof window.PulseAudio.getAudioContext === 'function') {
+        const ctx = window.PulseAudio.getAudioContext();
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+      }
+    } catch(e) {}
+  };
+  ['click', 'touchstart', 'touchend', 'keydown'].forEach(evtType => {
+    window.addEventListener(evtType, warmAudio, { passive: true });
+  });
 })();

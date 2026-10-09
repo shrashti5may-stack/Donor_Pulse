@@ -1,0 +1,56 @@
+const DEFAULT_STATE = {
+  // Active incoming emergency donor call (null when no live call is ringing)
+  activeIncomingCall: null,
+
+  // Active role session: 'guest' | 'donor' | 'recipient' | 'hospital'
+  currentRole: 'guest',
+
+  // Current Donor Profile (null initially until donor creates account/registers)
+  donor: null,
+
+  // Current Hospital Profile
+  hospital: {
+    id: 'HSP-88219-BLR',
+    name: 'Apollo Hospitals & Apex Trauma Centre',
+    category: 'Apex Multi-Specialty & Trauma Care (NABH Accredited)',
+    location: 'ICU Ward 4B, Emergency Wing',
+    address: '154/11 Bannerghatta Main Road, Opposite IIMB',
+    city: 'Bengaluru',
+    state: 'Karnataka',
+    zip: '560076',
+    phone: '+91 (80) 2630-4050',
+    email: 'triage@apollohospitals-bengaluru.org',
+    licenseNumber: 'NABH-BB-KA-88219',
+    authorizedPerson: 'Medical Superintendent',
+    roleTitle: 'Chief Medical Superintendent',
+    bedCapacity: 650,
+    traumaLevel: 'Trauma Level 1 Apex Centre',
+    verificationProof: {
+      documentType: 'NABH Blood Bank Operating License & CDSCO Clearance Form 28-C',
+      documentNumber: 'NABH-BB-KA-90428-2026',
+      fileName: 'hospital_nabh_accreditation.pdf',
+      fileSize: '2.4 MB',
+      uploadedAt: 'Sep 12, 2026'
+    },
+    verificationStatus: 'verified',
+    rejectionReason: ''
+  },
+
+  // Current Recipient & Patient Profile (defaults to active case Sanchit CASE-8686)
+  recipient: DEFAULT_RECIPIENT_CASES[0],
+
+  // Multiple Recipient / Patient Cases available for management across devices
+  recipientCases: DEFAULT_RECIPIENT_CASES,
+
+  // Registered Hospital Registry
+  registeredHospitals: [],
+
+  // Active Requests pool
+  requests: [
+    {
+      id: DEFAULT_RECIPIENT_CASES[0].requestId,
+      bloodGroup: DEFAULT_RECIPIENT_CASES[0].bloodGroup,
+      component: DEFAULT_RECIPIENT_CASES[0].component,
+      units: DEFAULT_RECIPIENT_CASES[0].unitsRequired,
+      urgency: DEFAULT_RECIPIENT_CASES[0].urgency,
+      hospitalName: DEFAULT_RECIPIENT_CASES[0].hospitalName,

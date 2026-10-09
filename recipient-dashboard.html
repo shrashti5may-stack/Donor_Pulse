@@ -946,6 +946,8 @@
         setName('hero-req-id', '#NONE');
         setName('hero-attendant-name', 'No Active Attendant');
         setName('hero-handshake-pin', '----');
+        setName('metric-units-secured', '0');
+        setName('metric-units-total', '0');
         return;
       }
       setName('sidebar-patient-name', data.patientName);
@@ -962,6 +964,8 @@
       setName('hero-req-id', '#' + data.requestId);
       setName('hero-attendant-name', data.attendantName);
       setName('hero-handshake-pin', data.handshakeOTP);
+      setName('metric-units-secured', data.unitsArranged !== undefined ? data.unitsArranged : (data.unitsFulfilled || 0));
+      setName('metric-units-total', data.unitsRequired !== undefined ? data.unitsRequired : (data.units || 2));
     }
 
     function switchCase(caseId) {
@@ -2954,9 +2958,9 @@
   <!-- TOAST NOTIFICATION CONTAINER (STRICTLY PINNED TO BOTTOM RIGHT CORNER) -->
   <div id="toast-container" class="fixed bottom-6 right-6 z-[999999] flex flex-col items-end gap-2.5 pointer-events-none max-w-sm w-full" style="position: fixed !important; bottom: 24px !important; right: 24px !important; left: auto !important; top: auto !important; z-index: 999999 !important; display: flex !important; flex-direction: column !important; align-items: flex-end !important; pointer-events: none !important;"></div>
 
-  <script src="js/audio.js?v=20261009_single_toast"></script>
-  <script src="js/store.js?v=20261009_single_toast"></script>
-  <script src="js/blood-cells.js?v=20261009_single_toast"></script>
+  <script src="js/audio.js?v=20261009_multidevice_sync"></script>
+  <script src="js/store.js?v=20261009_multidevice_sync"></script>
+  <script src="js/blood-cells.js?v=20261009_multidevice_sync"></script>
   <script>
     // Real-time synchronization & single bottom-right popup for recipient-dashboard.html
     (function() {
@@ -3130,6 +3134,47 @@
 
       function handleEvent(evt) {
         if (!evt) return;
+
+        if (evt.type === 'NEW_EMERGENCY_REQUEST' || evt.type === 'NEW_REQUEST_RINGING') {
+          const req = evt.case || evt.request || evt;
+          if (window.PulseStore) {
+            window.PulseStore.addOrUpdateRecipientCase(req, false);
+            window.PulseStore.notify();
+          }
+
+          const heroPatient = document.getElementById('hero-patient-name');
+          if (heroPatient && req.patientName) heroPatient.textContent = req.patientName;
+
+          const heroBlood = document.getElementById('hero-blood-need');
+          if (heroBlood && req.bloodGroup) heroBlood.textContent = `${req.bloodGroup} ${req.component || 'Whole Blood'} (${req.unitsRequired || req.units || 2} Units)`;
+
+          const heroReqId = document.getElementById('hero-req-id');
+          if (heroReqId) heroReqId.textContent = `#${req.requestId || req.id || 'REQ-8686'}`;
+
+          const heroAttendant = document.getElementById('hero-attendant-name');
+          if (heroAttendant && req.attendantName) heroAttendant.textContent = `${req.attendantName} (${req.attendantPhone || ''})`;
+
+          const heroPin = document.getElementById('hero-handshake-pin');
+          if (heroPin && (req.handshakeOTP || req.otp)) heroPin.textContent = req.handshakeOTP || req.otp;
+
+          const metricTotal = document.getElementById('metric-units-total');
+          if (metricTotal) metricTotal.textContent = req.unitsRequired || req.units || 2;
+
+          const metricSecured = document.getElementById('metric-units-secured');
+          if (metricSecured) metricSecured.textContent = req.unitsArranged || 0;
+
+          if (typeof renderStandaloneRecipientDonors === 'function') {
+            renderStandaloneRecipientDonors();
+          }
+
+          showDonorResponseToast({
+            title: 'Emergency Requisition Active',
+            message: `Emergency request #${req.requestId || req.id} for ${req.patientName || 'Patient'} (${req.bloodGroup || 'B+'}) is live across grid! System is contacting proximate donors.`,
+            isAccepted: true
+          });
+          return;
+        }
+
         if (evt.type === 'DONOR_RESPONSE' || evt.type === 'DONOR_CONFIRMED' || evt.type === 'DONOR_DECLINED') {
           const isAccepted = evt.type === 'DONOR_CONFIRMED' || (evt.status && evt.status.toUpperCase() === 'ACCEPTED');
           const donorName = evt.donorName || 'Volunteer Donor';
@@ -3172,6 +3217,9 @@
             window.PulseStore.notify();
           }
 
+          if (typeof syncRecipientUI === 'function') {
+            syncRecipientUI(evt.case || (window.PulseStore ? window.PulseStore.getRecipient() : null));
+          }
           if (typeof renderStandaloneRecipientDonors === 'function') {
             renderStandaloneRecipientDonors();
           }

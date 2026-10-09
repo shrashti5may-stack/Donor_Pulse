@@ -61,8 +61,25 @@ function initRealtimeEmergencyGrid() {
       const donorBlood = currentDonor ? currentDonor.bloodGroup : null;
       const isCompat = !donorBlood || (window.PulseStore && window.PulseStore.isBloodCompatible(donorBlood, bloodNeeded));
 
-      // Show emergency pop-up window on donor portal immediately without refreshing
+      // 1. If recipient/patient view is open on this device, update recipient dashboard immediately
+      if (isRecipientActive) {
+        if (typeof window.renderRecipientDashboard === 'function') {
+          window.renderRecipientDashboard();
+        }
+        if (window.showToast) {
+          window.showToast(
+            '🚨 Emergency Requisition Live',
+            `Requisition #${req.requestId || req.id || 'REQ-8686'} for ${req.patientName || 'Patient'} (${bloodNeeded}) is active across grid and alerting donors!`,
+            'info'
+          );
+        }
+      }
+
+      // 2. If donor portal/home is open on this device, ring the donor and show incoming call modal immediately
       if (isCompat && !isRecipientActive) {
+        if (typeof renderDonorDashboard === 'function') {
+          renderDonorDashboard();
+        }
         setTimeout(() => {
           const setTxt = (id, text) => {
             const el = document.getElementById(id);
@@ -79,12 +96,15 @@ function initRealtimeEmergencyGrid() {
           setTxt('call-clinical-reason', `"${req.clinicalReason || req.notes || 'Acute clinical transfusion needed.'}"`);
           setTxt('docked-donor-text', `Emergency Call: ${req.patientName || 'Patient'} (${bloodNeeded})`);
 
-          if (currentDonor) {
-            setTxt('call-donor-name', currentDonor.fullName || currentDonor.name || 'Volunteer Donor');
-            setTxt('call-donor-blood', `${currentDonor.bloodGroup || bloodNeeded} Volunteer Donor`);
-            setTxt('call-donor-phone', currentDonor.phone || '+91 98000 12345');
-            setTxt('call-donor-distance', `${currentDonor.distance || 1.8} km away`);
-          }
+          const dName = (currentDonor && (currentDonor.fullName || currentDonor.name)) || 'Volunteer Donor';
+          const dBlood = (currentDonor && currentDonor.bloodGroup) || bloodNeeded;
+          const dPhone = (currentDonor && currentDonor.phone) || '+91 98000 12345';
+          const dDist = (currentDonor && currentDonor.distance) || 1.8;
+
+          setTxt('call-donor-name', dName);
+          setTxt('call-donor-blood', `${dBlood} Volunteer Donor`);
+          setTxt('call-donor-phone', dPhone);
+          setTxt('call-donor-distance', `${dDist} km away`);
 
           if (window.PulseStore) {
             window.PulseStore.setActiveIncomingCall({
@@ -101,10 +121,10 @@ function initRealtimeEmergencyGrid() {
               attendantPhone: req.attendantPhone || '--',
               clinicalReason: req.clinicalReason || req.notes || 'Acute emergency transfusion needed.',
               donorId: currentDonor ? currentDonor.id : 'DNR-4821',
-              donorName: currentDonor ? (currentDonor.fullName || currentDonor.name) : 'Volunteer Hero',
-              donorPhone: currentDonor ? currentDonor.phone : '+91 98000 12345',
-              donorBloodGroup: currentDonor ? currentDonor.bloodGroup : bloodNeeded,
-              donorDistance: currentDonor ? (currentDonor.distance || 1.8) : 1.8,
+              donorName: dName,
+              donorPhone: dPhone,
+              donorBloodGroup: dBlood,
+              donorDistance: dDist,
               donorEta: currentDonor ? (currentDonor.liveEta || '15 mins') : '15 mins',
               status: 'ringing',
               timestamp: Date.now()
@@ -113,7 +133,7 @@ function initRealtimeEmergencyGrid() {
 
           // Start Phone Ringing Audio Siren
           if (window.PulseAudio && typeof window.PulseAudio.startPhoneRinging === 'function') {
-            window.PulseAudio.startPhoneRinging({ donorName: currentDonor ? (currentDonor.name || currentDonor.fullName) : 'Donor' });
+            window.PulseAudio.startPhoneRinging({ donorName: dName });
           }
 
           // Ensure modal is shown immediately
@@ -166,6 +186,14 @@ function initRealtimeEmergencyGrid() {
       window._seenDonorResponseTimestamps[token1] = now;
       window._seenDonorResponseTimestamps[token2] = now;
       window._seenDonorResponseTimestamps[token3] = now;
+
+      // Stop ringing and dismiss incoming call dialog across devices if active
+      if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+        window.PulseAudio.stopPhoneRinging();
+      }
+      if (typeof window.closeIncomingDonorCallModal === 'function') {
+        window.closeIncomingDonorCallModal();
+      }
 
       // Update store state (shouldBroadcast = false so this event listener does not echo back)
       if (window.PulseStore) {
