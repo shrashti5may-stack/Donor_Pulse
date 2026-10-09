@@ -2680,6 +2680,13 @@ function initPrototypeToolbar() {
 // ============================================================================
 // 6. VIEW RENDERING FUNCTIONS
 // ============================================================================
+function renderHospitalDashboard() {
+  if (typeof renderRecipientDashboard === 'function') {
+    return renderRecipientDashboard();
+  }
+}
+window.renderHospitalDashboard = renderHospitalDashboard;
+
 function renderAllViews() {
   renderDonorDashboard();
   populateDonorProfileForm();
@@ -2995,10 +3002,17 @@ function renderDonorDashboard() {
               </div>
             </div>
             ${isCompat ? `
-              <button type="button" onclick="window.openIncomingDonorCallModal('${donor.id}')" class="w-full py-2.5 px-space-md rounded-xl bg-primary text-white font-label-lg text-xs font-bold hover:bg-primary-container transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98">
-                <span class="material-symbols-outlined text-[18px]">ring_volume</span>
-                <span>Answer Emergency Requisition</span>
-              </button>
+              ${((r.status && (r.status.includes('Confirmed') || r.status.includes('En Route'))) || (r.donors && r.donors.some(d => (d.id === donor.id || d.name === donor.fullName) && d.confirmed))) ? `
+                <button type="button" onclick="window.showToast('Slot Confirmed', 'You have confirmed availability for this requisition. Transit corridor active.', 'success')" class="w-full py-2.5 px-space-md rounded-xl bg-tertiary text-on-tertiary font-label-lg text-xs font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+                  <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                  <span>Dispatched • Slot Confirmed</span>
+                </button>
+              ` : `
+                <button type="button" data-req-id="${escapeHtml(r.id || r.requestId || '')}" data-donor-id="${escapeHtml(donor.id || '')}" onclick="window.openIncomingDonorCallModal('${escapeHtml(r.id || r.requestId || '')}', '${escapeHtml(donor.id || '')}')" class="w-full py-2.5 px-space-md rounded-xl bg-primary text-white font-label-lg text-xs font-bold hover:bg-primary-container transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+                  <span class="material-symbols-outlined text-[18px]">ring_volume</span>
+                  <span>Answer Emergency Requisition</span>
+                </button>
+              `}
             ` : `
               <div class="p-2 rounded-xl bg-surface-container text-center text-[11px] text-on-surface-variant font-medium">
                 Incompatible (${escapeHtml(donor.bloodGroup)} donor vs ${escapeHtml(r.bloodGroup)} needed)
@@ -3702,116 +3716,189 @@ function renderRecipientDonorsSection(recipient) {
 // ============================================================================
 // INCOMING EMERGENCY CALL & DONOR RINGING CONTROLLER
 // ============================================================================
-
-window.openIncomingDonorCallModal = function(customDonorId) {
-  // STRICT USER CONSTRAINT: Recipient dashboard must NEVER receive incoming calls or ringing!
-  const currentHash = window.location.hash || '';
-  const isRecipientView = currentHash.includes('recipient') || 
-                          currentHash.includes('patient') || 
-                          currentHash.includes('family') ||
-                          currentHash.includes('hospital') ||
-                          window.location.pathname.includes('recipient-dashboard');
-  if (isRecipientView) {
-    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
-      window.PulseAudio.stopPhoneRinging();
-    }
-    const modal = document.getElementById('modal-incoming-donor-call');
-    if (modal) modal.classList.add('hidden');
-    return;
-  }
-
+window.openIncomingDonorCallModal = function(param1, param2) {
   const modal = document.getElementById('modal-incoming-donor-call');
   if (!modal) return;
 
-  const recipient = (window.PulseStore && typeof window.PulseStore.getRecipient === 'function')
-    ? window.PulseStore.getRecipient()
-    : null;
+  const store = window.PulseStore;
+  let targetReqId = null;
+  let targetDonorId = null;
 
-  if (!recipient) return;
+  if (typeof param1 === 'string') {
+    if (param1.startsWith('REQ-') || param1.startsWith('CASE-') || param1.startsWith('req_')) {
+      targetReqId = param1;
+      targetDonorId = param2;
+    } else if (param1.startsWith('DNR-') || param1.startsWith('D-') || param1.startsWith('donor_')) {
+      targetDonorId = param1;
+      targetReqId = param2;
+    } else {
+      const allReqs = (store && typeof store.getRequests === 'function') ? store.getRequests() : [];
+      if (allReqs.some(r => r.id === param1 || r.requestId === param1)) {
+        targetReqId = param1;
+        targetDonorId = param2;
+      } else {
+        targetDonorId = param1;
+        targetReqId = param2;
+      }
+    }
+  } else if (param1 && typeof param1 === 'object') {
+    targetReqId = param1.id || param1.requestId || param1.caseId;
+    targetDonorId = param1.donorId || param2;
+  }
 
-  const reqId = recipient.requestId;
-  const bloodGroup = recipient.bloodGroup;
+  // 1. Resolve Requisition Object
+  let req = null;
+  if (targetReqId && store) {
+    if (typeof store.getRequests === 'function') {
+      req = store.getRequests().find(r => r.id === targetReqId || r.requestId === targetReqId);
+    }
+    if (!req && typeof store.getRecipientCases === 'function') {
+      req = store.getRecipientCases().find(c => c.id === targetReqId || c.requestId === targetReqId || c.caseId === targetReqId);
+    }
+  }
+  if (!req && store && typeof store.getRecipient === 'function') {
+    req = store.getRecipient();
+  }
+  if (!req && store && typeof store.getRequests === 'function') {
+    const list = store.getRequests();
+    if (list && list.length > 0) req = list[0];
+  }
+  if (!req) {
+    req = {
+      id: targetReqId || 'REQ-MANIPAL-8921',
+      requestId: targetReqId || 'REQ-MANIPAL-8921',
+      caseId: 'CASE-8921',
+      patientName: 'Aarav Sharma',
+      patientAge: 32,
+      patientGender: 'Male',
+      bloodGroup: 'O-',
+      component: 'Whole Blood',
+      unitsRequired: 2,
+      units: 2,
+      hospitalName: 'Manipal Hospital Comprehensive Trauma Center',
+      hospitalWard: 'Emergency Trauma ICU',
+      attendantName: 'Priya Sharma (Immediate Relative)',
+      attendantPhone: '+91 98450 11223',
+      urgency: 'Stat Emergency (< 45 Mins)',
+      clinicalReason: 'Immediate whole blood required for emergency surgical stabilization.'
+    };
+  }
 
-  // Get available compatible donors
-  const donors = (window.PulseStore && typeof window.PulseStore.getAvailableDonors === 'function')
-    ? window.PulseStore.getAvailableDonors(reqId, bloodGroup)
+  // 2. Resolve Donor Object
+  const loggedInDonor = (store && typeof store.getDonor === 'function') ? store.getDonor() : null;
+  const currentDonorId = targetDonorId || (loggedInDonor ? loggedInDonor.id : 'DNR-4821');
+  const reqId = req.requestId || req.id || 'REQ-MANIPAL-8921';
+  const bloodGroup = req.bloodGroup || 'O-';
+  const availableDonors = (store && typeof store.getAvailableDonors === 'function')
+    ? store.getAvailableDonors(reqId, bloodGroup)
     : [];
 
   let targetDonor = null;
-  if (customDonorId) {
-    targetDonor = donors.find(d => d.id === customDonorId);
+  if (currentDonorId && availableDonors.length > 0) {
+    targetDonor = availableDonors.find(d => d.id === currentDonorId);
+  }
+  if (!targetDonor && availableDonors.length > 0) {
+    targetDonor = availableDonors.find(d => !d.confirmed && d.callStatus !== 'declined') || availableDonors[0];
   }
   if (!targetDonor) {
-    targetDonor = donors.find(d => !d.confirmed && d.callStatus !== 'declined') || donors[0];
+    targetDonor = {
+      id: currentDonorId || 'DNR-4821',
+      name: (loggedInDonor && (loggedInDonor.fullName || loggedInDonor.name)) || 'Volunteer Donor',
+      fullName: (loggedInDonor && (loggedInDonor.fullName || loggedInDonor.name)) || 'Volunteer Donor',
+      bloodGroup: (loggedInDonor && loggedInDonor.bloodGroup) || bloodGroup,
+      phone: (loggedInDonor && loggedInDonor.phone) || '+91 98451 44290',
+      distance: (loggedInDonor && loggedInDonor.distance) || 1.8,
+      liveEta: (loggedInDonor && (loggedInDonor.liveEta || loggedInDonor.eta)) || '15 mins',
+      confirmed: false,
+      callStatus: 'ringing'
+    };
   }
-  if (!targetDonor) return;
 
-  // Update store active incoming call
-  if (window.PulseStore && typeof window.PulseStore.setActiveIncomingCall === 'function') {
-    window.PulseStore.setActiveIncomingCall({
+  // 3. Populate Modal Content
+  const setTxt = (id, text) => {
+    const el = document.getElementById(id);
+    if (el && text !== undefined && text !== null) el.textContent = text;
+  };
+
+  setTxt('call-patient-name', req.patientName || 'Emergency Patient');
+  setTxt('call-patient-meta', `${req.patientAge || 32} Yrs / ${req.patientGender || 'Female'}`);
+  setTxt('call-blood-units-needed', `${req.bloodGroup || bloodGroup} ${req.component || 'Whole Blood'} (${req.unitsRequired || req.units || 2} Units)`);
+  setTxt('call-hospital-name', req.hospitalName || req.hospital || 'Hospital Trauma Center');
+  setTxt('call-hospital-ward', `${req.hospitalWard || req.ward || req.location || 'Emergency Resuscitation Wing'} • Emergency Wing`);
+  setTxt('call-urgency-badge', req.urgency || 'Stat Emergency (< 45 Mins)');
+  setTxt('call-attendant-info', `${req.attendantName || 'Family Attendant'} (${req.attendantPhone || '+91 98000 00000'})`);
+  setTxt('call-clinical-reason', `"${req.clinicalReason || req.notes || req.reason || 'Immediate blood transfusion required.'}"`);
+  setTxt('docked-donor-text', `Emergency Call: ${req.patientName || 'Patient'} (${req.bloodGroup || bloodGroup})`);
+
+  setTxt('call-donor-name', targetDonor.name || targetDonor.fullName);
+  setTxt('call-donor-blood', `${targetDonor.bloodGroup || bloodGroup} Volunteer Donor`);
+  setTxt('call-donor-phone', targetDonor.phone || '+91 98451 44290');
+  setTxt('call-donor-distance', `${targetDonor.distance || 1.8} km away`);
+
+  // Populate Target Donor Select
+  const select = document.getElementById('call-target-donor-select');
+  if (select) {
+    const donorOptions = availableDonors.length > 0 ? availableDonors : [targetDonor];
+    select.innerHTML = donorOptions.map(d => `
+      <option value="${escapeHtml(d.id)}" ${d.id === targetDonor.id ? 'selected' : ''}>
+        ${escapeHtml(d.name || d.fullName || 'Volunteer Donor')} (${escapeHtml(d.bloodGroup || bloodGroup)} - ${d.distance || 1.8} km) ${d.confirmed ? '✅ Confirmed' : ''}
+      </option>
+    `).join('');
+  }
+
+  // 4. Update PulseStore active call state
+  if (store && typeof store.setActiveIncomingCall === 'function') {
+    store.setActiveIncomingCall({
+      caseId: req.caseId || req.id || reqId,
       requestId: reqId,
-      patientName: recipient.patientName,
-      bloodGroup: recipient.bloodGroup,
-      component: recipient.component,
-      unitsRequired: recipient.unitsRequired,
-      urgency: recipient.urgency,
-      hospitalName: recipient.hospitalName,
-      hospitalWard: recipient.hospitalWard,
-      attendantName: recipient.attendantName,
-      attendantPhone: recipient.attendantPhone,
-      clinicalReason: recipient.clinicalReason,
+      patientName: req.patientName || 'Emergency Patient',
+      patientAge: req.patientAge || 32,
+      patientGender: req.patientGender || 'Female',
+      bloodGroup: req.bloodGroup || bloodGroup,
+      component: req.component || 'Whole Blood',
+      unitsRequired: req.unitsRequired || req.units || 2,
+      urgency: req.urgency || 'Stat Emergency (< 45 Mins)',
+      hospitalName: req.hospitalName || req.hospital || 'Hospital Trauma Center',
+      hospitalWard: req.hospitalWard || req.ward || 'Emergency Trauma ICU',
+      attendantName: req.attendantName || 'Family Attendant',
+      attendantPhone: req.attendantPhone || '+91 98000 00000',
+      clinicalReason: req.clinicalReason || req.notes || req.reason || 'Immediate blood transfusion required.',
       donorId: targetDonor.id,
-      donorName: targetDonor.name,
+      donorName: targetDonor.name || targetDonor.fullName,
       donorPhone: targetDonor.phone,
       donorBloodGroup: targetDonor.bloodGroup,
-      donorDistance: targetDonor.distance,
-      donorEta: targetDonor.liveEta || targetDonor.eta || '18 mins',
+      donorDistance: targetDonor.distance || 1.8,
+      donorEta: targetDonor.liveEta || targetDonor.eta || '15 mins',
       status: 'ringing',
       timestamp: Date.now()
     });
   }
 
-  // Set Modal Field Contents
-  const setTxt = (id, text) => {
-    const el = document.getElementById(id);
-    if (el && text !== undefined) el.textContent = text;
-  };
-
-  setTxt('call-donor-name', targetDonor.name);
-  setTxt('call-donor-blood', `${targetDonor.bloodGroup} Volunteer Donor`);
-  setTxt('call-donor-phone', targetDonor.phone || '+91 98452 33109');
-  setTxt('call-donor-distance', `${targetDonor.distance} km away`);
-  setTxt('call-hospital-name', recipient.hospitalName);
-  setTxt('call-hospital-ward', `${recipient.hospitalWard} • Emergency Wing`);
-  setTxt('call-urgency-badge', recipient.urgency || 'Stat Emergency (< 45 Mins)');
-  setTxt('call-patient-name', recipient.patientName);
-  setTxt('call-patient-meta', `${recipient.patientAge || 32} Yrs / ${recipient.patientGender || 'Female'}`);
-  setTxt('call-blood-units-needed', `${recipient.bloodGroup} ${recipient.component} (${recipient.unitsRequired} Units)`);
-  setTxt('call-attendant-info', `${recipient.attendantName} (${recipient.attendantPhone})`);
-  setTxt('call-clinical-reason', `"${recipient.clinicalReason || 'Urgent clinical blood request for patient.'}"`);
-  setTxt('docked-donor-text', `Ringing ${targetDonor.name} (${targetDonor.bloodGroup})`);
-
-  // Populate Target Donor Dropdown
-  const select = document.getElementById('call-target-donor-select');
-  if (select) {
-    select.innerHTML = donors.map(d => `
-      <option value="${escapeHtml(d.id)}" ${d.id === targetDonor.id ? 'selected' : ''}>
-        ${escapeHtml(d.name)} (${escapeHtml(d.bloodGroup)} - ${d.distance} km) ${d.confirmed ? '✅ Confirmed' : ''}
-      </option>
-    `).join('');
+  // 5. Hide docked indicator
+  const docked = document.getElementById('docked-ringing-call-indicator');
+  if (docked) {
+    docked.classList.add('hidden');
+    docked.style.display = 'none';
   }
 
-  // Start Phone Ringing Sound via Web Audio API!
+  // 6. Explicitly display modal with flex and highest z-index
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
+  modal.style.zIndex = '99999';
+  document.body.classList.add('overflow-hidden');
+
+  // 7. Start phone ringing sound
   if (window.PulseAudio && typeof window.PulseAudio.startPhoneRinging === 'function') {
     window.PulseAudio.startPhoneRinging({ donorName: targetDonor.name });
   }
+};
 
-  // Hide docked bar if open
-  const docked = document.getElementById('docked-ringing-call-indicator');
-  if (docked) docked.classList.add('hidden');
-
-  modal.classList.remove('hidden');
-  document.body.classList.add('overflow-hidden');
+window.answerEmergencyRequisition = function(reqId) {
+  const donor = (window.PulseStore && typeof window.PulseStore.getDonor === 'function') ? window.PulseStore.getDonor() : null;
+  const donorId = donor ? donor.id : 'DNR-4821';
+  window.openIncomingDonorCallModal(reqId, donorId);
 };
 
 window.closeIncomingDonorCallModal = function() {

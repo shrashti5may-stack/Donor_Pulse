@@ -1424,45 +1424,6 @@
       return;
     }
 
-      const setTxt = (id, text) => {
-        const el = document.getElementById(id);
-        if (el && text !== undefined) el.textContent = text;
-      };
-
-      setTxt('call-donor-name', targetDonor.name);
-      setTxt('call-donor-blood', `${targetDonor.bloodGroup} Volunteer Donor`);
-      setTxt('call-donor-phone', targetDonor.phone || '+91 98452 33109');
-      setTxt('call-donor-distance', `${targetDonor.distance} km away`);
-      setTxt('call-hospital-name', recipient.hospitalName);
-      setTxt('call-hospital-ward', `${recipient.hospitalWard} • Emergency Wing`);
-      setTxt('call-urgency-badge', recipient.urgency || 'Stat Emergency (< 45 Mins)');
-      setTxt('call-patient-name', recipient.patientName);
-      setTxt('call-patient-meta', `${recipient.patientAge || 32} Yrs / ${recipient.patientGender || 'Female'}`);
-      setTxt('call-blood-units-needed', `${recipient.bloodGroup} ${recipient.component} (${recipient.unitsRequired} Units)`);
-      setTxt('call-attendant-info', `${recipient.attendantName} (${recipient.attendantPhone})`);
-      setTxt('call-clinical-reason', `"${recipient.clinicalReason || 'Urgent clinical blood request for patient.'}"`);
-      setTxt('docked-donor-text', `Ringing ${targetDonor.name} (${targetDonor.bloodGroup})`);
-
-      const select = document.getElementById('call-target-donor-select');
-      if (select) {
-        select.innerHTML = donors.map(d => `
-          <option value="${d.id}" ${d.id === targetDonor.id ? 'selected' : ''}>
-            ${d.name} (${d.bloodGroup} - ${d.distance} km) ${d.confirmed ? '✅ Confirmed' : ''}
-          </option>
-        `).join('');
-      }
-
-      if (window.PulseAudio && typeof window.PulseAudio.startPhoneRinging === 'function') {
-        window.PulseAudio.startPhoneRinging({ donorName: targetDonor.name });
-      }
-
-      const docked = document.getElementById('docked-ringing-call-indicator');
-      if (docked) docked.classList.add('hidden');
-
-      modal.classList.remove('hidden');
-      document.body.classList.add('overflow-hidden');
-    }
-
     function closeIncomingDonorCallModal() {
       const modal = document.getElementById('modal-incoming-donor-call');
       if (modal) modal.classList.add('hidden');

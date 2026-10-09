@@ -5161,11 +5161,11 @@
   <div id="toast-container" class="fixed bottom-6 right-6 z-[999999] flex flex-col items-end gap-2.5 pointer-events-none max-w-sm w-full" style="position: fixed !important; bottom: 24px !important; right: 24px !important; left: auto !important; top: auto !important; z-index: 999999 !important; display: flex !important; flex-direction: column !important; align-items: flex-end !important; pointer-events: none !important;"></div>
 
   <!-- Core Scripts with Cache-Busting -->
-  <script src="js/audio.js?v=20261009_multidevice_sync"></script>
-  <script src="js/store.js?v=20261009_multidevice_sync"></script>
-  <script src="js/router.js?v=20261009_multidevice_sync"></script>
-  <script src="js/app.js?v=20261009_multidevice_sync"></script>
-  <script src="js/blood-cells.js?v=20261009_multidevice_sync"></script>
+  <script src="js/audio.js?v=20261009_final_fix"></script>
+  <script src="js/store.js?v=20261009_final_fix"></script>
+  <script src="js/router.js?v=20261009_final_fix"></script>
+  <script src="js/app.js?v=20261009_final_fix"></script>
+  <script src="js/blood-cells.js?v=20261009_final_fix"></script>
 
   <!-- Global Direct Action Handler for Critical UI Buttons -->
   <script>
@@ -5236,6 +5236,18 @@
               modal.style.zIndex = '99999';
               document.body.classList.add('overflow-hidden');
             }
+          }
+          return;
+        }
+
+        // 5. Answer Emergency Requisition
+        if (text.indexOf('Answer Emergency Requisition') !== -1) {
+          e.preventDefault();
+          e.stopPropagation();
+          var reqId = btn.getAttribute('data-req-id') || '';
+          var donorId = btn.getAttribute('data-donor-id') || '';
+          if (typeof window.openIncomingDonorCallModal === 'function') {
+            window.openIncomingDonorCallModal(reqId, donorId);
           }
           return;
         }
