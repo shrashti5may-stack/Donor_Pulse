@@ -1547,14 +1547,14 @@ function initBloodCompatibilityWidget() {
     // Render clickable donate badges
     if (donateListEl) {
       donateListEl.innerHTML = data.donate.map(item =>
-        `<button type="button" onclick="window.selectBloodType('${item}')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view ${item} profile">${item}</button>`
+        `<span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold shadow-xs select-none cursor-default pointer-events-none" style="pointer-events: none !important; cursor: default !important;">${item}</span>`
       ).join('');
     }
 
     // Render clickable receive badges
     if (receiveListEl) {
       receiveListEl.innerHTML = data.receive.map(item =>
-        `<button type="button" onclick="window.selectBloodType('${item}')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-primary-fixed/40 hover:bg-primary text-primary hover:text-on-primary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view ${item} profile">${item}${data.receive.length === 1 && item === 'O-' ? ' Only' : ''}</button>`
+        `<span class="px-2.5 py-1 rounded-lg bg-primary-fixed/40 text-primary font-label-badge text-xs font-bold shadow-xs select-none cursor-default pointer-events-none" style="pointer-events: none !important; cursor: default !important;">${item}${data.receive.length === 1 && item === 'O-' ? ' Only' : ''}</span>`
       ).join('');
     }
 
@@ -1774,6 +1774,17 @@ function initBloodCompatibilityWidget() {
   });
 
   // Bind toggle button
+  ['widget-can-donate-list', 'widget-can-receive-list'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.pointerEvents = 'none';
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, true);
+    }
+  });
+
   const btnToggle = document.getElementById('btn-toggle-matrix');
   if (btnToggle) {
     btnToggle.onclick = (e) => {
@@ -2700,6 +2711,326 @@ function renderAllViews() {
 /**
  * Render Donor Dashboard
  */
+function formatDonationDate(dateVal) {
+  if (!dateVal || dateVal === 'None' || dateVal === 'null' || dateVal === 'undefined') {
+    return 'First-time Donor';
+  }
+  if (typeof dateVal !== 'string') {
+    try {
+      const d = new Date(dateVal);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+    } catch (e) {}
+    return String(dateVal);
+  }
+  const trimmed = dateVal.trim();
+  if (!trimmed || trimmed.toLowerCase() === 'none') return 'First-time Donor';
+  const match = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    const year = parseInt(match[1], 10);
+    const monthIdx = parseInt(match[2], 10) - 1;
+    const day = parseInt(match[3], 10);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    if (!isNaN(year) && monthIdx >= 0 && monthIdx < 12 && !isNaN(day)) {
+      return `${day} ${months[monthIdx]} ${year}`;
+    }
+  }
+  return trimmed;
+}
+window.formatDonationDate = formatDonationDate;
+
+function parseDonationDate(dateVal) {
+  if (!dateVal) return null;
+  if (typeof dateVal === 'string') {
+    const s = dateVal.trim();
+    if (!s || s.toLowerCase().includes('first') || s.toLowerCase() === 'none' || s.toLowerCase() === 'null') {
+      return null;
+    }
+    const isoMatch = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (isoMatch) {
+      return new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+    }
+    const dmyMatch = s.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})/);
+    if (dmyMatch) {
+      const day = parseInt(dmyMatch[1], 10);
+      const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+      const monthIdx = months.indexOf(dmyMatch[2].toLowerCase().substring(0, 3));
+      const year = parseInt(dmyMatch[3], 10);
+      if (monthIdx !== -1) {
+        return new Date(year, monthIdx, day);
+      }
+    }
+    const parsed = new Date(s);
+    if (!isNaN(parsed.getTime())) return parsed;
+  } else if (dateVal instanceof Date && !isNaN(dateVal.getTime())) {
+    return dateVal;
+  }
+  return null;
+}
+window.parseDonationDate = parseDonationDate;
+
+function calculateDonationRecovery(lastDateVal, now = new Date()) {
+  const donationDate = parseDonationDate(lastDateVal);
+  if (!donationDate) {
+    return {
+      hasDonated: false,
+      isEligible: true,
+      inRecovery: false,
+      daysRemaining: 0,
+      hoursRemaining: 0,
+      minutesRemaining: 0,
+      secondsRemaining: 0,
+      totalSecondsRemaining: 0,
+      daysElapsed: 90,
+      progressPercent: 100,
+      nextEligibleDate: null,
+      formattedNextDate: 'Eligible Now',
+      statusText: 'First-time Donor • Ready to Donate'
+    };
+  }
+
+  const RECOVERY_DAYS = 90;
+  const eligibleTimestamp = donationDate.getTime() + (RECOVERY_DAYS * 24 * 60 * 60 * 1000);
+  const nextEligibleDate = new Date(eligibleTimestamp);
+  const diffMs = eligibleTimestamp - now.getTime();
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const formattedNextDate = `${nextEligibleDate.getDate()} ${months[nextEligibleDate.getMonth()]} ${nextEligibleDate.getFullYear()}`;
+
+  if (diffMs <= 0) {
+    const elapsedDays = Math.floor((now.getTime() - donationDate.getTime()) / (24 * 60 * 60 * 1000));
+    return {
+      hasDonated: true,
+      isEligible: true,
+      inRecovery: false,
+      daysRemaining: 0,
+      hoursRemaining: 0,
+      minutesRemaining: 0,
+      secondsRemaining: 0,
+      totalSecondsRemaining: 0,
+      daysElapsed: elapsedDays,
+      progressPercent: 100,
+      nextEligibleDate,
+      formattedNextDate,
+      statusText: '90-Day Recovery Complete • Eligible to Donate'
+    };
+  }
+
+  const totalSecondsRemaining = Math.floor(diffMs / 1000);
+  const daysRemaining = Math.floor(totalSecondsRemaining / (24 * 3600));
+  const hoursRemaining = Math.floor((totalSecondsRemaining % (24 * 3600)) / 3600);
+  const minutesRemaining = Math.floor((totalSecondsRemaining % 3600) / 60);
+  const secondsRemaining = totalSecondsRemaining % 60;
+
+  const msElapsed = now.getTime() - donationDate.getTime();
+  const daysElapsed = Math.max(0, Math.min(RECOVERY_DAYS, Math.floor(msElapsed / (24 * 60 * 60 * 1000))));
+  const progressPercent = Math.min(100, Math.max(0, Math.round((daysElapsed / RECOVERY_DAYS) * 100)));
+
+  return {
+    hasDonated: true,
+    isEligible: false,
+    inRecovery: true,
+    daysRemaining,
+    hoursRemaining,
+    minutesRemaining,
+    secondsRemaining,
+    totalSecondsRemaining,
+    daysElapsed,
+    progressPercent,
+    nextEligibleDate,
+    formattedNextDate,
+    statusText: `Biological Recovery Active • ${daysRemaining} Days Left`
+  };
+}
+window.calculateDonationRecovery = calculateDonationRecovery;
+
+function renderDonorRecoveryWidget(donor, recovery) {
+  if (window._recoveryTimerInterval) {
+    clearInterval(window._recoveryTimerInterval);
+    window._recoveryTimerInterval = null;
+  }
+
+  const card = document.getElementById('donor-recovery-countdown-card');
+  if (!card) return;
+
+  if (!recovery) {
+    const rawLastDate = donor ? (donor.lastDonationDate || (donor.donationHistory && donor.donationHistory.length > 0 ? donor.donationHistory[0].date : null)) : null;
+    recovery = calculateDonationRecovery(rawLastDate);
+  }
+
+  const iconBadge = document.getElementById('recovery-icon-badge');
+  const statusBadge = document.getElementById('recovery-status-badge-container');
+  const bodyContent = document.getElementById('recovery-body-content');
+
+  const formattedLast = formatDonationDate(donor ? donor.lastDonationDate : null);
+
+  if (recovery.inRecovery) {
+    if (iconBadge) {
+      iconBadge.className = 'w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30';
+      iconBadge.innerHTML = `<span class="material-symbols-outlined text-[24px] animate-spin" style="animation-duration: 10s;">hourglass_top</span>`;
+    }
+    if (statusBadge) {
+      statusBadge.innerHTML = `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 font-label-badge text-xs font-bold uppercase tracking-wider border border-amber-500/20">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+          Biological Recovery Active • Alerts Paused
+        </span>
+      `;
+    }
+    if (bodyContent) {
+      bodyContent.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-center">
+          <!-- Live 4-Digit Reverse Countdown Clock -->
+          <div class="lg:col-span-6 flex flex-col gap-2">
+            <span class="text-xs font-label-badge uppercase tracking-wider text-secondary font-bold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-amber-600 dark:text-amber-400">alarm</span>
+              <span>Reverse Biological Countdown Clock:</span>
+            </span>
+            <div class="grid grid-cols-4 gap-2 sm:gap-3 w-full">
+              <div class="bg-surface-container-low p-2.5 sm:p-3 rounded-xl text-center border border-surface-container shadow-2xs">
+                <div id="countdown-days" class="font-display-hero text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 leading-none">${recovery.daysRemaining}</div>
+                <div class="text-[10px] sm:text-xs font-label-badge uppercase tracking-wider text-secondary mt-1 font-semibold">Days</div>
+              </div>
+              <div class="bg-surface-container-low p-2.5 sm:p-3 rounded-xl text-center border border-surface-container shadow-2xs">
+                <div id="countdown-hours" class="font-display-hero text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 leading-none">${String(recovery.hoursRemaining).padStart(2, '0')}</div>
+                <div class="text-[10px] sm:text-xs font-label-badge uppercase tracking-wider text-secondary mt-1 font-semibold">Hours</div>
+              </div>
+              <div class="bg-surface-container-low p-2.5 sm:p-3 rounded-xl text-center border border-surface-container shadow-2xs">
+                <div id="countdown-mins" class="font-display-hero text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 leading-none">${String(recovery.minutesRemaining).padStart(2, '0')}</div>
+                <div class="text-[10px] sm:text-xs font-label-badge uppercase tracking-wider text-secondary mt-1 font-semibold">Mins</div>
+              </div>
+              <div class="bg-surface-container-low p-2.5 sm:p-3 rounded-xl text-center border border-surface-container shadow-2xs">
+                <div id="countdown-secs" class="font-display-hero text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 leading-none">${String(recovery.secondsRemaining).padStart(2, '0')}</div>
+                <div class="text-[10px] sm:text-xs font-label-badge uppercase tracking-wider text-secondary mt-1 font-semibold">Secs</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Milestones & Dates -->
+          <div class="lg:col-span-6 grid grid-cols-2 gap-2 sm:gap-3">
+            <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex flex-col justify-between">
+              <span class="text-[11px] font-label-badge uppercase tracking-wider text-secondary">Last Verified Donation</span>
+              <div class="font-title-md text-sm sm:text-base font-bold text-on-surface mt-1">${escapeHtml(formattedLast)}</div>
+              <span class="text-[10.5px] text-on-surface-variant mt-0.5">Day 0 of biological recovery</span>
+            </div>
+            <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-between">
+              <span class="text-[11px] font-label-badge uppercase tracking-wider text-amber-700 dark:text-amber-300 font-bold">Next Eligible Donation</span>
+              <div class="font-title-md text-sm sm:text-base font-bold text-primary mt-1">${escapeHtml(recovery.formattedNextDate)}</div>
+              <span class="text-[10.5px] text-amber-700 dark:text-amber-300 mt-0.5">Day 90 interval mark</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="flex flex-col gap-1.5 pt-1">
+          <div class="flex items-center justify-between text-xs font-body-sm text-on-surface-variant">
+            <span>Biological Recovery Progress: <strong>Day ${recovery.daysElapsed} of 90</strong> (${recovery.progressPercent}% replenished)</span>
+            <span class="text-amber-600 dark:text-amber-400 font-bold">${recovery.daysRemaining} days remaining</span>
+          </div>
+          <div class="w-full bg-surface-container-low rounded-full h-2.5 overflow-hidden">
+            <div id="recovery-progress-bar" class="bg-gradient-to-r from-amber-500 to-primary h-full rounded-full transition-all duration-300" style="width: ${recovery.progressPercent}%;"></div>
+          </div>
+        </div>
+
+        <!-- Mandatory 90-Day Protection Callout Notice -->
+        <div class="flex items-start gap-2.5 p-3 sm:p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-on-surface-variant">
+          <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[20px] shrink-0 mt-0.5">notifications_paused</span>
+          <div class="leading-relaxed">
+            <strong class="text-on-surface font-semibold">Strict Haemovigilance Notification Policy:</strong>
+            <span>Per national clinical blood banking guidelines, donors must wait a minimum of 90 days between donations to replenish red blood cells and ferritin. All emergency pings, phone rings, and dispatches are <strong>strictly paused</strong> for your account during this period. You will not be contacted until the reverse countdown concludes on <strong>${escapeHtml(recovery.formattedNextDate)}</strong>.</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // Start live ticking timer every second
+    if (recovery.totalSecondsRemaining > 0 && recovery.nextEligibleDate) {
+      const targetTime = recovery.nextEligibleDate.getTime();
+      window._recoveryTimerInterval = setInterval(() => {
+        const now = Date.now();
+        const diff = targetTime - now;
+        if (diff <= 0) {
+          clearInterval(window._recoveryTimerInterval);
+          window._recoveryTimerInterval = null;
+          if (typeof renderDonorDashboard === 'function') {
+            renderDonorDashboard();
+          }
+          return;
+        }
+        const totalSecs = Math.floor(diff / 1000);
+        const days = Math.floor(totalSecs / (24 * 3600));
+        const hours = Math.floor((totalSecs % (24 * 3600)) / 3600);
+        const mins = Math.floor((totalSecs % 3600) / 60);
+        const secs = totalSecs % 60;
+        const dEl = document.getElementById('countdown-days');
+        const hEl = document.getElementById('countdown-hours');
+        const mEl = document.getElementById('countdown-mins');
+        const sEl = document.getElementById('countdown-secs');
+        if (dEl) dEl.textContent = days;
+        if (hEl) hEl.textContent = String(hours).padStart(2, '0');
+        if (mEl) mEl.textContent = String(mins).padStart(2, '0');
+        if (sEl) sEl.textContent = String(secs).padStart(2, '0');
+      }, 1000);
+    }
+  } else {
+    // 90-Day Interval Complete or First-time Donor
+    if (iconBadge) {
+      iconBadge.className = 'w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30';
+      iconBadge.innerHTML = `<span class="material-symbols-outlined text-[24px]">verified</span>`;
+    }
+    if (statusBadge) {
+      statusBadge.innerHTML = `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-label-badge text-xs font-bold uppercase tracking-wider border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          90-Day Interval Satisfied • Eligible Now
+        </span>
+      `;
+    }
+    if (bodyContent) {
+      bodyContent.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-center">
+          <div class="lg:col-span-7 flex flex-col gap-1.5">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-xs">✓</span>
+              <h3 class="font-headline-sm text-sm sm:text-base font-bold text-on-surface">Biological Recovery Requirement Fully Satisfied</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+              ${donor && donor.lastDonationDate && !donor.lastDonationDate.toLowerCase().includes('first')
+                ? `Your last donation was on <strong>${escapeHtml(formattedLast)}</strong> (${recovery.daysElapsed} days ago). The mandatory 90-day recovery window is fully complete.`
+                : 'You are registered as a first-time donor with full biological readiness. No recovery waiting interval applies.'}
+              You are active on the standby emergency network and eligible to receive urgent dispatch notifications for compatible patients.
+            </p>
+          </div>
+          <div class="lg:col-span-5 grid grid-cols-2 gap-2 sm:gap-3">
+            <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex flex-col justify-between">
+              <span class="text-[11px] font-label-badge uppercase tracking-wider text-secondary">Last Donation</span>
+              <div class="font-title-md text-sm sm:text-base font-bold text-on-surface mt-1">${escapeHtml(formattedLast)}</div>
+              <span class="text-[10.5px] text-emerald-600 font-semibold mt-0.5">&gt;90 days elapsed</span>
+            </div>
+            <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex flex-col justify-between">
+              <span class="text-[11px] font-label-badge uppercase tracking-wider text-secondary">Eligibility Status</span>
+              <div class="font-title-md text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-1">Eligible Now</div>
+              <span class="text-[10.5px] text-on-surface-variant mt-0.5">Active on Standby Grid</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5 pt-1">
+          <div class="flex items-center justify-between text-xs font-body-sm text-on-surface-variant">
+            <span>Biological Recovery Progress: <strong>Complete (100%)</strong></span>
+            <span class="text-emerald-600 dark:text-emerald-400 font-bold">100% Ready to Donate</span>
+          </div>
+          <div class="w-full bg-surface-container-low rounded-full h-2.5 overflow-hidden">
+            <div class="bg-emerald-500 h-full rounded-full w-full"></div>
+          </div>
+        </div>
+      `;
+    }
+  }
+}
+window.renderDonorRecoveryWidget = renderDonorRecoveryWidget;
+
 function renderDonorDashboard() {
   let donor = window.PulseStore ? window.PulseStore.getDonor() : null;
 
@@ -2734,7 +3065,8 @@ function renderDonorDashboard() {
     setTextContentAll('.donor-address-display', 'No registered address');
     setTextContentAll('.donor-location-display', 'Register to set location');
     setTextContentAll('.donor-distance-display', '--');
-    setTextContentAll('.donor-last-date-display', 'None');
+    setTextContentAll('.donor-last-date-display', 'First-time / None');
+    setTextContentAll('.donor-eligible-display', 'Register to determine');
     setTextContentAll('.donor-donations-display', '0 Units');
     setTextContentAll('.donor-lives-display', '0 Lives Saved');
     setTextContentAll('.donor-points-display', '0');
@@ -2807,7 +3139,35 @@ function renderDonorDashboard() {
   const locStr = `${donor.address ? donor.address + ', ' : ''}${donor.city}`;
   setTextContentAll('.donor-location-display', locStr);
   setTextContentAll('.donor-distance-display', `Within ${donor.radiusMiles || 10} km`);
-  setTextContentAll('.donor-last-date-display', donor.lastDonationDate || 'First-time Donor');
+  const rawLastDate = donor.lastDonationDate || (donor.donationHistory && donor.donationHistory.length > 0 ? donor.donationHistory[0].date : null);
+  const formattedLastDate = formatDonationDate(rawLastDate);
+  setTextContentAll('.donor-last-date-display', formattedLastDate);
+  // 90-Day Biological Recovery & Live Reverse Countdown Calculation
+  const recovery = calculateDonationRecovery(rawLastDate);
+  if (recovery.inRecovery) {
+    setTextContentAll('.donor-eligible-display', `In 90-Day Recovery (${recovery.daysRemaining} days left)`);
+    document.querySelectorAll('.donor-eligible-display').forEach(el => {
+      el.className = 'donor-eligible-display font-bold text-amber-600 dark:text-amber-400';
+    });
+    const availBadge = document.getElementById('donor-avail-badge');
+    if (availBadge) {
+      availBadge.className = 'inline-flex items-center gap-1.5 px-space-xs py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 font-label-badge text-label-badge uppercase tracking-wide border border-amber-500/20';
+      availBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> In 90-Day Recovery • Alerts Paused`;
+    }
+  } else {
+    setTextContentAll('.donor-eligible-display', 'Ready to donate (Eligible Now)');
+    document.querySelectorAll('.donor-eligible-display').forEach(el => {
+      el.className = 'donor-eligible-display font-semibold text-tertiary';
+    });
+    const availBadge = document.getElementById('donor-avail-badge');
+    if (availBadge) {
+      availBadge.className = 'inline-flex items-center gap-1.5 px-space-xs py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-badge text-label-badge uppercase tracking-wide';
+      availBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Available to Donate`;
+    }
+  }
+
+  // Render 90-Day Recovery Countdown Widget
+  renderDonorRecoveryWidget(donor, recovery);
   setTextContentAll('.donor-donations-display', `${donor.totalDonations || 0} Units`);
   setTextContentAll('.donor-lives-display', `${donor.livesSaved || 0} Lives Saved to Date`);
   setTextContentAll('.donor-points-display', (donor.rewardPoints || 0).toLocaleString());
@@ -2858,66 +3218,101 @@ function renderDonorDashboard() {
     ? window.PulseStore.getRecipient()
     : null;
 
-  if (missionBanner && recipient) {
-    const isCompat = window.PulseStore.isBloodCompatible(donor.bloodGroup, recipient.bloodGroup);
-    const donorStatus = window.PulseStore.getDonorCallStatus(recipient.requestId, donor.id);
+  if (missionBanner) {
+    if (recovery && recovery.inRecovery) {
+      missionBanner.classList.remove('hidden');
+      missionBanner.innerHTML = `
+        <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[22px]">notifications_paused</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-200 text-[10px] font-bold uppercase tracking-wide">Biological Recovery Active</span>
+                <span class="text-xs font-bold text-on-surface">Emergency Notifications Paused (${recovery.daysRemaining} Days Left)</span>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-0.5">
+                ${recipient ? `Active emergency requisition for ${escapeHtml(recipient.bloodGroup)} detected at ${escapeHtml(recipient.hospitalName)}, but emergency` : 'Emergency'} pings and ringing are safely blocked per national haemovigilance guidelines until your 90-day biological recovery concludes on <strong>${escapeHtml(recovery.formattedNextDate)}</strong>.
+              </p>
+            </div>
+          </div>
+          <a href="#donor-recovery-countdown-card" class="px-3.5 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold transition-all shadow-xs shrink-0 self-start sm:self-center">
+            View Recovery Clock
+          </a>
+        </div>
+      `;
+    } else if (recipient) {
+      const isCompat = window.PulseStore.isBloodCompatible(donor.bloodGroup, recipient.bloodGroup);
+      const donorStatus = window.PulseStore.getDonorCallStatus(recipient.requestId, donor.id);
 
-    if (isCompat) {
-      if (donorStatus === 'confirmed') {
-        missionBanner.classList.remove('hidden');
-        missionBanner.innerHTML = `
-          <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                <span class="material-symbols-outlined text-[22px]">two_wheeler</span>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wide">Active Mission En Route</span>
-                  <span class="text-xs font-bold text-on-surface">Requisition #${escapeHtml(recipient.requestId)}</span>
+      if (isCompat) {
+        if (donorStatus === 'confirmed') {
+          missionBanner.classList.remove('hidden');
+          missionBanner.innerHTML = `
+            <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                  <span class="material-symbols-outlined text-[22px]">two_wheeler</span>
                 </div>
-                <p class="text-xs text-on-surface-variant mt-0.5">
-                  You confirmed availability for <strong>${escapeHtml(recipient.patientName)}</strong> (${escapeHtml(recipient.bloodGroup)} ${escapeHtml(recipient.component)}). Heading to <strong>${escapeHtml(recipient.hospitalName)}</strong> (${escapeHtml(recipient.hospitalWard)}).
-                </p>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wide">Active Mission En Route</span>
+                    <span class="text-xs font-bold text-on-surface">Requisition #${escapeHtml(recipient.requestId)}</span>
+                  </div>
+                  <p class="text-xs text-on-surface-variant mt-0.5">
+                    You confirmed availability for <strong>${escapeHtml(recipient.patientName)}</strong> (${escapeHtml(recipient.bloodGroup)} ${escapeHtml(recipient.component)}). Heading to <strong>${escapeHtml(recipient.hospitalName)}</strong> (${escapeHtml(recipient.hospitalWard)}).
+                  </p>
+                </div>
               </div>
+              <a href="#/recipient-tracking" class="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs shrink-0 self-start sm:self-center">
+                View Hospital Transit Grid
+              </a>
             </div>
-            <a href="#/recipient-tracking" class="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs shrink-0 self-start sm:self-center">
-              View Hospital Transit Grid
-            </a>
-          </div>
-        `;
-      } else if (donorStatus === 'declined') {
-        missionBanner.classList.remove('hidden');
-        missionBanner.innerHTML = `
-          <div class="p-3.5 rounded-2xl bg-surface-container-high border border-surface-container flex items-center justify-between gap-3">
-            <span class="text-xs text-on-surface-variant font-medium">You marked unavailable / declined for ${escapeHtml(recipient.patientName)}'s requisition.</span>
-            <button type="button" onclick="window.checkAndRingMatchedDonor()" class="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-highest text-primary text-xs font-bold cursor-pointer">Reconsider &amp; Ring</button>
-          </div>
-        `;
+          `;
+        } else if (donorStatus === 'declined') {
+          missionBanner.classList.remove('hidden');
+          missionBanner.innerHTML = `
+            <div class="p-3.5 rounded-2xl bg-surface-container-high border border-surface-container flex items-center justify-between gap-3">
+              <span class="text-xs text-on-surface-variant font-medium">You marked unavailable / declined for ${escapeHtml(recipient.patientName)}'s requisition.</span>
+              <button type="button" onclick="window.checkAndRingMatchedDonor()" class="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-highest text-primary text-xs font-bold cursor-pointer">Reconsider &amp; Ring</button>
+            </div>
+          `;
+        } else {
+          // Ringing or unconfirmed compatible donor!
+          missionBanner.classList.remove('hidden');
+          missionBanner.innerHTML = `
+            <div class="p-4 rounded-2xl bg-red-600/10 border-2 border-red-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm incoming-call-box-glow">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-2xs animate-phone-vibrate">
+                  <span class="material-symbols-outlined text-[24px]">ring_volume</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
+                    <span class="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold uppercase tracking-wide">Stat Emergency Alert</span>
+                    <span class="text-xs font-bold text-red-900">Incoming Call For Your Blood Group (${escapeHtml(donor.bloodGroup)})</span>
+                  </div>
+                  <p class="text-xs text-on-surface mt-0.5">
+                    <strong>${escapeHtml(recipient.hospitalName)}</strong> requires ${escapeHtml(recipient.unitsRequired)} units of ${escapeHtml(recipient.bloodGroup)} for <strong>${escapeHtml(recipient.patientName)}</strong>.
+                  </p>
+                </div>
+              </div>
+              <button type="button" onclick="window.openIncomingDonorCallModal('${donor.id}')" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5 shrink-0 self-start sm:self-center animate-pulse cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">phone_in_talk</span>
+                <span>Open Call Screen</span>
+              </button>
+            </div>
+          `;
+        }
       } else {
-        // Ringing or unconfirmed compatible donor!
         missionBanner.classList.remove('hidden');
         missionBanner.innerHTML = `
-          <div class="p-4 rounded-2xl bg-red-600/10 border-2 border-red-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm incoming-call-box-glow">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-2xs animate-phone-vibrate">
-                <span class="material-symbols-outlined text-[24px]">ring_volume</span>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
-                  <span class="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold uppercase tracking-wide">Stat Emergency Alert</span>
-                  <span class="text-xs font-bold text-red-900">Incoming Call For Your Blood Group (${escapeHtml(donor.bloodGroup)})</span>
-                </div>
-                <p class="text-xs text-on-surface mt-0.5">
-                  <strong>${escapeHtml(recipient.hospitalName)}</strong> requires ${escapeHtml(recipient.unitsRequired)} units of ${escapeHtml(recipient.bloodGroup)} for <strong>${escapeHtml(recipient.patientName)}</strong>.
-                </p>
-              </div>
+          <div class="p-3 rounded-2xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2 text-xs text-on-surface-variant font-medium">
+              <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
+              <span>No active requests matching your profile in your area.</span>
             </div>
-            <button type="button" onclick="window.openIncomingDonorCallModal('${donor.id}')" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5 shrink-0 self-start sm:self-center animate-pulse cursor-pointer">
-              <span class="material-symbols-outlined text-[16px]">phone_in_talk</span>
-              <span>Open Call Screen</span>
-            </button>
           </div>
         `;
       }
@@ -2927,21 +3322,27 @@ function renderDonorDashboard() {
         <div class="p-3 rounded-2xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3">
           <div class="flex items-center gap-2 text-xs text-on-surface-variant font-medium">
             <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
-            <span>No active requests matching your profile in your area.</span>
+            <span>No active requests currently pending. Your profile is on standby.</span>
           </div>
         </div>
       `;
     }
-  } else if (missionBanner) {
-    missionBanner.classList.remove('hidden');
-    missionBanner.innerHTML = `
-      <div class="p-3 rounded-2xl bg-surface-container-low border border-surface-container flex items-center justify-between gap-3">
-        <div class="flex items-center gap-2 text-xs text-on-surface-variant font-medium">
-          <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
-          <span>No active requests currently pending. Your profile is on standby.</span>
-        </div>
-      </div>
-    `;
+  }
+
+  // Update Code Red Respond Button state based on recovery
+  const codeRedBtn = document.getElementById('btn-code-red-respond');
+  if (codeRedBtn) {
+    if (recovery && recovery.inRecovery) {
+      codeRedBtn.disabled = true;
+      codeRedBtn.className = 'w-full sm:w-auto px-space-lg py-3 rounded-xl bg-surface-container-high/60 text-on-surface-variant font-label-lg text-label-lg font-bold cursor-not-allowed opacity-75';
+      codeRedBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">hourglass_top</span><span>In Recovery (${recovery.daysRemaining}d left)</span>`;
+      codeRedBtn.title = `Biological recovery in progress. Next eligible: ${recovery.formattedNextDate}`;
+    } else {
+      codeRedBtn.disabled = false;
+      codeRedBtn.className = 'w-full sm:w-auto px-space-lg py-3 rounded-xl bg-on-primary text-primary font-label-lg text-label-lg font-bold shadow-md hover:bg-surface-container transition-all active:scale-98 cursor-pointer';
+      codeRedBtn.innerHTML = `<span>Respond to Code Red Emergency</span><span class="material-symbols-outlined text-[20px]">arrow_forward</span>`;
+      codeRedBtn.title = 'Respond to active emergency requisition';
+    }
   }
 
   // 3. Dynamic Nearby Blood Requests Interactive Grid
@@ -3066,12 +3467,6 @@ function renderDonorDashboard() {
     }
   }
 
-  // Check and ring if user is active donor and matched!
-  setTimeout(() => {
-    if (typeof window.checkAndRingMatchedDonor === 'function') {
-      window.checkAndRingMatchedDonor();
-    }
-  }, 100);
 }
 
 /**
@@ -3795,10 +4190,19 @@ window.openIncomingDonorCallModal = function(param1, param2) {
 
   let targetDonor = null;
   if (currentDonorId && availableDonors.length > 0) {
-    targetDonor = availableDonors.find(d => d.id === currentDonorId);
+    const cleanCurrentId = String(currentDonorId).toLowerCase().trim();
+    targetDonor = availableDonors.find(d => {
+      if (!d) return false;
+      const dId = String(d.id || '').toLowerCase().trim();
+      const dName = String(d.name || d.fullName || '').toLowerCase().trim();
+      return dId === cleanCurrentId || dName === cleanCurrentId;
+    });
   }
   if (!targetDonor && availableDonors.length > 0) {
-    targetDonor = availableDonors.find(d => !d.confirmed && d.callStatus !== 'declined') || availableDonors[0];
+    targetDonor = availableDonors.find(d => !d.confirmed && d.callStatus !== 'declined');
+  }
+  if (!targetDonor && availableDonors.length > 0) {
+    targetDonor = availableDonors[0];
   }
   if (!targetDonor) {
     targetDonor = {
@@ -3812,6 +4216,32 @@ window.openIncomingDonorCallModal = function(param1, param2) {
       confirmed: false,
       callStatus: 'ringing'
     };
+  }
+
+  // 90-Day Biological Recovery Check: Block incoming call modal if target donor is in recovery!
+  const donorToCheck = targetDonor || loggedInDonor;
+  const rawDateToCheck = (donorToCheck && donorToCheck.lastDonationDate) || (loggedInDonor && loggedInDonor.lastDonationDate);
+  const donorRecovery = window.calculateDonationRecovery ? window.calculateDonationRecovery(rawDateToCheck) : null;
+  if (donorRecovery && donorRecovery.inRecovery) {
+    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+      window.PulseAudio.stopPhoneRinging();
+    }
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+    const docked = document.getElementById('docked-ringing-call-indicator');
+    if (docked) {
+      docked.classList.add('hidden');
+      docked.style.display = 'none';
+    }
+    document.body.classList.remove('overflow-hidden');
+    if (typeof window.showToast === 'function') {
+      window.showToast(
+        'Recovery Period Active',
+        `Donor is currently in mandatory 90-day recovery (${donorRecovery.daysRemaining} days remaining). Emergency alerts & calls are paused until ${donorRecovery.formattedNextDate}.`,
+        'warning'
+      );
+    }
+    return;
   }
 
   // 3. Populate Modal Content
@@ -3889,9 +4319,15 @@ window.openIncomingDonorCallModal = function(param1, param2) {
   modal.style.zIndex = '99999';
   document.body.classList.add('overflow-hidden');
 
-  // 7. Start phone ringing sound
-  if (window.PulseAudio && typeof window.PulseAudio.startPhoneRinging === 'function') {
-    window.PulseAudio.startPhoneRinging({ donorName: targetDonor.name });
+  // 7. Start phone ringing sound ONLY IF donor is not already confirmed or declined
+  if (targetDonor && !targetDonor.confirmed && targetDonor.callStatus !== 'declined') {
+    if (window.PulseAudio && typeof window.PulseAudio.startPhoneRinging === 'function') {
+      window.PulseAudio.startPhoneRinging({ donorName: targetDonor.name });
+    }
+  } else {
+    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+      window.PulseAudio.stopPhoneRinging();
+    }
   }
 };
 
@@ -3906,6 +4342,8 @@ window.closeIncomingDonorCallModal = function() {
   if (modal) {
     modal.classList.add('hidden');
     modal.style.display = 'none';
+    modal.style.visibility = 'hidden';
+    modal.style.opacity = '0';
   }
   const docked = document.getElementById('docked-ringing-call-indicator');
   if (docked) {
@@ -3922,6 +4360,7 @@ window.closeIncomingDonorCallModal = function() {
   if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
     window.PulseAudio.stopPhoneRinging();
   }
+  window._callActive = false;
 };
 
 window.minimizeIncomingCall = function() {
@@ -3997,10 +4436,15 @@ window.confirmActiveDonorAvailability = function(explicitDonorId) {
                   'D-KM-01';
 
   const reqId = (activeCall ? activeCall.requestId : null) || 
-                (recipient ? recipient.requestId : null) || 
+                (recipient ? (recipient.requestId || recipient.id) : null) || 
                 (window.PulseStore && window.PulseStore.state && window.PulseStore.state.selectedRequestId) || 
                 (window.PulseStore && typeof window.PulseStore.getRequests === 'function' && window.PulseStore.getRequests()[0]?.id) || 
                 'REQ-8686';
+
+  // Mark this call as handled so ringer NEVER re-opens it
+  window._dismissedCalls = window._dismissedCalls || {};
+  window._dismissedCalls[reqId] = true;
+  try { sessionStorage.setItem('call_handled_' + reqId, 'accepted'); } catch(e) {}
 
   // 3. Confirm in Store
   let confirmedDonorName = 'Volunteer Donor';
@@ -4009,7 +4453,18 @@ window.confirmActiveDonorAvailability = function(explicitDonorId) {
     if (res && res.donor) {
       confirmedDonorName = res.donor.name || res.donor.fullName || confirmedDonorName;
     }
+    if (loggedInDonor && loggedInDonor.id && loggedInDonor.id !== donorId) {
+      window.PulseStore.confirmDonorAvailability(reqId, loggedInDonor.id, false);
+    }
   }
+
+  if (window.PulseStore) {
+    window.PulseStore.state.activeIncomingCall = null;
+    window.PulseStore.saveState();
+  }
+
+  // 4. Force Close Modal immediately
+  window.closeIncomingDonorCallModal();
 
   // 3b. Sync to server in real time so recipient on ANY device sees it immediately without refresh
   const caseId = (recipient && (recipient.id || recipient.caseId)) || (activeCall && (activeCall.caseId || activeCall.id)) || reqId;
@@ -4035,9 +4490,6 @@ window.confirmActiveDonorAvailability = function(explicitDonorId) {
       })
     }).catch(err => console.warn('Donor accept API sync notice:', err));
   } catch (e) {}
-
-  // 4. Force Close Modal immediately
-  window.closeIncomingDonorCallModal();
 
   // 5. Show Toast
   const isDonorView = window.location.hash.includes('donor') || (document.getElementById('view-donor-dashboard') && document.getElementById('view-donor-dashboard').classList.contains('active'));
@@ -4096,19 +4548,36 @@ window.declineActiveDonorCall = function(explicitDonorId) {
                   'D-KM-01';
 
   const reqId = (activeCall ? activeCall.requestId : null) || 
-                (recipient ? recipient.requestId : null) || 
+                (recipient ? (recipient.requestId || recipient.id) : null) || 
                 (window.PulseStore && window.PulseStore.state && window.PulseStore.state.selectedRequestId) || 
                 (window.PulseStore && typeof window.PulseStore.getRequests === 'function' && window.PulseStore.getRequests()[0]?.id) || 
                 'REQ-8686';
 
+  // Mark this call as handled so ringer NEVER re-opens it
+  window._dismissedCalls = window._dismissedCalls || {};
+  window._dismissedCalls[reqId] = true;
+  try { sessionStorage.setItem('call_handled_' + reqId, 'declined'); } catch(e) {}
+
   // 3. Decline in store
+  let declinedDonorName = (loggedInDonor && (loggedInDonor.fullName || loggedInDonor.name)) || (activeCall && activeCall.donorName) || 'Volunteer Donor';
   if (window.PulseStore && typeof window.PulseStore.declineDonorCall === 'function') {
-    window.PulseStore.declineDonorCall(reqId, donorId);
+    const res = window.PulseStore.declineDonorCall(reqId, donorId);
+    if (res && res.donor) declinedDonorName = res.donor.name || res.donor.fullName || declinedDonorName;
+    if (loggedInDonor && loggedInDonor.id && loggedInDonor.id !== donorId) {
+      window.PulseStore.declineDonorCall(reqId, loggedInDonor.id, false);
+    }
   }
+
+  if (window.PulseStore) {
+    window.PulseStore.state.activeIncomingCall = null;
+    window.PulseStore.saveState();
+  }
+
+  // 4. Force Close Modal immediately
+  window.closeIncomingDonorCallModal();
 
   // 3b. Sync decline to server in real time
   const caseId = (recipient && (recipient.id || recipient.caseId)) || (activeCall && (activeCall.caseId || activeCall.id)) || reqId;
-  const declinedDonorName = (loggedInDonor && (loggedInDonor.fullName || loggedInDonor.name)) || (activeCall && activeCall.donorName) || 'Volunteer Donor';
   const donorBloodGroup = (loggedInDonor && loggedInDonor.bloodGroup) || (activeCall && activeCall.donorBloodGroup) || 'O+';
 
   try {
@@ -4125,9 +4594,6 @@ window.declineActiveDonorCall = function(explicitDonorId) {
       })
     }).catch(err => console.warn('Donor decline API sync notice:', err));
   } catch (e) {}
-
-  // 4. Force Close Modal immediately
-  window.closeIncomingDonorCallModal();
 
   // 5. Show notification
   const isDonorView = window.location.hash.includes('donor') || (document.getElementById('view-donor-dashboard') && document.getElementById('view-donor-dashboard').classList.contains('active'));
@@ -4257,7 +4723,7 @@ window.checkAndRingMatchedDonor = function() {
   const currentHash = window.location.hash || '';
   const isRecipientView = currentHash.includes('recipient') || 
                           currentHash.includes('patient') || 
-                          currentHash.includes('family') ||
+                          currentHash.includes('family') || 
                           currentHash.includes('hospital') ||
                           window.location.pathname.includes('recipient-dashboard');
 
@@ -4267,9 +4733,17 @@ window.checkAndRingMatchedDonor = function() {
       window.PulseAudio.stopPhoneRinging();
     }
     const modal = document.getElementById('modal-incoming-donor-call');
-    if (modal) modal.classList.add('hidden');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+      modal.style.visibility = 'hidden';
+      modal.style.opacity = '0';
+    }
     const docked = document.getElementById('docked-ringing-call-indicator');
-    if (docked) docked.classList.add('hidden');
+    if (docked) {
+      docked.classList.add('hidden');
+      docked.style.display = 'none';
+    }
     document.body.classList.remove('overflow-hidden');
     return;
   }
@@ -4285,7 +4759,40 @@ window.checkAndRingMatchedDonor = function() {
   const recipient = window.PulseStore ? window.PulseStore.getRecipient() : null;
   if (!recipient) return;
 
-  const reqId = recipient.requestId;
+  // 90-Day Biological Recovery Check: Suppress all ringing & calls if donor is in recovery!
+  const recovery = window.calculateDonationRecovery ? window.calculateDonationRecovery(donor.lastDonationDate) : null;
+  if (recovery && recovery.inRecovery) {
+    if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
+      window.PulseAudio.stopPhoneRinging();
+    }
+    const modal = document.getElementById('modal-incoming-donor-call');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+    }
+    const docked = document.getElementById('docked-ringing-call-indicator');
+    if (docked) {
+      docked.classList.add('hidden');
+      docked.style.display = 'none';
+    }
+    return;
+  }
+
+  const reqId = recipient.requestId || recipient.id;
+
+  // If user has already handled (accepted or declined) or dismissed this call, DO NOT RING!
+  if (window._dismissedCalls && window._dismissedCalls[reqId]) return;
+  try {
+    if (sessionStorage.getItem('call_handled_' + reqId)) return;
+  } catch(e) {}
+
+  // If there is no active incoming call ringing in the store, DO NOT AUTO-RING!
+  const activeCall = (window.PulseStore && typeof window.PulseStore.getActiveIncomingCall === 'function')
+    ? window.PulseStore.getActiveIncomingCall()
+    : null;
+  if (!activeCall || activeCall.status !== 'ringing') {
+    return;
+  }
 
   // 1. Check blood compatibility
   const isCompat = window.PulseStore.isBloodCompatible(donor.bloodGroup, recipient.bloodGroup);
@@ -4294,7 +4801,10 @@ window.checkAndRingMatchedDonor = function() {
       window.PulseAudio.stopPhoneRinging();
     }
     const modal = document.getElementById('modal-incoming-donor-call');
-    if (modal) modal.classList.add('hidden');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+    }
     return;
   }
 
@@ -4304,7 +4814,10 @@ window.checkAndRingMatchedDonor = function() {
       window.PulseAudio.stopPhoneRinging();
     }
     const modal = document.getElementById('modal-incoming-donor-call');
-    if (modal) modal.classList.add('hidden');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+    }
     return;
   }
 
@@ -4315,7 +4828,10 @@ window.checkAndRingMatchedDonor = function() {
       window.PulseAudio.stopPhoneRinging();
     }
     const modal = document.getElementById('modal-incoming-donor-call');
-    if (modal) modal.classList.add('hidden');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+    }
     return;
   }
 
@@ -6701,6 +7217,23 @@ window.goToRoleSelection = function(e) {
 // 15. CODE RED IMMEDIATE RESPONSE MODAL CONTROLLERS
 // ============================================================================
 window.openImmediateResponseModal = function() {
+  const store = window.PulseStore;
+  const donor = (store && typeof store.getDonor === 'function') ? store.getDonor() : null;
+  const rawLastDate = donor ? (donor.lastDonationDate || (donor.donationHistory && donor.donationHistory.length > 0 ? donor.donationHistory[0].date : null)) : null;
+  const recovery = window.calculateDonationRecovery ? window.calculateDonationRecovery(rawLastDate) : null;
+  if (recovery && recovery.inRecovery) {
+    if (typeof window.showToast === 'function') {
+      window.showToast(
+        'Recovery Period Active',
+        `You are currently in mandatory 90-day biological recovery (${recovery.daysRemaining} days remaining). Code Red response is locked until ${recovery.formattedNextDate}.`,
+        'warning'
+      );
+    } else {
+      alert(`You are currently in mandatory 90-day biological recovery (${recovery.daysRemaining} days remaining). Code Red response is locked until ${recovery.formattedNextDate}.`);
+    }
+    return;
+  }
+
   const modal = document.getElementById('modal-immediate-response');
   if (!modal) return;
 

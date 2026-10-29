@@ -492,5 +492,134 @@
       "pulse": "72 bpm",
       "weight": "68 kg"
     }
+  },
+  {
+    "id": "DP-5954-O",
+    "_id": "DP-5954-O",
+    "name": "Recovery Test Donor",
+    "fullName": "Recovery Test Donor",
+    "initials": "RT",
+    "age": 28,
+    "gender": "Not specified",
+    "bloodGroup": "O-",
+    "phone": "+91 99999 11111",
+    "email": "rec.test@pulse.in",
+    "password": "+91 99999 11111",
+    "address": "Local Area, Bengaluru",
+    "city": "Bengaluru, Karnataka",
+    "medicalHistory": "Pre-screened verified donor. Clinical vitals within healthy standard range.",
+    "lastDonationDate": "2026-09-18",
+    "nextEligibleDate": "Eligible Now",
+    "availability": true,
+    "radiusMiles": 10,
+    "totalDonations": 0,
+    "livesSaved": 0,
+    "rewardPoints": 100,
+    "rewardTier": "Active Registered Donor",
+    "distance": 1.5,
+    "isAvailable": true,
+    "verified": true,
+    "isPhoneVerified": true,
+    "role": "DONOR",
+    "coordinates": {
+      "type": "Point",
+      "coordinates": [
+        77.5983,
+        12.8958
+      ]
+    },
+    "donationHistory": [],
+    "vitals": {
+      "hemoglobin": "14.2 g/dL",
+      "bp": "120/80 mmHg",
+      "pulse": "72 bpm",
+      "weight": "68 kg"
+    }
+  },
+  {
+    "id": "DP-6792-O",
+    "_id": "DP-6792-O",
+    "name": "Recovery Test Donor",
+    "fullName": "Recovery Test Donor",
+    "initials": "RT",
+    "age": 28,
+    "gender": "Not specified",
+    "bloodGroup": "O-",
+    "phone": "+91 99999 11111",
+    "email": "rec.test@pulse.in",
+    "password": "+91 99999 11111",
+    "address": "Local Area, Bengaluru",
+    "city": "Bengaluru, Karnataka",
+    "medicalHistory": "Pre-screened verified donor. Clinical vitals within healthy standard range.",
+    "lastDonationDate": "2026-09-18",
+    "nextEligibleDate": "Eligible Now",
+    "availability": true,
+    "radiusMiles": 10,
+    "totalDonations": 0,
+    "livesSaved": 0,
+    "rewardPoints": 100,
+    "rewardTier": "Active Registered Donor",
+    "distance": 1.5,
+    "isAvailable": true,
+    "verified": true,
+    "isPhoneVerified": true,
+    "role": "DONOR",
+    "coordinates": {
+      "type": "Point",
+      "coordinates": [
+        77.5983,
+        12.8958
+      ]
+    },
+    "donationHistory": [],
+    "vitals": {
+      "hemoglobin": "14.2 g/dL",
+      "bp": "120/80 mmHg",
+      "pulse": "72 bpm",
+      "weight": "68 kg"
+    }
+  },
+  {
+    "id": "DP-1356-O",
+    "_id": "DP-1356-O",
+    "name": "Eligible Test Donor",
+    "fullName": "Eligible Test Donor",
+    "initials": "ET",
+    "age": 28,
+    "gender": "Not specified",
+    "bloodGroup": "O-",
+    "phone": "+91 99999 22222",
+    "email": "elig.test@pulse.in",
+    "password": "+91 99999 22222",
+    "address": "Local Area, Bengaluru",
+    "city": "Bengaluru, Karnataka",
+    "medicalHistory": "Pre-screened verified donor. Clinical vitals within healthy standard range.",
+    "lastDonationDate": "2026-06-14",
+    "nextEligibleDate": "Eligible Now",
+    "availability": true,
+    "radiusMiles": 10,
+    "totalDonations": 0,
+    "livesSaved": 0,
+    "rewardPoints": 100,
+    "rewardTier": "Active Registered Donor",
+    "distance": 1.5,
+    "isAvailable": true,
+    "verified": true,
+    "isPhoneVerified": true,
+    "role": "DONOR",
+    "coordinates": {
+      "type": "Point",
+      "coordinates": [
+        77.5983,
+        12.8958
+      ]
+    },
+    "donationHistory": [],
+    "vitals": {
+      "hemoglobin": "14.2 g/dL",
+      "bp": "120/80 mmHg",
+      "pulse": "72 bpm",
+      "weight": "68 kg"
+    }
   }
 ]

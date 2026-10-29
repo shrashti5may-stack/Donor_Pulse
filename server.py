@@ -38,6 +38,39 @@ def haversine_distance_km(lat1, lon1, lat2, lon2):
     c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
     return round(R * c, 1)
 
+def parse_date_str(date_val):
+    if not date_val or not isinstance(date_val, str):
+        return None
+    val = date_val.strip()
+    if not val or 'first' in val.lower() or val.lower() in ('none', 'null', 'n/a'):
+        return None
+    try:
+        clean = val.replace('Z', '+00:00')
+        if len(clean) == 10 and clean.count('-') == 2:
+            clean += 'T00:00:00+00:00'
+        return datetime.fromisoformat(clean)
+    except Exception:
+        pass
+    for fmt in ('%d %b %Y', '%d %B %Y', '%Y-%m-%d', '%d/%m/%Y', '%m/%d/%Y', '%d-%m-%Y'):
+        try:
+            return datetime.strptime(val, fmt).replace(tzinfo=timezone.utc)
+        except Exception:
+            continue
+    return None
+
+def is_donor_in_90_day_recovery(last_donation_date_str, now_dt=None):
+    if not last_donation_date_str:
+        return False
+    dt = parse_date_str(last_donation_date_str)
+    if not dt:
+        return False
+    if not now_dt:
+        now_dt = datetime.now(timezone.utc)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    diff = (now_dt - dt).total_seconds()
+    return 0 <= diff < (90 * 86400)
+
 # In-memory database storing registered users and requests (MongoDB/Postgres equivalent representation)
 DB_USERS = {}
 DB_REQUESTS = {}
@@ -504,6 +537,20 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
             donor_phone = body.get('donorPhone') or '+91 98000 00000'
             status = (body.get('status') or 'ACCEPTED').upper()
             eta = body.get('eta') or '15 mins'
+
+            if status == 'ACCEPTED' and donor_id:
+                donor_obj = DB_DONORS.get(donor_id) or DB_USERS.get(donor_id)
+                if donor_obj and is_donor_in_90_day_recovery(donor_obj.get('lastDonationDate')):
+                    self.send_response(400)
+                    self.send_header('Content-Type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({
+                        "success": False,
+                        "error": "Donor is currently in mandatory 90-day clinical recovery interval. No donation allowed.",
+                        "inRecovery": True
+                    }).encode('utf-8'))
+                    return
 
             # Find matching case in persistent database
             target_case = None
@@ -1066,16 +1113,10 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 if donor.get('bloodGroup') not in compatible_groups:
                     continue
 
-                # 90-day donation check
+                # 90-day clinical recovery check: Exclude donors who donated within last 90 days!
                 last_don = donor.get('lastDonationDate')
-                if last_don:
-                    try:
-                        last_dt = datetime.fromisoformat(last_don.replace('Z', '+00:00'))
-                        if last_dt > cutoff_90_days:
-                            # Exclude donors who donated within last 90 days!
-                            continue
-                    except Exception:
-                        pass
+                if is_donor_in_90_day_recovery(last_don, now_dt):
+                    continue
 
                 # Proximity check (25 km max)
                 d_coords = donor.get('coordinates', {}).get('coordinates', [0, 0])
@@ -1152,6 +1193,9 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
             if not matched_donor_list and DB_DONORS:
                 for d in DB_DONORS.values():
+                    # 90-day biological recovery check: Exclude donors in recovery!
+                    if is_donor_in_90_day_recovery(d.get('lastDonationDate'), now_dt):
+                        continue
                     d_bg = d.get('bloodGroup', blood_group_needed)
                     if d_bg in compatible_groups or not compatible_groups or d_bg == blood_group_needed:
                         matched_donor_list.append({

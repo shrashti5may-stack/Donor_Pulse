@@ -1426,10 +1426,23 @@
 
     function closeIncomingDonorCallModal() {
       const modal = document.getElementById('modal-incoming-donor-call');
-      if (modal) modal.classList.add('hidden');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        modal.style.visibility = 'hidden';
+        modal.style.opacity = '0';
+      }
       const docked = document.getElementById('docked-ringing-call-indicator');
-      if (docked) docked.classList.add('hidden');
+      if (docked) {
+        docked.classList.add('hidden');
+        docked.style.display = 'none';
+      }
       document.body.classList.remove('overflow-hidden');
+
+      if (window.PulseStore) {
+        window.PulseStore.state.activeIncomingCall = null;
+        window.PulseStore.saveState();
+      }
 
       if (window.PulseAudio && typeof window.PulseAudio.stopPhoneRinging === 'function') {
         window.PulseAudio.stopPhoneRinging();
@@ -1570,11 +1583,7 @@
         });
       }
 
-      if (nextDonor) {
-        setTimeout(() => openIncomingDonorCallModal(nextDonor.id), 400);
-      } else {
-        closeIncomingDonorCallModal();
-      }
+      closeIncomingDonorCallModal();
 
       renderStandaloneRecipientDonors();
     }

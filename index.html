@@ -672,36 +672,36 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5">
                 <!-- Can Donate To -->
                 <div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container-high">
-                  <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2 mb-3">
                     <div class="flex items-center gap-2">
                       <span class="w-6 h-6 rounded-full bg-tertiary-fixed text-tertiary flex items-center justify-center font-bold text-xs">✓</span>
                       <h4 class="font-title-md text-sm font-bold text-on-surface">Can Donate Red Blood Cells To:</h4>
                     </div>
-                    <span class="font-body-sm text-[11px] text-on-surface-variant">Click type to explore</span>
+
                   </div>
-                  <div id="widget-can-donate-list" class="flex flex-wrap gap-2">
-                    <button type="button" onclick="window.selectBloodType('O-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view O- profile">O-</button>
-                    <button type="button" onclick="window.selectBloodType('O+')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view O+ profile">O+</button>
-                    <button type="button" onclick="window.selectBloodType('A-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view A- profile">A-</button>
-                    <button type="button" onclick="window.selectBloodType('A+')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view A+ profile">A+</button>
-                    <button type="button" onclick="window.selectBloodType('B-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view B- profile">B-</button>
-                    <button type="button" onclick="window.selectBloodType('B+')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view B+ profile">B+</button>
-                    <button type="button" onclick="window.selectBloodType('AB-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view AB- profile">AB-</button>
-                    <button type="button" onclick="window.selectBloodType('AB+')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 hover:bg-tertiary text-on-tertiary-fixed hover:text-on-tertiary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view AB+ profile">AB+</button>
+                  <div id="widget-can-donate-list" class="flex flex-wrap gap-2 pointer-events-none select-none" style="pointer-events: none !important;">
+                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold shadow-xs select-none cursor-default">O-</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold shadow-xs select-none cursor-default">O+</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold shadow-xs select-none cursor-default">A-</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold shadow-xs select-none cursor-default">A+</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold shadow-xs select-none cursor-default">B-</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold shadow-xs select-none cursor-default">B+</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold shadow-xs select-none cursor-default">AB-</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed font-label-badge text-xs font-bold shadow-xs select-none cursor-default">AB+</span>
                   </div>
                 </div>
 
                 <!-- Can Receive From -->
                 <div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container-high">
-                  <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2 mb-3">
                     <div class="flex items-center gap-2">
                       <span class="w-6 h-6 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-xs">↓</span>
                       <h4 class="font-title-md text-sm font-bold text-on-surface">Can Receive Red Blood Cells From:</h4>
                     </div>
-                    <span class="font-body-sm text-[11px] text-on-surface-variant">Click type to explore</span>
+
                   </div>
-                  <div id="widget-can-receive-list" class="flex flex-wrap gap-2">
-                    <button type="button" onclick="window.selectBloodType('O-')" class="clickable-blood-pill px-2.5 py-1 rounded-lg bg-primary-fixed/40 hover:bg-primary text-primary hover:text-on-primary font-label-badge text-xs font-bold transition-all shadow-xs" title="Click to view O- profile">O- Only</button>
+                  <div id="widget-can-receive-list" class="flex flex-wrap gap-2 pointer-events-none select-none" style="pointer-events: none !important;">
+                    <span class="px-2.5 py-1 rounded-lg bg-primary-fixed/40 text-primary font-label-badge text-xs font-bold shadow-xs select-none cursor-default">O- Only</span>
                   </div>
                 </div>
               </div>
@@ -1381,6 +1381,10 @@
               </div>
               <span class="donor-id-display font-label-badge text-label-badge uppercase tracking-wider text-secondary mt-0.5">ID #STANDBY</span>
               <div class="text-[11px] text-secondary truncate donor-address-display mt-0.5">Location Not Set</div>
+              <div class="text-[11px] text-on-surface-variant flex items-center gap-1 mt-1 pt-1 border-t border-surface-container/60 truncate" title="Last Donation Date">
+                <span class="material-symbols-outlined text-[13px] text-primary shrink-0">calendar_today</span>
+                <span class="truncate">Last Donated: <strong class="donor-last-date-display text-on-surface font-semibold">--</strong></span>
+              </div>
             </div>
           </div>
 
@@ -1408,6 +1412,12 @@
               <div class="flex items-center gap-space-xs">
                 <span class="material-symbols-outlined text-[20px]">history</span>
                 <span>Donation History</span>
+              </div>
+            </button>
+            <button type="button" data-donor-nav="recovery" onclick="window.scrollToDonorSection('donor-recovery-countdown-card')" class="donor-nav-btn flex items-center justify-between px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface font-label-lg text-label-lg transition-colors cursor-pointer w-full text-left">
+              <div class="flex items-center gap-space-xs">
+                <span class="material-symbols-outlined text-[20px]">hourglass_top</span>
+                <span>90-Day Recovery Clock</span>
               </div>
             </button>
             <div class="my-1 h-px bg-surface-container"></div>
@@ -1451,7 +1461,11 @@
               <div class="flex flex-col gap-1 text-on-surface-variant font-body-sm text-body-sm pt-space-2xs">
                 <div class="flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[16px] text-tertiary">event_available</span>
-                  <span><strong class="font-medium text-on-surface">Eligibility Status</strong> (<span class="donor-last-date-display">Ready to donate</span>)</span>
+                  <span><strong class="font-medium text-on-surface">Eligibility Status:</strong> <span class="donor-eligible-display font-semibold text-tertiary">Ready to donate</span></span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-secondary shrink-0">calendar_today</span>
+                  <span><strong class="font-medium text-on-surface">Last Donation Date:</strong> <span class="donor-last-date-display font-medium text-on-surface">First-time Donor</span></span>
                 </div>
                 <div class="flex items-center gap-1.5 min-w-0">
                   <span class="material-symbols-outlined text-[16px] text-secondary shrink-0">location_on</span>
@@ -1474,6 +1488,26 @@
                 <span class="donor-blood-subtitle font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed font-semibold">Registered Blood Donor</span>
               </div>
             </div>
+          </section>
+
+          <!-- 90-DAY DONOR BIOLOGICAL RECOVERY & REVERSE COUNTDOWN WIDGET -->
+          <section id="donor-recovery-countdown-card" class="scroll-mt-section bg-surface-container-lowest rounded-xl shadow-sm p-space-lg border border-surface-container-high transition-all flex flex-col gap-space-md">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm border-b border-surface-container pb-space-sm">
+              <div class="flex items-center gap-space-sm">
+                <div id="recovery-icon-badge" class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[24px]">hourglass_top</span>
+                </div>
+                <div>
+                  <h2 class="font-headline-sm text-base sm:text-lg font-bold text-on-surface">90-Day Biological Donation Interval &amp; Recovery Clock</h2>
+                  <p class="font-body-sm text-xs sm:text-sm text-on-surface-variant">Mandatory minimum 90-day clinical recovery period between donations to safely replenish iron reserves and red cell mass.</p>
+                </div>
+              </div>
+              <div id="recovery-status-badge-container" class="shrink-0 self-start sm:self-center"></div>
+            </div>
+
+            <!-- Body: Countdown, Key Dates, Progress, and Notice -->
+            <div id="recovery-body-content" class="flex flex-col gap-space-sm"></div>
           </section>
 
           <!-- 4 METRIC SUMMARY CARDS -->
@@ -1523,6 +1557,13 @@
               </div>
               <div class="w-full bg-surface-container-low rounded-full h-1.5 overflow-hidden">
                 <div class="bg-primary h-full rounded-full w-4/5"></div>
+              </div>
+              <div class="bg-surface-container-low px-space-xs py-1 rounded text-[11px] font-label-badge text-on-surface-variant flex items-center justify-between">
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13px] text-primary">calendar_today</span>
+                  <span>Last Donated:</span>
+                </span>
+                <strong class="donor-last-date-display text-on-surface font-semibold">--</strong>
               </div>
             </div>
 
@@ -1681,7 +1722,13 @@
           <section id="donor-history-section" class="scroll-mt-section bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md w-full max-w-full overflow-hidden">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
               <div>
-                <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Donation History &amp; Records</h2>
+                <div class="flex items-center gap-2.5 flex-wrap">
+                  <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Donation History &amp; Records</h2>
+                  <span class="px-2.5 py-0.5 rounded-full bg-surface-container text-xs font-medium text-on-surface-variant flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-primary">history</span>
+                    <span>Last Donation: <strong class="donor-last-date-display text-primary font-bold">--</strong></span>
+                  </span>
+                </div>
                 <p class="font-body-sm text-body-sm text-on-surface-variant">Digitally attested clinical verification log per national haemovigilance standards (2024–2026)</p>
               </div>
               <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
@@ -5040,6 +5087,10 @@
           <button type="button" onclick="window.minimizeIncomingCall()" class="p-1 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all cursor-pointer" title="Minimize / View Dashboard">
             <span class="material-symbols-outlined text-[17px]">close_fullscreen</span>
           </button>
+          <!-- Cut / Decline Call -->
+          <button type="button" id="btn-call-ribbon-close" onclick="window.declineActiveDonorCall()" class="p-1 rounded-full bg-white/20 hover:bg-red-800 text-white transition-all cursor-pointer" title="Cut / End Call">
+            <span class="material-symbols-outlined text-[17px]">call_end</span>
+          </button>
         </div>
       </div>
 
@@ -5162,9 +5213,9 @@
 
   <!-- Core Scripts with Cache-Busting -->
   <script src="js/audio.js?v=20261009_final_fix"></script>
-  <script src="js/store.js?v=20261009_final_fix"></script>
+  <script src="js/store.js?v=20261029_recovery_countdown_v4"></script>
   <script src="js/router.js?v=20261009_final_fix"></script>
-  <script src="js/app.js?v=20261009_final_fix"></script>
+  <script src="js/app.js?v=20261029_recovery_countdown_v4"></script>
   <script src="js/blood-cells.js?v=20261009_final_fix"></script>
 
   <!-- Global Direct Action Handler for Critical UI Buttons -->
@@ -5191,7 +5242,7 @@
         }
 
         // 2. Decline Incoming Call
-        if (id === 'btn-call-decline' || text.indexOf('Decline / Busy') !== -1) {
+        if (id === 'btn-call-decline' || id === 'btn-call-ribbon-close' || text.indexOf('Decline / Busy') !== -1 || text.indexOf('Cut / End Call') !== -1) {
           e.preventDefault();
           e.stopPropagation();
           if (typeof window.declineActiveDonorCall === 'function') {

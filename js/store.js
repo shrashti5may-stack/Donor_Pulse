@@ -614,11 +614,31 @@ class Store {
 
   getDonorCallStatus(requestId, donorId) {
     const recipient = this.getRecipient();
-    const effectiveReqId = requestId || (recipient && recipient.requestId) || this.state.selectedRequestId;
+    const effectiveReqId = requestId || (recipient && (recipient.requestId || recipient.id)) || this.state.selectedRequestId;
     const bloodGroup = recipient ? recipient.bloodGroup : 'B+';
     const donorList = this.getRequestDonorTracking(effectiveReqId, bloodGroup);
-    const donor = donorList.find(d => d.id === donorId);
-    return donor ? (donor.confirmed ? 'confirmed' : (donor.callStatus || 'ringing')) : null;
+    const cleanId = String(donorId || '').toLowerCase().trim();
+    const donor = donorList.find(d => {
+      if (!d) return false;
+      const dId = String(d.id || '').toLowerCase().trim();
+      const dName = String(d.name || d.fullName || '').toLowerCase().trim();
+      return dId === cleanId || dName === cleanId;
+    });
+    if (donor) {
+      if (this.isDonorInRecovery(donor)) return false;
+      return donor.confirmed ? 'confirmed' : (donor.callStatus || 'ringing');
+    }
+    // Fallback: check current logged-in donor
+    if (this.state.donor) {
+      const curId = String(this.state.donor.id || '').toLowerCase().trim();
+      const curName = String(this.state.donor.fullName || this.state.donor.name || '').toLowerCase().trim();
+      if (curId === cleanId || curName === cleanId) {
+        if (this.state.activeDeployment && (this.state.activeDeployment.requestId === effectiveReqId || !this.state.activeDeployment.requestId)) {
+          return 'confirmed';
+        }
+      }
+    }
+    return null;
   }
 
   // --- Hospital methods ---
@@ -1253,6 +1273,29 @@ class Store {
   }
 
   // --- Donor Matching Pool ---
+  isDonorInRecovery(donor) {
+    if (!donor) return false;
+    const lastDate = donor.lastDonationDate;
+    if (!lastDate || typeof lastDate !== 'string') return false;
+    const clean = lastDate.trim().toLowerCase();
+    if (clean.includes('first') || clean === 'none' || clean === 'null' || !clean) return false;
+    if (typeof window !== 'undefined' && typeof window.calculateDonationRecovery === 'function') {
+      const rec = window.calculateDonationRecovery(lastDate);
+      return rec ? rec.inRecovery : false;
+    }
+    let parsedTime = null;
+    const isoMatch = clean.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (isoMatch) {
+      parsedTime = new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10)).getTime();
+    } else {
+      const d = new Date(lastDate);
+      if (!isNaN(d.getTime())) parsedTime = d.getTime();
+    }
+    if (!parsedTime) return false;
+    const diffDays = (Date.now() - parsedTime) / (24 * 3600 * 1000);
+    return diffDays < 90;
+  }
+
   getMatchedDonors(targetBloodGroup) {
     const compatMap = {
       'O-': ['O-'],
@@ -1270,17 +1313,18 @@ class Store {
     }
 
     if (!targetBloodGroup) {
-      return this.state.matchedDonorsPool;
+      return this.state.matchedDonorsPool.filter(d => !this.isDonorInRecovery(d));
     }
 
     const allowedDonors = compatMap[targetBloodGroup] || [targetBloodGroup];
-    return this.state.matchedDonorsPool.filter(d => allowedDonors.includes(d.bloodGroup));
+    return this.state.matchedDonorsPool.filter(d => allowedDonors.includes(d.bloodGroup) && !this.isDonorInRecovery(d));
   }
 
   notifyDonor(donorId) {
     if (!Array.isArray(this.state.matchedDonorsPool)) return false;
     const donor = this.state.matchedDonorsPool.find(d => d.id === donorId);
     if (donor) {
+      if (this.isDonorInRecovery(donor)) return false;
       donor.notified = true;
       this.saveState();
       return true;
@@ -1482,6 +1526,7 @@ class Store {
     }
 
     if (donor) {
+      if (this.isDonorInRecovery(donor)) return false;
       donor.callStatus = 'declined';
       donor.transitStatus = 'Declined / Busy';
       donor.statusClass = 'bg-surface-container-high text-on-surface-variant line-through opacity-60';
@@ -1515,6 +1560,7 @@ class Store {
     const donorList = this.getRequestDonorTracking(effectiveReqId, bloodGroup);
 
     const donor = donorList.find(d => d.id === donorId);
+    if (donor && this.isDonorInRecovery(donor)) return;
     if (donor && recipient) {
       donor.callStatus = 'ringing';
       this.state.activeIncomingCall = {
