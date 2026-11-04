@@ -3755,9 +3755,53 @@ function renderDonorMissionDetails() {
   setEl('donor-mission-attendant-name', attendantName);
   setEl('donor-mission-attendant-phone', attendantPhone);
 
+  // Live directions: Origin (Donor Location) & Destination (Hospital Location)
+  const donorAddress = (donor && donor.address)
+    ? `${donor.address}, ${donor.city || 'Bengaluru, Karnataka'}`
+    : '#24, 4th Cross, Koramangala 4th Block, Bengaluru, Karnataka';
+
+  const rawAddress = hospitalAddress || '';
+  let hospitalDest = hospitalName || 'Metro Trauma Blood Centre';
+  if (rawAddress && !rawAddress.toLowerCase().includes(hospitalDest.toLowerCase())) {
+    hospitalDest += `, ${rawAddress}`;
+  } else if (rawAddress) {
+    hospitalDest = rawAddress;
+  }
+  if (!hospitalDest.toLowerCase().includes('bengaluru') && !hospitalDest.toLowerCase().includes('bangalore')) {
+    hospitalDest += ', Bengaluru, Karnataka';
+  }
+
+  // Google Maps Driving Directions Embed URL (saddr -> daddr with driving mode)
+  const mapsEmbedDirectionsUrl = `https://maps.google.com/maps?saddr=${encodeURIComponent(donorAddress)}&daddr=${encodeURIComponent(hospitalDest)}&dirflg=d&output=embed`;
+  
+  // Google Maps Turn-by-Turn GPS Navigation URL
+  const mapsNavigationUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(donorAddress)}&destination=${encodeURIComponent(hospitalDest)}&travelmode=driving`;
+
+  const mapFrame = document.getElementById('donor-mission-map-frame');
+  if (mapFrame) {
+    mapFrame.src = mapsEmbedDirectionsUrl;
+  }
+
+  const mapMaximizeBtn = document.getElementById('donor-mission-map-maximize');
+  if (mapMaximizeBtn) {
+    mapMaximizeBtn.href = mapsNavigationUrl;
+  }
+
+  const startNavBtn = document.getElementById('donor-mission-start-nav-btn');
+  if (startNavBtn) {
+    startNavBtn.href = mapsNavigationUrl;
+  }
+
+  const mapTargetName = document.getElementById('donor-mission-map-target-name');
+  if (mapTargetName) {
+    mapTargetName.textContent = hospitalName;
+  }
+
+
+
   const mapsBtn = document.getElementById('donor-mission-maps-btn');
   if (mapsBtn) {
-    mapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hospitalName + ' ' + hospitalAddress)}`;
+    mapsBtn.href = mapsNavigationUrl;
   }
   const deskPhoneBtn = document.getElementById('donor-mission-desk-phone-btn');
   if (deskPhoneBtn) {

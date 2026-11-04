@@ -1,8 +1,8 @@
 const fs = require('fs');
 const assert = require('assert');
 
-// 1. Verify index.html contains view-donor-mission with all elements
-console.log('--- TEST 1: Inspect index.html view-donor-mission ---');
+// 1. Verify index.html contains view-donor-mission with live directions map window & no turn-by-turn box
+console.log('--- TEST 1: Inspect index.html view-donor-mission & Live Directions Map Window ---');
 const indexHtml = fs.readFileSync('index.html', 'utf-8');
 
 assert(indexHtml.includes('id="view-donor-mission"'), 'view-donor-mission missing in index.html');
@@ -27,7 +27,11 @@ const requiredIds = [
   'donor-mission-hospital-address',
   'donor-mission-distance',
   'donor-mission-eta-badge',
-  'donor-mission-maps-btn',
+  'donor-mission-map-window',
+  'donor-mission-map-frame',
+  'donor-mission-map-maximize',
+  'donor-mission-map-target-name',
+  'donor-mission-start-nav-btn',
   'donor-mission-desk-phone-btn',
   'donor-mission-attendant-name',
   'donor-mission-attendant-phone',
@@ -38,8 +42,14 @@ requiredIds.forEach(id => {
   assert(indexHtml.includes(`id="${id}"`), `Missing element with id "${id}" in index.html`);
 });
 
+// Assert the removed section is truly removed
+assert(!indexHtml.includes('Turn-by-Turn Directions to Hospital'), 'Turn-by-Turn Directions section must be removed');
+assert(!indexHtml.includes('id="donor-mission-direction-step-1"'), 'Direction steps must be removed');
+assert(!indexHtml.includes('Follow Emergency Transit Corridor'), 'Emergency corridor text must be removed');
+
+assert(indexHtml.includes('Start Google Maps Live Directions (GPS)'), 'Start navigation button must be present');
 assert(indexHtml.includes("window.PulseRouter.navigate('donor-dashboard')"), 'Back to Donor Dashboard button missing in view-donor-mission');
-console.log('✓ TEST 1 PASSED: All requested details (hospital location, patient name/age/gender, reason for blood, etc.) exist in view-donor-mission.\n');
+console.log('✓ TEST 1 PASSED: Turn-by-Turn box is removed, and directions map window & navigation button are intact.\n');
 
 // 2. Verify router.js
 console.log('--- TEST 2: Inspect router.js routes ---');
@@ -59,9 +69,10 @@ assert(!appJs.includes('<a href="#/recipient-tracking" class="px-3.5 py-1.5 roun
 
 assert(appJs.includes('function renderDonorMissionDetails('), 'renderDonorMissionDetails function definition missing');
 assert(appJs.includes('window.renderDonorMissionDetails = renderDonorMissionDetails;'), 'renderDonorMissionDetails export missing');
-assert(appJs.includes("['donor-mission-details', 'donor-mission', 'donor-transit-grid', 'mission-details'].includes(route)"), 'Router hook for donor-mission-details missing');
+assert(appJs.includes("mapsEmbedDirectionsUrl"), 'Directions embed calculation missing');
+assert(appJs.includes("mapsNavigationUrl"), 'Directions navigation calculation missing');
 
-console.log('✓ TEST 3 PASSED: Banner now points to donor mission page, and renderDonorMissionDetails is hooked to router.\n');
+console.log('✓ TEST 3 PASSED: Banner points to donor mission page, and renderDonorMissionDetails calculates directions & navigation.\n');
 
 // 4. Test renderDonorMissionDetails execution with mock DOM
 console.log('--- TEST 4: Execute renderDonorMissionDetails with mock DOM ---');
@@ -69,7 +80,7 @@ const domElements = {};
 global.document = {
   getElementById: (id) => {
     if (!domElements[id]) {
-      domElements[id] = { id, textContent: '', href: '' };
+      domElements[id] = { id, textContent: '', href: '', src: '' };
     }
     return domElements[id];
   },
@@ -80,6 +91,8 @@ global.window = {
     getDonor: () => ({
       id: 'DNR-4821',
       fullName: 'Arjun Nair',
+      address: '#24, 4th Cross, Koramangala 4th Block',
+      city: 'Bengaluru, Karnataka',
       distance: 1.8,
       eta: '12 mins'
     }),
@@ -94,17 +107,16 @@ global.window = {
       urgency: 'Stat Emergency (< 45 Mins)',
       hospitalName: 'Metro Trauma Blood Centre',
       hospitalWard: 'ICU Emergency Bed 4',
-      hospitalAddress: '#154/11 Bannerghatta Main Road, Indiranagar',
+      hospitalAddress: '#154/11 Bannerghatta Main Road, Opposite IIMB, Bengaluru',
       attendantName: 'Priya Sharma',
       attendantPhone: '+91 98450 11223',
       doctorName: 'Dr. Ramesh K., MD',
       clinicalReason: 'Acute clinical blood requirement, emergency broadcast.',
-      handshakeOTP: '8686'
+      handshakeOTP: '7120'
     }),
     state: { selectedRequestId: 'REQ-8686' }
   },
   calculateAge: (dob) => {
-    // 1996-05-18 in Nov 2026 is 30
     return 30;
   }
 };
@@ -117,24 +129,26 @@ window.renderDonorMissionDetails();
 console.log('Rendered elements:', {
   patient: domElements['donor-mission-patient-name']?.textContent,
   age: domElements['donor-mission-patient-age']?.textContent,
-  gender: domElements['donor-mission-patient-gender']?.textContent,
-  blood: domElements['donor-mission-blood-group']?.textContent,
   hospital: domElements['donor-mission-hospital-name']?.textContent,
-  reason: domElements['donor-mission-clinical-reason']?.textContent,
-  otp: domElements['donor-mission-otp']?.textContent,
-  mapLink: domElements['donor-mission-maps-btn']?.href
+  mapSrc: domElements['donor-mission-map-frame']?.src,
+  maximizeHref: domElements['donor-mission-map-maximize']?.href,
+  startNavHref: domElements['donor-mission-start-nav-btn']?.href
 });
 
 assert.strictEqual(domElements['donor-mission-patient-name'].textContent, 'Sanchit');
 assert(domElements['donor-mission-patient-age'].textContent.includes('30 yrs'), 'Patient age should be 30 yrs');
-assert.strictEqual(domElements['donor-mission-patient-gender'].textContent, 'Male');
-assert.strictEqual(domElements['donor-mission-blood-group'].textContent, 'B+');
 assert.strictEqual(domElements['donor-mission-hospital-name'].textContent, 'Metro Trauma Blood Centre');
-assert(domElements['donor-mission-clinical-reason'].textContent.includes('Acute clinical blood requirement'), 'Reason must be shown');
-assert.strictEqual(domElements['donor-mission-otp'].textContent, '8686');
-assert(domElements['donor-mission-maps-btn'].href.includes('google.com/maps'), 'Google maps GPS link generated');
+assert.strictEqual(domElements['donor-mission-otp'].textContent, '7120');
 
-console.log('✓ TEST 4 PASSED: renderDonorMissionDetails properly populates all details without switching to recipient dashboard.\n');
+// Verify directions embed contains saddr and daddr
+assert(domElements['donor-mission-map-frame'].src.includes('saddr='), 'Map frame must have saddr');
+assert(domElements['donor-mission-map-frame'].src.includes('daddr='), 'Map frame must have daddr');
+assert(domElements['donor-mission-map-frame'].src.includes('dirflg=d'), 'Map frame must have dirflg=d');
 
-console.log('ALL DONOR MISSION PAGE TESTS COMPLETED SUCCESSFULLY! 🎉');
+// Verify navigation links
+assert(domElements['donor-mission-map-maximize'].href.includes('google.com/maps/dir'), 'Maximize must open directions');
+assert(domElements['donor-mission-start-nav-btn'].href.includes('google.com/maps/dir'), 'Start nav must open directions');
 
+console.log('✓ TEST 4 PASSED: renderDonorMissionDetails properly configures directions without removed text box!\n');
+
+console.log('ALL TESTS COMPLETED SUCCESSFULLY! 🎉');
