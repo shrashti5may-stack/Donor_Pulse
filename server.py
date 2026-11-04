@@ -71,6 +71,43 @@ def is_donor_in_90_day_recovery(last_donation_date_str, now_dt=None):
     diff = (now_dt - dt).total_seconds()
     return 0 <= diff < (90 * 86400)
 
+def calculate_age_from_dob(dob_str, relative_to=None):
+    if not dob_str or not isinstance(dob_str, str):
+        return None
+    val = dob_str.strip()
+    if not val or val.lower() in ('none', 'null', 'undefined', 'n/a'):
+        return None
+    dt = parse_date_str(val)
+    if not dt:
+        return None
+    now_dt = relative_to or datetime.now(timezone.utc)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    age = now_dt.year - dt.year
+    if (now_dt.month, now_dt.day) < (dt.month, dt.day):
+        age -= 1
+    return max(0, age)
+
+def sync_donor_age(donor):
+    if not donor or not isinstance(donor, dict):
+        return donor
+    dob = donor.get('dateOfBirth') or donor.get('dob')
+    if dob:
+        calc_age = calculate_age_from_dob(dob)
+        if calc_age is not None:
+            donor['age'] = calc_age
+    return donor
+
+def sync_case_patient_age(case_obj):
+    if not case_obj or not isinstance(case_obj, dict):
+        return case_obj
+    dob = case_obj.get('patientDob') or case_obj.get('dateOfBirth') or case_obj.get('dob')
+    if dob:
+        calc_age = calculate_age_from_dob(dob)
+        if calc_age is not None:
+            case_obj['patientAge'] = calc_age
+    return case_obj
+
 # In-memory database storing registered users and requests (MongoDB/Postgres equivalent representation)
 DB_USERS = {}
 DB_REQUESTS = {}
@@ -96,6 +133,7 @@ def load_donors():
             with open(DONORS_FILE, 'r', encoding='utf-8') as f:
                 d_list = json.load(f)
                 for d in d_list:
+                    sync_donor_age(d)
                     did = d.get('id') or d.get('_id')
                     if did:
                         DB_DONORS[did] = d
@@ -141,6 +179,7 @@ def load_recipient_cases():
             with open(CASES_FILE, 'r', encoding='utf-8') as f:
                 cases_list = json.load(f)
                 for c in cases_list:
+                    sync_case_patient_age(c)
                     cid = c.get('id') or c.get('caseId')
                     if cid:
                         DB_RECIPIENT_CASES[cid] = c
@@ -208,6 +247,8 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
             current_donor = DB_DONORS.get(CURRENT_ACTIVE_DONOR_ID)
             if not current_donor and DB_DONORS:
                 current_donor = list(DB_DONORS.values())[0]
+            if current_donor:
+                sync_donor_age(current_donor)
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
@@ -216,6 +257,8 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
         # API: GET /api/donors
         if clean_path == '/api/donors':
+            for d in DB_DONORS.values():
+                sync_donor_age(d)
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
@@ -235,6 +278,7 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                         matched = d
                         break
             if matched:
+                sync_donor_age(matched)
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
@@ -285,6 +329,8 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
             current_case = DB_RECIPIENT_CASES.get(CURRENT_ACTIVE_CASE_ID)
             if not current_case and DB_RECIPIENT_CASES:
                 current_case = list(DB_RECIPIENT_CASES.values())[0]
+            if current_case:
+                sync_case_patient_age(current_case)
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
@@ -293,6 +339,8 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
         # API: GET /api/recipient-cases
         if clean_path == '/api/recipient-cases':
+            for c in DB_RECIPIENT_CASES.values():
+                sync_case_patient_age(c)
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
@@ -483,6 +531,7 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
             cid = case_obj.get('id') or case_obj.get('caseId')
             if cid:
+                sync_case_patient_age(case_obj)
                 DB_RECIPIENT_CASES[cid] = case_obj
                 CURRENT_ACTIVE_CASE_ID = cid
                 save_recipient_cases()
@@ -777,6 +826,9 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
             rand_id = random.randint(1000, 9999)
             new_id = body.get('id') or f"DP-{rand_id}-{clean_bg}"
             password = body.get('password') or body.get('phone') or 'donor@2026'
+            donor_dob = body.get('dateOfBirth') or body.get('dob')
+            calc_age = calculate_age_from_dob(donor_dob) if donor_dob else None
+            donor_age = calc_age if calc_age is not None else int(body.get('age') or 28)
 
             new_donor = {
                 "id": new_id,
@@ -784,7 +836,8 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 "name": full_name,
                 "fullName": full_name,
                 "initials": "".join([part[0] for part in full_name.split() if part])[:2].upper() or "VD",
-                "age": int(body.get('age') or 28),
+                "dateOfBirth": donor_dob,
+                "age": donor_age,
                 "gender": body.get('gender') or 'Not specified',
                 "bloodGroup": blood_group,
                 "phone": body.get('phone') or '+91 98000 00000',
@@ -917,6 +970,12 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
             donor_id = body.get('id') or CURRENT_ACTIVE_DONOR_ID
             if donor_id and donor_id in DB_DONORS:
+                donor_dob = body.get('dateOfBirth') or body.get('dob') or DB_DONORS[donor_id].get('dateOfBirth')
+                if donor_dob:
+                    calc_age = calculate_age_from_dob(donor_dob)
+                    if calc_age is not None:
+                        body['age'] = calc_age
+                        body['dateOfBirth'] = donor_dob
                 DB_DONORS[donor_id].update(body)
                 if donor_id in DB_USERS:
                     DB_USERS[donor_id].update(body)
@@ -928,6 +987,12 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 return
             elif DB_DONORS:
                 cur_donor = list(DB_DONORS.values())[0]
+                donor_dob = body.get('dateOfBirth') or body.get('dob') or cur_donor.get('dateOfBirth')
+                if donor_dob:
+                    calc_age = calculate_age_from_dob(donor_dob)
+                    if calc_age is not None:
+                        body['age'] = calc_age
+                        body['dateOfBirth'] = donor_dob
                 cur_donor.update(body)
                 save_donors()
                 self.send_response(200)
@@ -1211,12 +1276,18 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                             "liveEta": f"{int((d.get('distance', 1.8)) * 7 + 8)} mins"
                         })
 
+            patient_dob = body.get("patientDob") or body.get("dateOfBirth") or body.get("dob")
+            calc_p_age = calculate_age_from_dob(patient_dob) if patient_dob else None
+            effective_patient_age = calc_p_age if calc_p_age is not None else int(body.get("patientAge", 32))
+
             case_obj = {
                 "id": case_id,
                 "caseId": case_id,
                 "requestId": req_id,
                 "patientName": body.get("patientName") or patient.get("name", "Emergency Patient"),
-                "patientAge": int(body.get("patientAge", 32)),
+                "patientDob": patient_dob,
+                "dateOfBirth": patient_dob,
+                "patientAge": effective_patient_age,
                 "patientGender": body.get("patientGender", "Other"),
                 "bloodGroup": blood_group_needed,
                 "component": body.get("component", "Whole Blood"),

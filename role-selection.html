@@ -399,16 +399,13 @@
           <span class="material-symbols-outlined text-[15px]">person</span>
           <span>1. Personal Information</span>
         </span>
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-          <div class="sm:col-span-6 flex flex-col gap-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <!-- Line 1: Full Name & Gender -->
+          <div class="flex flex-col gap-1">
             <label class="text-xs font-semibold text-on-surface">Full Name *</label>
             <input required name="fullName" type="text" placeholder="e.g. Arjun Nair" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
           </div>
-          <div class="sm:col-span-3 flex flex-col gap-1">
-            <label class="text-xs font-semibold text-on-surface">Age *</label>
-            <input required name="age" type="number" min="18" max="75" placeholder="e.g. 29" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
-          </div>
-          <div class="sm:col-span-3 flex flex-col gap-1">
+          <div class="flex flex-col gap-1">
             <label class="text-xs font-semibold text-on-surface">Gender *</label>
             <select name="gender" required class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none">
               <option value="" disabled selected>Select Gender</option>
@@ -416,6 +413,21 @@
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
+          </div>
+          <!-- Line 2: Date of Birth & Age (Auto-Locked) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold text-on-surface">Date of Birth *</label>
+            <input required name="dob" id="reg-donor-dob" type="date" max="2008-11-04" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none" title="Select date of birth for automatic age calculation"/>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
+              <span class="whitespace-nowrap">Age *</span>
+              <span class="text-[10px] text-primary font-bold whitespace-nowrap">(Auto-Locked)</span>
+            </label>
+            <div class="relative">
+              <input required name="age" id="reg-donor-age" type="number" min="18" max="75" placeholder="e.g. 29" value="" readonly tabindex="-1" onkeydown="return false" onpaste="return false" class="w-full h-10 pl-3 pr-8 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface font-semibold text-xs sm:text-sm cursor-not-allowed select-none focus:outline-none" title="Age is locked and updates automatically every year based on Date of Birth"/>
+              <span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[16px] text-secondary pointer-events-none">lock</span>
+            </div>
           </div>
         </div>
       </div>
@@ -611,16 +623,13 @@
           <span class="material-symbols-outlined text-[15px]">person</span>
           <span>1. Patient Details</span>
         </span>
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-          <div class="sm:col-span-6 flex flex-col gap-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <!-- Line 1: Patient Full Name & Gender -->
+          <div class="flex flex-col gap-1">
             <label class="text-xs font-semibold text-on-surface">Patient Full Name *</label>
             <input required name="patientName" type="text" placeholder="e.g. Devika Sharma" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
           </div>
-          <div class="sm:col-span-3 flex flex-col gap-1">
-            <label class="text-xs font-semibold text-on-surface">Age *</label>
-            <input required name="patientAge" type="number" min="1" max="110" placeholder="e.g. 32" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
-          </div>
-          <div class="sm:col-span-3 flex flex-col gap-1">
+          <div class="flex flex-col gap-1">
             <label class="text-xs font-semibold text-on-surface">Gender *</label>
             <select name="patientGender" required class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none">
               <option value="" disabled selected>Select Gender</option>
@@ -628,6 +637,21 @@
               <option value="Male">Male</option>
               <option value="Other">Other</option>
             </select>
+          </div>
+          <!-- Line 2: Date of Birth & Age (Auto-Locked) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold text-on-surface">Date of Birth *</label>
+            <input required name="patientDob" type="date" max="2026-11-04" class="input-patient-dob h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none" title="Select patient date of birth for automatic age calculation"/>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
+              <span class="whitespace-nowrap">Age *</span>
+              <span class="text-[10px] text-primary font-bold whitespace-nowrap">(Auto-Locked)</span>
+            </label>
+            <div class="relative">
+              <input required name="patientAge" type="number" min="1" max="110" placeholder="e.g. 32" value="" readonly tabindex="-1" onkeydown="return false" onpaste="return false" class="input-patient-age w-full h-10 pl-3 pr-8 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface font-semibold text-xs sm:text-sm cursor-not-allowed select-none focus:outline-none" title="Age is locked and updates automatically every year based on Date of Birth"/>
+              <span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[16px] text-secondary pointer-events-none">lock</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1485,6 +1509,81 @@ function closeRaiseRequestModal() {
   }
 }
 
+// Global calculateAge helper for automatic age calculation according to Date of Birth
+function calculateAge(dateOfBirthVal, relativeTo = new Date()) {
+  if (!dateOfBirthVal) return null;
+  let birthDate = null;
+  if (typeof dateOfBirthVal === 'string') {
+    const trimmed = dateOfBirthVal.trim();
+    if (!trimmed || trimmed.toLowerCase() === 'null' || trimmed.toLowerCase() === 'undefined' || trimmed.toLowerCase() === 'none') return null;
+    const isoMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (isoMatch) {
+      birthDate = new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+    } else {
+      birthDate = new Date(trimmed);
+    }
+  } else if (dateOfBirthVal instanceof Date) {
+    birthDate = dateOfBirthVal;
+  }
+  if (!birthDate || isNaN(birthDate.getTime())) return null;
+
+  const today = (relativeTo instanceof Date && !isNaN(relativeTo.getTime())) ? relativeTo : new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age >= 0 ? age : 0;
+}
+window.calculateAge = calculateAge;
+
+function handleDobInputChange(e) {
+  const target = e.target;
+  if (!target) return;
+  // Donor DOB
+  if (target.matches('[name="dob"], #reg-donor-dob, [name="dateOfBirth"]')) {
+    const form = target.closest('form') || target.closest('div') || document;
+    if (form) {
+      const ageInput = form.querySelector('[name="age"], #reg-donor-age');
+      if (ageInput && target.value) {
+        const computed = calculateAge(target.value);
+        if (computed !== null) {
+          ageInput.value = computed;
+          ageInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    }
+  }
+  // Patient DOB
+  if (target.matches('[name="patientDob"], .input-patient-dob')) {
+    const form = target.closest('form') || target.closest('div') || document;
+    if (form) {
+      const ageInput = form.querySelector('[name="patientAge"], .input-patient-age');
+      if (ageInput && target.value) {
+        const computed = calculateAge(target.value);
+        if (computed !== null) {
+          ageInput.value = computed;
+          ageInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    }
+  }
+}
+function restrictManualAgeEditing(e) {
+  const target = e.target;
+  if (!target) return;
+  if (target.matches && target.matches('[name="age"], [name="patientAge"], #reg-donor-age, .input-patient-age')) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+}
+document.addEventListener('input', handleDobInputChange);
+document.addEventListener('change', handleDobInputChange);
+['keydown', 'keypress', 'paste', 'cut', 'drop'].forEach(evt => {
+  document.addEventListener(evt, restrictManualAgeEditing, true);
+});
+
 function fillDemoRaiseRequest() {
   const modal = document.getElementById('modal-request');
   if (!modal) return;
@@ -1495,6 +1594,7 @@ function fillDemoRaiseRequest() {
   };
 
   setVal('patientName', 'Emergency Patient');
+  setVal('patientDob', '1996-05-18');
   setVal('patientAge', '30');
   setVal('patientGender', 'Female');
   setVal('hospitalName', 'Metro Trauma Blood Centre');
@@ -1678,7 +1778,9 @@ if (roleModalReq) {
       }
 
       const patientName = reqForm.querySelector('[name="patientName"]')?.value?.trim() || 'Emergency Patient';
-      const patientAge = parseInt(reqForm.querySelector('[name="patientAge"]')?.value || 30, 10);
+      const patientDob = reqForm.querySelector('[name="patientDob"]')?.value || null;
+      const calcAge = patientDob ? calculateAge(patientDob) : null;
+      const patientAge = calcAge !== null ? calcAge : parseInt(reqForm.querySelector('[name="patientAge"]')?.value || 30, 10);
       const patientGender = reqForm.querySelector('[name="patientGender"]')?.value || 'Other';
       const bloodGroup = reqForm.querySelector('input[name="blood_type"]:checked')?.value || 'B+';
       const component = reqForm.querySelector('[name="component"]')?.value || 'Whole Blood';
@@ -1699,6 +1801,8 @@ if (roleModalReq) {
       if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
         newPatient = await window.PulseStore.createNewPatientRequest({
           patientName,
+          patientDob,
+          dateOfBirth: patientDob,
           patientAge,
           patientGender,
           bloodGroup,
@@ -1763,6 +1867,7 @@ function fillDemoDonorRegister() {
   };
 
   setVal('fullName', 'Arjun Nair');
+  setVal('dob', '1997-04-12');
   setVal('age', '29');
   setVal('gender', 'Male');
   setVal('phone', '+91 98451 44290');
@@ -1824,9 +1929,13 @@ if (roleDonorRegModal) {
 
       const formData = new FormData(regForm);
       const bloodGroup = regForm.querySelector('input[name="donor_blood_type"]:checked')?.value || formData.get('donor_blood_type') || 'A+';
+      const regDob = formData.get('dob') || formData.get('dateOfBirth') || null;
+      const calcDonorAge = regDob ? calculateAge(regDob) : null;
+      const finalDonorAge = calcDonorAge !== null ? calcDonorAge : parseInt(formData.get('age') || 29, 10);
       const donorData = {
         fullName: formData.get('fullName')?.toString().trim() || 'Registered Volunteer Donor',
-        age: parseInt(formData.get('age') || 29, 10),
+        dateOfBirth: regDob,
+        age: finalDonorAge,
         gender: formData.get('gender')?.toString().trim() || 'Male',
         bloodGroup: bloodGroup,
         phone: formData.get('phone')?.toString().trim() || '+91 98451 44290',

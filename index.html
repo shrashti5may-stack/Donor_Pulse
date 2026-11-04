@@ -1123,14 +1123,24 @@
         </div>
 
         <form id="form-donor-register" class="flex flex-col gap-space-md pt-space-lg">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-            <div class="flex flex-col gap-space-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-space-md">
+            <div class="sm:col-span-5 flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold">Full Name *</label>
               <input required name="fullName" type="text" placeholder="e.g. Full Name" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
-            <div class="flex flex-col gap-space-xs">
-              <label class="font-label-md text-label-md text-on-surface font-semibold">Age *</label>
-              <input required name="age" type="number" min="18" max="75" placeholder="e.g. 29" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            <div class="sm:col-span-4 flex flex-col gap-space-xs">
+              <label class="font-label-md text-label-md text-on-surface font-semibold">Date of Birth *</label>
+              <input required name="dob" type="date" max="2008-11-04" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+            </div>
+            <div class="sm:col-span-3 flex flex-col gap-space-xs">
+              <label class="font-label-md text-label-md text-on-surface font-semibold flex items-center justify-between">
+                <span>Age *</span>
+                <span class="text-xs text-primary font-bold">(Auto-Locked)</span>
+              </label>
+              <div class="relative">
+                <input required name="age" type="number" min="18" max="75" placeholder="e.g. 29" readonly tabindex="-1" onkeydown="return false" onpaste="return false" class="w-full h-11 pl-3 pr-10 rounded-lg bg-surface-container text-on-surface font-body-md font-semibold cursor-not-allowed border border-surface-container-high focus:outline-none select-none" title="Age is locked and updates automatically every year based on Date of Birth"/>
+                <span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-secondary">lock</span>
+              </div>
             </div>
           </div>
 
@@ -1259,10 +1269,20 @@
           </div>
 
           <!-- Editable Profile Details (Matching Registration Fields) -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
             <div class="flex flex-col gap-space-xs">
-              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-age">Age *</label>
-              <input required id="edit-donor-age" name="age" type="number" min="18" max="75" placeholder="e.g. 28" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none"/>
+              <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-dob">Date of Birth</label>
+              <input id="edit-donor-dob" name="dateOfBirth" type="date" max="2008-11-04" class="h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:outline-none" title="Date of Birth automatically keeps age updated"/>
+            </div>
+            <div class="flex flex-col gap-space-xs">
+              <label class="font-label-md text-label-md text-on-surface font-semibold flex items-center justify-between" for="edit-donor-age">
+                <span>Age *</span>
+                <span class="text-xs text-primary font-bold">(Auto-Locked)</span>
+              </label>
+              <div class="relative">
+                <input id="edit-donor-age" name="age" type="number" readonly tabindex="-1" onkeydown="return false" onpaste="return false" class="w-full h-11 pl-3 pr-10 rounded-lg bg-surface-container text-on-surface font-body-md font-semibold cursor-not-allowed border border-surface-container-high focus:outline-none select-none" title="Age is locked and updates automatically every year based on Date of Birth" placeholder="e.g. 29"/>
+                <span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-secondary">lock</span>
+              </div>
             </div>
             <div class="flex flex-col gap-space-xs">
               <label class="font-label-md text-label-md text-on-surface font-semibold" for="edit-donor-phone">Phone Number *</label>
@@ -1936,6 +1956,236 @@
               </a>
             </div>
           </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- VIEW 4B: DONOR ACTIVE MISSION & REQUEST DETAILS (#/donor-mission-details)-->
+    <!-- ------------------------------------------------------------------- -->
+    <div id="view-donor-mission" class="view-section w-full max-w-[1280px] mx-auto px-gutter-desktop py-space-xl">
+      <!-- Back Navigation Button -->
+      <div class="max-w-4xl mx-auto mb-4 flex items-center justify-between">
+        <button type="button" onclick="window.PulseRouter.navigate('donor-dashboard')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-all shadow-xs group cursor-pointer">
+          <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+          <span>Back to Donor Dashboard</span>
+        </button>
+        <span class="text-xs text-on-surface-variant font-medium">Donor Portal • Emergency Transit Grid</span>
+      </div>
+
+      <div class="max-w-4xl mx-auto flex flex-col gap-space-lg">
+        <!-- Top Banner: Mission Status & Header -->
+        <div class="bg-surface-container-lowest p-5 sm:p-6 rounded-2xl shadow-sm border border-emerald-500/30 bg-gradient-to-r from-emerald-500/5 to-surface-container-lowest flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shrink-0">
+              <span class="material-symbols-outlined text-[30px]">two_wheeler</span>
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600 text-white font-label-badge text-xs font-bold uppercase tracking-wider">
+                  <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                  Active Mission En Route
+                </span>
+                <span id="donor-mission-req-id" class="px-2.5 py-0.5 rounded-full bg-surface-container-high font-mono text-xs font-bold text-on-surface">Requisition #REQ-8686</span>
+              </div>
+              <h1 class="font-headline-md text-xl sm:text-2xl text-on-surface font-extrabold mt-1">
+                Hospital Transit &amp; Patient Requisition Details
+              </h1>
+              <p class="text-xs text-on-surface-variant mt-0.5">
+                You confirmed availability. Proceed to the hospital blood bank intake desk with your handshake token.
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col sm:items-end gap-1 shrink-0 bg-surface-container-low sm:bg-transparent p-3 sm:p-0 rounded-xl">
+            <span class="text-[10px] text-secondary font-bold uppercase tracking-wider">Handshake Intake OTP</span>
+            <span id="donor-mission-otp" class="text-2xl font-black font-mono text-primary tracking-widest">8686</span>
+            <span class="text-[11px] text-on-surface-variant">Present at Blood Bank</span>
+          </div>
+        </div>
+
+        <!-- Quick Summary Ribbon -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-surface-container-low p-4 rounded-2xl border border-surface-container">
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-secondary uppercase tracking-wider">Patient Name</span>
+            <span id="donor-mission-summary-patient" class="font-title-md text-sm sm:text-base font-bold text-on-surface truncate">Sanchit</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-secondary uppercase tracking-wider">Blood Required</span>
+            <span id="donor-mission-summary-blood" class="font-title-md text-sm sm:text-base font-extrabold text-primary truncate">B+ (PRBC)</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-secondary uppercase tracking-wider">Destination</span>
+            <span id="donor-mission-summary-hospital" class="font-title-md text-sm sm:text-base font-semibold text-on-surface truncate">Metro Trauma Blood Centre</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-secondary uppercase tracking-wider">Estimated Transit</span>
+            <span id="donor-mission-summary-eta" class="font-title-md text-sm sm:text-base font-bold text-emerald-700 truncate">~12 mins (1.8 km)</span>
+          </div>
+        </div>
+
+        <!-- Two Column Detailed Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+          <!-- LEFT COLUMN (7 COLS): Patient Medical Profile & Clinical Reason -->
+          <div class="lg:col-span-7 flex flex-col gap-space-md">
+            
+            <!-- Patient Profile Card -->
+            <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-4">
+              <div class="flex items-center justify-between pb-3 border-b border-surface-container">
+                <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-primary">person</span>
+                  <span>1. Recipient &amp; Patient Information</span>
+                </span>
+                <span id="donor-mission-urgency-badge" class="px-2.5 py-0.5 rounded-full bg-error-container text-primary font-bold text-[10px] uppercase">
+                  Stat Emergency (&lt; 45 Mins)
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="flex flex-col">
+                  <span class="text-[11px] text-secondary font-medium">Patient Full Name</span>
+                  <span id="donor-mission-patient-name" class="text-sm font-bold text-on-surface">Sanchit</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[11px] text-secondary font-medium">Age &amp; DOB</span>
+                  <span id="donor-mission-patient-age" class="text-sm font-bold text-on-surface">30 yrs (DOB: 18 May 1996)</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[11px] text-secondary font-medium">Gender</span>
+                  <span id="donor-mission-patient-gender" class="text-sm font-bold text-on-surface">Male</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[11px] text-secondary font-medium">Target Blood Group</span>
+                  <span id="donor-mission-blood-group" class="text-base font-black text-primary">B+</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[11px] text-secondary font-medium">Component</span>
+                  <span id="donor-mission-component" class="text-xs font-bold text-on-surface">Packed Red Blood Cells</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[11px] text-secondary font-medium">Units Demanded</span>
+                  <span id="donor-mission-units" class="text-xs font-bold text-on-surface">2 Units (1 Accepted by You)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Clinical Reason / Why Blood is Needed Card -->
+            <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-error">clinical_notes</span>
+                <span>2. Reason Why Blood Is Needed (Clinical Diagnosis)</span>
+              </span>
+              
+              <div class="p-4 rounded-xl bg-error-container/20 border border-error/20 flex flex-col gap-2">
+                <p id="donor-mission-clinical-reason" class="text-xs sm:text-sm font-medium text-on-surface leading-relaxed italic">
+                  "Acute clinical blood requirement, emergency broadcast. Acute blood loss and critical surgical stabilization required."
+                </p>
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-error/10 text-[11px] text-secondary">
+                  <span class="flex items-center gap-1 font-semibold text-on-surface">
+                    <span class="material-symbols-outlined text-[14px] text-primary">stethoscope</span>
+                    <span id="donor-mission-doctor-name">Dr. Ramesh K., MD (Trauma &amp; Critical Care)</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-tertiary font-bold text-[10px]">
+                    <span class="material-symbols-outlined text-[12px]">verified</span> CDSCO &amp; NABH Verified
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Handover Procedure Checklist -->
+            <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-secondary">checklist</span>
+                <span>3. Donor Checklist Upon Arrival</span>
+              </span>
+              <ul class="text-xs text-on-surface-variant flex flex-col gap-2">
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-[16px] text-emerald-600 shrink-0 mt-0.5">check_circle</span>
+                  <span><strong>1. Arrival &amp; Check-In:</strong> Report directly to the Hospital Blood Bank / Trauma Desk.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-[16px] text-emerald-600 shrink-0 mt-0.5">check_circle</span>
+                  <span><strong>2. Verification OTP:</strong> Quote your Handshake OTP (<strong id="donor-mission-checklist-otp">8686</strong>) to the staff.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">schedule</span>
+                  <span><strong>3. Quick Vitals Check:</strong> Hemoglobin and BP screening (takes ~3 minutes).</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">favorite</span>
+                  <span><strong>4. Complete Donation:</strong> Rest, refreshments, and life-saver certificate issued.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN (5 COLS): Hospital Destination, GPS Navigation & Contacts -->
+          <div class="lg:col-span-5 flex flex-col gap-space-md">
+            
+            <!-- Destination & Location Card -->
+            <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-primary">local_hospital</span>
+                <span>Hospital &amp; Blood Bank Destination</span>
+              </span>
+
+              <div class="flex flex-col gap-1.5">
+                <h3 id="donor-mission-hospital-name" class="font-headline-sm text-base sm:text-lg font-bold text-on-surface">Metro Trauma Blood Centre</h3>
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-primary">
+                  <span class="material-symbols-outlined text-[16px]">meeting_room</span>
+                  <span id="donor-mission-hospital-ward">ICU Emergency Bed 4 • Trauma Wing 2nd Floor</span>
+                </div>
+                <p id="donor-mission-hospital-address" class="text-xs text-on-surface-variant leading-snug mt-1">
+                  #154/11 Bannerghatta Main Road, Opposite IIMB, Bengaluru, Karnataka 560076
+                </p>
+              </div>
+
+              <!-- Transit Info Pill -->
+              <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[18px] text-emerald-600">route</span>
+                  <span><strong>Transit Distance:</strong> <span id="donor-mission-distance">1.8 km</span></span>
+                </div>
+                <span id="donor-mission-eta-badge" class="px-2 py-0.5 rounded-full bg-emerald-600 text-white font-bold text-[10px]">~12 mins ETA</span>
+              </div>
+
+              <!-- Action Buttons: GPS Map & Call Desk -->
+              <div class="flex flex-col gap-2 pt-1">
+                <a id="donor-mission-maps-btn" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-container text-white font-label-md text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+                  <span class="material-symbols-outlined text-[18px]">navigation</span>
+                  <span>Open in Google Maps (GPS)</span>
+                </a>
+                <a id="donor-mission-desk-phone-btn" href="tel:+918026304050" class="w-full py-2.5 px-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs font-semibold transition-all border border-surface-container-high flex items-center justify-center gap-2 cursor-pointer">
+                  <span class="material-symbols-outlined text-[18px] text-primary">call</span>
+                  <span>Call Hospital Blood Desk</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Emergency Attendant Contact Card -->
+            <div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-surface-container-high flex flex-col gap-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-secondary">family_restroom</span>
+                <span>Emergency Attendant Contact</span>
+              </span>
+
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 id="donor-mission-attendant-name" class="text-xs sm:text-sm font-bold text-on-surface">Priya Sharma</h4>
+                  <span class="text-[11px] text-on-surface-variant">Immediate Relative / Attendant</span>
+                </div>
+                <a id="donor-mission-attendant-phone-btn" href="tel:+919845011223" class="px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary font-bold text-xs transition-colors flex items-center gap-1.5 border border-primary/20">
+                  <span class="material-symbols-outlined text-[16px]">call</span>
+                  <span id="donor-mission-attendant-phone">+91 98450 11223</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Return to Dashboard Button -->
+            <button type="button" onclick="window.PulseRouter.navigate('donor-dashboard')" class="w-full py-3 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+              <span>Back to Donor Dashboard</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -3023,16 +3273,13 @@
             <span class="material-symbols-outlined text-[15px]">person</span>
             <span>1. Personal Information</span>
           </span>
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-            <div class="sm:col-span-6 flex flex-col gap-1">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- Line 1: Full Name & Gender -->
+            <div class="flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Full Name *</label>
               <input required name="fullName" type="text" placeholder="e.g. Arjun Nair" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
-            <div class="sm:col-span-3 flex flex-col gap-1">
-              <label class="text-xs font-semibold text-on-surface">Age *</label>
-              <input required name="age" type="number" min="18" max="75" placeholder="e.g. 29" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
-            </div>
-            <div class="sm:col-span-3 flex flex-col gap-1">
+            <div class="flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Gender *</label>
               <select name="gender" required class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none">
                 <option value="" disabled selected>Select Gender</option>
@@ -3040,6 +3287,21 @@
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
+            </div>
+            <!-- Line 2: Date of Birth & Age (Auto-Locked) -->
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-semibold text-on-surface">Date of Birth *</label>
+              <input required name="dob" id="reg-donor-dob" type="date" max="2008-11-04" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none" title="Select date of birth for automatic age calculation"/>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
+                <span class="whitespace-nowrap">Age *</span>
+                <span class="text-[10px] text-primary font-bold whitespace-nowrap">(Auto-Locked)</span>
+              </label>
+              <div class="relative">
+                <input required name="age" id="reg-donor-age" type="number" min="18" max="75" placeholder="e.g. 29" value="" readonly tabindex="-1" onkeydown="return false" onpaste="return false" class="w-full h-10 pl-3 pr-8 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface font-semibold text-xs sm:text-sm cursor-not-allowed select-none focus:outline-none" title="Age is locked and updates automatically every year based on Date of Birth"/>
+                <span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[16px] text-secondary pointer-events-none">lock</span>
+              </div>
             </div>
           </div>
         </div>
@@ -3533,16 +3795,13 @@
             <span class="material-symbols-outlined text-[15px]">person</span>
             <span>1. Patient Details</span>
           </span>
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-            <div class="sm:col-span-6 flex flex-col gap-1">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- Line 1: Patient Full Name & Gender -->
+            <div class="flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Patient Full Name *</label>
               <input required name="patientName" type="text" placeholder="e.g. Patient Full Name" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
-            <div class="sm:col-span-3 flex flex-col gap-1">
-              <label class="text-xs font-semibold text-on-surface">Age *</label>
-              <input required name="patientAge" type="number" min="1" max="110" placeholder="e.g. 32" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
-            </div>
-            <div class="sm:col-span-3 flex flex-col gap-1">
+            <div class="flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Gender *</label>
               <select name="patientGender" required class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none">
                 <option value="" disabled selected>Select Gender</option>
@@ -3550,6 +3809,21 @@
                 <option value="Male">Male</option>
                 <option value="Other">Other</option>
               </select>
+            </div>
+            <!-- Line 2: Date of Birth & Age (Auto-Locked) -->
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-semibold text-on-surface">Date of Birth *</label>
+              <input required name="patientDob" type="date" max="2026-11-04" class="input-patient-dob h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none" title="Select patient date of birth for automatic age calculation"/>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
+                <span class="whitespace-nowrap">Age *</span>
+                <span class="text-[10px] text-primary font-bold whitespace-nowrap">(Auto-Locked)</span>
+              </label>
+              <div class="relative">
+                <input required name="patientAge" type="number" min="1" max="110" placeholder="e.g. 32" value="" readonly tabindex="-1" onkeydown="return false" onpaste="return false" class="input-patient-age w-full h-10 pl-3 pr-8 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface font-semibold text-xs sm:text-sm cursor-not-allowed select-none focus:outline-none" title="Age is locked and updates automatically every year based on Date of Birth"/>
+                <span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[16px] text-secondary pointer-events-none">lock</span>
+              </div>
             </div>
           </div>
         </div>
@@ -5212,11 +5486,11 @@
   <div id="toast-container" class="fixed bottom-6 right-6 z-[999999] flex flex-col items-end gap-2.5 pointer-events-none max-w-sm w-full" style="position: fixed !important; bottom: 24px !important; right: 24px !important; left: auto !important; top: auto !important; z-index: 999999 !important; display: flex !important; flex-direction: column !important; align-items: flex-end !important; pointer-events: none !important;"></div>
 
   <!-- Core Scripts with Cache-Busting -->
-  <script src="js/audio.js?v=20261009_final_fix"></script>
-  <script src="js/store.js?v=20261029_recovery_countdown_v4"></script>
-  <script src="js/router.js?v=20261009_final_fix"></script>
-  <script src="js/app.js?v=20261029_recovery_countdown_v4"></script>
-  <script src="js/blood-cells.js?v=20261009_final_fix"></script>
+  <script src="js/audio.js?v=20261104_view_details_v5"></script>
+  <script src="js/store.js?v=20261104_view_details_v5"></script>
+  <script src="js/router.js?v=20261104_view_details_v5"></script>
+  <script src="js/app.js?v=20261104_view_details_v5"></script>
+  <script src="js/blood-cells.js?v=20261104_view_details_v5"></script>
 
   <!-- Global Direct Action Handler for Critical UI Buttons -->
   <script>

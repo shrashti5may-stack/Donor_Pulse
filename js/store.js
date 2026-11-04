@@ -11,6 +11,8 @@ const DEFAULT_RECIPIENT_CASES = [
     requestId: 'REQ-8686',
     caseId: 'CASE-8686',
     patientName: 'Sanchit',
+    patientDob: '1996-05-18',
+    dateOfBirth: '1996-05-18',
     patientAge: 30,
     patientGender: 'Male',
     bloodGroup: 'B+',
@@ -75,6 +77,8 @@ const DEFAULT_RECIPIENT_CASES = [
     requestId: 'REQ-9042',
     caseId: 'CASE-9042',
     patientName: 'Devika Sharma',
+    patientDob: '1994-06-25',
+    dateOfBirth: '1994-06-25',
     patientAge: 32,
     patientGender: 'Female',
     bloodGroup: 'B+',
@@ -381,13 +385,57 @@ class Store {
     });
   }
 
+  calculateAge(dateOfBirthVal, relativeTo = new Date()) {
+    if (!dateOfBirthVal) return null;
+    let birthDate = null;
+    if (typeof dateOfBirthVal === 'string') {
+      const trimmed = dateOfBirthVal.trim();
+      if (!trimmed || trimmed.toLowerCase() === 'null' || trimmed.toLowerCase() === 'undefined' || trimmed.toLowerCase() === 'none') return null;
+      const isoMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (isoMatch) {
+        birthDate = new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+      } else {
+        birthDate = new Date(trimmed);
+      }
+    } else if (dateOfBirthVal instanceof Date) {
+      birthDate = dateOfBirthVal;
+    }
+    if (!birthDate || isNaN(birthDate.getTime())) return null;
+
+    const today = (relativeTo instanceof Date && !isNaN(relativeTo.getTime())) ? relativeTo : new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 0 ? age : 0;
+  }
+
   // --- Donor methods ---
   getDonor() {
+    if (this.state.donor) {
+      const dob = this.state.donor.dateOfBirth || this.state.donor.dob;
+      if (dob) {
+        const computed = this.calculateAge(dob);
+        if (computed !== null) {
+          this.state.donor.age = computed;
+        }
+      }
+    }
     return this.state.donor || null;
   }
 
   setDonor(donorData) {
     this.state.donor = { ...this.state.donor, ...donorData };
+    if (this.state.donor) {
+      const dob = this.state.donor.dateOfBirth || this.state.donor.dob;
+      if (dob) {
+        const computed = this.calculateAge(dob);
+        if (computed !== null) {
+          this.state.donor.age = computed;
+        }
+      }
+    }
     if (this.state.donor && Array.isArray(this.state.matchedDonorsPool)) {
       const idx = this.state.matchedDonorsPool.findIndex(d => d.id === this.state.donor.id);
       if (idx >= 0) {
@@ -477,13 +525,18 @@ class Store {
       const randomId = Math.floor(1000 + Math.random() * 9000);
       const newId = `DP-${randomId}-${cleanBloodCode}`;
 
+      const donorDob = donorData.dateOfBirth || donorData.dob || null;
+      const calcDonorAge = donorDob ? this.calculateAge(donorDob) : null;
+      const finalDonorAge = calcDonorAge !== null ? calcDonorAge : parseInt(donorData.age || 25, 10);
+
       newDonor = {
         id: newId,
         _id: newId,
         name: donorData.fullName || 'Registered Volunteer Donor',
         fullName: donorData.fullName || 'Registered Volunteer Donor',
         initials: (donorData.fullName || 'VD').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
-        age: parseInt(donorData.age || 25, 10),
+        dateOfBirth: donorDob,
+        age: finalDonorAge,
         gender: donorData.gender || 'Not specified',
         bloodGroup: rawBlood,
         phone: donorData.phone || '+91 98000 00000',
@@ -591,7 +644,15 @@ class Store {
   }
 
   getAllDonorsPool() {
-    return this.state.matchedDonorsPool || [];
+    const pool = this.state.matchedDonorsPool || [];
+    pool.forEach(d => {
+      const dob = d.dateOfBirth || d.dob;
+      if (dob) {
+        const computed = this.calculateAge(dob);
+        if (computed !== null) d.age = computed;
+      }
+    });
+    return pool;
   }
 
   isBloodCompatible(donorBlood, targetBloodGroup) {
@@ -764,15 +825,41 @@ class Store {
       this.state.recipient = this.state.recipientCases[0];
       this.state.selectedRequestId = this.state.recipient.requestId;
     }
+    if (this.state.recipient) {
+      const pDob = this.state.recipient.patientDob || this.state.recipient.dateOfBirth || this.state.recipient.dob;
+      if (pDob) {
+        const computed = this.calculateAge(pDob);
+        if (computed !== null) {
+          this.state.recipient.patientAge = computed;
+        }
+      }
+    }
     return this.state.recipient || null;
   }
 
   getRecipientCases() {
-    return Array.isArray(this.state.recipientCases) ? this.state.recipientCases : [];
+    const list = Array.isArray(this.state.recipientCases) ? this.state.recipientCases : [];
+    list.forEach(c => {
+      const pDob = c.patientDob || c.dateOfBirth || c.dob;
+      if (pDob) {
+        const computed = this.calculateAge(pDob);
+        if (computed !== null) {
+          c.patientAge = computed;
+        }
+      }
+    });
+    return list;
   }
 
   addOrUpdateRecipientCase(caseData, saveNow = true) {
     if (!caseData || (!caseData.id && !caseData.caseId)) return null;
+    const pDob = caseData.patientDob || caseData.dateOfBirth || caseData.dob;
+    if (pDob) {
+      const computed = this.calculateAge(pDob);
+      if (computed !== null) {
+        caseData.patientAge = computed;
+      }
+    }
     const cid = caseData.id || caseData.caseId;
     if (!Array.isArray(this.state.recipientCases)) {
       this.state.recipientCases = [];
@@ -990,7 +1077,9 @@ class Store {
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
     const patientName = (data.patientName && data.patientName.trim()) ? data.patientName.trim() : 'Patient Case ' + randomCaseNum;
-    const patientAge = parseInt(data.patientAge || 30, 10);
+    const patientDob = data.patientDob || data.dateOfBirth || data.dob || null;
+    const calcPatientAge = patientDob ? this.calculateAge(patientDob) : null;
+    const patientAge = calcPatientAge !== null ? calcPatientAge : parseInt(data.patientAge || 30, 10);
     const patientGender = data.patientGender || 'Other';
     const bloodGroup = (data.bloodGroup || 'O-').trim();
     const component = data.component || 'Platelets (Apheresis)';
@@ -1025,6 +1114,8 @@ class Store {
       requestId: reqId,
       isNewRequest: true,
       patientName,
+      patientDob,
+      dateOfBirth: patientDob,
       patientAge,
       patientGender,
       bloodGroup,
@@ -1677,3 +1768,8 @@ class Store {
 }
 
 window.PulseStore = new Store();
+if (typeof window !== 'undefined') {
+  window.calculateAge = function(dob, relativeTo) {
+    return window.PulseStore ? window.PulseStore.calculateAge(dob, relativeTo) : null;
+  };
+}

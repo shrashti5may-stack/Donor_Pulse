@@ -578,6 +578,8 @@ function initRouterHooks() {
           window.checkAndRingMatchedDonor();
         }
       }, 200);
+    } else if (['donor-mission-details', 'donor-mission', 'donor-transit-grid', 'mission-details'].includes(route)) {
+      renderDonorMissionDetails();
     } else if (route === 'donor-profile') {
       populateDonorProfileForm();
     } else if (route === 'request-confirmation') {
@@ -619,9 +621,13 @@ function initFormControllers() {
 
         const formData = new FormData(modalDonorForm);
         const bloodGroup = modalDonorForm.querySelector('input[name="donor_blood_type"]:checked')?.value || formData.get('donor_blood_type') || 'A+';
+        const dobVal = formData.get('dob') || formData.get('dateOfBirth') || null;
+        const calcAge = dobVal ? calculateAge(dobVal) : null;
+        const finalAge = calcAge !== null ? calcAge : parseInt(formData.get('age') || 29, 10);
         const donorData = {
           fullName: formData.get('fullName')?.toString().trim() || 'Registered Volunteer Donor',
-          age: parseInt(formData.get('age') || 29, 10),
+          dateOfBirth: dobVal,
+          age: finalAge,
           gender: formData.get('gender')?.toString().trim() || 'Male',
           bloodGroup: bloodGroup,
           phone: formData.get('phone')?.toString().trim() || '+91 98451 44290',
@@ -664,9 +670,13 @@ function initFormControllers() {
     donorForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(donorForm);
+      const donorDobVal = formData.get('dob') || formData.get('dateOfBirth') || null;
+      const calcPageAge = donorDobVal ? calculateAge(donorDobVal) : null;
+      const finalPageAge = calcPageAge !== null ? calcPageAge : parseInt(formData.get('age') || 25, 10);
       const donorData = {
         fullName: formData.get('fullName')?.toString().trim() || 'New Registered Donor',
-        age: parseInt(formData.get('age') || 25, 10),
+        dateOfBirth: donorDobVal,
+        age: finalPageAge,
         bloodGroup: formData.get('bloodGroup')?.toString().trim() || 'O-',
         phone: formData.get('phone')?.toString().trim() || '+91 98000 00000',
         email: formData.get('email')?.toString().trim() || 'donor@donor-pulse.in',
@@ -703,12 +713,17 @@ function initFormControllers() {
       const formData = new FormData(editProfileForm);
 
       // Name and Blood Group CANNOT be changed once registered - strictly preserved
+      const editDob = formData.get('dateOfBirth') || formData.get('dob') || currentDonor.dateOfBirth;
+      const calcEditAge = editDob ? calculateAge(editDob) : null;
+      const finalEditAge = calcEditAge !== null ? calcEditAge : parseInt(formData.get('age') || currentDonor.age, 10);
+
       const updatedDonorData = {
         id: currentDonor.id,
         _id: currentDonor.id,
         fullName: currentDonor.fullName,
         bloodGroup: currentDonor.bloodGroup,
-        age: parseInt(formData.get('age') || currentDonor.age, 10),
+        dateOfBirth: editDob,
+        age: finalEditAge,
         phone: formData.get('phone')?.toString().trim() || currentDonor.phone,
         email: formData.get('email')?.toString().trim() || currentDonor.email,
         city: formData.get('city')?.toString().trim() || currentDonor.city,
@@ -868,7 +883,9 @@ function initFormControllers() {
       e.preventDefault();
 
       const patientName = form.querySelector('[name="patientName"]')?.value?.trim() || 'Emergency Patient';
-      const patientAge = parseInt(form.querySelector('[name="patientAge"]')?.value || 30, 10);
+      const patientDob = form.querySelector('[name="patientDob"]')?.value || form.querySelector('[name="dob"]')?.value || null;
+      const calcPatientAge = patientDob ? calculateAge(patientDob) : null;
+      const patientAge = calcPatientAge !== null ? calcPatientAge : parseInt(form.querySelector('[name="patientAge"]')?.value || 30, 10);
       const patientGender = form.querySelector('[name="patientGender"]')?.value || 'Other';
       const bloodGroup = form.querySelector('input[name="blood_type"]:checked')?.value || 'B+';
       const component = form.querySelector('[name="component"]')?.value || 'Whole Blood';
@@ -889,6 +906,8 @@ function initFormControllers() {
       if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
         newPatient = await window.PulseStore.createNewPatientRequest({
           patientName,
+          patientDob,
+          dateOfBirth: patientDob,
           patientAge,
           patientGender,
           bloodGroup,
@@ -1896,6 +1915,7 @@ function fillDemoRaiseRequest() {
   };
 
   setVal('patientName', 'Emergency Patient');
+  setVal('patientDob', '1996-05-18');
   setVal('patientAge', '30');
   setVal('patientGender', 'Female');
   setVal('hospitalName', 'Metro Trauma Blood Centre');
@@ -1992,7 +2012,9 @@ function openMedicalProofViewer(customData) {
   const form = document.querySelector('.form-blood-request');
   
   const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Emergency Patient';
-  const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 30;
+  const proofDob = (form && form.querySelector('[name="patientDob"]')?.value) || currentPatient.patientDob || currentPatient.dateOfBirth;
+  const rawAge = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 30;
+  const age = (proofDob && typeof window.calculateAge === 'function') ? (window.calculateAge(proofDob) ?? rawAge) : rawAge;
   const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Other';
   const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'General Ward';
   const blood = (form && form.querySelector('input[name="blood_type"]:checked')?.value) || currentPatient.bloodGroup || 'B+';
@@ -2336,6 +2358,7 @@ function fillDemoRaiseRequest() {
   };
 
   setVal('patientName', 'Emergency Patient');
+  setVal('patientDob', '1996-05-18');
   setVal('patientAge', '30');
   setVal('patientGender', 'Female');
   setVal('hospitalName', 'Metro Trauma Blood Centre');
@@ -2432,7 +2455,9 @@ function openMedicalProofViewer(customData) {
   const form = document.querySelector('.form-blood-request');
   
   const patientName = (form && form.querySelector('[name="patientName"]')?.value?.trim()) || currentPatient.patientName || 'Emergency Patient';
-  const age = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 30;
+  const proofDob = (form && form.querySelector('[name="patientDob"]')?.value) || currentPatient.patientDob || currentPatient.dateOfBirth;
+  const rawAge = (form && form.querySelector('[name="patientAge"]')?.value) || currentPatient.patientAge || 30;
+  const age = (proofDob && typeof window.calculateAge === 'function') ? (window.calculateAge(proofDob) ?? rawAge) : rawAge;
   const gender = (form && form.querySelector('[name="patientGender"]')?.value) || currentPatient.patientGender || 'Other';
   const ward = (form && form.querySelector('[name="ward"]')?.value?.trim()) || currentPatient.hospitalWard || 'General Ward';
   const blood = (form && form.querySelector('input[name="blood_type"]:checked')?.value) || currentPatient.bloodGroup || 'B+';
@@ -2524,6 +2549,7 @@ function fillDemoDonorRegister() {
   };
 
   setVal('fullName', 'Arjun Nair');
+  setVal('dob', '1997-04-12');
   setVal('age', '29');
   setVal('gender', 'Male');
   setVal('phone', '+91 98451 44290');
@@ -2711,6 +2737,141 @@ function renderAllViews() {
 /**
  * Render Donor Dashboard
  */
+// Global calculateAge helper for automatic age calculation according to Date of Birth
+function calculateAge(dateOfBirthVal, relativeTo = new Date()) {
+  if (!dateOfBirthVal) return null;
+  let birthDate = null;
+  if (typeof dateOfBirthVal === 'string') {
+    const trimmed = dateOfBirthVal.trim();
+    if (!trimmed || trimmed.toLowerCase() === 'null' || trimmed.toLowerCase() === 'undefined' || trimmed.toLowerCase() === 'none') return null;
+    const isoMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (isoMatch) {
+      birthDate = new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+    } else {
+      birthDate = new Date(trimmed);
+    }
+  } else if (dateOfBirthVal instanceof Date) {
+    birthDate = dateOfBirthVal;
+  }
+  if (!birthDate || isNaN(birthDate.getTime())) return null;
+
+  const today = (relativeTo instanceof Date && !isNaN(relativeTo.getTime())) ? relativeTo : new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age >= 0 ? age : 0;
+}
+window.calculateAge = calculateAge;
+
+function handleDobInputChange(e) {
+  const target = e.target;
+  if (!target) return;
+
+  // 1. Donor DOB inputs
+  if (target.matches('[name="dob"], #reg-donor-dob, #edit-donor-dob, [name="dateOfBirth"]')) {
+    const form = target.closest('form') || target.closest('div') || document;
+    if (form) {
+      const ageInput = form.querySelector('[name="age"], #reg-donor-age, #edit-donor-age');
+      if (ageInput && target.value) {
+        const computed = calculateAge(target.value);
+        if (computed !== null) {
+          ageInput.value = computed;
+          ageInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    }
+  }
+
+  // 2. Patient / Recipient DOB inputs
+  if (target.matches('[name="patientDob"], .input-patient-dob')) {
+    const form = target.closest('form') || target.closest('div') || document;
+    if (form) {
+      const ageInput = form.querySelector('[name="patientAge"], .input-patient-age');
+      if (ageInput && target.value) {
+        const computed = calculateAge(target.value);
+        if (computed !== null) {
+          ageInput.value = computed;
+          ageInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    }
+  }
+}
+
+// Strictly restrict manual age editing across all forms (keyboard, paste, drop)
+function restrictManualAgeEditing(e) {
+  const target = e.target;
+  if (!target) return;
+  if (target.matches && target.matches('[name="age"], [name="patientAge"], #reg-donor-age, #edit-donor-age, .input-patient-age')) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+}
+
+// Automatic Yearly/Daily Age Refresh based on birthdate
+function checkAndAutoUpdateAges() {
+  if (typeof window === 'undefined' || !window.PulseStore) return;
+  const today = new Date();
+  
+  // 1. Check and refresh current donor's age
+  const donor = window.PulseStore.getDonor();
+  if (donor && (donor.dateOfBirth || donor.dob)) {
+    const freshAge = calculateAge(donor.dateOfBirth || donor.dob, today);
+    if (freshAge !== null && donor.age !== freshAge) {
+      donor.age = freshAge;
+      window.PulseStore.setDonor(donor);
+      if (typeof renderDonorDashboard === 'function') {
+        renderDonorDashboard();
+      }
+    }
+  }
+
+  // 2. Check and refresh current recipient's age
+  const recipient = window.PulseStore.getRecipient();
+  if (recipient && (recipient.patientDob || recipient.dateOfBirth || recipient.dob)) {
+    const pDob = recipient.patientDob || recipient.dateOfBirth || recipient.dob;
+    const freshAge = calculateAge(pDob, today);
+    if (freshAge !== null && recipient.patientAge !== freshAge) {
+      recipient.patientAge = freshAge;
+      if (typeof window.renderRecipientDashboard === 'function') {
+        window.renderRecipientDashboard();
+      }
+    }
+  }
+
+  // 3. Keep open form inputs in sync
+  const editAgeInput = document.getElementById('edit-donor-age');
+  const editDobInput = document.getElementById('edit-donor-dob');
+  if (editAgeInput && editDobInput && editDobInput.value) {
+    const computed = calculateAge(editDobInput.value, today);
+    if (computed !== null && String(editAgeInput.value) !== String(computed)) {
+      editAgeInput.value = computed;
+    }
+  }
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('input', handleDobInputChange);
+  document.addEventListener('change', handleDobInputChange);
+  ['keydown', 'keypress', 'paste', 'cut', 'drop'].forEach(evt => {
+    document.addEventListener(evt, restrictManualAgeEditing, true);
+  });
+}
+
+if (typeof window !== 'undefined') {
+  setInterval(checkAndAutoUpdateAges, 60000);
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        checkAndAutoUpdateAges();
+      }
+    });
+  }
+}
+
 function formatDonationDate(dateVal) {
   if (!dateVal || dateVal === 'None' || dateVal === 'null' || dateVal === 'undefined') {
     return 'First-time Donor';
@@ -3131,10 +3292,16 @@ function renderDonorDashboard() {
   }
 
   // Name, ID, Age, Address, Blood Group
+  const donorDob = donor.dateOfBirth || donor.dob;
+  const currentDonorAge = (donorDob && typeof window.calculateAge === 'function')
+    ? (window.calculateAge(donorDob) ?? donor.age)
+    : donor.age;
+  donor.age = currentDonorAge;
+
   setTextContentAll('.donor-name-display', donor.fullName);
   setTextContentAll('.donor-id-display', `ID #${donor.id}`);
   setTextContentAll('.donor-blood-display', donor.bloodGroup);
-  setTextContentAll('.donor-age-display', `${donor.age} yrs`);
+  setTextContentAll('.donor-age-display', `${currentDonorAge} yrs`);
   setTextContentAll('.donor-address-display', donor.address || donor.city);
   const locStr = `${donor.address ? donor.address + ', ' : ''}${donor.city}`;
   setTextContentAll('.donor-location-display', locStr);
@@ -3265,8 +3432,9 @@ function renderDonorDashboard() {
                   </p>
                 </div>
               </div>
-              <a href="#/recipient-tracking" class="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs shrink-0 self-start sm:self-center">
-                View Hospital Transit Grid
+              <a href="#/donor-mission-details" class="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs shrink-0 self-start sm:self-center flex items-center gap-1.5 cursor-pointer" title="View patient, hospital and requisition details">
+                <span class="material-symbols-outlined text-[16px]">visibility</span>
+                <span>View Details</span>
               </a>
             </div>
           `;
@@ -3473,6 +3641,135 @@ function renderDonorDashboard() {
  * Pre-populates the Edit Profile & Vitals form with current donor data.
  * Blood Group and Full Name are strictly locked against edits.
  */
+/**
+ * Render Donor Mission & Hospital Transit Grid Details (#/donor-mission-details)
+ * Shows all essential requisition & hospital details to the donor without switching to the recipient dashboard.
+ */
+function renderDonorMissionDetails() {
+  const container = document.getElementById('view-donor-mission');
+  if (!container) return;
+
+  const store = window.PulseStore;
+  const donor = store ? store.getDonor() : null;
+  const recipient = store ? store.getRecipient() : null;
+  const selectedReqId = (store && store.state && store.state.selectedRequestId) || 
+                        (recipient ? (recipient.requestId || recipient.id) : null) || 
+                        'REQ-8686';
+
+  // Resolve Requisition Object
+  let req = null;
+  if (store) {
+    if (typeof store.getRecipientCases === 'function') {
+      req = store.getRecipientCases().find(c => c.requestId === selectedReqId || c.id === selectedReqId || c.caseId === selectedReqId);
+    }
+    if (!req && typeof store.getRequests === 'function') {
+      req = store.getRequests().find(r => r.id === selectedReqId || r.requestId === selectedReqId);
+    }
+  }
+  if (!req) req = recipient || {};
+
+  // 1. Patient Data & Dynamically Calculated Age
+  const patientName = req.patientName || 'Emergency Patient';
+  const patientDob = req.patientDob || req.dateOfBirth || req.dob;
+  let patientAge = req.patientAge || 30;
+  if (patientDob && typeof calculateAge === 'function') {
+    const calc = calculateAge(patientDob);
+    if (calc !== null) patientAge = calc;
+  }
+  let dobFormattedText = '';
+  if (patientDob) {
+    try {
+      const d = new Date(patientDob);
+      if (!isNaN(d.getTime())) {
+        dobFormattedText = ` (DOB: ${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })})`;
+      }
+    } catch(e) {}
+  }
+  const patientGender = req.patientGender || 'Other';
+  const bloodGroup = req.bloodGroup || 'B+';
+  const component = req.component || 'Packed Red Blood Cells (PRBC)';
+  const units = req.unitsRequired || req.units || 2;
+  const urgency = req.urgency || 'Stat Emergency (< 45 Mins)';
+  const clinicalReason = req.clinicalReason || req.notes || req.reason || 'Acute clinical blood requirement, emergency broadcast. Acute blood loss / emergency surgery in progress.';
+  const doctorName = req.doctorName || req.doctorRegId || 'Dr. Ramesh K., MD (Trauma & Critical Care)';
+  const reqId = req.requestId || req.id || selectedReqId;
+  const otp = req.handshakeOTP || (req.verificationProof && req.verificationProof.otp) || '8686';
+
+  // 2. Hospital / Destination Data
+  const hospitalName = req.hospitalName || req.hospital || 'Metro Trauma Blood Centre';
+  const hospitalWard = req.hospitalWard || req.ward || req.location || 'ICU Emergency Bed 4';
+  const hospitalAddress = req.hospitalAddress || req.address || '#154/11 Bannerghatta Main Road, Opposite IIMB, Bengaluru, Karnataka 560076';
+  const attendantName = req.attendantName || 'Immediate Relative / Attendant';
+  const attendantPhone = req.attendantPhone || '+91 98450 11223';
+  const cleanAttendantPhone = attendantPhone.replace(/[\s-]/g, '');
+  const hospitalPhone = req.doctorPhone || req.hospitalBloodDesk || '+91 (80) 2630-4050';
+  const cleanHospitalPhone = hospitalPhone.replace(/[\s-()]/g, '');
+
+  // 3. Transit Metrics
+  let distance = '1.8 km';
+  let eta = '12 mins';
+  if (donor) {
+    if (donor.distance) distance = `${donor.distance} km`;
+    if (donor.eta) eta = donor.eta;
+    else if (donor.liveEta) eta = donor.liveEta;
+  }
+  if (req.donors && Array.isArray(req.donors) && donor) {
+    const matchedD = req.donors.find(d => d.id === donor.id || d.name === donor.fullName);
+    if (matchedD) {
+      if (matchedD.distance) distance = `${matchedD.distance} km`;
+      if (matchedD.liveEta || matchedD.eta) eta = matchedD.liveEta || matchedD.eta;
+    }
+  }
+
+  // Safe DOM setter
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined && val !== null) el.textContent = val;
+  };
+
+  setEl('donor-mission-req-id', `Requisition #${reqId}`);
+  setEl('donor-mission-otp', otp);
+  setEl('donor-mission-checklist-otp', otp);
+  setEl('donor-mission-summary-patient', patientName);
+  setEl('donor-mission-summary-blood', `${bloodGroup} (${component})`);
+  setEl('donor-mission-summary-hospital', hospitalName);
+  setEl('donor-mission-summary-eta', `~${eta} (${distance})`);
+
+  setEl('donor-mission-urgency-badge', urgency);
+  setEl('donor-mission-patient-name', patientName);
+  setEl('donor-mission-patient-age', `${patientAge} yrs${dobFormattedText}`);
+  setEl('donor-mission-patient-gender', patientGender);
+  setEl('donor-mission-blood-group', bloodGroup);
+  setEl('donor-mission-component', component);
+  setEl('donor-mission-units', `${units} Units Required (1 Slot Confirmed by You)`);
+
+  setEl('donor-mission-clinical-reason', `"${clinicalReason}"`);
+  setEl('donor-mission-doctor-name', doctorName);
+
+  setEl('donor-mission-hospital-name', hospitalName);
+  setEl('donor-mission-hospital-ward', `${hospitalWard} • Emergency Wing`);
+  setEl('donor-mission-hospital-address', hospitalAddress);
+  setEl('donor-mission-distance', distance);
+  setEl('donor-mission-eta-badge', `~${eta} ETA`);
+
+  setEl('donor-mission-attendant-name', attendantName);
+  setEl('donor-mission-attendant-phone', attendantPhone);
+
+  const mapsBtn = document.getElementById('donor-mission-maps-btn');
+  if (mapsBtn) {
+    mapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hospitalName + ' ' + hospitalAddress)}`;
+  }
+  const deskPhoneBtn = document.getElementById('donor-mission-desk-phone-btn');
+  if (deskPhoneBtn) {
+    deskPhoneBtn.href = `tel:${cleanHospitalPhone}`;
+  }
+  const attendantPhoneBtn = document.getElementById('donor-mission-attendant-phone-btn');
+  if (attendantPhoneBtn) {
+    attendantPhoneBtn.href = `tel:${cleanAttendantPhone}`;
+  }
+}
+window.renderDonorMissionDetails = renderDonorMissionDetails;
+
 function populateDonorProfileForm() {
   const donor = window.PulseStore ? window.PulseStore.getDonor() : null;
   if (!donor) return;
@@ -3485,8 +3782,13 @@ function populateDonorProfileForm() {
   if (bloodInput) bloodInput.value = donor.bloodGroup || '';
 
   // Editable fields (matching registration options)
+  const dobInput = document.getElementById('edit-donor-dob');
+  if (dobInput) dobInput.value = donor.dateOfBirth || donor.dob || '';
+
   const ageInput = document.getElementById('edit-donor-age');
-  if (ageInput) ageInput.value = donor.age || 28;
+  const donorDob = donor.dateOfBirth || donor.dob;
+  const calcAge = donorDob ? calculateAge(donorDob) : null;
+  if (ageInput) ageInput.value = calcAge !== null ? calcAge : (donor.age || 28);
 
   const phoneInput = document.getElementById('edit-donor-phone');
   if (phoneInput) phoneInput.value = donor.phone || '';
@@ -3692,11 +3994,17 @@ function renderRecipientDashboard() {
   const cleanHospital = (recipient.hospitalName || 'Hospital Facility').split('&')[0].trim();
   const cleanWard = (recipient.hospitalWard || 'General Ward').split(',')[0].trim();
 
+  const pDob = recipient.patientDob || recipient.dateOfBirth || recipient.dob;
+  const currentPatientAge = (pDob && typeof window.calculateAge === 'function')
+    ? (window.calculateAge(pDob) ?? recipient.patientAge ?? 30)
+    : (recipient.patientAge || 30);
+  recipient.patientAge = currentPatientAge;
+
   setTextContentAll('.patient-name-display', recipient.patientName);
   setTextContentAll('.patient-blood-display', `${recipient.bloodGroup} ${(recipient.component || 'Blood').split(' ')[0]}`);
   setTextContentAll('.patient-blood-group-badge', recipient.bloodGroup);
   setTextContentAll('.patient-component-display', recipient.component);
-  setTextContentAll('.patient-meta-display', `${recipient.patientAge || 30} Yrs • ${recipient.patientGender || 'Other'} • ${cleanWard}`);
+  setTextContentAll('.patient-meta-display', `${currentPatientAge} Yrs • ${recipient.patientGender || 'Other'} • ${cleanWard}`);
   setTextContentAll('.attendant-name-display', cleanRelation ? `${recipient.attendantName} (${cleanRelation})` : recipient.attendantName);
   setTextContentAll('.attendant-phone-display', recipient.attendantPhone || '--');
   setTextContentAll('.hospital-name-display', recipient.hospitalName);
@@ -4251,7 +4559,11 @@ window.openIncomingDonorCallModal = function(param1, param2) {
   };
 
   setTxt('call-patient-name', req.patientName || 'Emergency Patient');
-  setTxt('call-patient-meta', `${req.patientAge || 32} Yrs / ${req.patientGender || 'Female'}`);
+  const callDob = req.patientDob || req.dateOfBirth;
+  const callAge = (callDob && typeof window.calculateAge === 'function')
+    ? (window.calculateAge(callDob) ?? req.patientAge ?? 32)
+    : (req.patientAge || 32);
+  setTxt('call-patient-meta', `${callAge} Yrs / ${req.patientGender || 'Female'}`);
   setTxt('call-blood-units-needed', `${req.bloodGroup || bloodGroup} ${req.component || 'Whole Blood'} (${req.unitsRequired || req.units || 2} Units)`);
   setTxt('call-hospital-name', req.hospitalName || req.hospital || 'Hospital Trauma Center');
   setTxt('call-hospital-ward', `${req.hospitalWard || req.ward || req.location || 'Emergency Resuscitation Wing'} • Emergency Wing`);

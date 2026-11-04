@@ -21,6 +21,11 @@ class PulseRouter {
       'donor-requests-section': 'view-donor-dashboard',
       'donation-history': 'view-donor-dashboard',
       'donor-history': 'view-donor-dashboard',
+      // Donor Active Mission & Hospital Transit Details
+      'donor-mission-details': 'view-donor-mission',
+      'donor-mission': 'view-donor-mission',
+      'donor-transit-grid': 'view-donor-mission',
+      'mission-details': 'view-donor-mission',
       // Recipient & Family Dashboard Routes
       'recipient-dashboard': 'view-recipient-dashboard',
       'recipient-overview': 'view-recipient-dashboard',

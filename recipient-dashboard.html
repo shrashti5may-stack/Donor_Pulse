@@ -202,6 +202,7 @@
               </div>
               <h2 id="sidebar-patient-name" class="font-bold text-lg text-on-surface truncate">No Active Patient Case</h2>
               <span id="sidebar-case-id" class="font-mono text-xs text-on-surface-variant">Standby</span>
+              <span id="sidebar-patient-meta" class="block text-xs font-semibold text-primary mt-0.5">--</span>
             </div>
           </div>
 
@@ -394,6 +395,8 @@
                   <span id="hero-patient-name">No Patient Case</span> — <span id="hero-blood-need" class="text-primary font-black">Requisition Standby</span>
                 </h1>
                 <p class="text-sm text-on-surface-variant mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span id="hero-patient-meta" class="whitespace-nowrap font-medium text-primary">Standby</span>
+                  <span class="text-outline-variant">•</span>
                   <span class="whitespace-nowrap">Portal on standby for patient emergency requisition</span>
                   <span class="text-outline-variant">•</span>
                   <span class="whitespace-nowrap">Attendant: <strong id="hero-attendant-name" class="font-semibold text-on-surface">No Active Attendant</strong></span>
@@ -821,6 +824,65 @@
 
   <!-- SCRIPT LOGIC FOR RECIPIENT DASHBOARD -->
   <script>
+    // Global calculateAge helper for automatic age calculation according to Date of Birth
+    function calculateAge(dateOfBirthVal, relativeTo = new Date()) {
+      if (!dateOfBirthVal) return null;
+      let birthDate = null;
+      if (typeof dateOfBirthVal === 'string') {
+        const trimmed = dateOfBirthVal.trim();
+        if (!trimmed || trimmed.toLowerCase() === 'null' || trimmed.toLowerCase() === 'undefined' || trimmed.toLowerCase() === 'none') return null;
+        const isoMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+        if (isoMatch) {
+          birthDate = new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+        } else {
+          birthDate = new Date(trimmed);
+        }
+      } else if (dateOfBirthVal instanceof Date) {
+        birthDate = dateOfBirthVal;
+      }
+      if (!birthDate || isNaN(birthDate.getTime())) return null;
+
+      const today = (relativeTo instanceof Date && !isNaN(relativeTo.getTime())) ? relativeTo : new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age >= 0 ? age : 0;
+    }
+    window.calculateAge = calculateAge;
+
+    function handleDobInputChange(e) {
+      const target = e.target;
+      if (!target) return;
+      if (target.matches('[name="patientDob"], .input-patient-dob')) {
+        const form = target.closest('form') || target.closest('div') || document;
+        if (form) {
+          const ageInput = form.querySelector('[name="patientAge"], .input-patient-age');
+          if (ageInput && target.value) {
+            const computed = calculateAge(target.value);
+            if (computed !== null) {
+              ageInput.value = computed;
+              ageInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          }
+        }
+      }
+    }
+    function restrictManualAgeEditing(e) {
+      const target = e.target;
+      if (!target) return;
+      if (target.matches && target.matches('[name="patientAge"], .input-patient-age')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    }
+    document.addEventListener('input', handleDobInputChange);
+    document.addEventListener('change', handleDobInputChange);
+    ['keydown', 'keypress', 'paste', 'cut', 'drop'].forEach(evt => {
+      document.addEventListener(evt, restrictManualAgeEditing, true);
+    });
     // Smooth scroll helper
     function scrollToSection(id) {
       const el = document.getElementById(id);
@@ -950,7 +1012,14 @@
         setName('metric-units-total', '0');
         return;
       }
+      const pDob = data.patientDob || data.dateOfBirth || data.dob;
+      const currentPatientAge = (pDob && typeof calculateAge === 'function')
+        ? (calculateAge(pDob) ?? data.patientAge ?? 30)
+        : (data.patientAge || 30);
+      data.patientAge = currentPatientAge;
+
       setName('sidebar-patient-name', data.patientName);
+      setName('sidebar-patient-meta', `${currentPatientAge} Yrs • ${data.patientGender || 'Patient'}`);
       setName('sidebar-case-id', data.id);
       setName('sidebar-blood-group', data.bloodGroup);
       setName('sidebar-blood-component', data.component);
@@ -960,6 +1029,7 @@
       setName('sidebar-admitted-ward', data.hospitalWard);
       setName('sidebar-active-case-text', `${data.patientName} (${data.bloodGroup})`);
       setName('hero-patient-name', data.patientName);
+      setName('hero-patient-meta', `${currentPatientAge} Yrs • ${data.patientGender || 'Patient'}`);
       setName('hero-blood-need', `${data.bloodGroup} ${(data.component || '').split(' ')[0]}`);
       setName('hero-req-id', '#' + data.requestId);
       setName('hero-attendant-name', data.attendantName);
@@ -1267,6 +1337,7 @@
       };
 
       setVal('patientName', 'Emergency Patient');
+      setVal('patientDob', '1996-05-18');
       setVal('patientAge', '30');
       setVal('patientGender', 'Female');
       setVal('hospitalName', 'Metro Trauma Blood Centre');
@@ -1821,7 +1892,9 @@
           }
 
           const patientName = reqForm.querySelector('[name="patientName"]')?.value?.trim() || 'Emergency Patient';
-          const patientAge = parseInt(reqForm.querySelector('[name="patientAge"]')?.value || 30, 10);
+          const patientDob = reqForm.querySelector('[name="patientDob"]')?.value || null;
+          const calcAge = patientDob ? calculateAge(patientDob) : null;
+          const patientAge = calcAge !== null ? calcAge : parseInt(reqForm.querySelector('[name="patientAge"]')?.value || 30, 10);
           const patientGender = reqForm.querySelector('[name="patientGender"]')?.value || 'Other';
           const bloodGroup = reqForm.querySelector('input[name="blood_type"]:checked')?.value || 'B+';
           const component = reqForm.querySelector('[name="component"]')?.value || 'Whole Blood';
@@ -1841,6 +1914,8 @@
           if (window.PulseStore && typeof window.PulseStore.createNewPatientRequest === 'function') {
             window.PulseStore.createNewPatientRequest({
               patientName,
+              patientDob,
+              dateOfBirth: patientDob,
               patientAge,
               patientGender,
               bloodGroup,
@@ -2285,16 +2360,13 @@
             <span class="material-symbols-outlined text-[15px]">person</span>
             <span>1. Patient Details</span>
           </span>
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-            <div class="sm:col-span-6 flex flex-col gap-1">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- Line 1: Patient Full Name & Gender -->
+            <div class="flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Patient Full Name *</label>
               <input required name="patientName" type="text" placeholder="e.g. Devika Sharma" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
             </div>
-            <div class="sm:col-span-3 flex flex-col gap-1">
-              <label class="text-xs font-semibold text-on-surface">Age *</label>
-              <input required name="patientAge" type="number" min="1" max="110" placeholder="e.g. 32" value="" class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none"/>
-            </div>
-            <div class="sm:col-span-3 flex flex-col gap-1">
+            <div class="flex flex-col gap-1">
               <label class="text-xs font-semibold text-on-surface">Gender *</label>
               <select name="patientGender" required class="h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none">
                 <option value="" disabled selected>Select Gender</option>
@@ -2302,6 +2374,21 @@
                 <option value="Male">Male</option>
                 <option value="Other">Other</option>
               </select>
+            </div>
+            <!-- Line 2: Date of Birth & Age (Auto-Locked) -->
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-semibold text-on-surface">Date of Birth *</label>
+              <input required name="patientDob" type="date" max="2026-11-04" class="input-patient-dob h-10 px-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none" title="Select patient date of birth for automatic age calculation"/>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-semibold text-on-surface flex items-center justify-between">
+                <span class="whitespace-nowrap">Age *</span>
+                <span class="text-[10px] text-primary font-bold whitespace-nowrap">(Auto-Locked)</span>
+              </label>
+              <div class="relative">
+                <input required name="patientAge" type="number" min="1" max="110" placeholder="e.g. 32" value="" readonly tabindex="-1" onkeydown="return false" onpaste="return false" class="input-patient-age w-full h-10 pl-3 pr-8 rounded-xl bg-surface-container border border-outline-variant/40 text-on-surface font-semibold text-xs sm:text-sm cursor-not-allowed select-none focus:outline-none" title="Age is locked and updates automatically every year based on Date of Birth"/>
+                <span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[16px] text-secondary pointer-events-none">lock</span>
+              </div>
             </div>
           </div>
         </div>
