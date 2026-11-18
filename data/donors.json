@@ -45,16 +45,24 @@
       {
         "id": "DON-8841",
         "date": "14 Jun 2026",
+        "hospital": "Apollo Hospitals Blood Centre, Indiranagar",
+        "center": "Apollo Hospitals Blood Centre, Indiranagar",
+        "type": "Whole Blood",
+        "donationType": "Whole Blood",
         "units": "1 Unit (Whole Blood)",
-        "hospital": "Apollo Hospitals, Indiranagar",
+        "subtext": "Blood Bank Resuscitation Wing \u2022 Verified",
         "verified": true,
         "impact": "Emergency ICU Patient Stabilized"
       },
       {
         "id": "DON-7712",
         "date": "10 Mar 2026",
+        "hospital": "Manipal Comprehensive Blood Centre, Old Airport Rd",
+        "center": "Manipal Comprehensive Blood Centre, Old Airport Rd",
+        "type": "Packed RBCs",
+        "donationType": "Packed RBCs",
         "units": "1 Unit (Packed RBCs)",
-        "hospital": "Manipal Blood Center, Old Airport Rd",
+        "subtext": "Transfusion Resuscitation Bay \u2022 Verified",
         "verified": true,
         "impact": "Surgical Hemostasis Support"
       }
