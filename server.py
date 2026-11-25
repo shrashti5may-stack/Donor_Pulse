@@ -5,7 +5,24 @@ import sys
 import json
 import mimetypes
 import math
+import urllib.parse
 from datetime import datetime, timezone, timedelta
+
+# Ensure UTF-8 output stream on Windows consoles
+try:
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    if hasattr(sys.stderr, 'reconfigure'):
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+
+# Import Cloud Telephony & SMS Alerts Engine
+try:
+    import telephony_service
+except Exception as _te:
+    print(f"[TelephonyService] Warning loading telephony_service: {_te}")
+    telephony_service = None
 
 PORT = int(os.environ.get('PORT', 3000))
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -433,6 +450,39 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
             }).encode('utf-8'))
             return
 
+        # API: GET /api/telephony/logs - Real-time telemetry call and SMS logs
+        if clean_path == '/api/telephony/logs':
+            logs = getattr(telephony_service, 'TELEPHONY_LOGS', []) if telephony_service else []
+            mock_mode = getattr(telephony_service, 'MOCK_TELEPHONY', True) if telephony_service else True
+            active_calls = getattr(telephony_service, 'ACTIVE_CALLS', {}) if telephony_service else {}
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": True,
+                "logs": logs,
+                "mockMode": mock_mode,
+                "activeCalls": active_calls
+            }).encode('utf-8'))
+            return
+
+        # API: GET /api/telephony/config - Return current telephony setup status (masked)
+        if clean_path == '/api/telephony/config':
+            cfg = telephony_service.get_telephony_config() if telephony_service and hasattr(telephony_service, 'get_telephony_config') else {}
+            masked_token = f"••••••••{cfg.get('authToken', '')[-4:]}" if len(cfg.get('authToken', '')) >= 4 else ""
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": True,
+                "mockMode": cfg.get("mockMode", True),
+                "accountSid": cfg.get("accountSid", ""),
+                "authTokenMasked": masked_token,
+                "fromNumber": cfg.get("fromNumber", ""),
+                "hasTwilioKeys": not cfg.get("mockMode", True) and bool(cfg.get("accountSid"))
+            }).encode('utf-8'))
+            return
+
         # Prevent directory traversal
         full_path = os.path.normpath(os.path.join(DIRECTORY, clean_path.lstrip('/\\')))
         if not full_path.startswith(DIRECTORY):
@@ -451,6 +501,249 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         clean_path = self.path.split('?')[0].split('#')[0]
         global CURRENT_ACTIVE_CASE_ID, CURRENT_ACTIVE_DONOR_ID
+
+        # API: POST /api/calls/initiate - Manual Patient-to-Donor Call with 40s Ring Duration
+        if clean_path == '/api/calls/initiate':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            donor_id = body.get('donorId')
+            case_id = body.get('caseId') or CURRENT_ACTIVE_CASE_ID
+            caller_phone = body.get('callerPhone') or '+91 98000 12345'
+
+            target_case = DB_RECIPIENT_CASES.get(case_id)
+            if not target_case and DB_RECIPIENT_CASES:
+                for c in DB_RECIPIENT_CASES.values():
+                    if c.get('id') == case_id or c.get('caseId') == case_id or c.get('requestId') == case_id:
+                        target_case = c
+                        break
+            if not target_case:
+                target_case = {
+                    "id": case_id,
+                    "caseId": case_id,
+                    "patientName": "Patient Attendant",
+                    "hospitalName": "Apex Hospital",
+                    "bloodGroup": "B+"
+                }
+
+            if not telephony_service:
+                self.send_response(503)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "Telephony service unavailable"}).encode('utf-8'))
+                return
+
+            result = telephony_service.initiate_manual_patient_call(
+                donor_id=donor_id,
+                case_obj=target_case,
+                caller_phone=caller_phone,
+                db_donors=DB_DONORS,
+                public_base_url=telephony_service.PUBLIC_WEBHOOK_BASE_URL,
+                live_event_callback=record_live_event
+            )
+
+            status_code = 200 if result.get("success") else 400
+            self.send_response(status_code)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(result).encode('utf-8'))
+            return
+
+        # API: POST /api/telephony/config - Update Twilio credentials directly from browser UI
+        if clean_path == '/api/telephony/config':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+
+            sid = body.get('accountSid', '').strip()
+            token = body.get('authToken', '').strip()
+            number = body.get('phoneNumber', '').strip()
+            live = body.get('enableLiveCalling', True)
+
+            env_path = os.path.join(DIRECTORY, '.env')
+            try:
+                lines = []
+                if os.path.exists(env_path):
+                    with open(env_path, 'r', encoding='utf-8') as f:
+                        lines = f.readlines()
+
+                updated_keys = set()
+                new_lines = []
+                for line in lines:
+                    if line.strip().startswith('TWILIO_ACCOUNT_SID='):
+                        new_lines.append(f"TWILIO_ACCOUNT_SID={sid}\n")
+                        updated_keys.add('TWILIO_ACCOUNT_SID')
+                    elif line.strip().startswith('TWILIO_AUTH_TOKEN='):
+                        new_lines.append(f"TWILIO_AUTH_TOKEN={token}\n")
+                        updated_keys.add('TWILIO_AUTH_TOKEN')
+                    elif line.strip().startswith('TWILIO_PHONE_NUMBER='):
+                        new_lines.append(f"TWILIO_PHONE_NUMBER={number}\n")
+                        updated_keys.add('TWILIO_PHONE_NUMBER')
+                    elif line.strip().startswith('MOCK_TELEPHONY='):
+                        new_lines.append(f"MOCK_TELEPHONY={'false' if live else 'true'}\n")
+                        updated_keys.add('MOCK_TELEPHONY')
+                    else:
+                        new_lines.append(line)
+
+                if 'TWILIO_ACCOUNT_SID' not in updated_keys:
+                    new_lines.append(f"TWILIO_ACCOUNT_SID={sid}\n")
+                if 'TWILIO_AUTH_TOKEN' not in updated_keys:
+                    new_lines.append(f"TWILIO_AUTH_TOKEN={token}\n")
+                if 'TWILIO_PHONE_NUMBER' not in updated_keys:
+                    new_lines.append(f"TWILIO_PHONE_NUMBER={number}\n")
+                if 'MOCK_TELEPHONY' not in updated_keys:
+                    new_lines.append(f"MOCK_TELEPHONY={'false' if live else 'true'}\n")
+
+                with open(env_path, 'w', encoding='utf-8') as f:
+                    f.writelines(new_lines)
+
+                os.environ['TWILIO_ACCOUNT_SID'] = sid
+                os.environ['TWILIO_AUTH_TOKEN'] = token
+                os.environ['TWILIO_PHONE_NUMBER'] = number
+                os.environ['MOCK_TELEPHONY'] = 'false' if live else 'true'
+
+                if telephony_service and hasattr(telephony_service, 'load_env_file'):
+                    telephony_service.load_env_file(override=True)
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "success": True,
+                    "message": "Twilio configuration saved successfully! Cloud telephony active.",
+                    "liveCalling": live
+                }).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+                return
+
+        # API: POST /api/telephony/status-webhook - Twilio / Mock Call Lifecycle Updates
+        if clean_path == '/api/telephony/status-webhook':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            content_type = self.headers.get('Content-Type', '')
+            parsed_data = {}
+            if 'application/x-www-form-urlencoded' in content_type:
+                qs = urllib.parse.parse_qs(body_bytes.decode('utf-8'))
+                parsed_data = {k: v[0] for k, v in qs.items()}
+            else:
+                try:
+                    parsed_data = json.loads(body_bytes.decode('utf-8'))
+                except Exception:
+                    pass
+
+            if telephony_service:
+                res = telephony_service.update_call_status_from_webhook(parsed_data, live_event_callback=record_live_event)
+            else:
+                res = {"success": True}
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(res).encode('utf-8'))
+            return
+
+        # API: POST /api/telephony/ivr-response - Handle Keypad response (1: Accept & Pledge, 2: Decline)
+        if clean_path == '/api/telephony/ivr-response':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            content_type = self.headers.get('Content-Type', '')
+            parsed_data = {}
+            if 'application/x-www-form-urlencoded' in content_type:
+                qs = urllib.parse.parse_qs(body_bytes.decode('utf-8'))
+                parsed_data = {k: v[0] for k, v in qs.items()}
+            else:
+                try:
+                    parsed_data = json.loads(body_bytes.decode('utf-8'))
+                except Exception:
+                    pass
+
+            q_params = {}
+            if '?' in self.path:
+                try:
+                    q_params = urllib.parse.parse_qs(self.path.split('?')[1])
+                except Exception:
+                    pass
+
+            donor_id = parsed_data.get('donorId') or (q_params.get('donorId', [None])[0])
+            case_id = parsed_data.get('caseId') or (q_params.get('caseId', [None])[0]) or CURRENT_ACTIVE_CASE_ID
+            digits = parsed_data.get('Digits', '')
+
+            if telephony_service:
+                twiml_xml, outcome = telephony_service.process_ivr_keypad_response(
+                    digits=digits,
+                    donor_id=donor_id,
+                    case_id=case_id,
+                    db_cases=DB_RECIPIENT_CASES,
+                    db_donors=DB_DONORS,
+                    live_event_callback=record_live_event
+                )
+                if outcome == "ACCEPTED":
+                    save_recipient_cases()
+            else:
+                twiml_xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>Recorded. Thank you.</Say></Response>"
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/xml; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(twiml_xml.encode('utf-8'))
+            return
+
+        # API: POST /api/telephony/sms-status - Twilio SMS delivery callback
+        if clean_path == '/api/telephony/sms-status':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            content_type = self.headers.get('Content-Type', '')
+            parsed_data = {}
+            if 'application/x-www-form-urlencoded' in content_type:
+                qs = urllib.parse.parse_qs(body_bytes.decode('utf-8'))
+                parsed_data = {k: v[0] for k, v in qs.items()}
+            else:
+                try:
+                    parsed_data = json.loads(body_bytes.decode('utf-8'))
+                except Exception:
+                    pass
+
+            msg_sid = parsed_data.get('MessageSid') or parsed_data.get('SmsSid')
+            sms_status = parsed_data.get('MessageStatus') or parsed_data.get('SmsStatus', 'delivered')
+            if telephony_service and msg_sid:
+                for l in reversed(telephony_service.TELEPHONY_LOGS):
+                    if l.get('messageSid') == msg_sid:
+                        l['smsStatus'] = sms_status
+                        break
+                telephony_service.persist_telephony_logs()
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True}).encode('utf-8'))
+            return
+
+        # API: POST /api/telephony/push-subscribe - Store Web Push token
+        if clean_path == '/api/telephony/push-subscribe':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body_bytes = self.rfile.read(content_length)
+            try:
+                body = json.loads(body_bytes.decode('utf-8'))
+            except Exception:
+                body = {}
+            print(f"[PushSubscribe] Received browser subscription for donor {body.get('donorId')}")
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "message": "Push notification subscribed"}).encode('utf-8'))
+            return
 
         # API: POST /api/recipient/login - Authenticate case and return across all devices
         if clean_path == '/api/recipient/login':
@@ -556,6 +849,18 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     "handshakeOTP": case_obj.get('handshakeOTP', '1234'),
                     "donors": case_obj.get('donors', [])
                 })
+
+                # Flow A: Automatic Emergency Blood Request Alert (Max 10s Ring + Pop-Up SMS)
+                if telephony_service:
+                    try:
+                        telephony_service.dispatch_auto_emergency_alerts(
+                            case_obj=case_obj,
+                            db_donors=DB_DONORS or DB_USERS,
+                            public_base_url=telephony_service.PUBLIC_WEBHOOK_BASE_URL,
+                            live_event_callback=record_live_event
+                        )
+                    except Exception as te:
+                        print(f"[TelephonyAutoAlertError] {te}")
 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
@@ -1326,6 +1631,18 @@ class DonorPulseHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 "handshakeOTP": otp_code,
                 "donors": matched_donor_list
             })
+
+            # Flow A: Automatic Emergency Blood Request Alert (Max 10s Ring + Pop-Up SMS)
+            if telephony_service:
+                try:
+                    telephony_service.dispatch_auto_emergency_alerts(
+                        case_obj=case_obj,
+                        db_donors=DB_DONORS or DB_USERS,
+                        public_base_url=telephony_service.PUBLIC_WEBHOOK_BASE_URL,
+                        live_event_callback=record_live_event
+                    )
+                except Exception as te:
+                    print(f"[TelephonyAutoAlertError] {te}")
 
             self.send_response(201)
             self.send_header('Content-Type', 'application/json')
