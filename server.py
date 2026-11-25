@@ -1492,13 +1492,18 @@ def start_server(port=PORT, max_tries=10):
         try:
             socketserver.TCPServer.allow_reuse_address = True
             with socketserver.TCPServer(("", p), DonorPulseHTTPHandler) as httpd:
-                url = f"http://localhost:{p}"
+                url = f"http://localhost:{p}/index.html"
                 print("\n" + "=" * 54)
                 print("  DonorPulse Web Server is Running!")
                 print(f"  Local URL:   {url}")
                 print(f"  Directory:   {DIRECTORY}")
                 print("  Pipeline:    Strict Compatibility & Proximity Active")
                 print("=" * 54 + "\n", flush=True)
+                try:
+                    import webbrowser, threading
+                    threading.Timer(0.6, lambda: webbrowser.open(url)).start()
+                except Exception:
+                    pass
                 httpd.serve_forever()
                 return
         except OSError as e:

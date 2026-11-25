@@ -195,9 +195,10 @@ donor-pulse/
    *(Or run directly: `node server.js`)*
 
 3. **Open in your browser:**
-   ```
-   http://localhost:3000
-   ```
+   - **Main Grid**: [http://localhost:3000](http://localhost:3000)
+   - **Role Portal**: [http://localhost:3000/role-selection.html](http://localhost:3000/role-selection.html)
+   - **Donor Dashboard**: [http://localhost:3000/donor-dashboard.html](http://localhost:3000/donor-dashboard.html)
+   - **Recipient Dashboard**: [http://localhost:3000/recipient-dashboard.html](http://localhost:3000/recipient-dashboard.html)
 
 ---
 
