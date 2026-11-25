@@ -247,6 +247,111 @@ function initRealtimeEmergencyGrid() {
         window.renderDonorDashboard();
       }
     }
+
+    // -----------------------------------------------------------------
+    // 3. TELEPHONY REAL-TIME EVENTS (PSTN Voice Ringing & SMS Delivery)
+    // -----------------------------------------------------------------
+    else if (evt.type === 'TELEPHONY_ALERT_DISPATCHED') {
+      const donorId = evt.donorId;
+      const caseId = evt.caseId;
+      const status = evt.status || 'ringing_10s';
+
+      if (window.PulseStore) {
+        const recip = window.PulseStore.getRecipient();
+        if (recip && (recip.requestId === caseId || recip.id === caseId || recip.caseId === caseId)) {
+          if (Array.isArray(recip.donors)) {
+            const d = recip.donors.find(x => x.id === donorId);
+            if (d) {
+              d.telephonyStatus = status;
+              d.smsStatus = 'delivered';
+              d.callStatus = 'ringing_10s';
+            }
+          }
+          window.PulseStore.notify();
+        }
+      }
+
+      // High-Priority Web Notification for offline/background donor
+      if (typeof window.triggerEmergencyWebNotification === 'function') {
+        window.triggerEmergencyWebNotification(
+          '🚨 URGENT Blood Requisition Call',
+          `Incoming emergency call for blood donation at ${evt.hospitalName || 'Trauma Centre'}. Your mobile phone is ringing!`,
+          `/#/donor-mission-details?caseId=${caseId}&donorId=${donorId}`
+        );
+      }
+
+      if (typeof window.renderRecipientDashboard === 'function') {
+        window.renderRecipientDashboard();
+      }
+    }
+    else if (evt.type === 'CALL_STATUS_UPDATE') {
+      const callStatus = evt.callStatus; // ringing, in-progress, completed, no-answer, failed
+      const donorId = evt.donorId;
+
+      if (window.PulseStore) {
+        const recip = window.PulseStore.getRecipient();
+        if (recip && Array.isArray(recip.donors)) {
+          const d = recip.donors.find(x => x.id === donorId);
+          if (d) {
+            d.callStatus = callStatus;
+            if (callStatus === 'in-progress') d.telephonyStatus = 'connected';
+            else if (callStatus === 'no-answer') d.telephonyStatus = 'no_answer';
+            else if (callStatus === 'completed') d.telephonyStatus = 'completed';
+          }
+          window.PulseStore.notify();
+        }
+      }
+
+      const activeBtn = document.querySelector(`[data-calling-donor="${donorId}"]`);
+      if (activeBtn) {
+        if (callStatus === 'in-progress') {
+          activeBtn.innerHTML = '<span class="text-emerald-700 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span><span>Connected</span></span>';
+        } else if (callStatus === 'no-answer' || callStatus === 'busy') {
+          activeBtn.innerHTML = '<span class="text-amber-700 font-bold">📵 No Answer</span>';
+          setTimeout(() => {
+            activeBtn.innerHTML = '<span class="material-symbols-outlined text-[13px] text-primary">call</span><span>Call Donor</span>';
+            activeBtn.disabled = false;
+          }, 3500);
+        } else if (callStatus === 'completed') {
+          activeBtn.innerHTML = '<span class="text-secondary font-bold">✓ Call Ended</span>';
+          setTimeout(() => {
+            activeBtn.innerHTML = '<span class="material-symbols-outlined text-[13px] text-primary">call</span><span>Call Donor</span>';
+            activeBtn.disabled = false;
+          }, 3500);
+        }
+      }
+
+      if (typeof window.renderRecipientDashboard === 'function') {
+        window.renderRecipientDashboard();
+      }
+    }
+    else if (evt.type === 'DONOR_PLEDGED') {
+      const donorId = evt.donorId;
+      const donorName = evt.donorName || 'Volunteer Donor';
+      const caseId = evt.caseId;
+
+      if (window.PulseStore) {
+        window.PulseStore.confirmDonorAvailability(caseId, donorId, false);
+        window.PulseStore.notify();
+      }
+
+      if (window.PulseAudio && typeof window.PulseAudio.playConfirmationChime === 'function') {
+        window.PulseAudio.playConfirmationChime();
+      }
+
+      showDonorResponseToast({
+        title: '✅ Life-Saver Pledge Confirmed via Call!',
+        message: `${donorName} answered phone and pressed 1 to pledge! Requisition details and OTP sent via SMS. Donor is EN ROUTE.`,
+        isAccepted: true
+      });
+
+      if (typeof window.renderRecipientDashboard === 'function') {
+        window.renderRecipientDashboard();
+      }
+      if (typeof window.renderDonorDashboard === 'function') {
+        window.renderDonorDashboard();
+      }
+    }
   }
 
   // 1. Same-device cross-tab instant synchronization
@@ -3610,28 +3715,55 @@ function renderDonorDashboard() {
         </tr>
       `;
     } else {
-      historyTbody.innerHTML = dHistory.map(rec => `
-        <tr class="hover:bg-surface transition-colors">
-          <td class="py-3.5 px-space-sm font-semibold text-on-surface whitespace-nowrap">${escapeHtml(rec.date)}</td>
-          <td class="py-3.5 px-space-sm">
+      historyTbody.innerHTML = dHistory.map(rec => {
+        // Resolve hospital & center name
+        const hospitalName = rec.hospital || rec.center || (rec.id === 'DON-7712' ? 'Manipal Comprehensive Blood Centre, Old Airport Rd' : 'Apollo Hospitals Blood Centre, Indiranagar');
+        const hospitalSubtext = rec.subtext || rec.bay || (rec.impact ? `${rec.impact} • Verified` : 'Blood Bank Resuscitation Wing • Verified');
+
+        // Resolve donation type
+        let donationType = rec.type || rec.donationType || '';
+        if (!donationType && rec.units) {
+          const uLower = rec.units.toLowerCase();
+          if (uLower.includes('whole blood')) donationType = 'Whole Blood';
+          else if (uLower.includes('packed rbc') || uLower.includes('prbc')) donationType = 'Packed RBCs';
+          else if (uLower.includes('platelet') || uLower.includes('sdp')) donationType = 'Platelets (SDP)';
+          else if (uLower.includes('plasma') || uLower.includes('ffp')) donationType = 'Plasma (FFP)';
+        }
+        if (!donationType) {
+          donationType = (rec.id === 'DON-7712' || (rec.date && rec.date.includes('Mar'))) ? 'Packed RBCs' : 'Whole Blood';
+        }
+
+        const unitsDisplay = rec.units || (donationType === 'Packed RBCs' ? '1 Unit (Packed RBCs)' : '1 Unit (Whole Blood)');
+
+        return `
+        <tr class="hover:bg-surface transition-colors border-b border-surface-container-low last:border-b-0">
+          <td class="py-3.5 px-space-sm font-semibold text-on-surface whitespace-nowrap text-left align-middle">${escapeHtml(rec.date)}</td>
+          <td class="py-3.5 px-space-sm text-left align-middle">
             <div class="flex flex-col">
-              <span class="font-medium text-on-surface">${escapeHtml(rec.center)}</span>
-              <span class="text-[12px] text-on-surface-variant">${escapeHtml(rec.subtext || '')}</span>
+              <span class="font-medium text-on-surface leading-snug">${escapeHtml(hospitalName)}</span>
+              <span class="text-[12px] text-on-surface-variant leading-tight mt-0.5">${escapeHtml(hospitalSubtext)}</span>
             </div>
           </td>
-          <td class="py-3.5 px-space-sm"><span class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-medium whitespace-nowrap">${escapeHtml(rec.type)}</span></td>
-          <td class="py-3.5 px-space-sm whitespace-nowrap"><span class="font-semibold text-on-surface">${escapeHtml(rec.units)}</span></td>
-          <td class="py-3.5 px-space-sm whitespace-nowrap">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed font-bold leading-tight">
+          <td class="py-3.5 px-space-sm text-left align-middle whitespace-nowrap">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-semibold text-xs border border-surface-container-high/60 shadow-2xs">${escapeHtml(donationType)}</span>
+          </td>
+          <td class="py-3.5 px-space-sm text-left align-middle whitespace-nowrap">
+            <span class="font-semibold text-on-surface">${escapeHtml(unitsDisplay)}</span>
+          </td>
+          <td class="py-3.5 px-space-sm text-left align-middle whitespace-nowrap">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed font-bold text-xs leading-tight">
               <span class="material-symbols-outlined text-[16px] text-primary shrink-0">verified</span>
               <span>Completed</span>
             </span>
           </td>
-          <td class="py-3.5 px-space-sm text-right whitespace-nowrap">
-            <span class="text-xs font-mono text-secondary">Attested</span>
+          <td class="py-3.5 px-space-sm text-right align-middle whitespace-nowrap">
+            <span class="inline-flex items-center justify-end gap-1 text-xs font-semibold text-secondary">
+              <span class="material-symbols-outlined text-[15px] text-emerald-600">verified_user</span>
+              <span>Attested</span>
+            </span>
           </td>
         </tr>
-      `).join('');
+      `;}).join('');
     }
   }
 
@@ -4366,10 +4498,10 @@ function renderRecipientDonorsSection(recipient) {
             <span class="material-symbols-outlined text-[16px]">pin</span>
             <span>Confirm Arrival</span>
           </button>
-          <a href="tel:${escapeHtml(d.phone || '+91 98201 44521')}" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs" title="Call Donor Directly">
+          <button type="button" data-calling-donor="${escapeHtml(d.id)}" onclick="window.initiateManualDonorCall('${escapeHtml(d.id)}', '${escapeHtml(recipient.requestId || recipient.id || '')}', this)" class="px-3.5 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs" title="Call Donor Directly (PSTN Real Phone Ring)">
             <span class="material-symbols-outlined text-[16px] text-primary">call</span>
             <span>Call Donor</span>
-          </a>
+          </button>
           <button type="button" onclick="window.showToast('Donor Line Active', 'Opening direct messaging channel to ${escapeHtml(d.name)}', 'info')" class="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface transition-all cursor-pointer" title="Direct Message">
             <span class="material-symbols-outlined text-[18px]">chat</span>
           </button>
@@ -4424,7 +4556,11 @@ function renderRecipientDonorsSection(recipient) {
                             <span class="sound-bar" style="height: 10px;"></span>
                             <span class="sound-bar" style="height: 4px;"></span>
                           </span>
-                          <span>Ringing</span>
+                          <span>Auto-Ringing (10s)</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold bg-sky-500/20 text-sky-800">
+                          <span class="material-symbols-outlined text-[11px]">sms</span>
+                          <span>SMS Sent</span>
                         </span>
                       `}
                     </div>
@@ -4438,7 +4574,11 @@ function renderRecipientDonorsSection(recipient) {
                       <span>En Route</span>
                     </span>
                   ` : `
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <button type="button" data-calling-donor="${escapeHtml(d.id)}" onclick="window.initiateManualDonorCall('${escapeHtml(d.id)}', '${escapeHtml(recipient.requestId || recipient.id || '')}', this)" class="px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer active:scale-95" title="Place Real Mobile Phone Call (Normal 40s Ring Duration)">
+                        <span class="material-symbols-outlined text-[13px] text-primary">call</span>
+                        <span>Call Donor</span>
+                      </button>
                       <button type="button" onclick="window.simulateDonorAnswerDirectly('${d.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer active:scale-95" title="Simulate answering directly">
                         <span class="material-symbols-outlined text-[13px]">check</span>
                         <span>Confirm as ${escapeHtml(d.name.split(' ')[0])}</span>
@@ -4459,6 +4599,120 @@ function renderRecipientDonorsSection(recipient) {
 
   container.innerHTML = html;
 }
+
+// ============================================================================
+// REAL TELEPHONY & BROWSER WEB NOTIFICATION ENGINE
+// ============================================================================
+if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+  try {
+    Notification.requestPermission();
+  } catch (e) {}
+}
+
+window.triggerEmergencyWebNotification = function(title, body, url) {
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    try {
+      const notif = new Notification(title, {
+        body: body,
+        icon: '/images/favicon.png',
+        badge: '/images/favicon.png',
+        tag: 'donorpulse-emergency-alert',
+        requireInteraction: true
+      });
+      notif.onclick = function() {
+        window.focus();
+        if (url) window.location.hash = url.replace(/^\/?#\/?/, '');
+        notif.close();
+      };
+    } catch (e) {
+      console.warn('[WebNotificationError]', e);
+    }
+  }
+};
+
+window.initiateManualDonorCall = async function(donorId, caseId, btnElement) {
+  if (!donorId) return;
+  const store = window.PulseStore;
+  const donor = (store && typeof store.getDonorById === 'function') ? store.getDonorById(donorId) : null;
+  const donorName = (donor && (donor.fullName || donor.name)) || 'Donor';
+
+  let btn = btnElement;
+  if (!btn && typeof event !== 'undefined' && event && event.currentTarget) {
+    btn = event.currentTarget;
+  }
+  const originalHtml = btn ? btn.innerHTML : null;
+
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add('opacity-75');
+    btn.innerHTML = '<span class="inline-block animate-spin mr-1">⟳</span><span>Validating...</span>';
+  }
+
+  try {
+    const res = await fetch('/api/calls/initiate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        donorId: donorId,
+        caseId: caseId || (window.CURRENT_ACTIVE_CASE_ID || 'CASE-8686'),
+        callerPhone: '+91 98000 12345'
+      })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      if (btn) {
+        btn.innerHTML = `<span class="text-error text-xs font-bold" title="${escapeHtml(data.error || data.reason || 'Ineligible')}">⚠️ Ineligible</span>`;
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+          btn.disabled = false;
+          btn.classList.remove('opacity-75');
+        }, 3000);
+      }
+      alert(data.error || data.reason || 'Cannot place call to this donor.');
+      return;
+    }
+
+    const targetPhone = (data.phone || '+91 7999758139').replace(/[^\d\+]/g, '');
+
+    if (btn) {
+      btn.innerHTML = `
+        <span class="flex items-center gap-1 text-emerald-800 font-bold">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          <span>Calling ${targetPhone}...</span>
+        </span>
+      `;
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+        btn.classList.remove('opacity-75');
+      }, 8000);
+    }
+
+    if (window.showToast) {
+      window.showToast(
+        '📞 Connecting Call to Donor',
+        `Placing direct call to ${data.donorName || donorName} at ${targetPhone}...`,
+        'info'
+      );
+    }
+
+    // 1. Immediately launch native device dialer so the actual call is placed
+    try {
+      window.location.href = `tel:${targetPhone}`;
+    } catch (dialErr) {
+      console.warn('[DirectDialError]', dialErr);
+    }
+  } catch (err) {
+    console.error('[ManualCallError]', err);
+    if (btn) {
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
+      btn.classList.remove('opacity-75');
+    }
+    alert('Failed to connect to telephony service.');
+  }
+};
 
 // ============================================================================
 // INCOMING EMERGENCY CALL & DONOR RINGING CONTROLLER
